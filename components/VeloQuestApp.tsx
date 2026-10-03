@@ -9,6 +9,7 @@ import { ClimbProfile } from "@/components/ClimbProfile";
 import { RouteMap } from "@/components/RouteMap";
 import { MetricChart } from "@/components/MetricChart";
 import { InstallCard } from "@/components/InstallCard";
+import { PerformanceRecords, SectorAnalysis } from "@/components/PerformancePanel";
 import {
   climbs,
   climbToWorkout,
@@ -1085,6 +1086,8 @@ export function VeloQuestApp() {
             <MetricChart title="Tour de taille" points={waistPoints} unit="cm" target={state.profile.targetWaist} />
           </div>
 
+          <PerformanceRecords sessions={state.sessions} />
+
           <section className="card">
             <h2>Journal des séances</h2>
             <div className="sessionHistory">
@@ -1410,6 +1413,13 @@ export function VeloQuestApp() {
               <DetailMetric label="Résistance moy." value={selectedSession.metrics?.avgResistance?.toFixed(1) ?? "—"} />
               <DetailMetric label="Source" value={selectedSession.metrics?.source ?? "manuel"} />
             </div>
+            {selectedRoute && selectedSession.metrics?.timeAttack && (
+              <SectorAnalysis
+                session={selectedSession}
+                route={selectedRoute}
+                reference={personalBest(state.sessions, selectedRoute.id)}
+              />
+            )}
             {selectedSession.metrics?.challenge && (
               <div className={selectedSession.metrics.challenge.success ? "challengeResult success" : "challengeResult failure"}>
                 <span>{selectedSession.metrics.challenge.success ? "✓" : "×"}</span>
