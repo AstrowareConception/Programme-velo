@@ -2,6 +2,8 @@
 
 **Ride · Level up · Repeat.**
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FAstrowareConception%2FProgramme-velo&project-name=veloquest&repository-name=Programme-velo)
+
 VeloQuest est une PWA de suivi d'entraînement sur vélo d'appartement, conçue à l'origine autour du TOPUTURE TEB5 et de ses 32 niveaux de résistance, mais utilisable avec n'importe quel vélo à résistance réglable.
 
 ## Philosophie
