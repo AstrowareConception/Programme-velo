@@ -79,6 +79,8 @@ export function VeloQuestApp() {
   const [telemetrySamples, setTelemetrySamples] = useState<TelemetrySample[]>([]);
   const [bluetoothError, setBluetoothError] = useState<string | null>(null);
   const [connectingBike, setConnectingBike] = useState(false);
+  const [controlGranted, setControlGranted] = useState(false);
+  const [testResistanceLevel, setTestResistanceLevel] = useState(8);
   const [climbStartDistanceM, setClimbStartDistanceM] = useState<number | null>(null);
   const [customClimbs, setCustomClimbs] = useState<ClimbChallenge[]>([]);
   const [gpxError, setGpxError] = useState<string | null>(null);
@@ -299,15 +301,39 @@ export function VeloQuestApp() {
         () => {
           setBike(null);
           setTelemetry({});
+          setControlGranted(false);
         }
       );
       setBike(connection);
+      setControlGranted(false);
       const range = connection.capabilities.resistanceRange;
       setToast(range ? `${connection.deviceName} connecté · résistance ${range.min}–${range.max}` : `${connection.deviceName} connecté`);
     } catch (error) {
       setBluetoothError(error instanceof Error ? error.message : "Connexion Bluetooth impossible.");
     } finally {
       setConnectingBike(false);
+    }
+  }
+
+  async function requestBikeControl() {
+    if (!bike?.requestControl) return;
+    try {
+      await bike.requestControl();
+      setControlGranted(true);
+      setToast("Contrôle FTMS accordé par le vélo.");
+    } catch (error) {
+      setControlGranted(false);
+      setBluetoothError(error instanceof Error ? error.message : "Contrôle FTMS refusé.");
+    }
+  }
+
+  async function sendTestResistance() {
+    if (!bike?.setResistance || !controlGranted) return;
+    try {
+      await bike.setResistance(testResistanceLevel);
+      setToast(`Résistance ${testResistanceLevel} confirmée par le vélo.`);
+    } catch (error) {
+      setBluetoothError(error instanceof Error ? error.message : "Commande de résistance refusée.");
     }
   }
 
@@ -527,7 +553,7 @@ export function VeloQuestApp() {
           <div><strong>VeloQuest</strong><span>Ride · Level up · Repeat</span></div>
         </div>
         <div className="topActions">
-          <button className={`bikePill ${bike ? "connected" : ""}`} onClick={bike ? () => { bike.disconnect(); setBike(null); setTelemetry({}); } : connectBike}>
+          <button className={`bikePill ${bike ? "connected" : ""}`} onClick={bike ? () => { bike.disconnect(); setBike(null); setTelemetry({}); setControlGranted(false); } : connectBike}>
             <span>{bike ? "●" : "◌"}</span>{bike ? bike.deviceName : connectingBike ? "Connexion…" : "TEB5"}
           </button>
           <div className="levelPill"><span>Niv. {level}</span><strong>{xp} XP</strong></div>
@@ -779,7 +805,20 @@ export function VeloQuestApp() {
                   <span><small>Résistance cible</small><strong>{bike.capabilities.supportsResistanceTarget ? "oui" : "non détectée"}</strong></span>
                   <span><small>Plage</small><strong>{bike.capabilities.resistanceRange ? `${bike.capabilities.resistanceRange.min}–${bike.capabilities.resistanceRange.max}` : "inconnue"}</strong></span>
                 </div>
-                <p className="finePrint">Le pilotage automatique reste verrouillé jusqu’à validation sur le TEB5 réel. Les primitives FTMS sont déjà présentes dans l’application.</p>
+                <p className="finePrint">Le pilotage automatique reste verrouillé jusqu’à validation sur le TEB5 réel. Le laboratoire ci-dessous permet seulement un test manuel et explicite.</p>
+                {bike.capabilities.supportsResistanceTarget && bike.requestControl && bike.setResistance && (
+                  <div className="controlLab">
+                    <div className="sectionHead"><div><small>LABORATOIRE DE CONTRÔLE</small><strong>{controlGranted ? "Contrôle accordé" : "Contrôle non demandé"}</strong></div><span className={controlGranted ? "labState ok" : "labState"}>{controlGranted ? "ARMÉ" : "VERROUILLÉ"}</span></div>
+                    {!controlGranted ? (
+                      <button className="secondary" onClick={requestBikeControl}>Demander le contrôle FTMS</button>
+                    ) : (
+                      <>
+                        <label>Niveau de test <strong>{testResistanceLevel}</strong><input type="range" min={bike.capabilities.resistanceRange?.min ?? 1} max={bike.capabilities.resistanceRange?.max ?? 32} step={bike.capabilities.resistanceRange?.increment || 1} value={testResistanceLevel} onChange={(e) => setTestResistanceLevel(Number(e.target.value))} /></label>
+                        <button className="secondary" onClick={sendTestResistance}>Envoyer ce niveau au vélo</button>
+                      </>
+                    )}
+                  </div>
+                )}
               </>
             ) : (
               <>
