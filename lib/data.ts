@@ -176,6 +176,37 @@ export const workouts: WorkoutTemplate[] = [
     ]
   },
   {
+    id: "free-ride",
+    name: "Séance libre",
+    tagline: "Tu roules, VeloQuest enregistre.",
+    kind: "endurance",
+    duration: 30,
+    points: 1,
+    xp: 45,
+    intensity: "moderate",
+    description: "Pour une séance improvisée ou déjà commencée. Termine-la puis renseigne les données du vélo ou laisse FTMS les récupérer.",
+    segments: [
+      { label: "Roulage libre", minutes: 30, resistance: "libre", rpe: "à ton choix", cadence: "libre" }
+    ]
+  },
+  {
+    id: "bonus-10",
+    name: "Micro bonus 10",
+    tagline: "Dix minutes valent mieux que zéro.",
+    kind: "bonus",
+    duration: 10,
+    points: 0,
+    xp: 15,
+    intensity: "easy",
+    bonus: true,
+    description: "Très facile : un petit supplément de mouvement sans créer de dette de récupération.",
+    segments: [
+      { label: "Départ", minutes: 2, resistance: "5–7", rpe: "2–3" },
+      { label: "Roulage", minutes: 6, resistance: "7–10", rpe: "3–4", cadence: "80–90" },
+      { label: "Retour au calme", minutes: 2, resistance: "4–6", rpe: "2" }
+    ]
+  },
+  {
     id: "bonus-15",
     name: "Micro bonus",
     tagline: "15 minutes offertes à ta régularité.",
@@ -189,6 +220,23 @@ export const workouts: WorkoutTemplate[] = [
     segments: [
       { label: "Départ facile", minutes: 3, resistance: "5–7", rpe: "2–3" },
       { label: "Roulage bonus", minutes: 9, resistance: "7–10", rpe: "3–4", cadence: "80–90" },
+      { label: "Retour au calme", minutes: 3, resistance: "4–6", rpe: "2" }
+    ]
+  },
+  {
+    id: "bonus-20",
+    name: "Micro bonus 20",
+    tagline: "Vingt minutes tranquilles pour empiler du volume.",
+    kind: "bonus",
+    duration: 20,
+    points: 0,
+    xp: 25,
+    intensity: "easy",
+    bonus: true,
+    description: "Bonus facile, parfait devant une vidéo ou en récupération active.",
+    segments: [
+      { label: "Départ facile", minutes: 3, resistance: "5–7", rpe: "2–3" },
+      { label: "Roulage bonus", minutes: 14, resistance: "7–10", rpe: "3–4", cadence: "80–90" },
       { label: "Retour au calme", minutes: 3, resistance: "4–6", rpe: "2" }
     ]
   }
