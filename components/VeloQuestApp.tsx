@@ -5,6 +5,7 @@ import type { AppState, Measurement, TelemetrySample, WorkoutTemplate } from "@/
 import { connectFtmsBike, hasWebBluetooth, type BikeConnection, type BikeTelemetry, webBluetoothHint } from "@/lib/ftms";
 import { ClimbProfile } from "@/components/ClimbProfile";
 import { RouteMap } from "@/components/RouteMap";
+import { MetricChart } from "@/components/MetricChart";
 import { climbs, climbToWorkout, type ClimbChallenge } from "@/lib/routes";
 import { parseGpxFile } from "@/lib/gpx";
 import {
@@ -16,7 +17,9 @@ import {
   totalXp,
   weekTargets,
   weeklyStats,
-  workouts
+  workouts,
+  streak,
+  isPerfectWeek
 } from "@/lib/data";
 
 type Tab = "dashboard" | "sessions" | "climbs" | "progress" | "badges" | "data";
@@ -137,8 +140,16 @@ export function VeloQuestApp() {
   const xp = totalXp(state);
   const level = levelForXp(xp);
   const allBadges = badges(state);
-  const latestMeasurement = [...state.measurements].sort((a, b) => b.date.localeCompare(a.date))[0];
+  const sortedMeasurements = [...state.measurements].sort((a, b) => a.date.localeCompare(b.date));
+  const latestMeasurement = sortedMeasurements.at(-1);
   const allClimbs = useMemo(() => [...climbs, ...customClimbs], [customClimbs]);
+  const currentStreak = streak(state);
+  const perfectWeek = isPerfectWeek(state, week);
+  const totalDistance = state.sessions.reduce((sum, session) => sum + (session.metrics?.distanceKm ?? 0), 0);
+  const weightLost = state.profile.startWeight && latestMeasurement?.weight !== undefined ? state.profile.startWeight - latestMeasurement.weight : 0;
+  const waistLost = state.profile.startWaist && latestMeasurement?.waist !== undefined ? state.profile.startWaist - latestMeasurement.waist : 0;
+  const weightPoints = sortedMeasurements.filter((m) => m.weight !== undefined).map((m) => ({ label: dateLabel(m.date), value: m.weight! }));
+  const waistPoints = sortedMeasurements.filter((m) => m.waist !== undefined).map((m) => ({ label: dateLabel(m.date), value: m.waist! }));
 
   const autoMetrics = useMemo(() => {
     const firstDistance = telemetrySamples.find((s) => s.distanceKm !== undefined)?.distanceKm;
@@ -376,6 +387,13 @@ export function VeloQuestApp() {
             <Stat label="Variété" value={stats.variety} target={target.variety} />
           </section>
 
+          <section className="grid achievementGrid">
+            <article className={`card achievement ${perfectWeek ? "success" : ""}`}><span>👑</span><div><small>Semaine</small><strong>{perfectWeek ? "Parfaite" : "En cours"}</strong><em>{stats.points}/{target.points} pts · {stats.hard}/{target.maxHard} séances dures</em></div></article>
+            <article className="card achievement"><span>🔥</span><div><small>Série</small><strong>{currentStreak} semaine{currentStreak > 1 ? "s" : ""}</strong><em>parfaite{currentStreak > 1 ? "s" : ""} d’affilée</em></div></article>
+            <article className="card achievement"><span>🛣️</span><div><small>Distance totale</small><strong>{totalDistance.toFixed(1)} km</strong><em>enregistrés</em></div></article>
+            <article className="card achievement"><span>📉</span><div><small>Transformation</small><strong>{weightLost > 0 ? `-${weightLost.toFixed(1)} kg` : "—"}</strong><em>{waistLost > 0 ? `-${waistLost.toFixed(1)} cm de taille` : "mesures à compléter"}</em></div></article>
+          </section>
+
           <section className={`card bikeConsole ${bike ? "online" : ""}`}>
             <div className="sectionHead">
               <div><p className="eyebrow">TEB5 · MODE CONNECTÉ BETA</p><h2>{bike ? bike.deviceName : "Console Bluetooth"}</h2></div>
@@ -499,6 +517,11 @@ export function VeloQuestApp() {
               <div className="metricBig"><span>Poids</span><strong>{latestMeasurement?.weight ?? state.profile.startWeight ?? "—"} kg</strong><small>objectif {state.profile.targetWeight ?? "—"} kg</small></div>
               <div className="metricBig"><span>Tour de taille</span><strong>{latestMeasurement?.waist ?? state.profile.startWaist ?? "—"} cm</strong><small>objectif {state.profile.targetWaist ?? "—"} cm</small></div>
             </section>
+          </div>
+
+          <div className="grid twoCols chartGrid">
+            <MetricChart title="Poids" points={weightPoints} unit="kg" target={state.profile.targetWeight} />
+            <MetricChart title="Tour de taille" points={waistPoints} unit="cm" target={state.profile.targetWaist} />
           </div>
 
           <section className="card">
