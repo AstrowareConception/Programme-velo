@@ -136,6 +136,48 @@ async function writeControlPoint(characteristic: any, bytes: Uint8Array) {
   }
 }
 
+async function controlCommand(characteristic: any, payload: Uint8Array) {
+  const opcode = payload[0];
+
+  return new Promise<void>(async (resolve, reject) => {
+    let settled = false;
+    const cleanup = () => {
+      characteristic.removeEventListener("characteristicvaluechanged", onResponse);
+      window.clearTimeout(timeout);
+    };
+    const finish = (error?: Error) => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      if (error) reject(error);
+      else resolve();
+    };
+    const onResponse = (event: Event) => {
+      const value: DataView | undefined = (event.target as any)?.value;
+      if (!value || value.byteLength < 3 || value.getUint8(0) !== 0x80 || value.getUint8(1) !== opcode) return;
+      const result = value.getUint8(2);
+      if (result === 0x01) finish();
+      else {
+        const labels: Record<number, string> = {
+          0x02: "commande non supportée",
+          0x03: "paramètre invalide",
+          0x04: "échec de l’opération",
+          0x05: "contrôle non autorisé"
+        };
+        finish(new Error(`FTMS : ${labels[result] ?? `erreur 0x${result.toString(16)}`}`));
+      }
+    };
+    const timeout = window.setTimeout(() => finish(new Error("FTMS : aucune confirmation reçue du vélo.")), 1800);
+
+    characteristic.addEventListener("characteristicvaluechanged", onResponse);
+    try {
+      await writeControlPoint(characteristic, payload);
+    } catch (error) {
+      finish(error instanceof Error ? error : new Error("Écriture FTMS impossible."));
+    }
+  });
+}
+
 export async function connectFtmsBike(
   onTelemetry: (telemetry: BikeTelemetry) => void,
   onDisconnected?: () => void
@@ -212,7 +254,7 @@ export async function connectFtmsBike(
 
   const requestControl = controlPoint
     ? async () => {
-        await writeControlPoint(controlPoint, new Uint8Array([0x00]));
+        await controlCommand(controlPoint, new Uint8Array([0x00]));
       }
     : undefined;
 
@@ -226,7 +268,7 @@ export async function connectFtmsBike(
         const payload = new Uint8Array(3);
         payload[0] = 0x04;
         new DataView(payload.buffer).setInt16(1, value, true);
-        await writeControlPoint(controlPoint, payload);
+        await controlCommand(controlPoint, payload);
       }
     : undefined;
 
