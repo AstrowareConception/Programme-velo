@@ -83,6 +83,7 @@ export function VeloQuestApp() {
   const [connectingBike, setConnectingBike] = useState(false);
   const [controlGranted, setControlGranted] = useState(false);
   const [testResistanceLevel, setTestResistanceLevel] = useState(8);
+  const [autoResistanceControl, setAutoResistanceControl] = useState(false);
   const [climbStartDistanceM, setClimbStartDistanceM] = useState<number | null>(null);
   const [customClimbs, setCustomClimbs] = useState<ClimbChallenge[]>([]);
   const [gpxError, setGpxError] = useState<string | null>(null);
@@ -280,6 +281,12 @@ export function VeloQuestApp() {
     return candidates[0] ?? structured.sort((a, b) => a.duration - b.duration)[0];
   }, [state.sessions, stats.hard, target.maxHard, availableMinutes, energy]);
 
+  const totalSessionSeconds = active ? active.segments.reduce((sum, segment) => sum + segment.minutes * 60, 0) : 0;
+  const elapsedBeforeSegment = active ? active.segments.slice(0, segmentIndex).reduce((sum, segment) => sum + segment.minutes * 60, 0) : 0;
+  const currentSegmentSeconds = active ? active.segments[segmentIndex]?.minutes * 60 || 0 : 0;
+  const sessionElapsedSeconds = active ? elapsedBeforeSegment + Math.max(0, currentSegmentSeconds - secondsLeft) : 0;
+  const sessionProgressPercent = totalSessionSeconds ? Math.min(100, Math.round((sessionElapsedSeconds / totalSessionSeconds) * 100)) : 0;
+
   const climbProgress = useMemo(() => {
     if (!activeClimb || !active) return 0;
     if (bike && telemetry.distanceM !== undefined && climbStartDistanceM !== null) {
@@ -288,6 +295,18 @@ export function VeloQuestApp() {
     const segmentFraction = active.segments.length ? segmentIndex / active.segments.length : 0;
     return Math.max(0, Math.min(1, segmentFraction));
   }, [activeClimb, active, bike, telemetry.distanceM, climbStartDistanceM, segmentIndex]);
+
+  useEffect(() => {
+    if (!autoResistanceControl || !controlGranted || !running || !sessionStarted || !active || !bike?.setResistance) return;
+    const resistanceText = active.segments[segmentIndex]?.resistance ?? "";
+    const values = resistanceText.match(/\d+(?:[.,]\d+)?/g)?.map((v) => Number(v.replace(",", "."))) ?? [];
+    if (!values.length) return;
+    const targetLevel = values.reduce((sum, value) => sum + value, 0) / values.length;
+    bike.setResistance(targetLevel).catch((error) => {
+      setAutoResistanceControl(false);
+      setBluetoothError(error instanceof Error ? error.message : "Pilotage automatique interrompu.");
+    });
+  }, [autoResistanceControl, controlGranted, running, sessionStarted, active, segmentIndex, bike]);
 
   if (!hydrated) return null;
 
@@ -307,10 +326,12 @@ export function VeloQuestApp() {
           setBike(null);
           setTelemetry({});
           setControlGranted(false);
+          setAutoResistanceControl(false);
         }
       );
       setBike(connection);
       setControlGranted(false);
+      setAutoResistanceControl(false);
       const range = connection.capabilities.resistanceRange;
       setToast(range ? `${connection.deviceName} connecté · résistance ${range.min}–${range.max}` : `${connection.deviceName} connecté`);
     } catch (error) {
@@ -340,6 +361,19 @@ export function VeloQuestApp() {
     } catch (error) {
       setBluetoothError(error instanceof Error ? error.message : "Commande de résistance refusée.");
     }
+  }
+
+  function openManualLog() {
+    const freeRide = workouts.find((workout) => workout.id === "free-ride");
+    if (!freeRide) return;
+    setActive(freeRide);
+    setActiveClimb(null);
+    setSegmentIndex(0);
+    setSecondsLeft(Math.round(freeRide.duration * 60));
+    setRunning(false);
+    setSessionStarted(true);
+    setShowFinish(true);
+    setTelemetrySamples([]);
   }
 
   function launch(workout: WorkoutTemplate, climb: ClimbChallenge | null = null) {
@@ -570,7 +604,7 @@ export function VeloQuestApp() {
           <div><strong>VeloQuest</strong><span>Ride · Level up · Repeat</span></div>
         </div>
         <div className="topActions">
-          <button className={`bikePill ${bike ? "connected" : ""}`} onClick={bike ? () => { bike.disconnect(); setBike(null); setTelemetry({}); setControlGranted(false); } : connectBike}>
+          <button className={`bikePill ${bike ? "connected" : ""}`} onClick={bike ? () => { bike.disconnect(); setBike(null); setTelemetry({}); setControlGranted(false); setAutoResistanceControl(false); } : connectBike}>
             <span>{bike ? "●" : "◌"}</span>{bike ? bike.deviceName : connectingBike ? "Connexion…" : "TEB5"}
           </button>
           <div className="levelPill"><span>Niv. {level}</span><strong>{xp} XP</strong></div>
@@ -686,7 +720,7 @@ export function VeloQuestApp() {
 
       {tab === "sessions" && (
         <section>
-          <div className="pageHead"><p className="eyebrow">CATALOGUE</p><h1>Choisis ta quête</h1><p>Du décrassage au HIIT. Le ressenti reste prioritaire sur le numéro de résistance.</p></div>
+          <div className="pageHead pageHeadActions"><div><p className="eyebrow">CATALOGUE</p><h1>Choisis ta quête</h1><p>Du décrassage au HIIT. Le ressenti reste prioritaire sur le numéro de résistance.</p></div><button className="secondary" onClick={openManualLog}>+ Enregistrer une séance déjà faite</button></div>
           <div className="grid workoutGrid">
             {workouts.map((w) => (
               <article className={`card workoutCard ${w.bonus ? "bonusCard" : ""}`} key={w.id}>
@@ -844,6 +878,7 @@ export function VeloQuestApp() {
                       <>
                         <label>Niveau de test <strong>{testResistanceLevel}</strong><input type="range" min={bike.capabilities.resistanceRange?.min ?? 1} max={bike.capabilities.resistanceRange?.max ?? 32} step={bike.capabilities.resistanceRange?.increment || 1} value={testResistanceLevel} onChange={(e) => setTestResistanceLevel(Number(e.target.value))} /></label>
                         <button className="secondary" onClick={sendTestResistance}>Envoyer ce niveau au vélo</button>
+                        <Toggle label="Auto-résistance pour cette connexion" description="À chaque changement de segment, VeloQuest envoie le niveau cible au vélo. Désactivé automatiquement en cas d’erreur." checked={autoResistanceControl} onChange={setAutoResistanceControl} />
                       </>
                     )}
                   </div>
@@ -961,6 +996,11 @@ export function VeloQuestApp() {
                   <strong>{active.segments[segmentIndex].resistance}</strong>
                 </div>
                 <div className="timer" aria-live="off">{formatClock(secondsLeft)}</div>
+                <div className="sessionOverall">
+                  <div><span>Segment {segmentIndex + 1}/{active.segments.length}</span><strong>{sessionProgressPercent}%</strong></div>
+                  <i><b style={{ width: `${sessionProgressPercent}%` }} /></i>
+                  {autoResistanceControl && controlGranted && <small>AUTO LEVEL ACTIF</small>}
+                </div>
                 <div className="segmentMeta"><span>RPE {active.segments[segmentIndex].rpe}</span>{active.segments[segmentIndex].cadence && <span>Cible {active.segments[segmentIndex].cadence} tr/min</span>}</div>
                 {bike && (
                   <div className="liveStrip">
