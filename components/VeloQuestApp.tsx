@@ -38,6 +38,7 @@ import {
 import { compactTelemetry, cueSegment, formatClock, requestScreenWakeLock } from "@/lib/session";
 import { createBackup, estimateLocalBytes, normalizeState, parseBackup, safeLocalStorageWrite } from "@/lib/storage";
 import { captureSplits, checkpointKilometers, formatRaceTime, ghostDeltaSeconds, ghostDistanceAtElapsed, personalBest, routeAttempts } from "@/lib/time-attack";
+import { challengesForRoute, evaluateRouteChallenge, type RouteChallenge } from "@/lib/challenges";
 
 type Tab = "dashboard" | "sessions" | "climbs" | "progress" | "more";
 type Energy = "easy" | "normal" | "hard";
@@ -88,6 +89,9 @@ export function VeloQuestApp() {
   const [active, setActive] = useState<WorkoutTemplate | null>(null);
   const [activeClimb, setActiveClimb] = useState<ClimbChallenge | null>(null);
   const [routeMode, setRouteMode] = useState<RouteMode>("training");
+  const [challengeRoute, setChallengeRoute] = useState<ClimbChallenge | null>(null);
+  const [activeChallenge, setActiveChallenge] = useState<RouteChallenge | null>(null);
+  const [pauseCount, setPauseCount] = useState(0);
   const [timeAttackElapsedSeconds, setTimeAttackElapsedSeconds] = useState(0);
   const [timeAttackSplits, setTimeAttackSplits] = useState<TimeAttackSplit[]>([]);
   const [segmentIndex, setSegmentIndex] = useState(0);
@@ -505,6 +509,8 @@ export function VeloQuestApp() {
     setActive(workout);
     setActiveClimb(climb);
     setRouteMode(climb ? mode : "training");
+    setPauseCount(0);
+    if (!climb) setActiveChallenge(null);
     setTimeAttackElapsedSeconds(0);
     setTimeAttackSplits([]);
     timeAttackStartedAtRef.current = 0;
@@ -536,7 +542,24 @@ export function VeloQuestApp() {
       elapsedSeconds !== undefined &&
       (!previousBest?.metrics?.elapsedSeconds || elapsedSeconds < previousBest.metrics.elapsedSeconds)
     );
-    const awardedXp = active.xp + (isPersonalBest ? 50 : 0);
+    const completedRoute = activeClimb
+      ? (bike && telemetry.distanceM !== undefined && climbStartDistanceM !== null
+          ? currentRouteKm >= activeClimb.distanceKm * 0.98
+          : sessionProgressPercent >= 98 || (isTimeAttack && timeAttackSplits.some((split) => split.km >= activeClimb.distanceKm * .98)))
+      : true;
+    const formCadence = n(form, "avgCadence");
+    const challengeResult = activeChallenge && activeClimb
+      ? evaluateRouteChallenge(activeChallenge, {
+          route: activeClimb,
+          completedRoute,
+          pauseCount,
+          avgCadenceRpm: formCadence ?? autoMetrics.avgCadenceRpm,
+          elapsedSeconds,
+          pbBeforeSeconds: previousBest?.metrics?.elapsedSeconds,
+          checkpointSplits: timeAttackSplits
+        })
+      : undefined;
+    const awardedXp = active.xp + (isPersonalBest ? 50 : 0) + (challengeResult?.xpBonus ?? 0);
 
     setState((prev) => ({
       ...prev,
@@ -560,6 +583,7 @@ export function VeloQuestApp() {
             elapsedSeconds,
             timeAttack: isTimeAttack || undefined,
             checkpointSplits: isTimeAttack ? timeAttackSplits : undefined,
+            challenge: challengeResult,
             distanceKm: n(form, "distance") ?? autoMetrics.distanceKm ?? (activeClimb ? currentRouteKm : undefined),
             calories: n(form, "calories"),
             avgSpeedKmh: n(form, "avgSpeed") ?? autoMetrics.avgSpeedKmh,
@@ -583,7 +607,11 @@ export function VeloQuestApp() {
     setTimeAttackElapsedSeconds(0);
     setTimeAttackSplits([]);
     timeAttackStartedAtRef.current = 0;
-    setToast(isPersonalBest ? `Nouveau record personnel · +${awardedXp} XP` : `Quête validée · +${awardedXp} XP`);
+    setPauseCount(0);
+    setActiveChallenge(null);
+    setToast(challengeResult
+      ? (challengeResult.success ? `Défi réussi · +${awardedXp} XP` : `Défi manqué · ${challengeResult.summary}`)
+      : isPersonalBest ? `Nouveau record personnel · +${awardedXp} XP` : `Quête validée · +${awardedXp} XP`);
   }
 
   function beginSession() {
@@ -605,6 +633,7 @@ export function VeloQuestApp() {
   function togglePause() {
     if (!active || !sessionStarted || routeMode === "timeAttack") return;
     if (running) {
+      setPauseCount((count) => count + 1);
       setRunning(false);
       return;
     }
@@ -620,6 +649,12 @@ export function VeloQuestApp() {
     setSecondsLeft(seconds);
     segmentDeadlineRef.current = Date.now() + seconds * 1000;
     if (sessionStarted) cueSegment(active.segments[next], preferences);
+  }
+
+  function launchChallenge(route: ClimbChallenge, challenge: RouteChallenge) {
+    setChallengeRoute(null);
+    setActiveChallenge(challenge);
+    launch(climbToWorkout(route), route, challenge.baseMode);
   }
 
   function updatePreference(key: keyof Omit<Preferences, "resistanceOffset">, value: boolean) {
