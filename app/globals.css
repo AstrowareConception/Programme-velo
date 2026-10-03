@@ -221,3 +221,26 @@ button { cursor: pointer; }
   .gpxImport { grid-template-columns:1fr; }
   .gpxButton { width:100%; }
 }
+
+.achievementGrid { grid-template-columns:repeat(4,1fr); margin-bottom:16px; }
+.achievement { display:flex; align-items:center; gap:13px; min-height:110px; }
+.achievement > span { font-size:1.8rem; }
+.achievement small, .achievement em { display:block; color:var(--muted); font-size:.68rem; font-style:normal; }
+.achievement strong { display:block; margin:3px 0; font-size:1.05rem; }
+.achievement.success { border-color:rgba(255,209,102,.28); background:linear-gradient(145deg,rgba(255,209,102,.07),var(--panel)); }
+.chartGrid { margin:16px 0; }
+.metricChart { overflow:hidden; }
+.metricChart svg { width:100%; height:auto; margin-top:10px; }
+.chartGrid line, .chartGrid path, .chartGrid circle { vector-effect:non-scaling-stroke; }
+.chartGrid .chartGrid { stroke:rgba(255,255,255,.07); stroke-width:1; }
+.chartTarget { stroke:var(--lime); stroke-width:2; stroke-dasharray:7 7; opacity:.65; }
+.chartLine { stroke:var(--cyan); stroke-width:4; stroke-linecap:round; stroke-linejoin:round; filter:drop-shadow(0 0 5px rgba(80,227,255,.22)); }
+.chartPoint { fill:var(--violet); stroke:#0c1222; stroke-width:3; }
+.chartLatest { text-align:right; }
+.chartLatest strong { display:block; font-size:1.7rem; }
+.chartLatest small { color:var(--muted); }
+.chartAxis { display:flex; align-items:center; justify-content:space-between; gap:10px; color:var(--muted); font-size:.65rem; }
+.chartAxis strong { color:var(--lime); font-weight:700; }
+.emptyChart { min-height:260px; display:flex; flex-direction:column; justify-content:center; }
+@media (max-width: 900px) { .achievementGrid { grid-template-columns:1fr 1fr; } }
+@media (max-width: 520px) { .achievementGrid { grid-template-columns:1fr; } }
