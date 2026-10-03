@@ -13,7 +13,7 @@ export default function OpenGraphImage() {
           <div style={{ width:82, height:82, borderRadius:22, background:"#0c1020", border:"2px solid rgba(80,227,255,.35)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:55, fontWeight:950, color:"#50e3ff" }}>V</div>
           <div style={{ fontSize:30, fontWeight:800, letterSpacing:2 }}>VELOQUEST</div>
         </div>
-        <div style={{ fontSize:72, lineHeight:1.02, fontWeight:950, letterSpacing:-4 }}>Ride. Level up.<br/>Repeat.</div>
+        <div style={{ display:"flex", flexDirection:"column", fontSize:72, lineHeight:1.02, fontWeight:950, letterSpacing:-4 }}><span>Ride. Level up.</span><span>Repeat.</span></div>
         <div style={{ fontSize:27, color:"#9ba7c0", marginTop:30, lineHeight:1.4 }}>Coach indoor · séances guidées · FTMS · cols réels · progression · gamification</div>
         <div style={{ display:"flex", gap:12, marginTop:38 }}>
           {["12 semaines","32 niveaux","PWA offline"].map((label) => <span key={label} style={{ padding:"10px 16px", borderRadius:999, border:"1px solid rgba(255,255,255,.14)", fontSize:19 }}>{label}</span>)}
