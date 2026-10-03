@@ -1,6 +1,14 @@
-import type { Badge, AppState, WeekTarget, WorkoutTemplate } from "./types";
+import type { Badge, AppState, Preferences, WeekTarget, WorkoutTemplate } from "./types";
 
 export const STORAGE_KEY = "veloquest:v1";
+
+export const defaultPreferences: Preferences = {
+  soundCues: true,
+  voiceCues: false,
+  haptics: true,
+  keepScreenAwake: true,
+  keepTelemetryTrace: true
+};
 
 export const workouts: WorkoutTemplate[] = [
   {
@@ -264,7 +272,8 @@ export function emptyState(): AppState {
       startDate: new Date().toISOString().slice(0, 10)
     },
     sessions: [],
-    measurements: []
+    measurements: [],
+    preferences: { ...defaultPreferences }
   };
 }
 
