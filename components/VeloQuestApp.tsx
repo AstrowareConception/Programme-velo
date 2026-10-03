@@ -41,7 +41,14 @@ import {
 import { compactTelemetry, cueSegment, formatClock, requestScreenWakeLock } from "@/lib/session";
 import { createBackup, estimateLocalBytes, normalizeState, parseBackup, safeLocalStorageWrite } from "@/lib/storage";
 import { captureSplits, checkpointKilometers, formatRaceTime, ghostDeltaSeconds, ghostDistanceAtElapsed, personalBest, routeAttempts } from "@/lib/time-attack";
-import { challengesForRoute, evaluateRouteChallenge, type RouteChallenge } from "@/lib/challenges";
+import { challengesForRoute, evaluateRouteChallenge, routeChallenges, type RouteChallenge } from "@/lib/challenges";
+import {
+  clearActiveSessionSnapshot,
+  readActiveSessionSnapshot,
+  restoreSessionSnapshot,
+  writeActiveSessionSnapshot,
+  type ActiveSessionSnapshot
+} from "@/lib/session-recovery";
 
 type Tab = "dashboard" | "sessions" | "climbs" | "progress" | "more";
 type Energy = "easy" | "normal" | "hard";
@@ -125,7 +132,9 @@ export function VeloQuestApp() {
   const [routeDifficultyFilter, setRouteDifficultyFilter] = useState<0 | 1 | 2 | 3 | 4 | 5>(0);
   const [routeFavoritesOnly, setRouteFavoritesOnly] = useState(false);
   const [routeSort, setRouteSort] = useState<"featured" | "distance" | "elevation" | "difficulty" | "pb">("featured");
+  const [resumeSnapshot, setResumeSnapshot] = useState<ActiveSessionSnapshot | null>(null);
   const lastSampleAt = useRef(0);
+  const activeSnapshotRef = useRef<ActiveSessionSnapshot | null>(null);
   const segmentDeadlineRef = useRef(0);
   const timeAttackStartedAtRef = useRef(0);
   const wakeLockRef = useRef<any>(null);
@@ -148,6 +157,7 @@ export function VeloQuestApp() {
     if (savedRoutes) {
       try { setCustomClimbs(JSON.parse(savedRoutes)); } catch { /* ignore corrupted custom routes */ }
     }
+    setResumeSnapshot(readActiveSessionSnapshot());
     setOnline(navigator.onLine);
     const goOnline = () => setOnline(true);
     const goOffline = () => setOnline(false);
@@ -167,6 +177,56 @@ export function VeloQuestApp() {
   useEffect(() => {
     if (hydrated && !safeLocalStorageWrite(CUSTOM_ROUTES_KEY, customClimbs)) setToast("Impossible d’enregistrer les parcours : stockage local insuffisant.");
   }, [customClimbs, hydrated]);
+
+  useEffect(() => {
+    if (!active || !sessionStarted) {
+      activeSnapshotRef.current = null;
+      return;
+    }
+    activeSnapshotRef.current = {
+      version: 1,
+      savedAt: Date.now(),
+      workoutId: active.id,
+      routeId: activeClimb?.id,
+      routeMode,
+      challengeId: activeChallenge?.id,
+      segmentIndex,
+      secondsLeft,
+      running,
+      sessionStarted,
+      showFinish,
+      timeAttackElapsedSeconds,
+      timeAttackSplits,
+      pauseCount,
+      sessionResistanceDelta,
+      climbStartDistanceM,
+      telemetrySamples: compactTelemetry(telemetrySamples, 180),
+      hadBikeConnection: Boolean(bike)
+    };
+  }, [active, activeClimb, routeMode, activeChallenge, segmentIndex, secondsLeft, running, sessionStarted, showFinish, timeAttackElapsedSeconds, timeAttackSplits, pauseCount, sessionResistanceDelta, climbStartDistanceM, telemetrySamples, bike]);
+
+  useEffect(() => {
+    if (!active || !sessionStarted) return;
+    const save = () => {
+      if (!activeSnapshotRef.current) return;
+      const snapshot = { ...activeSnapshotRef.current, savedAt: Date.now() };
+      activeSnapshotRef.current = snapshot;
+      writeActiveSessionSnapshot(snapshot);
+    };
+
+    save();
+    const timer = window.setInterval(save, 5000);
+    const onPageHide = () => save();
+    const onVisibility = () => { if (document.visibilityState === "hidden") save(); };
+    window.addEventListener("pagehide", onPageHide);
+    document.addEventListener("visibilitychange", onVisibility);
+
+    return () => {
+      window.clearInterval(timer);
+      window.removeEventListener("pagehide", onPageHide);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, [active?.id, sessionStarted]);
 
   useEffect(() => {
     if (!running || !active || !sessionStarted) return;
@@ -441,6 +501,61 @@ export function VeloQuestApp() {
     );
   }
 
+  function resumeInterruptedSession() {
+    if (!resumeSnapshot) return;
+    const route = resumeSnapshot.routeId ? allClimbs.find((item) => item.id === resumeSnapshot.routeId) ?? null : null;
+    const workout = route ? climbToWorkout(route) : workouts.find((item) => item.id === resumeSnapshot.workoutId);
+    if (!workout) {
+      clearActiveSessionSnapshot();
+      setResumeSnapshot(null);
+      setToast("La séance interrompue ne peut plus être restaurée.");
+      return;
+    }
+
+    const restored = restoreSessionSnapshot(resumeSnapshot, workout);
+    setActive(workout);
+    setActiveClimb(route);
+    setRouteMode(restored.routeMode);
+    setActiveChallenge(restored.challengeId ? routeChallenges.find((challenge) => challenge.id === restored.challengeId) ?? null : null);
+    setSegmentIndex(restored.segmentIndex);
+    setSecondsLeft(restored.secondsLeft);
+    setRunning(restored.running);
+    setSessionStarted(restored.sessionStarted);
+    setShowFinish(restored.showFinish);
+    setTimeAttackElapsedSeconds(restored.timeAttackElapsedSeconds);
+    setTimeAttackSplits(restored.timeAttackSplits);
+    setPauseCount(restored.pauseCount);
+    setSessionResistanceDelta(restored.sessionResistanceDelta);
+    setClimbStartDistanceM(null);
+    setTelemetrySamples(restored.telemetrySamples ?? []);
+    timeAttackStartedAtRef.current = restored.routeMode === "timeAttack" && restored.running
+      ? Date.now() - restored.timeAttackElapsedSeconds * 1000
+      : 0;
+    segmentDeadlineRef.current = Date.now() + restored.secondsLeft * 1000;
+    setResumeSnapshot(null);
+    if (restored.hadBikeConnection) setToast("Séance restaurée. Reconnecte le vélo pour reprendre la télémétrie FTMS.");
+    else setToast("Séance restaurée.");
+  }
+
+  function discardInterruptedSession() {
+    clearActiveSessionSnapshot();
+    setResumeSnapshot(null);
+    setToast("Séance interrompue abandonnée.");
+  }
+
+  function parkActiveSession() {
+    if (activeSnapshotRef.current) {
+      const snapshot = { ...activeSnapshotRef.current, savedAt: Date.now() };
+      writeActiveSessionSnapshot(snapshot);
+      setResumeSnapshot(snapshot);
+    }
+    setActive(null);
+    setActiveClimb(null);
+    setActiveChallenge(null);
+    setRunning(false);
+    setSessionStarted(false);
+  }
+
   async function connectBike() {
     if (!hasWebBluetooth()) {
       setBluetoothError(webBluetoothHint() === "ios"
@@ -609,6 +724,9 @@ export function VeloQuestApp() {
     setRunning(false);
     setShowFinish(false);
     setTelemetrySamples([]);
+    clearActiveSessionSnapshot();
+    setResumeSnapshot(null);
+    activeSnapshotRef.current = null;
     setTimeAttackElapsedSeconds(0);
     setTimeAttackSplits([]);
     timeAttackStartedAtRef.current = 0;
@@ -771,6 +889,7 @@ export function VeloQuestApp() {
     if (!window.confirm("Effacer le profil, l’historique, les mesures et les parcours personnels de cet appareil ?")) return;
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem(CUSTOM_ROUTES_KEY);
+    clearActiveSessionSnapshot();
     setState(emptyState());
     setCustomClimbs([]);
     setSelectedSessionId(null);
@@ -834,6 +953,18 @@ export function VeloQuestApp() {
 
       {tab === "dashboard" && (
         <>
+          {resumeSnapshot && (
+            <section className="card resumeSessionCard">
+              <div className="resumeIcon">↻</div>
+              <div>
+                <p className="eyebrow">SÉANCE INTERROMPUE</p>
+                <h2>Reprendre là où tu t’es arrêté ?</h2>
+                <p>{resumeSnapshot.routeId ? "Parcours" : "Séance"} · segment {resumeSnapshot.segmentIndex + 1} · {formatClock(resumeSnapshot.secondsLeft)} restant sur le segment{resumeSnapshot.routeMode === "timeAttack" ? ` · chrono ${formatRaceTime(resumeSnapshot.timeAttackElapsedSeconds)}` : ""}.</p>
+              </div>
+              <div className="resumeActions"><button className="primary" onClick={resumeInterruptedSession}>Reprendre</button><button className="secondary dangerButton" onClick={discardInterruptedSession}>Abandonner</button></div>
+            </section>
+          )}
+
           <section className="grid statsGrid">
             <Stat label="Points" value={stats.points} target={target.points} suffix=" pts" />
             <Stat label="Minutes" value={stats.minutes} target={target.minutes} suffix=" min" />
@@ -1260,7 +1391,7 @@ export function VeloQuestApp() {
       {active && (
         <div className="modalBackdrop">
           <div className={`sessionModal ${activeClimb ? "climbSession" : ""}`}>
-            <button className="close" aria-label="Fermer la séance" onClick={() => { setActive(null); setActiveClimb(null); setActiveChallenge(null); setSessionResistanceDelta(0); setRunning(false); setSessionStarted(false); }}>×</button>
+            <button className="close" aria-label="Mettre la séance de côté" onClick={parkActiveSession}>×</button>
 
             {showFinish ? (
               <form action={finishActive} className="finishForm">
