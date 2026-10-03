@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { AppState, Measurement, Preferences, TelemetrySample, WorkoutTemplate } from "@/lib/types";
 import { connectFtmsBike, hasWebBluetooth, type BikeConnection, type BikeTelemetry, webBluetoothHint } from "@/lib/ftms";
@@ -565,7 +566,7 @@ export function VeloQuestApp() {
     <main className="shell">
       <header className="topbar">
         <div className="brand">
-          <img src="/logo.svg" alt="" className="brandMark" />
+          <Image src="/logo.svg" alt="" width={44} height={44} className="brandMark" priority />
           <div><strong>VeloQuest</strong><span>Ride · Level up · Repeat</span></div>
         </div>
         <div className="topActions">
@@ -592,6 +593,17 @@ export function VeloQuestApp() {
             <Stat label="Minutes" value={stats.minutes} target={target.minutes} suffix=" min" />
             <Stat label="Séances" value={stats.sessions} target={target.sessions} />
             <Stat label="Variété" value={stats.variety} target={target.variety} />
+          </section>
+
+          <section className="card weeklyMission">
+            <div className="sectionHead"><div><p className="eyebrow">MISSION SEMAINE {week}</p><h2>Ce qu’il reste à conquérir</h2></div><strong>{perfectWeek ? "✓ complète" : `${Math.max(0, target.points - stats.points)} pts restants`}</strong></div>
+            <div className="missionItems">
+              <MissionItem label="Charge" value={stats.points} target={target.points} suffix=" pts" />
+              <MissionItem label="Volume" value={stats.minutes} target={target.minutes} suffix=" min" />
+              <MissionItem label="Séances" value={stats.sessions} target={target.sessions} />
+              <MissionItem label="Variété" value={stats.variety} target={target.variety} />
+              <div className={stats.hard <= target.maxHard ? "missionItem done" : "missionItem warning"}><span>{stats.hard <= target.maxHard ? "✓" : "!"}</span><div><strong>Intensité</strong><small>{stats.hard}/{target.maxHard} séances dures max</small></div></div>
+            </div>
           </section>
 
           <section className="grid achievementGrid">
@@ -1006,7 +1018,7 @@ export function VeloQuestApp() {
       {showSetup && (
         <div className="modalBackdrop">
           <form action={saveProfile} className="sessionModal setupModal">
-            <img src="/logo.svg" alt="" className="setupLogo" />
+            <Image src="/logo.svg" alt="" width={64} height={64} className="setupLogo" />
             <p className="eyebrow">BIENVENUE DANS VELOQUEST</p>
             <h2>Configure ta quête</h2>
             <div className="form">
@@ -1027,6 +1039,11 @@ export function VeloQuestApp() {
       )}
     </main>
   );
+}
+
+function MissionItem({ label, value, target, suffix = "" }: { label: string; value: number; target: number; suffix?: string }) {
+  const done = value >= target;
+  return <div className={done ? "missionItem done" : "missionItem"}><span>{done ? "✓" : "•"}</span><div><strong>{label}</strong><small>{value}{suffix} / {target}{suffix}</small></div></div>;
 }
 
 function DetailMetric({ label, value }: { label: string; value: string }) {
