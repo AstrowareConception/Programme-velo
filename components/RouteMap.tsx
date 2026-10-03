@@ -16,10 +16,19 @@ function positionAt(climb: ClimbChallenge, progress: number): [number, number] {
   ];
 }
 
-export function RouteMap({ climb, progress = 0 }: { climb: ClimbChallenge; progress?: number }) {
+export function RouteMap({
+  climb,
+  progress = 0,
+  ghostProgress
+}: {
+  climb: ClimbChallenge;
+  progress?: number;
+  ghostProgress?: number;
+}) {
   const el = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
   const riderRef = useRef<any>(null);
+  const ghostRef = useRef<any>(null);
 
   useEffect(() => {
     let disposed = false;
@@ -42,16 +51,27 @@ export function RouteMap({ climb, progress = 0 }: { climb: ClimbChallenge; progr
       const start = climb.coordinates[0];
       const end = climb.coordinates[climb.coordinates.length - 1];
       L.circleMarker(start, { radius: 6 }).bindTooltip("Départ").addTo(map);
-      L.circleMarker(end, { radius: 6 }).bindTooltip("Sommet").addTo(map);
+      L.circleMarker(end, { radius: 6 }).bindTooltip("Arrivée").addTo(map);
 
       riderRef.current = L.circleMarker(positionAt(climb, progress), { radius: 9, weight: 4 })
-        .bindTooltip("Ta position")
+        .bindTooltip("Toi")
         .addTo(map);
+
+      if (ghostProgress !== undefined) {
+        ghostRef.current = L.circleMarker(positionAt(climb, ghostProgress), {
+          radius: 7,
+          weight: 2,
+          dashArray: "4 4",
+          opacity: 0.65,
+          fillOpacity: 0.18
+        }).bindTooltip("Ghost PB").addTo(map);
+      }
     });
 
     return () => {
       disposed = true;
       riderRef.current = null;
+      ghostRef.current = null;
       mapRef.current?.remove?.();
       mapRef.current = null;
     };
@@ -61,6 +81,30 @@ export function RouteMap({ climb, progress = 0 }: { climb: ClimbChallenge; progr
     if (!riderRef.current || !climb.coordinates.length) return;
     riderRef.current.setLatLng(positionAt(climb, progress));
   }, [climb, progress]);
+
+  useEffect(() => {
+    if (!mapRef.current || !climb.coordinates.length) return;
+    import("leaflet").then((L) => {
+      if (ghostProgress === undefined) {
+        if (ghostRef.current) {
+          ghostRef.current.remove();
+          ghostRef.current = null;
+        }
+        return;
+      }
+      const pos = positionAt(climb, ghostProgress);
+      if (ghostRef.current) ghostRef.current.setLatLng(pos);
+      else {
+        ghostRef.current = L.circleMarker(pos, {
+          radius: 7,
+          weight: 2,
+          dashArray: "4 4",
+          opacity: 0.65,
+          fillOpacity: 0.18
+        }).bindTooltip("Ghost PB").addTo(mapRef.current);
+      }
+    });
+  }, [climb, ghostProgress]);
 
   return <div ref={el} className="routeMap" role="img" aria-label={`Carte de ${climb.name}, progression ${Math.round(progress * 100)} %`} />;
 }
