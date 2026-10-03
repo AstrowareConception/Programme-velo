@@ -43,7 +43,7 @@ describe("campaigns",()=>{
 
   it("unlocks campaign completion and campaign XP",()=>{
     const campaign=campaigns.find(c=>c.id==="provence-discovery")!;
-    const sessions=campaign.routeIds.map(session);
+    const sessions=campaign.routeIds.map((routeId)=>session(routeId));
     expect(campaignProgress(campaign,sessions).complete).toBe(true);
     expect(campaignBonusXp(sessions)).toBeGreaterThanOrEqual(campaign.xpBonus);
   });
