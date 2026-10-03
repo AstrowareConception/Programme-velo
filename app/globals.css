@@ -206,3 +206,6 @@ button { cursor: pointer; }
   .climbCard { padding:16px; }
   .climbSession .routeMap { height:190px; }
 }
+
+.bonusChoices { display:flex; flex-wrap:wrap; gap:8px; }
+.bonusChoices .secondary { min-width:86px; }
