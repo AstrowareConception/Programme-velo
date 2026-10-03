@@ -51,6 +51,13 @@ describe("session recovery",()=>{
     expect(restored.timeAttackElapsedSeconds).toBe(560);
   });
 
+  it("adds background time to a running Segment Attack",()=>{
+    const original=snapshot({routeMode:"segmentAttack",segmentAttackIndex:2,timeAttackElapsedSeconds:120});
+    const restored=restoreSessionSnapshot(original,workout,1_030_000);
+    expect(restored.timeAttackElapsedSeconds).toBe(150);
+    expect(restored.segmentAttackIndex).toBe(2);
+  });
+
   it("does not advance a paused snapshot",()=>{
     const original=snapshot({running:false,secondsLeft:200});
     const restored=restoreSessionSnapshot(original,workout,2_000_000);
