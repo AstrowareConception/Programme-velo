@@ -437,26 +437,58 @@ export function VeloQuestApp() {
   const sessionElapsedSeconds = active ? elapsedBeforeSegment + Math.max(0, currentSegmentSeconds - secondsLeft) : 0;
   const sessionProgressPercent = totalSessionSeconds ? Math.min(100, Math.round((sessionElapsedSeconds / totalSessionSeconds) * 100)) : 0;
 
+  const activeSegmentBounds = activeClimb && segmentAttackIndex !== null
+    ? segmentBounds(activeClimb.distanceKm, segmentAttackIndex)
+    : undefined;
+
   const climbProgress = useMemo(() => {
     if (!activeClimb || !active) return 0;
-    if (bike && telemetry.distanceM !== undefined && climbStartDistanceM !== null) {
-      return Math.max(0, Math.min(1, (telemetry.distanceM - climbStartDistanceM) / (activeClimb.distanceKm * 1000)));
-    }
     const timedProgress = totalSessionSeconds ? sessionElapsedSeconds / totalSessionSeconds : 0;
+
+    if (bike && telemetry.distanceM !== undefined && climbStartDistanceM !== null) {
+      const localKm = Math.max(0, (telemetry.distanceM - climbStartDistanceM) / 1000);
+      if (routeMode === "segmentAttack" && activeSegmentBounds) {
+        const absoluteKm = Math.min(activeSegmentBounds.endKm, activeSegmentBounds.startKm + localKm);
+        return Math.max(0, Math.min(1, absoluteKm / activeClimb.distanceKm));
+      }
+      return Math.max(0, Math.min(1, localKm / activeClimb.distanceKm));
+    }
+
+    if (routeMode === "segmentAttack" && activeSegmentBounds) {
+      const ratio = activeSegmentBounds.startRatio + timedProgress * (activeSegmentBounds.endRatio - activeSegmentBounds.startRatio);
+      return Math.max(0, Math.min(1, ratio));
+    }
+
     return Math.max(0, Math.min(1, timedProgress));
-  }, [activeClimb, active, bike, telemetry.distanceM, climbStartDistanceM, segmentIndex, totalSessionSeconds, sessionElapsedSeconds]);
+  }, [activeClimb, active, bike, telemetry.distanceM, climbStartDistanceM, routeMode, activeSegmentBounds, totalSessionSeconds, sessionElapsedSeconds]);
 
   const currentRouteKm = activeClimb ? climbProgress * activeClimb.distanceKm : 0;
   const routeBest = activeClimb ? personalBest(state.sessions, activeClimb.id) : undefined;
+  const segmentBest = activeClimb && segmentAttackIndex !== null
+    ? segmentPersonalBest(state.sessions, activeClimb.id, segmentAttackIndex)
+    : undefined;
+  const activeRaceBest = routeMode === "segmentAttack" ? segmentBest : routeBest;
   const routeAttemptCount = activeClimb ? routeAttempts(state.sessions, activeClimb.id).length : 0;
-  const ghostDelta = activeClimb && routeMode === "timeAttack"
-    ? ghostDeltaSeconds(routeBest, currentRouteKm, activeClimb.distanceKm, timeAttackElapsedSeconds)
+  const segmentAttemptCount = activeClimb && segmentAttackIndex !== null
+    ? segmentAttempts(state.sessions, activeClimb.id, segmentAttackIndex).length
+    : 0;
+  const raceDistanceKm = routeMode === "segmentAttack" && activeSegmentBounds
+    ? activeSegmentBounds.distanceKm
+    : activeClimb?.distanceKm ?? 0;
+  const raceCurrentKm = routeMode === "segmentAttack" && activeSegmentBounds
+    ? Math.max(0, currentRouteKm - activeSegmentBounds.startKm)
+    : currentRouteKm;
+  const ghostDelta = activeClimb && (routeMode === "timeAttack" || routeMode === "segmentAttack")
+    ? ghostDeltaSeconds(activeRaceBest, raceCurrentKm, raceDistanceKm, timeAttackElapsedSeconds)
     : undefined;
-  const ghostDistanceKm = activeClimb && routeMode === "timeAttack"
-    ? ghostDistanceAtElapsed(routeBest, timeAttackElapsedSeconds, activeClimb.distanceKm)
+  const ghostDistanceLocalKm = activeClimb && (routeMode === "timeAttack" || routeMode === "segmentAttack")
+    ? ghostDistanceAtElapsed(activeRaceBest, timeAttackElapsedSeconds, raceDistanceKm)
     : undefined;
-  const ghostProgress = activeClimb && ghostDistanceKm !== undefined
-    ? Math.max(0, Math.min(1, ghostDistanceKm / activeClimb.distanceKm))
+  const ghostAbsoluteKm = ghostDistanceLocalKm !== undefined
+    ? (routeMode === "segmentAttack" && activeSegmentBounds ? activeSegmentBounds.startKm + ghostDistanceLocalKm : ghostDistanceLocalKm)
+    : undefined;
+  const ghostProgress = activeClimb && ghostAbsoluteKm !== undefined
+    ? Math.max(0, Math.min(1, ghostAbsoluteKm / activeClimb.distanceKm))
     : undefined;
   const routeCheckpoints = activeClimb ? checkpointKilometers(activeClimb.distanceKm) : [];
 
@@ -466,21 +498,34 @@ export function VeloQuestApp() {
   }, [routeMode, activeClimb, sessionStarted, currentRouteKm, timeAttackElapsedSeconds]);
 
   useEffect(() => {
-    if (routeMode !== "timeAttack" || !activeClimb || !active || !bike || climbStartDistanceM === null || !sessionStarted) return;
-    const profileIndex = activeClimb.profile.slice(1).findIndex((point) => currentRouteKm <= point.km);
-    const nextIndex = profileIndex < 0 ? active.segments.length - 1 : profileIndex;
+    if ((routeMode !== "timeAttack" && routeMode !== "segmentAttack") || !activeClimb || !active || !bike || climbStartDistanceM === null || !sessionStarted) return;
+
+    let nextIndex = segmentIndex;
+    if (routeMode === "segmentAttack" && activeSegmentBounds) {
+      const localProgress = Math.max(0, Math.min(0.999, (currentRouteKm - activeSegmentBounds.startKm) / activeSegmentBounds.distanceKm));
+      nextIndex = Math.min(active.segments.length - 1, Math.floor(localProgress * active.segments.length));
+    } else {
+      const profileIndex = activeClimb.profile.slice(1).findIndex((point) => currentRouteKm <= point.km);
+      nextIndex = profileIndex < 0 ? active.segments.length - 1 : profileIndex;
+    }
+
     if (nextIndex !== segmentIndex) {
       setSegmentIndex(nextIndex);
       const seconds = Math.round(active.segments[nextIndex].minutes * 60);
       setSecondsLeft(seconds);
       cueSegment(active.segments[nextIndex], preferences);
     }
-    if (climbProgress >= 0.999 && running) {
+
+    const finished = routeMode === "segmentAttack" && activeSegmentBounds
+      ? currentRouteKm >= activeSegmentBounds.endKm - 0.01
+      : climbProgress >= 0.999;
+
+    if (finished && running) {
       setRunning(false);
       setShowFinish(true);
-      setToast("Arrivée ! Time Attack terminé.");
+      setToast(routeMode === "segmentAttack" ? "Secteur terminé !" : "Arrivée ! Time Attack terminé.");
     }
-  }, [routeMode, activeClimb, bike, climbStartDistanceM, sessionStarted, currentRouteKm, climbProgress, segmentIndex, active, running]);
+  }, [routeMode, activeClimb, activeSegmentBounds, bike, climbStartDistanceM, sessionStarted, currentRouteKm, climbProgress, segmentIndex, active, running]);
 
   useEffect(() => {
     if (!autoResistanceControl || !controlGranted || !running || !sessionStarted || !active || !bike?.setResistance) return;
