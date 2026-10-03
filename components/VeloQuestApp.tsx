@@ -585,6 +585,7 @@ export function VeloQuestApp() {
             timeAttack: isTimeAttack || undefined,
             checkpointSplits: isTimeAttack ? timeAttackSplits : undefined,
             challenge: challengeResult,
+            completedRoute: activeClimb ? completedRoute : undefined,
             distanceKm: n(form, "distance") ?? autoMetrics.distanceKm ?? (activeClimb ? currentRouteKm : undefined),
             calories: n(form, "calories"),
             avgSpeedKmh: n(form, "avgSpeed") ?? autoMetrics.avgSpeedKmh,
