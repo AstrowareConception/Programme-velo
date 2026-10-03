@@ -128,8 +128,10 @@ test("route filters can isolate multi-col stages", async ({ page }) => {
 
   await page.getByRole("button", { name: "Étapes" }).click();
   await expect(page.getByRole("heading", { name: "Chaussy + Madeleine" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Villages médiévaux de Vaison" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Tour des Corniches" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Col du Galibier" })).toHaveCount(0);
-  await expect(page.getByText(/1 parcours/)).toBeVisible();
+  await expect(page.getByText(/6 parcours/)).toBeVisible();
 });
 
 test("challenge picker launches the selected mode and constraint", async ({ page }) => {
