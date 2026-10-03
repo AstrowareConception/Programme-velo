@@ -153,3 +153,28 @@ test("challenge picker launches the selected mode and constraint", async ({ page
   await expect(page.getByText("Pacing progressif")).toBeVisible();
   await expect(page.getByRole("button", { name: "Lancer le chrono" })).toBeVisible();
 });
+
+
+test("Segment Attack picker launches a quarter-route race", async ({ page }) => {
+  await seed(page);
+  await page.goto("/");
+  await page.getByRole("button", { name: /Parcours/ }).click();
+  await page.getByLabel("Rechercher").fill("Tour des Corniches");
+
+  const route = page.getByRole("heading", { name: "Tour des Corniches" }).locator("xpath=ancestor::article");
+  await route.getByRole("button", { name: /Segments/ }).click();
+
+  await expect(page.getByText(/SEGMENT ATTACK · TOUR DES CORNICHES/)).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Choisis ton secteur." })).toBeVisible();
+
+  const choices = page.locator(".segmentAttackPicker .segmentAttackChoice");
+  await expect(choices).toHaveCount(4);
+  const sector3 = choices.nth(2);
+  await expect(sector3).toContainText(/Secteur 3/);
+  await expect(sector3).toContainText(/15.7 km/);
+  await sector3.click();
+
+  await expect(page.getByText("SEGMENT ATTACK").first()).toBeVisible();
+  await expect(page.getByText(/Secteur 3 · 15.7 km/)).toBeVisible();
+  await expect(page.getByRole("button", { name: "Lancer le chrono" })).toBeVisible();
+});

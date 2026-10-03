@@ -716,3 +716,49 @@ export function climbToWorkout(climb: ClimbChallenge): WorkoutTemplate {
     segments
   };
 }
+
+
+export function routeSegmentWorkout(route: ClimbChallenge, segmentIndex: number, segments = 4): WorkoutTemplate {
+  const safeIndex = Math.max(0, Math.min(segments - 1, segmentIndex));
+  const startKm = route.distanceKm * (safeIndex / segments);
+  const endKm = route.distanceKm * ((safeIndex + 1) / segments);
+
+  const workoutSegments = route.profile.slice(1).flatMap((point, index) => {
+    const previous = route.profile[index];
+    const overlapStart = Math.max(startKm, previous.km);
+    const overlapEnd = Math.min(endKm, point.km);
+    const distance = overlapEnd - overlapStart;
+    if (distance <= 0) return [];
+
+    const minutes = Math.max(0.5, Math.round(((distance / 15) * 60) * 2) / 2);
+    const level = resistanceForGrade(point.grade);
+    return [{
+      label: `${overlapEnd.toFixed(1)} km · ${point.grade.toFixed(1)} %`,
+      minutes,
+      resistance: String(level),
+      rpe: point.grade >= 10 ? "8–9" : point.grade >= 7 ? "7–8" : point.grade >= 4 ? "6–7" : point.grade > 0 ? "4–6" : "2–4",
+      cadence: point.grade >= 8 ? "65–80" : point.grade >= 4 ? "70–85" : "80–95"
+    }];
+  });
+
+  const fallback = workoutSegments.length ? workoutSegments : [{
+    label: `${endKm.toFixed(1)} km · secteur`,
+    minutes: Math.max(1, Math.round((((endKm - startKm) / 15) * 60) * 2) / 2),
+    resistance: String(resistanceForGrade(route.avgGrade)),
+    rpe: "6–8",
+    cadence: "75–90"
+  }];
+
+  return {
+    id: `segment-${route.id}-${safeIndex}`,
+    name: `${route.name} · Secteur ${safeIndex + 1}`,
+    tagline: `${startKm.toFixed(1)} → ${endKm.toFixed(1)} km`,
+    kind: "hills",
+    duration: fallback.reduce((sum, segment) => sum + segment.minutes, 0),
+    points: Math.max(2, Math.round(route.points / 2)),
+    xp: Math.max(80, Math.round(route.xp / 3)),
+    intensity: "hard",
+    description: `Segment Attack sur le secteur ${safeIndex + 1}/${segments} de ${route.name}.`,
+    segments: fallback
+  };
+}

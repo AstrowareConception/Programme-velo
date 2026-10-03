@@ -69,6 +69,7 @@ export type SessionMetrics = {
   elapsedSeconds?: number;
   timeAttack?: boolean;
   checkpointSplits?: TimeAttackSplit[];
+  segmentAttackIndex?: number;
   distanceKm?: number;
   calories?: number;
   avgSpeedKmh?: number;
