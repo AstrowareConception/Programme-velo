@@ -194,6 +194,7 @@ export function VeloQuestApp() {
         resistance: telemetry.resistance,
         powerW: telemetry.powerW,
         heartRate: telemetry.heartRate,
+        calories: telemetry.totalEnergyKcal,
         distanceKm: telemetry.distanceM !== undefined ? telemetry.distanceM / 1000 : undefined
       }
     ]);
@@ -273,7 +274,8 @@ export function VeloQuestApp() {
       maxPowerW: maximum(telemetrySamples.map((s) => s.powerW)),
       avgHeartRate: average(telemetrySamples.map((s) => s.heartRate)),
       maxHeartRate: maximum(telemetrySamples.map((s) => s.heartRate)),
-      avgResistance: average(telemetrySamples.map((s) => s.resistance))
+      avgResistance: average(telemetrySamples.map((s) => s.resistance)),
+      calories: [...telemetrySamples].reverse().find((sample) => sample.calories !== undefined)?.calories
     };
   }, [telemetrySamples]);
 
@@ -430,6 +432,8 @@ export function VeloQuestApp() {
       .some((key) => String(form.get(key) ?? "").trim().length > 0);
     const hasFtms = telemetrySamples.length > 0;
     const duration = n(form, "duration") ?? active.duration;
+    const loggedAt = String(form.get("loggedAt") || "").trim();
+    const date = loggedAt ? new Date(loggedAt).toISOString() : new Date().toISOString();
 
     setState((prev) => ({
       ...prev,
@@ -439,7 +443,7 @@ export function VeloQuestApp() {
           id: uid(),
           templateId: active.id,
           routeId: activeClimb?.id,
-          date: new Date().toISOString(),
+          date,
           duration,
           points: active.points,
           xp: active.xp,
@@ -451,7 +455,7 @@ export function VeloQuestApp() {
           metrics: {
             source: hasFtms && manualUsed ? "mixed" : hasFtms ? "ftms" : "manual",
             distanceKm: n(form, "distance") ?? autoMetrics.distanceKm,
-            calories: n(form, "calories"),
+            calories: n(form, "calories") ?? autoMetrics.calories,
             avgSpeedKmh: n(form, "avgSpeed") ?? autoMetrics.avgSpeedKmh,
             avgCadenceRpm: n(form, "avgCadence") ?? autoMetrics.avgCadenceRpm,
             maxCadenceRpm: autoMetrics.maxCadenceRpm,
@@ -518,9 +522,10 @@ export function VeloQuestApp() {
   }
 
   function addMeasurement(form: FormData) {
+    const measuredOn = String(form.get("measuredOn") || "").trim();
     const m: Measurement = {
       id: uid(),
-      date: new Date().toISOString(),
+      date: measuredOn ? new Date(`${measuredOn}T08:00:00`).toISOString() : new Date().toISOString(),
       weight: n(form, "weight"),
       waist: n(form, "waist"),
       abdomen: n(form, "abdomen")
@@ -606,6 +611,19 @@ export function VeloQuestApp() {
     } catch {
       alert("Sauvegarde invalide.");
     }
+  }
+
+  function deleteSession(id: string) {
+    if (!window.confirm("Supprimer définitivement cette séance de l’historique ?")) return;
+    setState((prev) => ({ ...prev, sessions: prev.sessions.filter((session) => session.id !== id) }));
+    setSelectedSessionId(null);
+    setToast("Séance supprimée.");
+  }
+
+  function deleteMeasurement(id: string) {
+    if (!window.confirm("Supprimer cette mesure ?")) return;
+    setState((prev) => ({ ...prev, measurements: prev.measurements.filter((measurement) => measurement.id !== id) }));
+    setToast("Mesure supprimée.");
   }
 
   function resetLocalData() {
@@ -699,6 +717,7 @@ export function VeloQuestApp() {
                 <ConsoleMetric label="WATTS" value={telemetry.powerW?.toFixed(0) ?? "—"} />
                 <ConsoleMetric label="LEVEL" value={telemetry.resistance?.toFixed(0) ?? "—"} />
                 <ConsoleMetric label="BPM" value={telemetry.heartRate?.toFixed(0) ?? "—"} />
+                <ConsoleMetric label="KCAL" value={telemetry.totalEnergyKcal?.toFixed(0) ?? "—"} />
               </div>
             ) : (
               <p>{webBluetoothHint() === "ios"
@@ -821,6 +840,7 @@ export function VeloQuestApp() {
             <section className="card">
               <h2>Nouvelle mesure</h2>
               <form action={addMeasurement} className="form">
+                <label>Date de mesure<input name="measuredOn" type="date" defaultValue={new Date().toISOString().slice(0,10)} /></label>
                 <label>Poids (kg)<input name="weight" type="number" step="0.1" placeholder={latestWeight?.toString() || "ex. 118.4"} /></label>
                 <label>Tour de taille (cm)<input name="waist" type="number" step="0.1" placeholder={latestWaist?.toString() || "ex. 112"} /></label>
                 <label>Tour abdominal (cm)<input name="abdomen" type="number" step="0.1" placeholder={latestAbdomen?.toString() || "ex. 116"} /></label>
@@ -867,7 +887,7 @@ export function VeloQuestApp() {
             <h2>Dernières mesures</h2>
             <div className="history">
               {[...state.measurements].sort((a,b) => b.date.localeCompare(a.date)).slice(0,12).map((m) => (
-                <div key={m.id}><span>{dateLabel(m.date)}</span><strong>{m.weight ? `${m.weight} kg` : "—"}</strong><span>{m.waist ? `${m.waist} cm taille` : "—"}</span></div>
+                <div key={m.id}><span>{dateLabel(m.date)}</span><strong>{m.weight ? `${m.weight} kg` : "—"}</strong><span>{m.waist ? `${m.waist} cm taille` : "—"}</span><button className="iconDanger" aria-label="Supprimer la mesure" onClick={() => deleteMeasurement(m.id)}>×</button></div>
               ))}
               {!state.measurements.length && <p>Aucune mesure pour l'instant.</p>}
             </div>
@@ -991,13 +1011,14 @@ export function VeloQuestApp() {
                 <h2>Enregistre ta performance</h2>
                 {telemetrySamples.length > 0 && <p className="connectedNotice">✓ {telemetrySamples.length} échantillons FTMS récupérés. Les champs connus sont préremplis.</p>}
                 <div className="form">
+                  <label>Date et heure de la séance<input name="loggedAt" type="datetime-local" defaultValue={new Date().toISOString().slice(0,16)} /></label>
                   <div className="formRow">
                     <label>Durée (min)<input name="duration" type="number" step="1" defaultValue={active.duration} /></label>
                     <label>RPE ressenti /10<input name="rpe" type="number" min="1" max="10" step="0.5" /></label>
                   </div>
                   <div className="formRow">
                     <label>Distance (km)<input name="distance" type="number" step="0.01" defaultValue={autoMetrics.distanceKm?.toFixed(2)} /></label>
-                    <label>Calories affichées<input name="calories" type="number" step="1" /></label>
+                    <label>Calories affichées<input name="calories" type="number" step="1" defaultValue={autoMetrics.calories?.toFixed(0)} /></label>
                   </div>
                   <div className="formRow">
                     <label>Vitesse moyenne<input name="avgSpeed" type="number" step="0.1" defaultValue={autoMetrics.avgSpeedKmh?.toFixed(1)} /></label>
@@ -1106,6 +1127,7 @@ export function VeloQuestApp() {
               <DetailMetric label="Source" value={selectedSession.metrics?.source ?? "manuel"} />
             </div>
             {selectedSession.note && <div className="sessionNote"><small>NOTE</small><p>{selectedSession.note}</p></div>}
+            <button className="secondary dangerButton fullWidth" onClick={() => deleteSession(selectedSession.id)}>Supprimer cette séance</button>
             {selectedSession.metrics?.samples?.length ? <p className="finePrint">{selectedSession.metrics.samples.length} points de télémétrie compactés sont conservés avec cette séance.</p> : null}
           </section>
         </div>
