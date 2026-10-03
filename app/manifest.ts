@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
+    id: "/",
     name: "VeloQuest",
     short_name: "VeloQuest",
     description: "Ton programme vélo, tes quêtes, ta progression.",
@@ -12,6 +13,11 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: "#0c1020",
     orientation: "any",
     categories: ["fitness", "health", "sports"],
+    shortcuts: [
+      { name: "Choisir une séance", short_name: "Séances", url: "/?tab=sessions", icons: [{ src: "/icon.svg", sizes: "any", type: "image/svg+xml" }] },
+      { name: "Cols & parcours", short_name: "Parcours", url: "/?tab=climbs", icons: [{ src: "/icon.svg", sizes: "any", type: "image/svg+xml" }] },
+      { name: "Voir ma progression", short_name: "Suivi", url: "/?tab=progress", icons: [{ src: "/icon.svg", sizes: "any", type: "image/svg+xml" }] }
+    ],
     icons: [
       { src: "/icon.svg", sizes: "any", type: "image/svg+xml", purpose: "any" }
     ]
