@@ -1,6 +1,8 @@
 name: Deploy VeloQuest to Vercel
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -13,26 +15,31 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Verify Vercel token
+      - name: Detect Vercel credentials
+        id: auth
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |
-          if [ -z "$VERCEL_TOKEN" ]; then
-            echo "::error::Missing GitHub repository secret VERCEL_TOKEN"
-            echo "Add a Vercel token as repository secret VERCEL_TOKEN, then re-run this workflow."
-            exit 1
+          if [ -n "$VERCEL_TOKEN" ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "VERCEL_TOKEN is not configured; deployment is skipped."
           fi
 
       - name: Install Vercel CLI
+        if: steps.auth.outputs.available == 'true'
         run: npm install --global vercel@latest
 
       - name: Ensure VeloQuest project exists
+        if: steps.auth.outputs.available == 'true'
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |
           vercel project add veloquest --token="$VERCEL_TOKEN" || true
 
       - name: Deploy production
+        if: steps.auth.outputs.available == 'true'
         id: deploy
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
@@ -44,8 +51,15 @@ jobs:
           echo "Deployment URL: $URL"
 
       - name: Verify deployment responds
+        if: steps.auth.outputs.available == 'true'
         env:
           URL: ${{ steps.deploy.outputs.url }}
         run: |
           curl --fail --location --retry 5 --retry-delay 3 "$URL" >/dev/null
           echo "Production URL responds successfully."
+
+      - name: Deployment skipped
+        if: steps.auth.outputs.available != 'true'
+        run: |
+          echo "### VeloQuest deployment skipped" >> "$GITHUB_STEP_SUMMARY"
+          echo "Configure the repository secret VERCEL_TOKEN to enable automatic production deployment." >> "$GITHUB_STEP_SUMMARY"
