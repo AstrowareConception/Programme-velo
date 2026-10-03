@@ -357,7 +357,9 @@ export function badges(state: AppState): Badge[] {
   const weightLost = state.profile.startWeight && latestWeight !== undefined ? state.profile.startWeight - latestWeight : 0;
   const waistLost = state.profile.startWaist && latestWaist !== undefined ? state.profile.startWaist - latestWaist : 0;
   const connected = state.sessions.filter((s) => s.metrics?.source === "ftms" || s.metrics?.source === "mixed");
-  const routeIds = new Set(state.sessions.map((s) => s.routeId).filter(Boolean));
+  const routeIds = new Set(state.sessions.filter((s) => s.routeId && s.metrics?.completedRoute !== false).map((s) => s.routeId).filter(Boolean));
+  const successfulChallenges = state.sessions.filter((s) => s.metrics?.challenge?.success);
+  const uniqueChallengeIds = new Set(successfulChallenges.map((s) => s.metrics!.challenge!.id));
   const totalDistance = state.sessions.reduce((sum, s) => sum + (s.metrics?.distanceKm ?? 0), 0);
   const sessionsWithPower = state.sessions.filter((s) => (s.metrics?.avgPowerW ?? 0) > 0);
 
@@ -386,6 +388,9 @@ export function badges(state: AppState): Badge[] {
     { id: "distance500", name: "Grand rouleur", icon: "🌍", description: "Cumuler 500 km enregistrés.", unlocked: totalDistance >= 500, progress: `${Math.min(totalDistance, 500).toFixed(0)}/500 km` },
     { id: "connected10", name: "100 % connecté", icon: "📶", description: "Enregistrer 10 séances avec télémétrie FTMS.", unlocked: connected.length >= 10, progress: `${Math.min(connected.length, 10)}/10` },
     { id: "goalWeight", name: "Objectif poids", icon: "🎖️", description: "Atteindre l’objectif de poids défini.", unlocked: Boolean(state.profile.targetWeight !== undefined && latestWeight !== undefined && latestWeight <= state.profile.targetWeight), progress: state.profile.targetWeight !== undefined && latestWeight !== undefined ? `${latestWeight.toFixed(1)} / ${state.profile.targetWeight.toFixed(1)} kg` : "objectif à définir" },
-    { id: "goalWaist", name: "Objectif tour de taille", icon: "🥇", description: "Atteindre l’objectif de tour de taille défini.", unlocked: Boolean(state.profile.targetWaist !== undefined && latestWaist !== undefined && latestWaist <= state.profile.targetWaist), progress: state.profile.targetWaist !== undefined && latestWaist !== undefined ? `${latestWaist.toFixed(1)} / ${state.profile.targetWaist.toFixed(1)} cm` : "objectif à définir" }
+    { id: "goalWaist", name: "Objectif tour de taille", icon: "🥇", description: "Atteindre l’objectif de tour de taille défini.", unlocked: Boolean(state.profile.targetWaist !== undefined && latestWaist !== undefined && latestWaist <= state.profile.targetWaist), progress: state.profile.targetWaist !== undefined && latestWaist !== undefined ? `${latestWaist.toFixed(1)} / ${state.profile.targetWaist.toFixed(1)} cm` : "objectif à définir" },
+    { id: "challenge1", name: "Défi relevé", icon: "◆", description: "Réussir un premier défi de parcours.", unlocked: successfulChallenges.length >= 1, progress: `${Math.min(successfulChallenges.length, 1)}/1` },
+    { id: "challenge5", name: "Challenger", icon: "🎲", description: "Réussir 5 défis de parcours.", unlocked: successfulChallenges.length >= 5, progress: `${Math.min(successfulChallenges.length, 5)}/5` },
+    { id: "challenge-variety", name: "Polyvalent", icon: "🧩", description: "Réussir 4 types de défis différents.", unlocked: uniqueChallengeIds.size >= 4, progress: `${Math.min(uniqueChallengeIds.size, 4)}/4` }
   ];
 }
