@@ -324,6 +324,11 @@ export function levelForXp(xp: number) {
   return Math.floor(xp / 500) + 1;
 }
 
+export function levelTitle(level: number) {
+  const titles = ["Découvreur", "Rouleur", "Régulier", "Baroudeur", "Grimpeur", "Puncheur", "Endurant", "Capitaine de route", "Maître du tempo", "Légende"];
+  return titles[Math.min(titles.length - 1, Math.max(0, level - 1))];
+}
+
 export function isPerfectWeek(state: AppState, week: number) {
   const target = weekTargets[week - 1];
   const s = weeklyStats(state, week);
@@ -344,9 +349,11 @@ export function badges(state: AppState): Badge[] {
   const bonus = state.sessions.filter((s) => s.bonus);
   const kinds = new Set(structured.map((s) => s.kind));
   const perfectWeeks = weekTargets.filter((w) => isPerfectWeek(state, w.week)).length;
-  const latest = [...state.measurements].sort((a, b) => b.date.localeCompare(a.date))[0];
-  const weightLost = state.profile.startWeight && latest?.weight ? state.profile.startWeight - latest.weight : 0;
-  const waistLost = state.profile.startWaist && latest?.waist ? state.profile.startWaist - latest.waist : 0;
+  const sortedMeasurements = [...state.measurements].sort((a, b) => b.date.localeCompare(a.date));
+  const latestWeight = sortedMeasurements.find((m) => m.weight !== undefined)?.weight;
+  const latestWaist = sortedMeasurements.find((m) => m.waist !== undefined)?.waist;
+  const weightLost = state.profile.startWeight && latestWeight !== undefined ? state.profile.startWeight - latestWeight : 0;
+  const waistLost = state.profile.startWaist && latestWaist !== undefined ? state.profile.startWaist - latestWaist : 0;
   const connected = state.sessions.filter((s) => s.metrics?.source === "ftms" || s.metrics?.source === "mixed");
   const routeIds = new Set(state.sessions.map((s) => s.routeId).filter(Boolean));
   const totalDistance = state.sessions.reduce((sum, s) => sum + (s.metrics?.distanceKm ?? 0), 0);
@@ -367,6 +374,16 @@ export function badges(state: AppState): Badge[] {
     { id: "climb1", name: "Premier sommet", icon: "⛰️", description: "Terminer un Col de légende.", unlocked: routeIds.size >= 1, progress: `${Math.min(routeIds.size, 1)}/1` },
     { id: "climb3", name: "Collectionneur de cols", icon: "🏔️", description: "Terminer 3 cols différents.", unlocked: routeIds.size >= 3, progress: `${Math.min(routeIds.size, 3)}/3` },
     { id: "distance100", name: "Centurion", icon: "🛣️", description: "Cumuler 100 km enregistrés.", unlocked: totalDistance >= 100, progress: `${Math.min(totalDistance, 100).toFixed(0)}/100 km` },
-    { id: "power", name: "Watts up", icon: "⚡", description: "Enregistrer 5 séances avec une puissance moyenne.", unlocked: sessionsWithPower.length >= 5, progress: `${Math.min(sessionsWithPower.length, 5)}/5` }
+    { id: "power", name: "Watts up", icon: "⚡", description: "Enregistrer 5 séances avec une puissance moyenne.", unlocked: sessionsWithPower.length >= 5, progress: `${Math.min(sessionsWithPower.length, 5)}/5` },
+    { id: "sessions10", name: "En selle", icon: "🔟", description: "Terminer 10 séances structurées.", unlocked: structured.length >= 10, progress: `${Math.min(structured.length, 10)}/10` },
+    { id: "sessions25", name: "Habitude ancrée", icon: "🧱", description: "Terminer 25 séances structurées.", unlocked: structured.length >= 25, progress: `${Math.min(structured.length, 25)}/25` },
+    { id: "sessions50", name: "Machine régulière", icon: "🏁", description: "Terminer 50 séances structurées.", unlocked: structured.length >= 50, progress: `${Math.min(structured.length, 50)}/50` },
+    { id: "perfect4", name: "Mois solide", icon: "🗓️", description: "Cumuler 4 semaines parfaites.", unlocked: perfectWeeks >= 4, progress: `${Math.min(perfectWeeks, 4)}/4` },
+    { id: "perfect8", name: "Deux mois d’acier", icon: "🛡️", description: "Cumuler 8 semaines parfaites.", unlocked: perfectWeeks >= 8, progress: `${Math.min(perfectWeeks, 8)}/8` },
+    { id: "perfect12", name: "Conquête des 12 semaines", icon: "🏆", description: "Valider les 12 semaines parfaites.", unlocked: perfectWeeks >= 12, progress: `${Math.min(perfectWeeks, 12)}/12` },
+    { id: "distance500", name: "Grand rouleur", icon: "🌍", description: "Cumuler 500 km enregistrés.", unlocked: totalDistance >= 500, progress: `${Math.min(totalDistance, 500).toFixed(0)}/500 km` },
+    { id: "connected10", name: "100 % connecté", icon: "📶", description: "Enregistrer 10 séances avec télémétrie FTMS.", unlocked: connected.length >= 10, progress: `${Math.min(connected.length, 10)}/10` },
+    { id: "goalWeight", name: "Objectif poids", icon: "🎖️", description: "Atteindre l’objectif de poids défini.", unlocked: Boolean(state.profile.targetWeight !== undefined && latestWeight !== undefined && latestWeight <= state.profile.targetWeight), progress: state.profile.targetWeight !== undefined && latestWeight !== undefined ? `${latestWeight.toFixed(1)} / ${state.profile.targetWeight.toFixed(1)} kg` : "objectif à définir" },
+    { id: "goalWaist", name: "Objectif tour de taille", icon: "🥇", description: "Atteindre l’objectif de tour de taille défini.", unlocked: Boolean(state.profile.targetWaist !== undefined && latestWaist !== undefined && latestWaist <= state.profile.targetWaist), progress: state.profile.targetWaist !== undefined && latestWaist !== undefined ? `${latestWaist.toFixed(1)} / ${state.profile.targetWaist.toFixed(1)} cm` : "objectif à définir" }
   ];
 }
