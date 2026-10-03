@@ -274,7 +274,8 @@ export function emptyState(): AppState {
     },
     sessions: [],
     measurements: [],
-    preferences: { ...defaultPreferences }
+    preferences: { ...defaultPreferences },
+    favoriteRouteIds: []
   };
 }
 
