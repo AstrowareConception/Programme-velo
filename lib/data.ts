@@ -7,7 +7,8 @@ export const defaultPreferences: Preferences = {
   voiceCues: false,
   haptics: true,
   keepScreenAwake: true,
-  keepTelemetryTrace: true
+  keepTelemetryTrace: true,
+  resistanceOffset: 0
 };
 
 export const workouts: WorkoutTemplate[] = [
