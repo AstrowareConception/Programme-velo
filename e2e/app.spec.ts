@@ -171,7 +171,7 @@ test("Segment Attack picker launches a quarter-route race", async ({ page }) => 
   await expect(choices).toHaveCount(4);
   const sector3 = choices.nth(2);
   await expect(sector3).toContainText(/Secteur 3/);
-  await expect(sector3).toContainText(/31.5 → 47.2 km/);
+  await expect(sector3).toContainText(/15.7 km/);
   await sector3.click();
 
   await expect(page.getByText("SEGMENT ATTACK").first()).toBeVisible();
