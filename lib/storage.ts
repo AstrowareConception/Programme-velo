@@ -53,7 +53,10 @@ export function normalizeState(value: unknown): AppState {
     profile,
     sessions: Array.isArray(value.sessions) ? value.sessions.filter(isObject) as AppState["sessions"] : [],
     measurements: Array.isArray(value.measurements) ? value.measurements.filter(isObject) as AppState["measurements"] : [],
-    preferences: normalizePreferences(value.preferences)
+    preferences: normalizePreferences(value.preferences),
+    favoriteRouteIds: Array.isArray(value.favoriteRouteIds)
+      ? value.favoriteRouteIds.filter((item): item is string => typeof item === "string")
+      : []
   };
 }
 
