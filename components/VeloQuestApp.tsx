@@ -41,6 +41,16 @@ function uid() {
   return crypto.randomUUID();
 }
 
+function localInputDate(date = new Date()) {
+  const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+  return local.toISOString().slice(0, 10);
+}
+
+function localInputDateTime(date = new Date()) {
+  const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+  return local.toISOString().slice(0, 16);
+}
+
 function dateLabel(value: string) {
   return new Intl.DateTimeFormat("fr-FR", { day: "2-digit", month: "short" }).format(new Date(value));
 }
@@ -840,7 +850,7 @@ export function VeloQuestApp() {
             <section className="card">
               <h2>Nouvelle mesure</h2>
               <form action={addMeasurement} className="form">
-                <label>Date de mesure<input name="measuredOn" type="date" defaultValue={new Date().toISOString().slice(0,10)} /></label>
+                <label>Date de mesure<input name="measuredOn" type="date" defaultValue={localInputDate()} /></label>
                 <label>Poids (kg)<input name="weight" type="number" step="0.1" placeholder={latestWeight?.toString() || "ex. 118.4"} /></label>
                 <label>Tour de taille (cm)<input name="waist" type="number" step="0.1" placeholder={latestWaist?.toString() || "ex. 112"} /></label>
                 <label>Tour abdominal (cm)<input name="abdomen" type="number" step="0.1" placeholder={latestAbdomen?.toString() || "ex. 116"} /></label>
@@ -1011,7 +1021,7 @@ export function VeloQuestApp() {
                 <h2>Enregistre ta performance</h2>
                 {telemetrySamples.length > 0 && <p className="connectedNotice">✓ {telemetrySamples.length} échantillons FTMS récupérés. Les champs connus sont préremplis.</p>}
                 <div className="form">
-                  <label>Date et heure de la séance<input name="loggedAt" type="datetime-local" defaultValue={new Date().toISOString().slice(0,16)} /></label>
+                  <label>Date et heure de la séance<input name="loggedAt" type="datetime-local" defaultValue={localInputDateTime()} /></label>
                   <div className="formRow">
                     <label>Durée (min)<input name="duration" type="number" step="1" defaultValue={active.duration} /></label>
                     <label>RPE ressenti /10<input name="rpe" type="number" min="1" max="10" step="0.5" /></label>
