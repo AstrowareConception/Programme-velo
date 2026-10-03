@@ -1,3 +1,5 @@
+import type { WorkoutTemplate } from "./types";
+
 export type ClimbPoint = {
   km: number;
   elevation: number;
@@ -136,4 +138,36 @@ export function resistanceForGrade(grade: number) {
   if (grade <= 9.5) return 25;
   if (grade <= 11) return 27;
   return 29;
+}
+
+
+export function climbToWorkout(climb: ClimbChallenge): WorkoutTemplate {
+  const segments = climb.profile.slice(1).map((point, index) => {
+    const previous = climb.profile[index];
+    const distance = Math.max(0.2, point.km - previous.km);
+    // Baseline simulation at ~15 km/h. With FTMS connected, route progress
+    // is based on actual distance instead of this time estimate.
+    const minutes = Math.max(2, Math.round((distance / 15) * 60));
+    const level = resistanceForGrade(point.grade);
+    return {
+      label: `${point.km.toFixed(1)} km · ${point.grade.toFixed(1)} %`,
+      minutes,
+      resistance: String(level),
+      rpe: point.grade >= 9 ? "8–9" : point.grade >= 7 ? "7–8" : point.grade >= 5 ? "6–7" : "5–6",
+      cadence: point.grade >= 8 ? "65–80" : "75–90"
+    };
+  });
+
+  return {
+    id: `climb-${climb.id}`,
+    name: climb.name,
+    tagline: climb.subtitle,
+    kind: "hills",
+    duration: segments.reduce((sum, segment) => sum + segment.minutes, 0),
+    points: climb.points,
+    xp: climb.xp,
+    intensity: "hard",
+    description: climb.note,
+    segments
+  };
 }
