@@ -634,3 +634,16 @@ button:focus-visible, input:focus-visible, .fileButton:focus-within { outline: 2
   .resumeActions { grid-column:1 / -1; }
   .resumeActions button { flex:1; }
 }
+
+.segmentAttackButton { color:var(--cyan); border-color:rgba(80,227,255,.24); }
+.segmentAttackList { display:grid; gap:8px; margin-top:16px; }
+.segmentAttackChoice { width:100%; display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:12px; text-align:left; color:var(--text); background:rgba(255,255,255,.03); border:1px solid var(--line); border-radius:14px; padding:12px; }
+.segmentAttackChoice:hover { background:rgba(80,227,255,.05); border-color:rgba(80,227,255,.2); }
+.segmentAttackChoice > div strong, .segmentAttackChoice > div p { display:block; }
+.segmentAttackChoice > div p { margin:4px 0 0; color:var(--muted); font-size:.72rem; }
+.segmentAttackChoice > em { color:var(--cyan); font-style:normal; font-family:"SFMono-Regular",Consolas,monospace; font-size:.82rem; }
+.segmentAttackNumber { width:36px; height:36px; display:grid; place-items:center; border-radius:12px; color:#061017; background:var(--cyan); font-weight:950; }
+@media (max-width:520px) {
+  .segmentAttackChoice { grid-template-columns:auto 1fr; }
+  .segmentAttackChoice > em { grid-column:2; }
+}
