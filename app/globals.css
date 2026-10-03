@@ -186,8 +186,8 @@ button { cursor: pointer; }
 .climbLiveTitle span { color:var(--cyan); font-family:"SFMono-Regular",Consolas,monospace; font-size:.78rem; }
 .connectedNotice { color:var(--lime) !important; border:1px solid rgba(185,255,102,.18); border-radius:12px; padding:10px 12px; background:rgba(185,255,102,.05); font-size:.78rem; }
 .finishForm h2 { margin-bottom:10px; }
-.sessionHistory > div { display:grid; grid-template-columns:85px minmax(150px,1fr) auto; gap:14px; align-items:center; padding:13px 0; border-top:1px solid var(--line); }
-.sessionHistory > div > span { color:var(--muted); font-size:.75rem; }
+.sessionHistory > .sessionHistoryRow { display:grid; grid-template-columns:85px minmax(150px,1fr) auto; gap:14px; align-items:center; padding:13px 0; width:100%; color:var(--text); background:transparent; border-left:0; border-right:0; border-bottom:0; text-align:left; border-top:1px solid var(--line); }
+.sessionHistory > .sessionHistoryRow > span { color:var(--muted); font-size:.75rem; }
 .sessionHistory strong, .sessionHistory small { display:block; }
 .sessionHistory small { color:var(--muted); margin-top:3px; }
 .historyMetrics { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:5px; }
@@ -195,7 +195,7 @@ button { cursor: pointer; }
 
 @media (max-width: 700px) {
   .climbStats { grid-template-columns:1fr 1fr; }
-  .sessionHistory > div { grid-template-columns:70px 1fr; }
+  .sessionHistory > .sessionHistoryRow { grid-template-columns:70px 1fr; }
   .historyMetrics { grid-column:2; justify-content:flex-start; }
   .routeMap { height:240px; }
 }
@@ -349,3 +349,16 @@ button:focus-visible, input:focus-visible, .fileButton:focus-within { outline: 2
 .controlLab label input { grid-column:1 / -1; width:100%; accent-color:var(--cyan); }
 .labState { color:var(--gold); border:1px solid rgba(255,209,102,.2); border-radius:999px; padding:5px 8px; font-size:.58rem; font-weight:900; letter-spacing:.12em; }
 .labState.ok { color:var(--lime); border-color:rgba(185,255,102,.22); }
+
+.sessionHistoryRow:hover { background:rgba(255,255,255,.025); }
+.historyDetail { max-width:680px; }
+.detailDate { color:var(--muted); margin-top:-12px; }
+.detailMetrics { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:18px 0; }
+.detailMetrics span { padding:12px; border:1px solid var(--line); border-radius:12px; background:rgba(255,255,255,.025); }
+.detailMetrics small, .detailMetrics strong { display:block; }
+.detailMetrics small { color:var(--muted); font-size:.58rem; }
+.detailMetrics strong { margin-top:4px; font-size:.86rem; }
+.sessionNote { margin-top:12px; padding:14px; border-radius:13px; background:rgba(255,255,255,.035); border:1px solid var(--line); }
+.sessionNote small { color:var(--cyan); letter-spacing:.12em; font-size:.58rem; }
+.sessionNote p { margin:5px 0 0; color:var(--text); }
+@media (max-width:560px) { .detailMetrics { grid-template-columns:1fr 1fr; } }
