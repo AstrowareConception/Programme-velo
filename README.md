@@ -4,53 +4,121 @@
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FAstrowareConception%2FProgramme-velo&project-name=veloquest&repository-name=Programme-velo)
 
-VeloQuest est une PWA de suivi d'entraînement sur vélo d'appartement, conçue à l'origine autour du TOPUTURE TEB5 et de ses 32 niveaux de résistance, mais utilisable avec n'importe quel vélo à résistance réglable.
+VeloQuest est une PWA de cyclisme indoor **local-first**, initialement conçue autour du TOPUTURE TEB5 (32 niveaux), mais utilisable manuellement avec n’importe quel vélo d’appartement.
 
-## Philosophie
+L’objectif n’est pas d’imposer un calendrier rigide : VeloQuest transforme un programme de 12 semaines en un ensemble de **quêtes choisies selon le temps disponible, l’énergie du jour et la charge déjà réalisée**.
 
-Pas de calendrier rigide. VeloQuest propose un **catalogue de quêtes** à choisir selon le temps disponible, l'énergie du jour et la charge déjà accumulée :
+## Fonctionnalités
 
-- séances faciles de décrassage ;
-- endurance normale et longue ;
-- montée progressive ;
-- HIIT court et 4×4 ;
-- travail au seuil ;
-- côtes ;
-- escalier ;
-- micro-séances bonus de 10, 15 ou 20 minutes ;
-- séance libre pour enregistrer un entraînement improvisé ;
-- Cols de légende avec profil altimétrique et carte interactive.
+### Coach & séances guidées
 
-Le programme dure 12 semaines et suit des objectifs de points, minutes, variété et nombre de séances. Les séances intenses sont volontairement plafonnées : une **semaine parfaite** récompense la régularité et la diversité, pas le surentraînement.
+- Coach Express selon le temps disponible et l’énergie du jour ;
+- programme progressif sur 12 semaines ;
+- décrassage, endurance, longue, progressif, HIIT, 4×4, seuil, côtes, escalier et séance libre ;
+- micro-séances bonus 10 / 15 / 20 minutes avec XP plafonné ;
+- pré-vol détaillé avant la séance ;
+- chrono robuste aux pauses et suspensions mobiles ;
+- précédent / pause / suivant ;
+- prochain segment annoncé ;
+- objectifs RPE, cadence et résistance ;
+- maintien de l’écran éveillé si l’appareil le permet ;
+- bips, annonces vocales et retour haptique configurables.
 
-Les challenges de cols utilisent des données globales réelles pour la distance, le dénivelé et les pentes. Les profils intermédiaires embarqués dans la V1 sont des profils d’entraînement simplifiés ; l’import GPX permettra ensuite d’obtenir une reproduction kilométrique plus fidèle.
+### Bluetooth FTMS
 
-## Gamification
+Sur navigateur compatible Web Bluetooth :
 
-- XP et niveaux ;
-- semaine parfaite : +250 XP ;
-- série de semaines parfaites ;
-- badges de variété et de régularité ;
-- badges de perte de poids et de tour de taille ;
-- micro-séances bonus avec XP hebdomadaire plafonné ;
-- recommandations selon la charge récente ;
-- badges pour les ascensions, kilomètres et séances connectées ;
-- badge d’icône PWA lié aux séances restant à accomplir.
+- Indoor Bike Data ;
+- vitesse instantanée et moyenne ;
+- cadence instantanée et moyenne ;
+- distance ;
+- niveau de résistance ;
+- watts instantanés et moyens ;
+- fréquence cardiaque si diffusée ;
+- énergie / calories ;
+- MET ;
+- temps FTMS ;
+- détection de la plage de résistance ;
+- diagnostic du Fitness Machine Control Point ;
+- demande de contrôle FTMS avec acquittement ;
+- test manuel de résistance ;
+- auto-résistance **opt-in**, uniquement après contrôle accordé.
 
-## PWA / vie privée
+Le pilotage automatique doit être validé sur le vélo réel avant utilisation régulière. Voir [le protocole TEB5](docs/TEB5-BLUETOOTH-VALIDATION.md).
 
-- Next.js 16 + React 19 + TypeScript ;
-- PWA installable ;
-- service worker et fonctionnement offline après première visite ;
-- aucune API, aucun compte, aucun backend ;
-- données conservées dans `localStorage` sous la clé `veloquest:v1` ;
-- export/import JSON depuis l'application ;
-- télémétrie FTMS enregistrée et échantillonnée lorsqu’elle est disponible ;
-- saisie manuelle enrichie en solution de repli.
+> iPhone / iPad : les PWA iOS n’exposent actuellement pas Web Bluetooth. Le mode guidé, la saisie manuelle et tout le suivi restent utilisables. Une enveloppe native CoreBluetooth/Capacitor pourra être ajoutée ultérieurement.
 
-### Bluetooth
+### Parcours & GPX
 
-VeloQuest utilise Web Bluetooth + FTMS lorsque le navigateur le permet. Chrome/Edge desktop et Chrome Android peuvent exploiter ce mode. Les navigateurs iOS actuels n’exposent pas Web Bluetooth aux PWA ; sur iPhone, le mode guidé et la saisie manuelle restent disponibles. Une enveloppe native CoreBluetooth/Capacitor pourra être ajoutée ultérieurement sans modifier le modèle de données.
+- Alpe d’Huez, Mont Ventoux et Tourmalet fournis comme challenges ;
+- carte OpenStreetMap interactive ;
+- profil altimétrique ;
+- position du cycliste ;
+- import de fichiers GPX ;
+- calcul distance, D+, pente lissée et profil ;
+- transformation des pentes en niveaux de résistance ;
+- progression par distance réelle si FTMS la fournit ;
+- calibration globale de résistance TEB5 de **-4 à +4**.
+
+### Suivi & données
+
+- poids ;
+- tour de taille ;
+- tour abdominal ;
+- objectifs ;
+- courbes de progression ;
+- journal détaillé des séances ;
+- saisie rétroactive avec date/heure locale ;
+- saisie manuelle enrichie lorsque le Bluetooth n’est pas disponible ;
+- suppression d’une saisie erronée ;
+- export CSV ;
+- sauvegardes JSON versionnées et migrables ;
+- estimation de l’empreinte locale ;
+- récupération d’un état local corrompu ;
+- aucune base de données distante.
+
+### Gamification
+
+- XP et niveaux nommés ;
+- progression vers le prochain niveau ;
+- semaine parfaite ;
+- séries de semaines parfaites ;
+- missions hebdomadaires ;
+- badges de régularité, variété, volume, distance, FTMS, cols et objectifs physiques ;
+- bonus limités pour ne pas encourager le surentraînement ;
+- badge d’icône PWA quand l’API est disponible.
+
+## Documentation
+
+- [Guide utilisateur](docs/USER-GUIDE.md)
+- [Validation Bluetooth du TOPUTURE TEB5](docs/TEB5-BLUETOOTH-VALIDATION.md)
+- [Notice de confidentialité](app/confidentialite/page.tsx)
+
+## PWA & vie privée
+
+VeloQuest est volontairement **local-first** :
+
+- aucun compte ;
+- aucun backend métier ;
+- profil et historique dans `localStorage` ;
+- les GPX restent sur l’appareil ;
+- les données FTMS sont traitées localement ;
+- export explicite uniquement à la demande.
+
+Les tuiles cartographiques OpenStreetMap et l’hébergement Vercel impliquent naturellement des requêtes réseau ordinaires.
+
+## Stack
+
+- Next.js 16 / App Router
+- React 19
+- TypeScript
+- Leaflet / OpenStreetMap
+- Web Bluetooth / FTMS
+- PWA / Service Worker
+- localStorage
+- Vitest
+- GitHub Actions
+- Vercel
 
 ## Développement
 
@@ -59,20 +127,44 @@ npm install
 npm run dev
 ```
 
-Vérification :
+Vérification complète :
 
 ```bash
 npm run typecheck
+npm test
 npm run build
 ```
 
+La CI exécute ces trois étapes sur chaque PR.
+
 ## Déploiement Vercel
 
-Importer le dépôt dans Vercel. Le preset Next.js est détecté automatiquement et aucune variable d'environnement n'est nécessaire.
+Le dépôt contient `vercel.json` et un workflow `.github/workflows/deploy-vercel.yml`.
 
-## Sécurité d'entraînement
+Deux possibilités :
 
-Les niveaux de résistance sont des repères de départ. Le ressenti (RPE), la cadence et l'absence de douleur restent prioritaires. Une micro-séance bonus doit rester facile et ne remplace jamais une séance structurée.
+1. importer le dépôt via le bouton **Deploy with Vercel** ;
+2. ajouter le secret GitHub Actions `VERCEL_TOKEN`, puis laisser le workflow créer/lier `veloquest`, déployer en production et vérifier l’URL.
+
+Aucune variable d’environnement applicative n’est requise.
+
+## Avant la première séance connectée
+
+1. utiliser VeloQuest manuellement ;
+2. vérifier le sens des niveaux de résistance ;
+3. connecter le TEB5 depuis un navigateur Web Bluetooth compatible ;
+4. comparer les métriques avec l’écran physique ;
+5. exécuter le laboratoire FTMS ;
+6. tester quelques niveaux de résistance ;
+7. seulement ensuite activer l’auto-résistance.
+
+## Sécurité d’entraînement
+
+Les niveaux proposés sont des repères de départ. Le **ressenti (RPE)**, la cadence, la récupération et l’absence de douleur restent prioritaires. La gamification ne doit jamais devenir une raison de multiplier les séances intenses.
+
+## Statut
+
+VeloQuest est fonctionnel en mode local/PWA. Le Bluetooth FTMS est implémenté avec diagnostic et contrôle, mais le comportement exact du TOPUTURE TEB5 doit encore être validé sur l’exemplaire physique.
 
 ## Licence
 
