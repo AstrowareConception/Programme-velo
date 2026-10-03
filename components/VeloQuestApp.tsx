@@ -26,6 +26,7 @@ import {
   levelTitle
 } from "@/lib/data";
 import { compactTelemetry, cueSegment, formatClock, requestScreenWakeLock } from "@/lib/session";
+import { createBackup, estimateLocalBytes, normalizeState, parseBackup, safeLocalStorageWrite } from "@/lib/storage";
 
 type Tab = "dashboard" | "sessions" | "climbs" | "progress" | "more";
 type Energy = "easy" | "normal" | "hard";
@@ -103,10 +104,11 @@ export function VeloQuestApp() {
   useEffect(() => {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
-      try {
-        const parsed = JSON.parse(raw);
-        setState({ ...parsed, preferences: { ...defaultPreferences, ...(parsed.preferences ?? {}) } });
-      } catch { /* ignore corrupted backup */ }
+      try { setState(normalizeState(JSON.parse(raw))); }
+      catch {
+        setState(emptyState());
+        setToast("Sauvegarde locale illisible : un état sain a été chargé.");
+      }
     } else {
       setShowSetup(true);
     }
@@ -130,11 +132,11 @@ export function VeloQuestApp() {
   }, []);
 
   useEffect(() => {
-    if (hydrated) localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    if (hydrated && !safeLocalStorageWrite(STORAGE_KEY, state)) setToast("Stockage local plein : exporte une sauvegarde puis allège l’historique.");
   }, [state, hydrated]);
 
   useEffect(() => {
-    if (hydrated) localStorage.setItem(CUSTOM_ROUTES_KEY, JSON.stringify(customClimbs));
+    if (hydrated && !safeLocalStorageWrite(CUSTOM_ROUTES_KEY, customClimbs)) setToast("Impossible d’enregistrer les parcours : stockage local insuffisant.");
   }, [customClimbs, hydrated]);
 
   useEffect(() => {
@@ -256,6 +258,7 @@ export function VeloQuestApp() {
   const waistLost = state.profile.startWaist && latestWaist !== undefined ? state.profile.startWaist - latestWaist : 0;
   const weightPoints = sortedMeasurements.filter((m) => m.weight !== undefined).map((m) => ({ label: dateLabel(m.date), value: m.weight! }));
   const waistPoints = sortedMeasurements.filter((m) => m.waist !== undefined).map((m) => ({ label: dateLabel(m.date), value: m.waist! }));
+  const localBytes = hydrated ? estimateLocalBytes(state, customClimbs) : 0;
 
   const autoMetrics = useMemo(() => {
     const firstDistance = telemetrySamples.find((s) => s.distanceKm !== undefined)?.distanceKm;
@@ -540,7 +543,7 @@ export function VeloQuestApp() {
   }
 
   function exportData() {
-    const backup = { format: "veloquest-backup-v2", state, customClimbs };
+    const backup = createBackup(state, customClimbs);
     const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -595,13 +598,10 @@ export function VeloQuestApp() {
   async function importData(file?: File) {
     if (!file) return;
     try {
-      const parsed = JSON.parse(await file.text());
-      if (parsed?.format === "veloquest-backup-v2" && parsed.state) {
-        setState(parsed.state);
-        setCustomClimbs(Array.isArray(parsed.customClimbs) ? parsed.customClimbs : []);
-      } else {
-        setState(parsed);
-      }
+      const parsed = parseBackup(await file.text());
+      setState(parsed.state);
+      setCustomClimbs(parsed.customClimbs);
+      setToast("Sauvegarde importée.");
     } catch {
       alert("Sauvegarde invalide.");
     }
@@ -951,7 +951,8 @@ export function VeloQuestApp() {
           <section className="card actionStack">
             <div><p className="eyebrow">DONNÉES LOCALES</p><h2>Profil & sauvegardes</h2><p>Les données restent sur cet appareil tant que tu ne les exportes pas.</p></div>
             <button className="secondary" onClick={() => setShowSetup(true)}>Modifier le profil et les objectifs</button>
-            <button className="secondary" onClick={exportData}>Exporter une sauvegarde JSON</button>
+            <div className="storageMeter"><span>Empreinte locale</span><strong>{localBytes < 1024 * 1024 ? `${Math.max(1, Math.round(localBytes / 1024))} Ko` : `${(localBytes / 1024 / 1024).toFixed(2)} Mo`}</strong></div>
+            <button className="secondary" onClick={exportData}>Exporter une sauvegarde JSON v3</button>
             <button className="secondary" onClick={exportCsv}>Exporter séances + mesures en CSV</button>
             <label className="secondary fileButton">Importer une sauvegarde<input type="file" accept="application/json" onChange={(e) => importData(e.target.files?.[0])} /></label>
             <button className="secondary dangerButton" onClick={resetLocalData}>Réinitialiser les données de cet appareil</button>
