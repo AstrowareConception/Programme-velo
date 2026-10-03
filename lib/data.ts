@@ -1,4 +1,5 @@
 import type { Badge, AppState, Preferences, WeekTarget, WorkoutTemplate } from "./types";
+import { campaignBonusXp, campaigns, campaignProgress } from "./campaigns";
 
 export const STORAGE_KEY = "veloquest:v1";
 
@@ -319,7 +320,7 @@ export function totalXp(state: AppState) {
     return s.points >= target.points && s.minutes >= target.minutes && s.sessions >= target.sessions && s.variety >= target.variety && s.hard <= target.maxHard;
   }).length;
   const bonusXp = weekTargets.reduce((sum, target) => sum + weeklyStats(state, target.week).bonusXp, 0);
-  return sessionXp + bonusXp + completedWeeks * 250;
+  return sessionXp + bonusXp + completedWeeks * 250 + campaignBonusXp(state.sessions);
 }
 
 export function levelForXp(xp: number) {
