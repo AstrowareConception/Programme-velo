@@ -132,13 +132,23 @@ export function VeloQuestApp() {
     if (!running || !active || !sessionStarted) return;
     segmentDeadlineRef.current = Date.now() + secondsLeft * 1000;
     const timer = window.setInterval(() => {
-      const remaining = Math.max(0, Math.ceil((segmentDeadlineRef.current - Date.now()) / 1000));
+      const now = Date.now();
+      const remaining = Math.ceil((segmentDeadlineRef.current - now) / 1000);
       if (remaining > 0) {
         setSecondsLeft(remaining);
         return;
       }
 
-      const next = segmentIndex + 1;
+      let overdueMs = Math.max(0, now - segmentDeadlineRef.current);
+      let next = segmentIndex + 1;
+
+      while (next < active.segments.length) {
+        const segmentMs = Math.round(active.segments[next].minutes * 60 * 1000);
+        if (overdueMs < segmentMs) break;
+        overdueMs -= segmentMs;
+        next += 1;
+      }
+
       if (next >= active.segments.length) {
         setSecondsLeft(0);
         setRunning(false);
@@ -147,10 +157,11 @@ export function VeloQuestApp() {
         return;
       }
 
+      const nextTotalMs = Math.round(active.segments[next].minutes * 60 * 1000);
+      const nextRemainingSeconds = Math.max(1, Math.ceil((nextTotalMs - overdueMs) / 1000));
       setSegmentIndex(next);
-      const nextSeconds = Math.round(active.segments[next].minutes * 60);
-      setSecondsLeft(nextSeconds);
-      segmentDeadlineRef.current = Date.now() + nextSeconds * 1000;
+      setSecondsLeft(nextRemainingSeconds);
+      segmentDeadlineRef.current = now + nextRemainingSeconds * 1000;
       cueSegment(active.segments[next], { ...defaultPreferences, ...(state.preferences ?? {}) });
     }, 250);
 
@@ -292,8 +303,8 @@ export function VeloQuestApp() {
     if (bike && telemetry.distanceM !== undefined && climbStartDistanceM !== null) {
       return Math.max(0, Math.min(1, (telemetry.distanceM - climbStartDistanceM) / (activeClimb.distanceKm * 1000)));
     }
-    const segmentFraction = active.segments.length ? segmentIndex / active.segments.length : 0;
-    return Math.max(0, Math.min(1, segmentFraction));
+    const timedProgress = totalSessionSeconds ? sessionElapsedSeconds / totalSessionSeconds : 0;
+    return Math.max(0, Math.min(1, timedProgress));
   }, [activeClimb, active, bike, telemetry.distanceM, climbStartDistanceM, segmentIndex]);
 
   useEffect(() => {
