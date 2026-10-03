@@ -9,7 +9,16 @@ import { ClimbProfile } from "@/components/ClimbProfile";
 import { RouteMap } from "@/components/RouteMap";
 import { MetricChart } from "@/components/MetricChart";
 import { InstallCard } from "@/components/InstallCard";
-import { climbs, climbToWorkout, type ClimbChallenge } from "@/lib/routes";
+import {
+  climbs,
+  climbToWorkout,
+  routeCategory,
+  routeDifficulty,
+  routeSearchText,
+  routeTerrain,
+  type ClimbChallenge,
+  type RouteCategory
+} from "@/lib/routes";
 import { parseGpxFile } from "@/lib/gpx";
 import {
   STORAGE_KEY,
@@ -103,6 +112,11 @@ export function VeloQuestApp() {
   const [climbStartDistanceM, setClimbStartDistanceM] = useState<number | null>(null);
   const [customClimbs, setCustomClimbs] = useState<ClimbChallenge[]>([]);
   const [gpxError, setGpxError] = useState<string | null>(null);
+  const [routeSearch, setRouteSearch] = useState("");
+  const [routeCategoryFilter, setRouteCategoryFilter] = useState<"all" | RouteCategory>("all");
+  const [routeDifficultyFilter, setRouteDifficultyFilter] = useState<0 | 1 | 2 | 3 | 4 | 5>(0);
+  const [routeFavoritesOnly, setRouteFavoritesOnly] = useState(false);
+  const [routeSort, setRouteSort] = useState<"featured" | "distance" | "elevation" | "difficulty" | "pb">("featured");
   const lastSampleAt = useRef(0);
   const segmentDeadlineRef = useRef(0);
   const timeAttackStartedAtRef = useRef(0);
@@ -266,6 +280,29 @@ export function VeloQuestApp() {
   const latestWaist = [...sortedMeasurements].reverse().find((m) => m.waist !== undefined)?.waist;
   const latestAbdomen = [...sortedMeasurements].reverse().find((m) => m.abdomen !== undefined)?.abdomen;
   const allClimbs = useMemo(() => [...climbs, ...customClimbs], [customClimbs]);
+  const favoriteRouteIds = state.favoriteRouteIds ?? [];
+  const visibleRoutes = useMemo(() => {
+    const query = routeSearch.trim().toLocaleLowerCase("fr");
+    const filtered = allClimbs.filter((route) => {
+      if (query && !routeSearchText(route).includes(query)) return false;
+      if (routeCategoryFilter !== "all" && routeCategory(route) !== routeCategoryFilter) return false;
+      if (routeDifficultyFilter && routeDifficulty(route) !== routeDifficultyFilter) return false;
+      if (routeFavoritesOnly && !favoriteRouteIds.includes(route.id)) return false;
+      return true;
+    });
+
+    return [...filtered].sort((a, b) => {
+      if (routeSort === "distance") return b.distanceKm - a.distanceKm;
+      if (routeSort === "elevation") return b.elevationGainM - a.elevationGainM;
+      if (routeSort === "difficulty") return routeDifficulty(b) - routeDifficulty(a);
+      if (routeSort === "pb") {
+        const aPb = personalBest(state.sessions, a.id)?.metrics?.elapsedSeconds ?? Number.POSITIVE_INFINITY;
+        const bPb = personalBest(state.sessions, b.id)?.metrics?.elapsedSeconds ?? Number.POSITIVE_INFINITY;
+        return aPb - bPb;
+      }
+      return Number(Boolean(b.featured)) - Number(Boolean(a.featured)) || routeDifficulty(b) - routeDifficulty(a);
+    });
+  }, [allClimbs, routeSearch, routeCategoryFilter, routeDifficultyFilter, routeFavoritesOnly, routeSort, favoriteRouteIds, state.sessions]);
   const selectedSession = selectedSessionId ? state.sessions.find((session) => session.id === selectedSessionId) : undefined;
   const selectedTemplate = selectedSession ? workouts.find((w) => w.id === selectedSession.templateId) : undefined;
   const selectedRoute = selectedSession ? allClimbs.find((c) => c.id === selectedSession.routeId) : undefined;
@@ -715,6 +752,19 @@ export function VeloQuestApp() {
 
   function deleteCustomClimb(id: string) {
     setCustomClimbs((previous) => previous.filter((climb) => climb.id !== id));
+    setState((prev) => ({ ...prev, favoriteRouteIds: (prev.favoriteRouteIds ?? []).filter((routeId) => routeId !== id) }));
+  }
+
+  function toggleRouteFavorite(id: string) {
+    setState((prev) => {
+      const current = prev.favoriteRouteIds ?? [];
+      return {
+        ...prev,
+        favoriteRouteIds: current.includes(id)
+          ? current.filter((routeId) => routeId !== id)
+          : [...current, id]
+      };
+    });
   }
 
   return (
