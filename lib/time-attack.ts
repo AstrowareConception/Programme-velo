@@ -74,3 +74,24 @@ export function ghostDeltaSeconds(best: CompletedSession | undefined, distanceKm
   if (ghost === undefined) return undefined;
   return elapsedSeconds - ghost;
 }
+
+
+export function ghostDistanceAtElapsed(best: CompletedSession | undefined, elapsedSeconds: number, routeDistanceKm: number) {
+  if (!best?.metrics?.elapsedSeconds) return undefined;
+  const trace = normalizedTrace(best.metrics.samples);
+  if (trace.length >= 2) {
+    if (elapsedSeconds <= trace[0].elapsedSeconds) return trace[0].distanceKm;
+    for (let i=1;i<trace.length;i++) {
+      const a=trace[i-1];
+      const b=trace[i];
+      if (elapsedSeconds <= b.elapsedSeconds) {
+        const span=Math.max(0.001,b.elapsedSeconds-a.elapsedSeconds);
+        const ratio=Math.max(0,Math.min(1,(elapsedSeconds-a.elapsedSeconds)/span));
+        return a.distanceKm+(b.distanceKm-a.distanceKm)*ratio;
+      }
+    }
+    return Math.min(routeDistanceKm, trace.at(-1)?.distanceKm ?? routeDistanceKm);
+  }
+  const progress = Math.max(0, Math.min(1, elapsedSeconds / best.metrics.elapsedSeconds));
+  return routeDistanceKm * progress;
+}
