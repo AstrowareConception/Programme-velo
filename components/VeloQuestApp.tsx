@@ -170,6 +170,40 @@ export function VeloQuestApp() {
 
   const preferences: Preferences = { ...defaultPreferences, ...(state.preferences ?? {}) };
 
+  useEffect(() => {
+    if (!toast) return;
+    const timer = window.setTimeout(() => setToast(null), 3200);
+    return () => window.clearTimeout(timer);
+  }, [toast]);
+
+  useEffect(() => {
+    if (!running || !sessionStarted || !preferences.keepScreenAwake) {
+      try { wakeLockRef.current?.release?.(); } catch {}
+      wakeLockRef.current = null;
+      return;
+    }
+
+    let cancelled = false;
+    const acquire = async () => {
+      const lock = await requestScreenWakeLock();
+      if (!cancelled) wakeLockRef.current = lock;
+      else try { await lock?.release?.(); } catch {}
+    };
+    acquire();
+
+    const onVisibility = () => {
+      if (document.visibilityState === "visible" && running) acquire();
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+
+    return () => {
+      cancelled = true;
+      document.removeEventListener("visibilitychange", onVisibility);
+      try { wakeLockRef.current?.release?.(); } catch {}
+      wakeLockRef.current = null;
+    };
+  }, [running, sessionStarted, preferences.keepScreenAwake]);
+
   const week = currentProgramWeek(state.profile.startDate);
   const target = weekTargets[week - 1];
   const stats = weeklyStats(state, week);
@@ -262,6 +296,8 @@ export function VeloQuestApp() {
         }
       );
       setBike(connection);
+      const range = connection.capabilities.resistanceRange;
+      setToast(range ? `${connection.deviceName} connecté · résistance ${range.min}–${range.max}` : `${connection.deviceName} connecté`);
     } catch (error) {
       setBluetoothError(error instanceof Error ? error.message : "Connexion Bluetooth impossible.");
     } finally {
@@ -275,6 +311,7 @@ export function VeloQuestApp() {
     setSegmentIndex(0);
     setSecondsLeft(Math.round(workout.segments[0].minutes * 60));
     setRunning(false);
+    setSessionStarted(false);
     setShowFinish(false);
     setTelemetrySamples([]);
     lastSampleAt.current = 0;
@@ -317,7 +354,7 @@ export function VeloQuestApp() {
             avgHeartRate: n(form, "avgHeartRate") ?? autoMetrics.avgHeartRate,
             maxHeartRate: autoMetrics.maxHeartRate,
             avgResistance: autoMetrics.avgResistance,
-            samples: hasFtms ? telemetrySamples : undefined
+            samples: hasFtms && preferences.keepTelemetryTrace ? compactTelemetry(telemetrySamples) : undefined
           }
         }
       ]
@@ -327,6 +364,44 @@ export function VeloQuestApp() {
     setRunning(false);
     setShowFinish(false);
     setTelemetrySamples([]);
+    setToast(`Quête validée · +${active.xp} XP`);
+  }
+
+  function beginSession() {
+    if (!active) return;
+    setSessionStarted(true);
+    setRunning(true);
+    const seconds = Math.round(active.segments[segmentIndex].minutes * 60);
+    setSecondsLeft(seconds);
+    segmentDeadlineRef.current = Date.now() + seconds * 1000;
+    cueSegment(active.segments[segmentIndex], preferences);
+  }
+
+  function togglePause() {
+    if (!active || !sessionStarted) return;
+    if (running) {
+      setRunning(false);
+      return;
+    }
+    segmentDeadlineRef.current = Date.now() + secondsLeft * 1000;
+    setRunning(true);
+  }
+
+  function goToSegment(index: number) {
+    if (!active) return;
+    const next = Math.max(0, Math.min(active.segments.length - 1, index));
+    setSegmentIndex(next);
+    const seconds = Math.round(active.segments[next].minutes * 60);
+    setSecondsLeft(seconds);
+    segmentDeadlineRef.current = Date.now() + seconds * 1000;
+    if (sessionStarted) cueSegment(active.segments[next], preferences);
+  }
+
+  function updatePreference(key: keyof Preferences, value: boolean) {
+    setState((prev) => ({
+      ...prev,
+      preferences: { ...defaultPreferences, ...(prev.preferences ?? {}), [key]: value }
+    }));
   }
 
   function addMeasurement(form: FormData) {
