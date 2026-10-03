@@ -359,7 +359,7 @@ export function VeloQuestApp() {
   }, [routeMode, activeClimb, sessionStarted, currentRouteKm, timeAttackElapsedSeconds]);
 
   useEffect(() => {
-    if (routeMode !== "timeAttack" || !activeClimb || !bike || climbStartDistanceM === null || !sessionStarted) return;
+    if (routeMode !== "timeAttack" || !activeClimb || !active || !bike || climbStartDistanceM === null || !sessionStarted) return;
     const profileIndex = activeClimb.profile.slice(1).findIndex((point) => currentRouteKm <= point.km);
     const nextIndex = profileIndex < 0 ? active.segments.length - 1 : profileIndex;
     if (nextIndex !== segmentIndex) {
