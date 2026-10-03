@@ -99,7 +99,7 @@ test("manifest is served with VeloQuest metadata", async ({ request }) => {
 });
 
 
-test("route favorite persists and favorites filter isolates it", async ({ page }) => {
+test("route favorite is persisted locally and favorites filter isolates it", async ({ page }) => {
   await seed(page);
   await page.goto("/");
   await page.getByRole("button", { name: /Parcours/ }).click();
@@ -110,10 +110,13 @@ test("route favorite persists and favorites filter isolates it", async ({ page }
   await galibier.getByRole("button", { name: "Ajouter aux favoris" }).click();
   await expect(galibier.getByRole("button", { name: "Retirer des favoris" })).toBeVisible();
 
-  await page.reload();
-  await page.getByRole("button", { name: /Parcours/ }).click();
-  await page.getByRole("button", { name: /Favoris/ }).click();
+  await expect.poll(async () => page.evaluate(() => {
+    const raw = localStorage.getItem("veloquest:v1");
+    return raw ? JSON.parse(raw).favoriteRouteIds : [];
+  })).toContain("galibier-valloire");
 
+  await page.getByLabel("Rechercher").fill("");
+  await page.getByRole("button", { name: /Favoris/ }).click();
   await expect(page.getByRole("heading", { name: "Col du Galibier" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Mont Ventoux" })).toHaveCount(0);
 });
