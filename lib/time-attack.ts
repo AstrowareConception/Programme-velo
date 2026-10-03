@@ -95,3 +95,30 @@ export function ghostDistanceAtElapsed(best: CompletedSession | undefined, elaps
   const progress = Math.max(0, Math.min(1, elapsedSeconds / best.metrics.elapsedSeconds));
   return routeDistanceKm * progress;
 }
+
+
+export function segmentAttempts(sessions: CompletedSession[], routeId: string, segmentIndex: number) {
+  return sessions
+    .filter((session) =>
+      session.routeId === routeId &&
+      session.metrics?.segmentAttackIndex === segmentIndex &&
+      typeof session.metrics.elapsedSeconds === "number"
+    )
+    .sort((a,b) => (a.metrics?.elapsedSeconds ?? Infinity) - (b.metrics?.elapsedSeconds ?? Infinity));
+}
+
+export function segmentPersonalBest(sessions: CompletedSession[], routeId: string, segmentIndex: number) {
+  return segmentAttempts(sessions, routeId, segmentIndex)[0];
+}
+
+export function segmentBounds(distanceKm: number, segmentIndex: number, segments = 4) {
+  const index = Math.max(0, Math.min(segments - 1, segmentIndex));
+  const size = distanceKm / segments;
+  return {
+    startKm: size * index,
+    endKm: size * (index + 1),
+    distanceKm: size,
+    startRatio: index / segments,
+    endRatio: (index + 1) / segments
+  };
+}
