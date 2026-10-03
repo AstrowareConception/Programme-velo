@@ -193,6 +193,7 @@ test("campaign panel opens the next discovery stage", async ({ page }) => {
   await campaign.getByRole("button", { name: /Continuer · Velleron/ }).click();
 
   await expect(page.getByText("PARCOURS").first()).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Velleron – L’Isle-sur-la-Sorgue" })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Démarrer la séance" })).toBeVisible();
+  const preflight = page.locator(".sessionPreview");
+  await expect(preflight.getByRole("heading", { name: "Velleron – L’Isle-sur-la-Sorgue" })).toBeVisible();
+  await expect(preflight.getByRole("button", { name: "Démarrer la séance" })).toBeVisible();
 });
