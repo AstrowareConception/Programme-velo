@@ -120,6 +120,7 @@ export type AppState = {
   sessions: CompletedSession[];
   measurements: Measurement[];
   preferences?: Preferences;
+  favoriteRouteIds?: string[];
 };
 
 export type Badge = {
