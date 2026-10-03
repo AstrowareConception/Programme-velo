@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { AppState, Measurement, Preferences, TelemetrySample, WorkoutTemplate } from "@/lib/types";
 import { connectFtmsBike, hasWebBluetooth, type BikeConnection, type BikeTelemetry, webBluetoothHint } from "@/lib/ftms";
@@ -880,6 +881,16 @@ export function VeloQuestApp() {
 
           <InstallCard />
 
+          <section className="card quickGuide">
+            <div className="sectionHead"><div><p className="eyebrow">GUIDE RAPIDE</p><h2>Une routine simple</h2></div><span className="spark">4 étapes</span></div>
+            <div className="guideSteps">
+              <div><span>1</span><p><strong>Choisis selon ton temps.</strong><small>Le Coach Express adapte la séance au créneau et à ton énergie.</small></p></div>
+              <div><span>2</span><p><strong>Respecte surtout le RPE.</strong><small>Le niveau TEB5 est un repère ; utilise la calibration globale s’il est trop facile ou trop dur.</small></p></div>
+              <div><span>3</span><p><strong>Enregistre la séance.</strong><small>Bluetooth si disponible, sinon recopie simplement les chiffres utiles du vélo.</small></p></div>
+              <div><span>4</span><p><strong>Suis les tendances.</strong><small>Poids, tour de taille, régularité et volume comptent davantage qu’une valeur isolée.</small></p></div>
+            </div>
+          </section>
+
           <section className="card">
             <div className="sectionHead"><div><p className="eyebrow">CONFORT DE SÉANCE</p><h2>Ton cockpit</h2></div><span className="spark">personnalisable</span></div>
             <div className="toggleList">
@@ -955,6 +966,7 @@ export function VeloQuestApp() {
             <button className="secondary" onClick={exportData}>Exporter une sauvegarde JSON v3</button>
             <button className="secondary" onClick={exportCsv}>Exporter séances + mesures en CSV</button>
             <label className="secondary fileButton">Importer une sauvegarde<input type="file" accept="application/json" onChange={(e) => importData(e.target.files?.[0])} /></label>
+            <Link href="/confidentialite" className="secondary linkButton">Confidentialité & stockage local</Link>
             <button className="secondary dangerButton" onClick={resetLocalData}>Réinitialiser les données de cet appareil</button>
           </section>
         </section>
