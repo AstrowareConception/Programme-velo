@@ -22,7 +22,8 @@ import {
   workouts,
   streak,
   isPerfectWeek,
-  defaultPreferences
+  defaultPreferences,
+  levelTitle
 } from "@/lib/data";
 import { compactTelemetry, cueSegment, formatClock, requestScreenWakeLock } from "@/lib/session";
 
@@ -228,6 +229,8 @@ export function VeloQuestApp() {
   const stats = weeklyStats(state, week);
   const xp = totalXp(state);
   const level = levelForXp(xp);
+  const currentLevelTitle = levelTitle(level);
+  const levelXp = xp % 500;
   const allBadges = badges(state);
   const sortedMeasurements = [...state.measurements].sort((a, b) => a.date.localeCompare(b.date));
   const latestMeasurement = sortedMeasurements.at(-1);
@@ -627,8 +630,9 @@ export function VeloQuestApp() {
           <p className="eyebrow">SEMAINE {week} / 12</p>
           <h1>{state.profile.name ? `${state.profile.name}, ta quête continue.` : "Ta quête continue."}</h1>
           <p>Choisis selon ton temps et ton énergie. VeloQuest récompense la régularité, la variété et la progression.</p>
+          <div className="heroLevelProgress"><span><strong>{currentLevelTitle}</strong><small>{levelXp}/500 XP vers le niveau {level + 1}</small></span><i><b style={{ width: `${Math.round((levelXp / 500) * 100)}%` }} /></i></div>
         </div>
-        <div className="heroRune"><span>{level}</span><small>NIVEAU</small></div>
+        <div className="heroRune"><span>{level}</span><small>NIVEAU</small><em>{currentLevelTitle}</em></div>
       </section>
 
       {tab === "dashboard" && (
