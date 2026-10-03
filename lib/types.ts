@@ -47,6 +47,7 @@ export type TelemetrySample = {
   resistance?: number;
   powerW?: number;
   heartRate?: number;
+  calories?: number;
   distanceKm?: number;
 };
 
