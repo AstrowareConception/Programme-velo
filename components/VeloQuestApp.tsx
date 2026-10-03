@@ -458,9 +458,13 @@ export function VeloQuestApp() {
     setTelemetrySamples([]);
   }
 
-  function launch(workout: WorkoutTemplate, climb: ClimbChallenge | null = null) {
+  function launch(workout: WorkoutTemplate, climb: ClimbChallenge | null = null, mode: RouteMode = "training") {
     setActive(workout);
     setActiveClimb(climb);
+    setRouteMode(climb ? mode : "training");
+    setTimeAttackElapsedSeconds(0);
+    setTimeAttackSplits([]);
+    timeAttackStartedAtRef.current = 0;
     setSegmentIndex(0);
     setSecondsLeft(Math.round(workout.segments[0].minutes * 60));
     setRunning(false);
@@ -476,7 +480,20 @@ export function VeloQuestApp() {
     const manualUsed = ["distance", "calories", "avgCadence", "avgPower", "avgHeartRate", "rpe", "note"]
       .some((key) => String(form.get(key) ?? "").trim().length > 0);
     const hasFtms = telemetrySamples.length > 0;
-    const duration = n(form, "duration") ?? active.duration;
+    const isTimeAttack = routeMode === "timeAttack" && Boolean(activeClimb);
+    const elapsedSeconds = isTimeAttack
+      ? (n(form, "elapsedSeconds") ?? timeAttackElapsedSeconds)
+      : undefined;
+    const duration = isTimeAttack && elapsedSeconds !== undefined
+      ? elapsedSeconds / 60
+      : (n(form, "duration") ?? active.duration);
+    const previousBest = isTimeAttack && activeClimb ? personalBest(state.sessions, activeClimb.id) : undefined;
+    const isPersonalBest = Boolean(
+      isTimeAttack &&
+      elapsedSeconds !== undefined &&
+      (!previousBest?.metrics?.elapsedSeconds || elapsedSeconds < previousBest.metrics.elapsedSeconds)
+    );
+    const awardedXp = active.xp + (isPersonalBest ? 50 : 0);
 
     setState((prev) => ({
       ...prev,
@@ -489,7 +506,7 @@ export function VeloQuestApp() {
           date: new Date().toISOString(),
           duration,
           points: active.points,
-          xp: active.xp,
+          xp: awardedXp,
           intensity: active.intensity,
           kind: active.kind,
           bonus: Boolean(active.bonus),
@@ -497,7 +514,10 @@ export function VeloQuestApp() {
           note: String(form.get("note") ?? "").trim() || undefined,
           metrics: {
             source: hasFtms && manualUsed ? "mixed" : hasFtms ? "ftms" : "manual",
-            distanceKm: n(form, "distance") ?? autoMetrics.distanceKm,
+            elapsedSeconds,
+            timeAttack: isTimeAttack || undefined,
+            checkpointSplits: isTimeAttack ? timeAttackSplits : undefined,
+            distanceKm: n(form, "distance") ?? autoMetrics.distanceKm ?? (activeClimb ? currentRouteKm : undefined),
             calories: n(form, "calories"),
             avgSpeedKmh: n(form, "avgSpeed") ?? autoMetrics.avgSpeedKmh,
             avgCadenceRpm: n(form, "avgCadence") ?? autoMetrics.avgCadenceRpm,
@@ -517,12 +537,21 @@ export function VeloQuestApp() {
     setRunning(false);
     setShowFinish(false);
     setTelemetrySamples([]);
-    setToast(`Quête validée · +${active.xp} XP`);
+    setTimeAttackElapsedSeconds(0);
+    setTimeAttackSplits([]);
+    timeAttackStartedAtRef.current = 0;
+    setToast(isPersonalBest ? `Nouveau record personnel · +${awardedXp} XP` : `Quête validée · +${awardedXp} XP`);
   }
 
   function beginSession() {
     if (!active) return;
     setSessionStarted(true);
+    if (activeClimb) setClimbStartDistanceM(telemetry.distanceM ?? null);
+    if (routeMode === "timeAttack") {
+      setTimeAttackElapsedSeconds(0);
+      setTimeAttackSplits([]);
+      timeAttackStartedAtRef.current = Date.now();
+    }
     setRunning(true);
     const seconds = Math.round(active.segments[segmentIndex].minutes * 60);
     setSecondsLeft(seconds);
@@ -531,7 +560,7 @@ export function VeloQuestApp() {
   }
 
   function togglePause() {
-    if (!active || !sessionStarted) return;
+    if (!active || !sessionStarted || routeMode === "timeAttack") return;
     if (running) {
       setRunning(false);
       return;
