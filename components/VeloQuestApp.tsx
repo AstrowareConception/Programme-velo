@@ -772,7 +772,7 @@ export function VeloQuestApp() {
       {active && (
         <div className="modalBackdrop">
           <div className={`sessionModal ${activeClimb ? "climbSession" : ""}`}>
-            <button className="close" onClick={() => { setActive(null); setActiveClimb(null); setRunning(false); }}>×</button>
+            <button className="close" aria-label="Fermer la séance" onClick={() => { setActive(null); setActiveClimb(null); setRunning(false); setSessionStarted(false); }}>×</button>
 
             {showFinish ? (
               <form action={finishActive} className="finishForm">
@@ -800,6 +800,31 @@ export function VeloQuestApp() {
                   <button className="primary" type="submit">Valider la quête · +{active.xp} XP</button>
                 </div>
               </form>
+            ) : !sessionStarted ? (
+              <div className="sessionPreview">
+                <p className="eyebrow">{activeClimb ? "PARCOURS" : "PRÉPARATION"}</p>
+                <h2>{active.name}</h2>
+                <p className="previewDescription">{active.description}</p>
+                <div className="previewStats">
+                  <span><small>Durée</small><strong>{active.duration} min</strong></span>
+                  <span><small>Intensité</small><strong>{active.intensity === "hard" ? "dure" : active.intensity === "moderate" ? "soutenue" : "facile"}</strong></span>
+                  <span><small>Récompense</small><strong>+{active.xp} XP</strong></span>
+                  <span><small>Segments</small><strong>{active.segments.length}</strong></span>
+                </div>
+                {bike && <div className="connectedNotice">✓ {bike.deviceName} connecté · télémétrie automatique activée</div>}
+                <div className="segmentPlan">
+                  {active.segments.map((segment, index) => (
+                    <button key={index} type="button" onClick={() => goToSegment(index)}>
+                      <span>{String(index + 1).padStart(2, "0")}</span>
+                      <div><strong>{segment.label}</strong><small>{segment.minutes} min · niveau {segment.resistance} · RPE {segment.rpe}</small></div>
+                    </button>
+                  ))}
+                </div>
+                <div className="previewFooter">
+                  <span>{preferences.keepScreenAwake ? "☀ écran actif" : "écran standard"} · {preferences.voiceCues ? "voix active" : preferences.soundCues ? "bips actifs" : "silencieux"}</span>
+                  <button className="primary bigStart" onClick={beginSession}>Démarrer la séance</button>
+                </div>
+              </div>
             ) : (
               <>
                 <p className="eyebrow">{activeClimb ? "COL DE LÉGENDE" : active.name.toUpperCase()}</p>
@@ -817,7 +842,7 @@ export function VeloQuestApp() {
                   <small>NIVEAU TEB5</small>
                   <strong>{active.segments[segmentIndex].resistance}</strong>
                 </div>
-                <div className="timer">{String(Math.floor(secondsLeft / 60)).padStart(2, "0")}:{String(secondsLeft % 60).padStart(2, "0")}</div>
+                <div className="timer" aria-live="off">{formatClock(secondsLeft)}</div>
                 <div className="segmentMeta"><span>RPE {active.segments[segmentIndex].rpe}</span>{active.segments[segmentIndex].cadence && <span>Cible {active.segments[segmentIndex].cadence} tr/min</span>}</div>
                 {bike && (
                   <div className="liveStrip">
@@ -827,14 +852,14 @@ export function VeloQuestApp() {
                     <span><small>BPM</small><strong>{telemetry.heartRate?.toFixed(0) ?? "—"}</strong></span>
                   </div>
                 )}
+                {active.segments[segmentIndex + 1] && (
+                  <div className="nextSegment"><small>ENSUITE</small><strong>{active.segments[segmentIndex + 1].label}</strong><span>niveau {active.segments[segmentIndex + 1].resistance}</span></div>
+                )}
                 <div className="segmentProgress">{active.segments.map((_, i) => <i key={i} className={i <= segmentIndex ? "done" : ""} />)}</div>
-                <div className="modalActions">
-                  <button className="primary" onClick={() => setRunning((v) => !v)}>{running ? "Pause" : "Démarrer"}</button>
-                  <button className="secondary" onClick={() => {
-                    const next = Math.min(active.segments.length - 1, segmentIndex + 1);
-                    setSegmentIndex(next);
-                    setSecondsLeft(Math.round(active.segments[next].minutes * 60));
-                  }}>Segment suivant</button>
+                <div className="modalActions three">
+                  <button className="secondary" disabled={segmentIndex === 0} onClick={() => goToSegment(segmentIndex - 1)}>← Précédent</button>
+                  <button className="primary" onClick={togglePause}>{running ? "Pause" : "Reprendre"}</button>
+                  <button className="secondary" disabled={segmentIndex >= active.segments.length - 1} onClick={() => goToSegment(segmentIndex + 1)}>Suivant →</button>
                 </div>
                 <button className="finish" onClick={() => { setRunning(false); setShowFinish(true); }}>Terminer et enregistrer</button>
               </>
@@ -842,6 +867,8 @@ export function VeloQuestApp() {
           </div>
         </div>
       )}
+
+      {toast && <div className="toast" role="status">{toast}</div>}
 
       {showSetup && (
         <div className="modalBackdrop">
@@ -877,6 +904,16 @@ function Stat({ label, value, target, suffix = "" }: { label: string; value: num
   return <article className="card stat"><span>{label}</span><strong>{value}{suffix}</strong><small>objectif {target}{suffix}</small><div className="bar"><i style={{ width: `${pct(value, target)}%` }} /></div></article>;
 }
 
+function Toggle({ label, description, checked, onChange }: { label: string; description: string; checked: boolean; onChange: (value: boolean) => void }) {
+  return (
+    <label className="toggleRow">
+      <span><strong>{label}</strong><small>{description}</small></span>
+      <input type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} />
+      <i aria-hidden="true" />
+    </label>
+  );
+}
+
 function NavButton({ active, onClick, icon, label }: { active: boolean; onClick: () => void; icon: string; label: string }) {
-  return <button className={active ? "active" : ""} onClick={onClick}><span>{icon}</span><small>{label}</small></button>;
+  return <button className={active ? "active" : ""} onClick={onClick} aria-current={active ? "page" : undefined}><span>{icon}</span><small>{label}</small></button>;
 }
