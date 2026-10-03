@@ -589,3 +589,25 @@ button:focus-visible, input:focus-visible, .fileButton:focus-within { outline: 2
   .sectorRow { grid-template-columns:32px 1.4fr 1fr; }
   .sectorRow > div:nth-of-type(3) { display:none; }
 }
+
+
+/* Long-term palmares */
+.palmares { margin:18px 0; border-color:rgba(255,209,102,.16); background:linear-gradient(145deg,rgba(255,209,102,.035),rgba(18,24,43,.92)); }
+.palmaresStats { display:grid; grid-template-columns:repeat(6,1fr); gap:7px; margin:14px 0 18px; }
+.palmaresStats span { padding:10px; border:1px solid var(--line); border-radius:11px; background:rgba(255,255,255,.025); }
+.palmaresStats small, .palmaresStats strong { display:block; }
+.palmaresStats small { color:var(--muted); font-size:.52rem; }
+.palmaresStats strong { margin-top:4px; font-size:.9rem; }
+.collectionList { display:grid; gap:8px; }
+.collectionCard { display:grid; grid-template-columns:42px 1fr auto; gap:11px; align-items:center; padding:12px; border:1px solid var(--line); border-radius:13px; background:rgba(255,255,255,.025); opacity:.82; }
+.collectionCard > span { width:40px; height:40px; display:grid; place-items:center; border-radius:12px; background:rgba(255,209,102,.07); font-size:1.2rem; }
+.collectionCard > div > div { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.collectionCard > div > div small { color:var(--muted); }
+.collectionCard p { margin:3px 0 7px; color:var(--muted); font-size:.66rem; }
+.collectionCard i { display:block; height:4px; border-radius:999px; overflow:hidden; background:rgba(255,255,255,.07); }
+.collectionCard i b { display:block; height:100%; background:linear-gradient(90deg,var(--gold),var(--cyan)); }
+.collectionCard > em { font-style:normal; color:var(--muted); font-size:.7rem; font-weight:900; }
+.collectionCard.unlocked { opacity:1; border-color:rgba(185,255,102,.2); }
+.collectionCard.unlocked > em { color:var(--lime); font-size:1.05rem; }
+@media (max-width:900px) { .palmaresStats { grid-template-columns:repeat(3,1fr); } }
+@media (max-width:520px) { .palmaresStats { grid-template-columns:1fr 1fr; } }
