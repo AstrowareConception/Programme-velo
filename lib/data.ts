@@ -290,6 +290,10 @@ export function badges(state: AppState): Badge[] {
   const latest = [...state.measurements].sort((a, b) => b.date.localeCompare(a.date))[0];
   const weightLost = state.profile.startWeight && latest?.weight ? state.profile.startWeight - latest.weight : 0;
   const waistLost = state.profile.startWaist && latest?.waist ? state.profile.startWaist - latest.waist : 0;
+  const connected = state.sessions.filter((s) => s.metrics?.source === "ftms" || s.metrics?.source === "mixed");
+  const routeIds = new Set(state.sessions.map((s) => s.routeId).filter(Boolean));
+  const totalDistance = state.sessions.reduce((sum, s) => sum + (s.metrics?.distanceKm ?? 0), 0);
+  const sessionsWithPower = state.sessions.filter((s) => (s.metrics?.avgPowerW ?? 0) > 0);
 
   return [
     { id: "first", name: "Premier tour de roue", icon: "🚲", description: "Terminer une première séance.", unlocked: structured.length >= 1, progress: `${Math.min(structured.length, 1)}/1` },
@@ -301,6 +305,11 @@ export function badges(state: AppState): Badge[] {
     { id: "weight25", name: "Allégé", icon: "⚖️", description: "Perdre 2,5 kg depuis le départ.", unlocked: weightLost >= 2.5, progress: `${Math.max(0, weightLost).toFixed(1)}/2,5 kg` },
     { id: "weight5", name: "Cap -5 kg", icon: "🏔️", description: "Perdre 5 kg depuis le départ.", unlocked: weightLost >= 5, progress: `${Math.max(0, weightLost).toFixed(1)}/5 kg` },
     { id: "waist2", name: "Ceinture gagnée", icon: "📏", description: "Perdre 2 cm de tour de taille.", unlocked: waistLost >= 2, progress: `${Math.max(0, waistLost).toFixed(1)}/2 cm` },
-    { id: "waist5", name: "Silhouette", icon: "🎯", description: "Perdre 5 cm de tour de taille.", unlocked: waistLost >= 5, progress: `${Math.max(0, waistLost).toFixed(1)}/5 cm` }
+    { id: "waist5", name: "Silhouette", icon: "🎯", description: "Perdre 5 cm de tour de taille.", unlocked: waistLost >= 5, progress: `${Math.max(0, waistLost).toFixed(1)}/5 cm` },
+    { id: "connected", name: "Machine liée", icon: "📡", description: "Enregistrer une séance avec télémétrie FTMS.", unlocked: connected.length >= 1, progress: `${Math.min(connected.length, 1)}/1` },
+    { id: "climb1", name: "Premier sommet", icon: "⛰️", description: "Terminer un Col de légende.", unlocked: routeIds.size >= 1, progress: `${Math.min(routeIds.size, 1)}/1` },
+    { id: "climb3", name: "Collectionneur de cols", icon: "🏔️", description: "Terminer 3 cols différents.", unlocked: routeIds.size >= 3, progress: `${Math.min(routeIds.size, 3)}/3` },
+    { id: "distance100", name: "Centurion", icon: "🛣️", description: "Cumuler 100 km enregistrés.", unlocked: totalDistance >= 100, progress: `${Math.min(totalDistance, 100).toFixed(0)}/100 km` },
+    { id: "power", name: "Watts up", icon: "⚡", description: "Enregistrer 5 séances avec une puissance moyenne.", unlocked: sessionsWithPower.length >= 5, progress: `${Math.min(sessionsWithPower.length, 5)}/5` }
   ];
 }
