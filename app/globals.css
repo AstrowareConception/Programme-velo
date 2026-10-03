@@ -362,3 +362,18 @@ button:focus-visible, input:focus-visible, .fileButton:focus-within { outline: 2
 .sessionNote small { color:var(--cyan); letter-spacing:.12em; font-size:.58rem; }
 .sessionNote p { margin:5px 0 0; color:var(--text); }
 @media (max-width:560px) { .detailMetrics { grid-template-columns:1fr 1fr; } }
+
+.weeklyMission { margin-bottom:16px; }
+.weeklyMission > .sectionHead > strong { color:var(--cyan); font-size:.78rem; }
+.missionItems { display:grid; grid-template-columns:repeat(5,1fr); gap:7px; margin-top:14px; }
+.missionItem { display:flex; align-items:center; gap:9px; padding:10px; border:1px solid var(--line); border-radius:12px; background:rgba(255,255,255,.025); }
+.missionItem > span { width:24px; height:24px; display:grid; place-items:center; border-radius:50%; background:rgba(255,255,255,.05); color:var(--muted); flex:0 0 auto; }
+.missionItem strong, .missionItem small { display:block; }
+.missionItem strong { font-size:.74rem; }
+.missionItem small { color:var(--muted); font-size:.61rem; margin-top:2px; }
+.missionItem.done { border-color:rgba(185,255,102,.18); }
+.missionItem.done > span { color:#071018; background:var(--lime); }
+.missionItem.warning { border-color:rgba(255,98,125,.25); }
+.missionItem.warning > span { color:#fff; background:var(--hot); }
+@media (max-width:900px) { .missionItems { grid-template-columns:1fr 1fr 1fr; } }
+@media (max-width:560px) { .missionItems { grid-template-columns:1fr 1fr; } .weeklyMission .sectionHead { align-items:flex-start; } }
