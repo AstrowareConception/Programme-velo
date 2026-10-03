@@ -96,6 +96,9 @@ export function VeloQuestApp() {
     } else {
       setShowSetup(true);
     }
+    const requestedTab = new URLSearchParams(window.location.search).get("tab");
+    if (requestedTab && ["dashboard","sessions","climbs","progress","more"].includes(requestedTab)) setTab(requestedTab as Tab);
+
     const savedRoutes = localStorage.getItem(CUSTOM_ROUTES_KEY);
     if (savedRoutes) {
       try { setCustomClimbs(JSON.parse(savedRoutes)); } catch { /* ignore corrupted custom routes */ }
@@ -212,12 +215,15 @@ export function VeloQuestApp() {
   const allBadges = badges(state);
   const sortedMeasurements = [...state.measurements].sort((a, b) => a.date.localeCompare(b.date));
   const latestMeasurement = sortedMeasurements.at(-1);
+  const latestWeight = [...sortedMeasurements].reverse().find((m) => m.weight !== undefined)?.weight;
+  const latestWaist = [...sortedMeasurements].reverse().find((m) => m.waist !== undefined)?.waist;
+  const latestAbdomen = [...sortedMeasurements].reverse().find((m) => m.abdomen !== undefined)?.abdomen;
   const allClimbs = useMemo(() => [...climbs, ...customClimbs], [customClimbs]);
   const currentStreak = streak(state);
   const perfectWeek = isPerfectWeek(state, week);
   const totalDistance = state.sessions.reduce((sum, session) => sum + (session.metrics?.distanceKm ?? 0), 0);
-  const weightLost = state.profile.startWeight && latestMeasurement?.weight !== undefined ? state.profile.startWeight - latestMeasurement.weight : 0;
-  const waistLost = state.profile.startWaist && latestMeasurement?.waist !== undefined ? state.profile.startWaist - latestMeasurement.waist : 0;
+  const weightLost = state.profile.startWeight && latestWeight !== undefined ? state.profile.startWeight - latestWeight : 0;
+  const waistLost = state.profile.startWaist && latestWaist !== undefined ? state.profile.startWaist - latestWaist : 0;
   const weightPoints = sortedMeasurements.filter((m) => m.weight !== undefined).map((m) => ({ label: dateLabel(m.date), value: m.weight! }));
   const waistPoints = sortedMeasurements.filter((m) => m.waist !== undefined).map((m) => ({ label: dateLabel(m.date), value: m.waist! }));
 
@@ -441,6 +447,48 @@ export function VeloQuestApp() {
     URL.revokeObjectURL(url);
   }
 
+  function downloadText(filename: string, content: string, type = "text/csv;charset=utf-8") {
+    const blob = new Blob([content], { type });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function exportCsv() {
+    const quote = (value: unknown) => `"${String(value ?? "").replaceAll('"', '""')}"`;
+    const sessions = [
+      ["date","seance","duree_min","distance_km","calories","vitesse_moy","rpm_moy","watts_moy","fc_moy","rpe","source"],
+      ...state.sessions.map((session) => {
+        const template = workouts.find((w) => w.id === session.templateId);
+        const route = allClimbs.find((c) => c.id === session.routeId);
+        return [
+          session.date,
+          route?.name ?? template?.name ?? session.templateId,
+          session.duration,
+          session.metrics?.distanceKm,
+          session.metrics?.calories,
+          session.metrics?.avgSpeedKmh,
+          session.metrics?.avgCadenceRpm,
+          session.metrics?.avgPowerW,
+          session.metrics?.avgHeartRate,
+          session.rpe,
+          session.metrics?.source
+        ];
+      })
+    ].map((row) => row.map(quote).join(";")).join("\n");
+
+    const measurements = [
+      ["date","poids_kg","tour_taille_cm","tour_abdominal_cm"],
+      ...state.measurements.map((m) => [m.date,m.weight,m.waist,m.abdomen])
+    ].map((row) => row.map(quote).join(";")).join("\n");
+
+    downloadText(`veloquest-seances-${new Date().toISOString().slice(0,10)}.csv`, sessions);
+    window.setTimeout(() => downloadText(`veloquest-mesures-${new Date().toISOString().slice(0,10)}.csv`, measurements), 200);
+  }
+
   async function importData(file?: File) {
     if (!file) return;
     try {
@@ -645,16 +693,16 @@ export function VeloQuestApp() {
             <section className="card">
               <h2>Nouvelle mesure</h2>
               <form action={addMeasurement} className="form">
-                <label>Poids (kg)<input name="weight" type="number" step="0.1" placeholder={latestMeasurement?.weight?.toString() || "ex. 118.4"} /></label>
-                <label>Tour de taille (cm)<input name="waist" type="number" step="0.1" placeholder={latestMeasurement?.waist?.toString() || "ex. 112"} /></label>
-                <label>Tour abdominal (cm)<input name="abdomen" type="number" step="0.1" placeholder={latestMeasurement?.abdomen?.toString() || "ex. 116"} /></label>
+                <label>Poids (kg)<input name="weight" type="number" step="0.1" placeholder={latestWeight?.toString() || "ex. 118.4"} /></label>
+                <label>Tour de taille (cm)<input name="waist" type="number" step="0.1" placeholder={latestWaist?.toString() || "ex. 112"} /></label>
+                <label>Tour abdominal (cm)<input name="abdomen" type="number" step="0.1" placeholder={latestAbdomen?.toString() || "ex. 116"} /></label>
                 <button className="primary" type="submit">Enregistrer</button>
               </form>
             </section>
             <section className="card">
               <h2>Objectifs</h2>
-              <div className="metricBig"><span>Poids</span><strong>{latestMeasurement?.weight ?? state.profile.startWeight ?? "—"} kg</strong><small>objectif {state.profile.targetWeight ?? "—"} kg</small></div>
-              <div className="metricBig"><span>Tour de taille</span><strong>{latestMeasurement?.waist ?? state.profile.startWaist ?? "—"} cm</strong><small>objectif {state.profile.targetWaist ?? "—"} cm</small></div>
+              <div className="metricBig"><span>Poids</span><strong>{latestWeight ?? state.profile.startWeight ?? "—"} kg</strong><small>objectif {state.profile.targetWeight ?? "—"} kg</small></div>
+              <div className="metricBig"><span>Tour de taille</span><strong>{latestWaist ?? state.profile.startWaist ?? "—"} cm</strong><small>objectif {state.profile.targetWaist ?? "—"} cm</small></div>
             </section>
           </div>
 
@@ -756,6 +804,7 @@ export function VeloQuestApp() {
             <div><p className="eyebrow">DONNÉES LOCALES</p><h2>Profil & sauvegardes</h2><p>Les données restent sur cet appareil tant que tu ne les exportes pas.</p></div>
             <button className="secondary" onClick={() => setShowSetup(true)}>Modifier le profil et les objectifs</button>
             <button className="secondary" onClick={exportData}>Exporter une sauvegarde JSON</button>
+            <button className="secondary" onClick={exportCsv}>Exporter séances + mesures en CSV</button>
             <label className="secondary fileButton">Importer une sauvegarde<input type="file" accept="application/json" onChange={(e) => importData(e.target.files?.[0])} /></label>
           </section>
         </section>
