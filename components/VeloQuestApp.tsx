@@ -15,6 +15,7 @@ import { recommendAdaptiveWorkout } from "@/lib/coach";
 import {
   climbs,
   climbToWorkout,
+  routeSegmentWorkout,
   routeCategory,
   routeDifficulty,
   routeSearchText,
@@ -40,7 +41,7 @@ import {
 } from "@/lib/data";
 import { compactTelemetry, cueSegment, formatClock, requestScreenWakeLock } from "@/lib/session";
 import { createBackup, estimateLocalBytes, normalizeState, parseBackup, safeLocalStorageWrite } from "@/lib/storage";
-import { captureSplits, checkpointKilometers, formatRaceTime, ghostDeltaSeconds, ghostDistanceAtElapsed, personalBest, routeAttempts } from "@/lib/time-attack";
+import { captureSplits, checkpointKilometers, formatRaceTime, ghostDeltaSeconds, ghostDistanceAtElapsed, personalBest, routeAttempts, segmentAttempts, segmentBounds, segmentPersonalBest } from "@/lib/time-attack";
 import { challengesForRoute, evaluateRouteChallenge, routeChallenges, type RouteChallenge } from "@/lib/challenges";
 import {
   clearActiveSessionSnapshot,
@@ -52,7 +53,7 @@ import {
 
 type Tab = "dashboard" | "sessions" | "climbs" | "progress" | "more";
 type Energy = "easy" | "normal" | "hard";
-type RouteMode = "training" | "timeAttack";
+type RouteMode = "training" | "timeAttack" | "segmentAttack";
 const CUSTOM_ROUTES_KEY = "veloquest:custom-routes:v1";
 
 function pct(value: number, target: number) {
@@ -100,6 +101,8 @@ export function VeloQuestApp() {
   const [activeClimb, setActiveClimb] = useState<ClimbChallenge | null>(null);
   const [routeMode, setRouteMode] = useState<RouteMode>("training");
   const [challengeRoute, setChallengeRoute] = useState<ClimbChallenge | null>(null);
+  const [segmentAttackRoute, setSegmentAttackRoute] = useState<ClimbChallenge | null>(null);
+  const [segmentAttackIndex, setSegmentAttackIndex] = useState<number | null>(null);
   const [activeChallenge, setActiveChallenge] = useState<RouteChallenge | null>(null);
   const [pauseCount, setPauseCount] = useState(0);
   const [timeAttackElapsedSeconds, setTimeAttackElapsedSeconds] = useState(0);
@@ -190,6 +193,7 @@ export function VeloQuestApp() {
       routeId: activeClimb?.id,
       routeMode,
       challengeId: activeChallenge?.id,
+      segmentAttackIndex: segmentAttackIndex ?? undefined,
       segmentIndex,
       secondsLeft,
       running,
@@ -203,7 +207,7 @@ export function VeloQuestApp() {
       telemetrySamples: compactTelemetry(telemetrySamples, 180),
       hadBikeConnection: Boolean(bike)
     };
-  }, [active, activeClimb, routeMode, activeChallenge, segmentIndex, secondsLeft, running, sessionStarted, showFinish, timeAttackElapsedSeconds, timeAttackSplits, pauseCount, sessionResistanceDelta, climbStartDistanceM, telemetrySamples, bike]);
+  }, [active, activeClimb, routeMode, activeChallenge, segmentAttackIndex, segmentIndex, secondsLeft, running, sessionStarted, showFinish, timeAttackElapsedSeconds, timeAttackSplits, pauseCount, sessionResistanceDelta, climbStartDistanceM, telemetrySamples, bike]);
 
   useEffect(() => {
     if (!active || !sessionStarted) return;
@@ -230,7 +234,7 @@ export function VeloQuestApp() {
 
   useEffect(() => {
     if (!running || !active || !sessionStarted) return;
-    if (routeMode === "timeAttack" && activeClimb && bike && climbStartDistanceM !== null) return;
+    if ((routeMode === "timeAttack" || routeMode === "segmentAttack") && activeClimb && bike && climbStartDistanceM !== null) return;
     segmentDeadlineRef.current = Date.now() + secondsLeft * 1000;
     const timer = window.setInterval(() => {
       const now = Date.now();
@@ -270,7 +274,7 @@ export function VeloQuestApp() {
   }, [running, active, segmentIndex, sessionStarted, routeMode, activeClimb, bike, climbStartDistanceM]);
 
   useEffect(() => {
-    if (routeMode !== "timeAttack" || !activeClimb || !sessionStarted || !running) return;
+    if ((routeMode !== "timeAttack" && routeMode !== "segmentAttack") || !activeClimb || !sessionStarted || !running) return;
     if (!timeAttackStartedAtRef.current) timeAttackStartedAtRef.current = Date.now() - timeAttackElapsedSeconds * 1000;
 
     const update = () => setTimeAttackElapsedSeconds(Math.max(0, Math.floor((Date.now() - timeAttackStartedAtRef.current) / 1000)));
