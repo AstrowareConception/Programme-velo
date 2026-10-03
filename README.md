@@ -15,9 +15,13 @@ Pas de calendrier rigide. VeloQuest propose un **catalogue de quêtes** à chois
 - travail au seuil ;
 - côtes ;
 - escalier ;
-- micro-séances bonus de 15 minutes.
+- micro-séances bonus de 10, 15 ou 20 minutes ;
+- séance libre pour enregistrer un entraînement improvisé ;
+- Cols de légende avec profil altimétrique et carte interactive.
 
 Le programme dure 12 semaines et suit des objectifs de points, minutes, variété et nombre de séances. Les séances intenses sont volontairement plafonnées : une **semaine parfaite** récompense la régularité et la diversité, pas le surentraînement.
+
+Les challenges de cols utilisent des données globales réelles pour la distance, le dénivelé et les pentes. Les profils intermédiaires embarqués dans la V1 sont des profils d’entraînement simplifiés ; l’import GPX permettra ensuite d’obtenir une reproduction kilométrique plus fidèle.
 
 ## Gamification
 
@@ -27,7 +31,9 @@ Le programme dure 12 semaines et suit des objectifs de points, minutes, variét�
 - badges de variété et de régularité ;
 - badges de perte de poids et de tour de taille ;
 - micro-séances bonus avec XP hebdomadaire plafonné ;
-- recommandations selon la charge récente.
+- recommandations selon la charge récente ;
+- badges pour les ascensions, kilomètres et séances connectées ;
+- badge d’icône PWA lié aux séances restant à accomplir.
 
 ## PWA / vie privée
 
@@ -36,7 +42,13 @@ Le programme dure 12 semaines et suit des objectifs de points, minutes, variét�
 - service worker et fonctionnement offline après première visite ;
 - aucune API, aucun compte, aucun backend ;
 - données conservées dans `localStorage` sous la clé `veloquest:v1` ;
-- export/import JSON depuis l'application.
+- export/import JSON depuis l'application ;
+- télémétrie FTMS enregistrée et échantillonnée lorsqu’elle est disponible ;
+- saisie manuelle enrichie en solution de repli.
+
+### Bluetooth
+
+VeloQuest utilise Web Bluetooth + FTMS lorsque le navigateur le permet. Chrome/Edge desktop et Chrome Android peuvent exploiter ce mode. Les navigateurs iOS actuels n’exposent pas Web Bluetooth aux PWA ; sur iPhone, le mode guidé et la saisie manuelle restent disponibles. Une enveloppe native CoreBluetooth/Capacitor pourra être ajoutée ultérieurement sans modifier le modèle de données.
 
 ## Développement
 
