@@ -98,10 +98,19 @@ export type Profile = {
   targetWaist?: number;
 };
 
+export type Preferences = {
+  soundCues: boolean;
+  voiceCues: boolean;
+  haptics: boolean;
+  keepScreenAwake: boolean;
+  keepTelemetryTrace: boolean;
+};
+
 export type AppState = {
   profile: Profile;
   sessions: CompletedSession[];
   measurements: Measurement[];
+  preferences?: Preferences;
 };
 
 export type Badge = {
