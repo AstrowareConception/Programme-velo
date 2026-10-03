@@ -12,8 +12,7 @@ export const metadata: Metadata = {
   applicationName: "VeloQuest",
   manifest: "/manifest.webmanifest",
   icons: {
-    icon: "/icon.svg",
-    apple: "/icon.svg"
+    icon: "/icon.svg"
   },
   appleWebApp: {
     capable: true,
