@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { captureSplits, checkpointKilometers, formatRaceTime, ghostDeltaSeconds, personalBest } from "../lib/time-attack";
+import { captureSplits, checkpointKilometers, formatRaceTime, ghostDeltaSeconds, ghostDistanceAtElapsed, personalBest } from "../lib/time-attack";
 import type { CompletedSession } from "../lib/types";
 
 function attempt(seconds:number): CompletedSession {
@@ -32,5 +32,16 @@ describe("time attack helpers", () => {
   it("computes ghost delta from PB average pace fallback", () => {
     const best=attempt(1200);
     expect(ghostDeltaSeconds(best,10,20,590)).toBe(-10);
+    expect(ghostDistanceAtElapsed(best,600,20)).toBe(10);
+  });
+
+  it("uses recorded telemetry for ghost position", () => {
+    const best=attempt(1000);
+    best.metrics!.samples = [
+      { t:1000, distanceKm:50 },
+      { t:501000, distanceKm:58 },
+      { t:1001000, distanceKm:70 }
+    ];
+    expect(ghostDistanceAtElapsed(best,500,20)).toBe(8);
   });
 });
