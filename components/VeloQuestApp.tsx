@@ -9,7 +9,16 @@ import { ClimbProfile } from "@/components/ClimbProfile";
 import { RouteMap } from "@/components/RouteMap";
 import { MetricChart } from "@/components/MetricChart";
 import { InstallCard } from "@/components/InstallCard";
-import { climbs, climbToWorkout, type ClimbChallenge } from "@/lib/routes";
+import {
+  climbs,
+  climbToWorkout,
+  routeCategory,
+  routeDifficulty,
+  routeSearchText,
+  routeTerrain,
+  type ClimbChallenge,
+  type RouteCategory
+} from "@/lib/routes";
 import { parseGpxFile } from "@/lib/gpx";
 import {
   STORAGE_KEY,
@@ -103,6 +112,11 @@ export function VeloQuestApp() {
   const [climbStartDistanceM, setClimbStartDistanceM] = useState<number | null>(null);
   const [customClimbs, setCustomClimbs] = useState<ClimbChallenge[]>([]);
   const [gpxError, setGpxError] = useState<string | null>(null);
+  const [routeSearch, setRouteSearch] = useState("");
+  const [routeCategoryFilter, setRouteCategoryFilter] = useState<"all" | RouteCategory>("all");
+  const [routeDifficultyFilter, setRouteDifficultyFilter] = useState<0 | 1 | 2 | 3 | 4 | 5>(0);
+  const [routeFavoritesOnly, setRouteFavoritesOnly] = useState(false);
+  const [routeSort, setRouteSort] = useState<"featured" | "distance" | "elevation" | "difficulty" | "pb">("featured");
   const lastSampleAt = useRef(0);
   const segmentDeadlineRef = useRef(0);
   const timeAttackStartedAtRef = useRef(0);
@@ -266,6 +280,29 @@ export function VeloQuestApp() {
   const latestWaist = [...sortedMeasurements].reverse().find((m) => m.waist !== undefined)?.waist;
   const latestAbdomen = [...sortedMeasurements].reverse().find((m) => m.abdomen !== undefined)?.abdomen;
   const allClimbs = useMemo(() => [...climbs, ...customClimbs], [customClimbs]);
+  const favoriteRouteIds = state.favoriteRouteIds ?? [];
+  const visibleRoutes = useMemo(() => {
+    const query = routeSearch.trim().toLocaleLowerCase("fr");
+    const filtered = allClimbs.filter((route) => {
+      if (query && !routeSearchText(route).includes(query)) return false;
+      if (routeCategoryFilter !== "all" && routeCategory(route) !== routeCategoryFilter) return false;
+      if (routeDifficultyFilter && routeDifficulty(route) !== routeDifficultyFilter) return false;
+      if (routeFavoritesOnly && !favoriteRouteIds.includes(route.id)) return false;
+      return true;
+    });
+
+    return [...filtered].sort((a, b) => {
+      if (routeSort === "distance") return b.distanceKm - a.distanceKm;
+      if (routeSort === "elevation") return b.elevationGainM - a.elevationGainM;
+      if (routeSort === "difficulty") return routeDifficulty(b) - routeDifficulty(a);
+      if (routeSort === "pb") {
+        const aPb = personalBest(state.sessions, a.id)?.metrics?.elapsedSeconds ?? Number.POSITIVE_INFINITY;
+        const bPb = personalBest(state.sessions, b.id)?.metrics?.elapsedSeconds ?? Number.POSITIVE_INFINITY;
+        return aPb - bPb;
+      }
+      return Number(Boolean(b.featured)) - Number(Boolean(a.featured)) || routeDifficulty(b) - routeDifficulty(a);
+    });
+  }, [allClimbs, routeSearch, routeCategoryFilter, routeDifficultyFilter, routeFavoritesOnly, routeSort, favoriteRouteIds, state.sessions]);
   const selectedSession = selectedSessionId ? state.sessions.find((session) => session.id === selectedSessionId) : undefined;
   const selectedTemplate = selectedSession ? workouts.find((w) => w.id === selectedSession.templateId) : undefined;
   const selectedRoute = selectedSession ? allClimbs.find((c) => c.id === selectedSession.routeId) : undefined;
@@ -715,6 +752,19 @@ export function VeloQuestApp() {
 
   function deleteCustomClimb(id: string) {
     setCustomClimbs((previous) => previous.filter((climb) => climb.id !== id));
+    setState((prev) => ({ ...prev, favoriteRouteIds: (prev.favoriteRouteIds ?? []).filter((routeId) => routeId !== id) }));
+  }
+
+  function toggleRouteFavorite(id: string) {
+    setState((prev) => {
+      const current = prev.favoriteRouteIds ?? [];
+      return {
+        ...prev,
+        favoriteRouteIds: current.includes(id)
+          ? current.filter((routeId) => routeId !== id)
+          : [...current, id]
+      };
+    });
   }
 
   return (
@@ -858,7 +908,47 @@ export function VeloQuestApp() {
 
       {tab === "climbs" && (
         <section>
-          <div className="pageHead"><p className="eyebrow">COLS & PARCOURS</p><h1>Change ton salon en montagne.</h1><p>Profil, carte et résistance conseillée. Importe aussi n’importe quel fichier GPX pour créer ton propre parcours.</p></div>
+          <div className="pageHead"><p className="eyebrow">PARCOURS V2</p><h1>Cols, étapes & défis.</h1><p>Choisis une montée mythique, une étape multi-cols ou importe ton propre GPX. Les cartes de bibliothèque restent légères ; la carte interactive complète s’ouvre pendant la séance.</p></div>
+
+          <section className="card routeLibraryToolbar">
+            <div className="routeSearchBox">
+              <label htmlFor="route-search">Rechercher</label>
+              <input id="route-search" value={routeSearch} onChange={(event) => setRouteSearch(event.target.value)} placeholder="Galibier, Alpes, Tour de France…" />
+            </div>
+            <div className="routeFilterGroup">
+              <small>Catégorie</small>
+              <div className="choiceRow">
+                {([
+                  ["all", "Tout"],
+                  ["climb", "Cols"],
+                  ["stage", "Étapes"],
+                  ["imported", "Mes GPX"]
+                ] as const).map(([value,label]) => (
+                  <button key={value} className={routeCategoryFilter === value ? "choice active" : "choice"} onClick={() => setRouteCategoryFilter(value)}>{label}</button>
+                ))}
+              </div>
+            </div>
+            <div className="routeFilterGroup">
+              <small>Difficulté</small>
+              <div className="choiceRow">
+                <button className={routeDifficultyFilter === 0 ? "choice active" : "choice"} onClick={() => setRouteDifficultyFilter(0)}>Toutes</button>
+                {[1,2,3,4,5].map((level) => <button key={level} className={routeDifficultyFilter === level ? "choice active" : "choice"} onClick={() => setRouteDifficultyFilter(level as 1|2|3|4|5)}>{level}★</button>)}
+              </div>
+            </div>
+            <div className="routeToolbarBottom">
+              <button className={routeFavoritesOnly ? "secondary favoriteFilter active" : "secondary favoriteFilter"} onClick={() => setRouteFavoritesOnly((value) => !value)}>♥ Favoris {favoriteRouteIds.length ? `(${favoriteRouteIds.length})` : ""}</button>
+              <label>Trier
+                <select value={routeSort} onChange={(event) => setRouteSort(event.target.value as typeof routeSort)}>
+                  <option value="featured">Sélection VeloQuest</option>
+                  <option value="difficulty">Difficulté</option>
+                  <option value="distance">Distance</option>
+                  <option value="elevation">Dénivelé</option>
+                  <option value="pb">Meilleurs chronos</option>
+                </select>
+              </label>
+              <span>{visibleRoutes.length} parcours</span>
+            </div>
+          </section>
 
           <section className="card gpxImport">
             <div>
@@ -870,35 +960,67 @@ export function VeloQuestApp() {
             {gpxError && <p className="errorText">{gpxError}</p>}
           </section>
 
-          <div className="climbList">
-            {allClimbs.map((climb) => (
-              <article className="card climbCard" key={climb.id}>
-                <div className="climbHeader">
-                  <div><p className="eyebrow">{climb.region.toUpperCase()}</p><h2>{climb.name}</h2><p>{climb.subtitle}</p></div>
-                  <div className="climbReward"><strong>+{climb.xp}</strong><small>XP</small></div>
-                </div>
-                <div className="climbStats">
-                  <span><strong>{climb.distanceKm.toFixed(1)}</strong> km</span>
-                  <span><strong>{climb.elevationGainM}</strong> m D+</span>
-                  <span><strong>{climb.avgGrade.toFixed(1)} %</strong> moyen</span>
-                  <span><strong>{climb.maxGrade} %</strong> max</span>
-                </div>
-                <ClimbProfile climb={climb} />
-                <RouteMap climb={climb} />
-                <p className="finePrint">{climb.note}</p>
-                <div className="timeAttackSummary">
-                  <span><small>TIME ATTACK</small><strong>{personalBest(state.sessions, climb.id)?.metrics?.elapsedSeconds !== undefined ? formatRaceTime(personalBest(state.sessions, climb.id)!.metrics!.elapsedSeconds!) : "Aucun chrono"}</strong></span>
-                  <span><small>TENTATIVES</small><strong>{routeAttempts(state.sessions, climb.id).length}</strong></span>
-                  <span><small>MODE PRÉCIS</small><strong>{bike ? "FTMS prêt" : "simulation"}</strong></span>
-                </div>
-                <div className="climbActions">
-                  <button className="primary" onClick={() => launch(climbToWorkout(climb), climb, "training")}>Entraînement</button>
-                  <button className="secondary timeAttackButton" onClick={() => launch(climbToWorkout(climb), climb, "timeAttack")}>⏱ Time Attack</button>
-                  {climb.id.startsWith("gpx-") && <button className="secondary dangerButton" onClick={() => deleteCustomClimb(climb.id)}>Supprimer</button>}
-                </div>
-              </article>
-            ))}
-          </div>
+          {visibleRoutes.length ? (
+            <div className="routeLibraryGrid">
+              {visibleRoutes.map((climb) => {
+                const difficulty = routeDifficulty(climb);
+                const terrain = routeTerrain(climb);
+                const category = routeCategory(climb);
+                const pb = personalBest(state.sessions, climb.id);
+                const attempts = routeAttempts(state.sessions, climb.id).length;
+                const favorite = favoriteRouteIds.includes(climb.id);
+
+                return (
+                  <article className={`card routeLibraryCard ${climb.featured ? "featured" : ""}`} key={climb.id}>
+                    <div className="routeCardTop">
+                      <div>
+                        <div className="routeBadges">
+                          <span>{category === "stage" ? "ÉTAPE" : category === "imported" ? "GPX" : "COL"}</span>
+                          {climb.featured && <span className="featuredTag">SÉLECTION</span>}
+                        </div>
+                        <p className="eyebrow">{climb.region.toUpperCase()}</p>
+                        <h2>{climb.name}</h2>
+                        <p>{climb.subtitle}</p>
+                      </div>
+                      <button className={favorite ? "favoriteButton active" : "favoriteButton"} aria-label={favorite ? "Retirer des favoris" : "Ajouter aux favoris"} onClick={() => toggleRouteFavorite(climb.id)}>{favorite ? "♥" : "♡"}</button>
+                    </div>
+
+                    <div className="routeDifficulty"><span>{"★".repeat(difficulty)}{"☆".repeat(5-difficulty)}</span><small>Difficulté {difficulty}/5</small></div>
+
+                    <div className="climbStats compactStats">
+                      <span><strong>{climb.distanceKm.toFixed(1)}</strong> km</span>
+                      <span><strong>{climb.elevationGainM}</strong> m D+</span>
+                      <span><strong>{terrain.ascentKm.toFixed(1)}</strong> km ↑</span>
+                      <span><strong>{terrain.descentKm.toFixed(1)}</strong> km ↓</span>
+                    </div>
+
+                    <ClimbProfile climb={climb} />
+
+                    <div className="routeTags">
+                      {(climb.tags ?? []).slice(0,5).map((tag) => <span key={tag}>{tag}</span>)}
+                    </div>
+
+                    <div className="timeAttackSummary">
+                      <span><small>RECORD</small><strong>{pb?.metrics?.elapsedSeconds !== undefined ? formatRaceTime(pb.metrics.elapsedSeconds) : "—"}</strong></span>
+                      <span><small>TENTATIVES</small><strong>{attempts}</strong></span>
+                      <span><small>RÉCOMPENSE</small><strong>+{climb.xp} XP</strong></span>
+                    </div>
+
+                    <p className="routeNote">{climb.note}</p>
+                    {climb.sourceUrl && <a className="routeSource" href={climb.sourceUrl} target="_blank" rel="noreferrer">Source : {climb.sourceLabel ?? "fiche officielle"} ↗</a>}
+
+                    <div className="climbActions">
+                      <button className="primary" onClick={() => launch(climbToWorkout(climb), climb, "training")}>Entraînement</button>
+                      <button className="secondary timeAttackButton" onClick={() => launch(climbToWorkout(climb), climb, "timeAttack")}>⏱ Time Attack</button>
+                      {climb.id.startsWith("gpx-") && <button className="secondary dangerButton" onClick={() => deleteCustomClimb(climb.id)}>Supprimer</button>}
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          ) : (
+            <section className="card routeEmpty"><span>⌕</span><h2>Aucun parcours ne correspond.</h2><p>Modifie les filtres ou importe un GPX personnel.</p><button className="secondary" onClick={() => { setRouteSearch(""); setRouteCategoryFilter("all"); setRouteDifficultyFilter(0); setRouteFavoritesOnly(false); }}>Réinitialiser les filtres</button></section>
+          )}
         </section>
       )}
 

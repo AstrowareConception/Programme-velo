@@ -1,5 +1,8 @@
 import type { WorkoutTemplate } from "./types";
 
+export type RouteCategory = "climb" | "stage" | "imported";
+export type RouteDifficulty = 1 | 2 | 3 | 4 | 5;
+
 export type ClimbPoint = {
   km: number;
   elevation: number;
@@ -22,6 +25,12 @@ export type ClimbChallenge = {
   coordinates: [number, number][];
   profile: ClimbPoint[];
   note: string;
+  category?: RouteCategory;
+  difficulty?: RouteDifficulty;
+  tags?: string[];
+  featured?: boolean;
+  sourceLabel?: string;
+  sourceUrl?: string;
 };
 
 export const climbs: ClimbChallenge[] = [
@@ -57,7 +66,13 @@ export const climbs: ClimbChallenge[] = [
       { km: 12.8, elevation: 1740, grade: 6.7 },
       { km: 14.454, elevation: 1860, grade: 7.3 }
     ],
-    note: "Distance, dénivelé et pentes globales officiels. Le profil intermédiaire est une approximation d’entraînement ; un import GPX permettra ensuite une reproduction plus fine."
+    note: "Distance, dénivelé et pentes globales officiels. Le profil intermédiaire est une approximation d’entraînement ; un import GPX permettra ensuite une reproduction plus fine.",
+    category: "climb",
+    difficulty: 4,
+    tags: ["Tour de France", "Alpes", "mythique", "grimpe"],
+    featured: true,
+    sourceLabel: "Alpe d’Huez",
+    sourceUrl: "https://www.alpedhuez.com/fr/activites/activites-ete/velo/les-21-virages/"
   },
   {
     id: "ventoux-bedoin",
@@ -91,7 +106,13 @@ export const climbs: ClimbChallenge[] = [
       { km: 19, elevation: 1745, grade: 8.3 },
       { km: 21, elevation: 1910, grade: 8.3 }
     ],
-    note: "Chiffres globaux issus du Parc naturel régional du Mont-Ventoux. Profil intermédiaire simplifié pour l’entraînement."
+    note: "Chiffres globaux issus du Parc naturel régional du Mont-Ventoux. Profil intermédiaire simplifié pour l’entraînement.",
+    category: "climb",
+    difficulty: 5,
+    tags: ["Tour de France", "Provence", "mythique", "long"],
+    featured: true,
+    sourceLabel: "Parc naturel régional du Mont-Ventoux",
+    sourceUrl: "https://www.parcduventoux.fr/a-voir-a-faire/decouvrir-en-douceur/decouvrir-le-ventoux-a-velo/"
   },
   {
     id: "tourmalet-est",
@@ -125,9 +146,319 @@ export const climbs: ClimbChallenge[] = [
       { km: 21, elevation: 1975, grade: 8.0 },
       { km: 22.5, elevation: 2115, grade: 9.0 }
     ],
-    note: "Chiffres globaux issus de Hautes-Pyrénées Tourisme. Profil intermédiaire simplifié pour l’entraînement."
+    note: "Chiffres globaux issus de Hautes-Pyrénées Tourisme. Profil intermédiaire simplifié pour l’entraînement.",
+    category: "climb",
+    difficulty: 4,
+    tags: ["Tour de France", "Pyrénées", "mythique", "long"],
+    featured: true,
+    sourceLabel: "Hautes-Pyrénées Tourisme",
+    sourceUrl: "https://www.tourisme-hautes-pyrenees.com/voyage-aux-pyrenees/les-grands-sites/col-tourmalet/"
+  },
+  {
+    id: "galibier-valloire",
+    name: "Col du Galibier",
+    subtitle: "Versant Valloire",
+    region: "Maurienne · Savoie",
+    distanceKm: 17,
+    elevationGainM: 1212,
+    avgGrade: 7.2,
+    maxGrade: 12,
+    startElevationM: 1430,
+    finishElevationM: 2642,
+    xp: 390,
+    points: 6,
+    coordinates: [
+      [45.1654, 6.4295],
+      [45.1395, 6.4317],
+      [45.1168, 6.4286],
+      [45.0952, 6.4197],
+      [45.0781, 6.4125],
+      [45.0642, 6.4078]
+    ],
+    profile: [
+      { km: 0, elevation: 1430, grade: 0 },
+      { km: 2.5, elevation: 1580, grade: 6.0 },
+      { km: 5, elevation: 1740, grade: 6.4 },
+      { km: 7.5, elevation: 1910, grade: 6.8 },
+      { km: 10, elevation: 2080, grade: 6.8 },
+      { km: 12.5, elevation: 2250, grade: 6.8 },
+      { km: 15, elevation: 2440, grade: 7.6 },
+      { km: 16.2, elevation: 2540, grade: 8.3 },
+      { km: 17, elevation: 2642, grade: 12.0 }
+    ],
+    note: "Distance, dénivelé, pente moyenne et pente maximale officiels depuis Valloire. Profil intermédiaire simplifié pour l’entraînement.",
+    category: "climb",
+    difficulty: 5,
+    tags: ["Tour de France", "Alpes", "haute montagne", "mythique"],
+    featured: true,
+    sourceLabel: "Maurienne Tourisme",
+    sourceUrl: "https://www.maurienne-tourisme.com/visiter_bouger/col-du-galibier-point-de-vue-93471/"
+  },
+  {
+    id: "madeleine-maurienne",
+    name: "Col de la Madeleine",
+    subtitle: "Versant La Chambre",
+    region: "Maurienne · Savoie",
+    distanceKm: 19.3,
+    elevationGainM: 1520,
+    avgGrade: 8.0,
+    maxGrade: 10,
+    startElevationM: 472,
+    finishElevationM: 2000,
+    xp: 430,
+    points: 6,
+    coordinates: [
+      [45.3570, 6.3020],
+      [45.3770, 6.3250],
+      [45.3935, 6.3440],
+      [45.4140, 6.3605],
+      [45.4310, 6.3730],
+      [45.4351, 6.3758]
+    ],
+    profile: [
+      { km: 0, elevation: 472, grade: 0 },
+      { km: 2.5, elevation: 680, grade: 8.3 },
+      { km: 5, elevation: 905, grade: 9.0 },
+      { km: 7.5, elevation: 1120, grade: 8.6 },
+      { km: 10, elevation: 1290, grade: 6.8 },
+      { km: 12.5, elevation: 1470, grade: 7.2 },
+      { km: 15, elevation: 1665, grade: 7.8 },
+      { km: 17.5, elevation: 1850, grade: 7.4 },
+      { km: 19.3, elevation: 2000, grade: 8.3 }
+    ],
+    note: "Distance et dénivelé officiels depuis La Chambre ; l’office annonce une montée proche de 8 % de moyenne avec des passages approchant 10 %. Profil intermédiaire simplifié.",
+    category: "climb",
+    difficulty: 5,
+    tags: ["Tour de France", "Alpes", "hors catégorie", "long"],
+    featured: true,
+    sourceLabel: "Maurienne Tourisme",
+    sourceUrl: "https://www.maurienne-tourisme.com/visiter_bouger/montee-cyclo-du-col-de-la-madeleine-versant-maurienne-76577/"
+  },
+  {
+    id: "croix-de-fer-maurienne",
+    name: "Col de la Croix-de-Fer",
+    subtitle: "Depuis Saint-Jean-de-Maurienne",
+    region: "Maurienne · Savoie",
+    distanceKm: 29.3,
+    elevationGainM: 1620,
+    avgGrade: 5.5,
+    maxGrade: 10,
+    startElevationM: 570,
+    finishElevationM: 2067,
+    xp: 480,
+    points: 7,
+    coordinates: [
+      [45.2770, 6.3445],
+      [45.2390, 6.3110],
+      [45.2230, 6.2780],
+      [45.2200, 6.2390],
+      [45.2250, 6.2140],
+      [45.2280, 6.2030]
+    ],
+    profile: [
+      { km: 0, elevation: 570, grade: 0 },
+      { km: 5, elevation: 820, grade: 5.0 },
+      { km: 10, elevation: 1045, grade: 4.5 },
+      { km: 15, elevation: 1235, grade: 3.8 },
+      { km: 19, elevation: 1435, grade: 5.0 },
+      { km: 22, elevation: 1585, grade: 5.0 },
+      { km: 25, elevation: 1770, grade: 6.2 },
+      { km: 27.5, elevation: 1940, grade: 6.8 },
+      { km: 29.3, elevation: 2067, grade: 7.1 }
+    ],
+    note: "Distance et dénivelé officiels. La montée est très longue et moins régulière que son pourcentage moyen ne le laisse penser ; profil intermédiaire simplifié.",
+    category: "climb",
+    difficulty: 5,
+    tags: ["Tour de France", "Alpes", "très long", "haute montagne"],
+    featured: true,
+    sourceLabel: "Maurienne Tourisme",
+    sourceUrl: "https://www.maurienne-tourisme.com/visiter_bouger/montee-cyclo-du-col-de-la-croix-de-fer-74643/"
+  },
+  {
+    id: "glandon-cuines",
+    name: "Col du Glandon",
+    subtitle: "Depuis Saint-Étienne-de-Cuines",
+    region: "Maurienne · Savoie",
+    distanceKm: 19.9,
+    elevationGainM: 1439,
+    avgGrade: 7.0,
+    maxGrade: 11,
+    startElevationM: 485,
+    finishElevationM: 1924,
+    xp: 430,
+    points: 6,
+    coordinates: [
+      [45.3423, 6.2913],
+      [45.3050, 6.2820],
+      [45.2750, 6.2590],
+      [45.2450, 6.2250],
+      [45.2360, 6.1870],
+      [45.2405, 6.1758]
+    ],
+    profile: [
+      { km: 0, elevation: 485, grade: 0 },
+      { km: 3, elevation: 700, grade: 7.2 },
+      { km: 6, elevation: 930, grade: 7.7 },
+      { km: 9, elevation: 1125, grade: 6.5 },
+      { km: 11.5, elevation: 1190, grade: 2.6 },
+      { km: 14, elevation: 1380, grade: 7.6 },
+      { km: 16.5, elevation: 1580, grade: 8.0 },
+      { km: 18, elevation: 1745, grade: 11.0 },
+      { km: 19.9, elevation: 1924, grade: 9.4 }
+    ],
+    note: "Distance, dénivelé et moyenne issus de Maurienne Tourisme. Le replat masque un final de 3 km à plus de 10 % ; profil intermédiaire simplifié.",
+    category: "climb",
+    difficulty: 5,
+    tags: ["Tour de France", "Alpes", "final raide", "mythique"],
+    featured: false,
+    sourceLabel: "Maurienne Tourisme",
+    sourceUrl: "https://www.maurienne-tourisme.com/visiter_bouger/montee-cyclo-du-col-du-glandon-76554/"
+  },
+  {
+    id: "iseran-bonneval",
+    name: "Col de l’Iseran",
+    subtitle: "Depuis Bonneval-sur-Arc",
+    region: "Haute-Maurienne · Savoie",
+    distanceKm: 13.4,
+    elevationGainM: 915,
+    avgGrade: 7.5,
+    maxGrade: 10,
+    startElevationM: 1849,
+    finishElevationM: 2764,
+    xp: 330,
+    points: 5,
+    coordinates: [
+      [45.3710, 7.0460],
+      [45.3900, 7.0230],
+      [45.4050, 7.0030],
+      [45.4170, 6.9850],
+      [45.4238, 6.9778]
+    ],
+    profile: [
+      { km: 0, elevation: 1849, grade: 0 },
+      { km: 2, elevation: 1980, grade: 6.6 },
+      { km: 4, elevation: 2125, grade: 7.3 },
+      { km: 6, elevation: 2265, grade: 7.0 },
+      { km: 8, elevation: 2410, grade: 7.3 },
+      { km: 10, elevation: 2545, grade: 6.8 },
+      { km: 12, elevation: 2685, grade: 7.0 },
+      { km: 13.4, elevation: 2764, grade: 5.6 }
+    ],
+    note: "Distance, dénivelé et pente moyenne officiels depuis Bonneval-sur-Arc. Profil intermédiaire simplifié.",
+    category: "climb",
+    difficulty: 4,
+    tags: ["Alpes", "haute altitude", "mythique", "court et dense"],
+    featured: false,
+    sourceLabel: "Maurienne Tourisme",
+    sourceUrl: "https://www.maurienne-tourisme.com/velo/velo-de-route/itineraires/"
+  },
+  {
+    id: "chaussy-madeleine-stage",
+    name: "Chaussy + Madeleine",
+    subtitle: "Étape multi-cols",
+    region: "Maurienne · Savoie",
+    distanceKm: 79.5,
+    elevationGainM: 2398,
+    avgGrade: 3.0,
+    maxGrade: 10,
+    startElevationM: 550,
+    finishElevationM: 550,
+    xp: 760,
+    points: 9,
+    coordinates: [
+      [45.2771, 6.3451],
+      [45.3290, 6.3370],
+      [45.3830, 6.3530],
+      [45.4310, 6.3740],
+      [45.3600, 6.3030],
+      [45.2771, 6.3451]
+    ],
+    profile: [
+      { km: 0, elevation: 550, grade: 0 },
+      { km: 6, elevation: 850, grade: 5.0 },
+      { km: 12, elevation: 1170, grade: 5.3 },
+      { km: 19, elevation: 1533, grade: 5.2 },
+      { km: 26, elevation: 1000, grade: -7.6 },
+      { km: 34, elevation: 480, grade: -6.5 },
+      { km: 39, elevation: 760, grade: 5.6 },
+      { km: 46, elevation: 1260, grade: 7.1 },
+      { km: 54, elevation: 1710, grade: 5.6 },
+      { km: 59.5, elevation: 2000, grade: 5.3 },
+      { km: 66, elevation: 1450, grade: -8.5 },
+      { km: 73, elevation: 850, grade: -8.6 },
+      { km: 79.5, elevation: 550, grade: -4.6 }
+    ],
+    note: "Distance et D+ officiels pour le circuit Chaussy + Madeleine. Le profil de simulation représente les deux ascensions et les descentes, mais n’est pas un relevé GPX exact.",
+    category: "stage",
+    difficulty: 5,
+    tags: ["étape", "multi-cols", "Alpes", "endurance", "Tour de France"],
+    featured: true,
+    sourceLabel: "Maurienne Tourisme",
+    sourceUrl: "https://www.maurienne-tourisme.com/visiter_bouger/col-du-chaussy-et-de-la-madeleine-776865/"
   }
 ];
+
+export function routeCategory(route: ClimbChallenge): RouteCategory {
+  if (route.category) return route.category;
+  return route.id.startsWith("gpx-") ? "imported" : "climb";
+}
+
+export function routeDifficulty(route: ClimbChallenge): RouteDifficulty {
+  if (route.difficulty) return route.difficulty;
+  const score = route.elevationGainM / 450 + route.distanceKm / 35 + Math.max(0, route.maxGrade - 7) / 4;
+  if (score >= 7) return 5;
+  if (score >= 5) return 4;
+  if (score >= 3.5) return 3;
+  if (score >= 2) return 2;
+  return 1;
+}
+
+export function routeTerrain(route: ClimbChallenge) {
+  let ascentKm = 0;
+  let descentKm = 0;
+  let flatKm = 0;
+
+  route.profile.slice(1).forEach((point, index) => {
+    const previous = route.profile[index];
+    const km = Math.max(0, point.km - previous.km);
+    if (point.grade > 1) ascentKm += km;
+    else if (point.grade < -1) descentKm += km;
+    else flatKm += km;
+  });
+
+  return {
+    ascentKm,
+    descentKm,
+    flatKm,
+    minGrade: Math.min(...route.profile.map((point) => point.grade)),
+    maxGrade: Math.max(...route.profile.map((point) => point.grade))
+  };
+}
+
+export function remainingRouteStats(route: ClimbChallenge, currentKm: number) {
+  const km = Math.max(0, Math.min(route.distanceKm, currentKm));
+  let remainingGainM = 0;
+  let nextHardSectorKm: number | undefined;
+
+  route.profile.slice(1).forEach((point, index) => {
+    const previous = route.profile[index];
+    if (point.km <= km) return;
+    const segmentStart = Math.max(km, previous.km);
+    const segmentKm = Math.max(0, point.km - segmentStart);
+    if (point.grade > 0) remainingGainM += segmentKm * 1000 * (point.grade / 100);
+    if (nextHardSectorKm === undefined && point.grade >= 8) nextHardSectorKm = Math.max(0, segmentStart - km);
+  });
+
+  return {
+    distanceKm: Math.max(0, route.distanceKm - km),
+    elevationGainM: Math.round(remainingGainM),
+    nextHardSectorKm
+  };
+}
+
+export function routeSearchText(route: ClimbChallenge) {
+  return [route.name, route.subtitle, route.region, ...(route.tags ?? [])].join(" ").toLocaleLowerCase("fr");
+}
 
 export function resistanceForGrade(grade: number) {
   if (grade <= -5) return 5;
