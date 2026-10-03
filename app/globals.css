@@ -438,3 +438,13 @@ button:focus-visible, input:focus-visible, .fileButton:focus-within { outline: 2
 .legalSection p { margin-bottom:0; }
 @media (max-width:850px) { .guideSteps { grid-template-columns:1fr 1fr; } }
 @media (max-width:520px) { .guideSteps { grid-template-columns:1fr; } }
+
+.history > div { grid-template-columns:100px 1fr 1fr auto; align-items:center; }
+.iconDanger { width:32px; height:32px; min-height:32px; display:grid; place-items:center; border-radius:50%; border:1px solid rgba(255,98,125,.18); background:rgba(255,98,125,.06); color:#ff8f9f; font-size:1.1rem; }
+.fullWidth { width:100%; margin-top:14px; }
+.consoleMetrics { grid-template-columns:repeat(auto-fit,minmax(90px,1fr)); }
+@media (max-width:560px) {
+  .history > div { grid-template-columns:70px 1fr auto; }
+  .history > div span:last-of-type { grid-column:2; }
+  .history > div .iconDanger { grid-column:3; grid-row:1 / span 2; }
+}
