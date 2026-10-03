@@ -377,3 +377,16 @@ button:focus-visible, input:focus-visible, .fileButton:focus-within { outline: 2
 .missionItem.warning > span { color:#fff; background:var(--hot); }
 @media (max-width:900px) { .missionItems { grid-template-columns:1fr 1fr 1fr; } }
 @media (max-width:560px) { .missionItems { grid-template-columns:1fr 1fr; } .weeklyMission .sectionHead { align-items:flex-start; } }
+
+.pageHeadActions { display:flex; align-items:flex-end; justify-content:space-between; gap:18px; }
+.pageHeadActions > div { min-width:0; }
+.sessionOverall { margin:12px 0 2px; }
+.sessionOverall > div { display:flex; justify-content:space-between; align-items:center; color:var(--muted); font-size:.68rem; }
+.sessionOverall > div strong { color:var(--cyan); }
+.sessionOverall > i { display:block; height:5px; margin-top:6px; border-radius:999px; background:rgba(255,255,255,.07); overflow:hidden; }
+.sessionOverall > i b { display:block; height:100%; background:linear-gradient(90deg,var(--cyan),var(--violet)); transition:width .25s linear; }
+.sessionOverall > small { display:block; color:var(--lime); letter-spacing:.12em; font-size:.56rem; margin-top:6px; text-align:center; }
+@media (max-width:700px) {
+  .pageHeadActions { flex-direction:column; align-items:stretch; }
+  .pageHeadActions > .secondary { width:100%; }
+}
