@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { AppState, Measurement, WorkoutTemplate } from "@/lib/types";
+import { connectFtmsBike, hasWebBluetooth, type BikeConnection, type BikeTelemetry, webBluetoothHint } from "@/lib/ftms";
 import {
   STORAGE_KEY,
   badges,
@@ -37,6 +38,10 @@ export function VeloQuestApp() {
   const [secondsLeft, setSecondsLeft] = useState(0);
   const [running, setRunning] = useState(false);
   const [showSetup, setShowSetup] = useState(false);
+  const [bike, setBike] = useState<BikeConnection | null>(null);
+  const [telemetry, setTelemetry] = useState<BikeTelemetry>({});
+  const [bluetoothError, setBluetoothError] = useState<string | null>(null);
+  const [connectingBike, setConnectingBike] = useState(false);
 
   useEffect(() => {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -91,6 +96,31 @@ export function VeloQuestApp() {
   }, [state.sessions, stats.hard, stats.points, target.maxHard, target.points]);
 
   if (!hydrated) return null;
+
+  async function connectBike() {
+    if (!hasWebBluetooth()) {
+      setBluetoothError(webBluetoothHint() === "ios"
+        ? "Safari sur iPhone/iPad ne permet pas encore l’accès Web Bluetooth. Le mode guidé reste entièrement utilisable."
+        : "Web Bluetooth n’est pas disponible dans ce navigateur.");
+      return;
+    }
+    setConnectingBike(true);
+    setBluetoothError(null);
+    try {
+      const connection = await connectFtmsBike(
+        (next) => setTelemetry((prev) => ({ ...prev, ...next })),
+        () => {
+          setBike(null);
+          setTelemetry({});
+        }
+      );
+      setBike(connection);
+    } catch (error) {
+      setBluetoothError(error instanceof Error ? error.message : "Connexion Bluetooth impossible.");
+    } finally {
+      setConnectingBike(false);
+    }
+  }
 
   function launch(workout: WorkoutTemplate) {
     setActive(workout);
@@ -175,7 +205,12 @@ export function VeloQuestApp() {
           <img src="/logo.svg" alt="" className="brandMark" />
           <div><strong>VeloQuest</strong><span>Ride · Level up · Repeat</span></div>
         </div>
-        <div className="levelPill"><span>Niv. {level}</span><strong>{xp} XP</strong></div>
+        <div className="topActions">
+          <button className={`bikePill ${bike ? "connected" : ""}`} onClick={bike ? () => { bike.disconnect(); setBike(null); setTelemetry({}); } : connectBike}>
+            <span>{bike ? "●" : "◌"}</span>{bike ? bike.deviceName : connectingBike ? "Connexion…" : "TEB5"}
+          </button>
+          <div className="levelPill"><span>Niv. {level}</span><strong>{xp} XP</strong></div>
+        </div>
       </header>
 
       <section className="hero">
@@ -194,6 +229,28 @@ export function VeloQuestApp() {
             <Stat label="Minutes" value={stats.minutes} target={target.minutes} suffix=" min" />
             <Stat label="Séances" value={stats.sessions} target={target.sessions} />
             <Stat label="Variété" value={stats.variety} target={target.variety} />
+          </section>
+
+          <section className={`card bikeConsole ${bike ? "online" : ""}`}>
+            <div className="sectionHead">
+              <div><p className="eyebrow">TEB5 · MODE CONNECTÉ BETA</p><h2>{bike ? bike.deviceName : "Console Bluetooth"}</h2></div>
+              <span className="connectionState">{bike ? "LIVE" : "OFFLINE"}</span>
+            </div>
+            {bike ? (
+              <div className="consoleMetrics">
+                <ConsoleMetric label="RPM" value={telemetry.cadenceRpm?.toFixed(0) ?? "—"} />
+                <ConsoleMetric label="KM/H" value={telemetry.speedKmh?.toFixed(1) ?? "—"} />
+                <ConsoleMetric label="WATTS" value={telemetry.powerW?.toFixed(0) ?? "—"} />
+                <ConsoleMetric label="LEVEL" value={telemetry.resistance?.toFixed(0) ?? "—"} />
+                <ConsoleMetric label="BPM" value={telemetry.heartRate?.toFixed(0) ?? "—"} />
+              </div>
+            ) : (
+              <p>{webBluetoothHint() === "ios"
+                ? "Sur iPhone/iPad, Safari ne donne pas encore accès au Bluetooth depuis une PWA. Le mode guidé fonctionne normalement ; la connexion directe est disponible sur les navigateurs compatibles Web Bluetooth."
+                : "Connecte un vélo FTMS compatible pour récupérer en direct cadence, vitesse, puissance, résistance et fréquence cardiaque quand elles sont diffusées."}</p>
+            )}
+            {!bike && <button className="secondary" onClick={connectBike} disabled={connectingBike}>{connectingBike ? "Recherche du vélo…" : "Connecter le vélo"}</button>}
+            {bluetoothError && <p className="errorText">{bluetoothError}</p>}
           </section>
 
           <section className="card questCard">
@@ -311,7 +368,15 @@ export function VeloQuestApp() {
               <strong>{active.segments[segmentIndex].resistance}</strong>
             </div>
             <div className="timer">{String(Math.floor(secondsLeft / 60)).padStart(2, "0")}:{String(secondsLeft % 60).padStart(2, "0")}</div>
-            <div className="segmentMeta"><span>RPE {active.segments[segmentIndex].rpe}</span>{active.segments[segmentIndex].cadence && <span>{active.segments[segmentIndex].cadence} tr/min</span>}</div>
+            <div className="segmentMeta"><span>RPE {active.segments[segmentIndex].rpe}</span>{active.segments[segmentIndex].cadence && <span>Cible {active.segments[segmentIndex].cadence} tr/min</span>}</div>
+            {bike && (
+              <div className="liveStrip">
+                <span><small>RPM</small><strong>{telemetry.cadenceRpm?.toFixed(0) ?? "—"}</strong></span>
+                <span><small>W</small><strong>{telemetry.powerW?.toFixed(0) ?? "—"}</strong></span>
+                <span><small>KM/H</small><strong>{telemetry.speedKmh?.toFixed(1) ?? "—"}</strong></span>
+                <span><small>BPM</small><strong>{telemetry.heartRate?.toFixed(0) ?? "—"}</strong></span>
+              </div>
+            )}
             <div className="segmentProgress">{active.segments.map((_, i) => <i key={i} className={i <= segmentIndex ? "done" : ""} />)}</div>
             <div className="modalActions">
               <button className="primary" onClick={() => setRunning((v) => !v)}>{running ? "Pause" : "Démarrer"}</button>
@@ -350,6 +415,10 @@ export function VeloQuestApp() {
       )}
     </main>
   );
+}
+
+function ConsoleMetric({ label, value }: { label: string; value: string }) {
+  return <div className="consoleMetric"><small>{label}</small><strong>{value}</strong></div>;
 }
 
 function Stat({ label, value, target, suffix = "" }: { label: string; value: number; target: number; suffix?: string }) {
