@@ -4,6 +4,7 @@ import "./globals.css";
 import { ServiceWorkerRegistrar } from "@/components/ServiceWorkerRegistrar";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://veloquest.vercel.app"),
   title: {
     default: "VeloQuest",
     template: "%s · VeloQuest"
