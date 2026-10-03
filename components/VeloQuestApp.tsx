@@ -6,6 +6,7 @@ import { connectFtmsBike, hasWebBluetooth, type BikeConnection, type BikeTelemet
 import { ClimbProfile } from "@/components/ClimbProfile";
 import { RouteMap } from "@/components/RouteMap";
 import { climbs, climbToWorkout, type ClimbChallenge } from "@/lib/routes";
+import { parseGpxFile } from "@/lib/gpx";
 import {
   STORAGE_KEY,
   badges,
@@ -19,6 +20,7 @@ import {
 } from "@/lib/data";
 
 type Tab = "dashboard" | "sessions" | "climbs" | "progress" | "badges" | "data";
+const CUSTOM_ROUTES_KEY = "veloquest:custom-routes:v1";
 
 function pct(value: number, target: number) {
   return Math.min(100, Math.round((value / Math.max(1, target)) * 100));
@@ -66,6 +68,8 @@ export function VeloQuestApp() {
   const [bluetoothError, setBluetoothError] = useState<string | null>(null);
   const [connectingBike, setConnectingBike] = useState(false);
   const [climbStartDistanceM, setClimbStartDistanceM] = useState<number | null>(null);
+  const [customClimbs, setCustomClimbs] = useState<ClimbChallenge[]>([]);
+  const [gpxError, setGpxError] = useState<string | null>(null);
   const lastSampleAt = useRef(0);
 
   useEffect(() => {
@@ -75,12 +79,20 @@ export function VeloQuestApp() {
     } else {
       setShowSetup(true);
     }
+    const savedRoutes = localStorage.getItem(CUSTOM_ROUTES_KEY);
+    if (savedRoutes) {
+      try { setCustomClimbs(JSON.parse(savedRoutes)); } catch { /* ignore corrupted custom routes */ }
+    }
     setHydrated(true);
   }, []);
 
   useEffect(() => {
     if (hydrated) localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }, [state, hydrated]);
+
+  useEffect(() => {
+    if (hydrated) localStorage.setItem(CUSTOM_ROUTES_KEY, JSON.stringify(customClimbs));
+  }, [customClimbs, hydrated]);
 
   useEffect(() => {
     if (!running || !active) return;
@@ -126,6 +138,7 @@ export function VeloQuestApp() {
   const level = levelForXp(xp);
   const allBadges = badges(state);
   const latestMeasurement = [...state.measurements].sort((a, b) => b.date.localeCompare(a.date))[0];
+  const allClimbs = useMemo(() => [...climbs, ...customClimbs], [customClimbs]);
 
   const autoMetrics = useMemo(() => {
     const firstDistance = telemetrySamples.find((s) => s.distanceKm !== undefined)?.distanceKm;
@@ -290,7 +303,8 @@ export function VeloQuestApp() {
   }
 
   function exportData() {
-    const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+    const backup = { format: "veloquest-backup-v2", state, customClimbs };
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -303,10 +317,30 @@ export function VeloQuestApp() {
     if (!file) return;
     try {
       const parsed = JSON.parse(await file.text());
-      setState(parsed);
+      if (parsed?.format === "veloquest-backup-v2" && parsed.state) {
+        setState(parsed.state);
+        setCustomClimbs(Array.isArray(parsed.customClimbs) ? parsed.customClimbs : []);
+      } else {
+        setState(parsed);
+      }
     } catch {
       alert("Sauvegarde invalide.");
     }
+  }
+
+  async function importGpx(file?: File) {
+    if (!file) return;
+    setGpxError(null);
+    try {
+      const climb = await parseGpxFile(file);
+      setCustomClimbs((previous) => [climb, ...previous.filter((c) => c.id !== climb.id)]);
+    } catch (error) {
+      setGpxError(error instanceof Error ? error.message : "Import GPX impossible.");
+    }
+  }
+
+  function deleteCustomClimb(id: string) {
+    setCustomClimbs((previous) => previous.filter((climb) => climb.id !== id));
   }
 
   return (
@@ -409,9 +443,20 @@ export function VeloQuestApp() {
 
       {tab === "climbs" && (
         <section>
-          <div className="pageHead"><p className="eyebrow">COLS DE LÉGENDE</p><h1>Change ton salon en montagne.</h1><p>Profil, carte et résistance conseillée. Lorsque le pilotage FTMS sera validé sur le TEB5 réel, ces niveaux pourront devenir automatiques.</p></div>
+          <div className="pageHead"><p className="eyebrow">COLS & PARCOURS</p><h1>Change ton salon en montagne.</h1><p>Profil, carte et résistance conseillée. Importe aussi n’importe quel fichier GPX pour créer ton propre parcours.</p></div>
+
+          <section className="card gpxImport">
+            <div>
+              <p className="eyebrow">IMPORT GPX</p>
+              <h2>Une route réelle devient une quête.</h2>
+              <p>VeloQuest calcule la distance, le D+, les pentes lissées, le profil altimétrique et les niveaux TEB5. Le fichier reste sur ton appareil.</p>
+            </div>
+            <label className="primary gpxButton">Choisir un fichier GPX<input type="file" accept=".gpx,application/gpx+xml" onChange={(e) => importGpx(e.target.files?.[0])} /></label>
+            {gpxError && <p className="errorText">{gpxError}</p>}
+          </section>
+
           <div className="climbList">
-            {climbs.map((climb) => (
+            {allClimbs.map((climb) => (
               <article className="card climbCard" key={climb.id}>
                 <div className="climbHeader">
                   <div><p className="eyebrow">{climb.region.toUpperCase()}</p><h2>{climb.name}</h2><p>{climb.subtitle}</p></div>
@@ -426,7 +471,10 @@ export function VeloQuestApp() {
                 <ClimbProfile climb={climb} />
                 <RouteMap climb={climb} />
                 <p className="finePrint">{climb.note}</p>
-                <button className="primary" onClick={() => launch(climbToWorkout(climb), climb)}>Lancer l’ascension</button>
+                <div className="climbActions">
+                  <button className="primary" onClick={() => launch(climbToWorkout(climb), climb)}>Lancer le parcours</button>
+                  {climb.id.startsWith("gpx-") && <button className="secondary dangerButton" onClick={() => deleteCustomClimb(climb.id)}>Supprimer</button>}
+                </div>
               </article>
             ))}
           </div>
@@ -458,7 +506,7 @@ export function VeloQuestApp() {
             <div className="sessionHistory">
               {[...state.sessions].sort((a,b) => b.date.localeCompare(a.date)).slice(0,20).map((session) => {
                 const template = workouts.find((w) => w.id === session.templateId);
-                const route = climbs.find((c) => c.id === session.routeId);
+                const route = allClimbs.find((c) => c.id === session.routeId);
                 return (
                   <div key={session.id}>
                     <span>{dateLabel(session.date)}</span>

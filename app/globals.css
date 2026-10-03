@@ -209,3 +209,15 @@ button { cursor: pointer; }
 
 .bonusChoices { display:flex; flex-wrap:wrap; gap:8px; }
 .bonusChoices .secondary { min-width:86px; }
+
+.gpxImport { display:grid; grid-template-columns:1fr auto; align-items:center; gap:18px; margin-bottom:20px; border-color:rgba(80,227,255,.2); background:linear-gradient(135deg,rgba(80,227,255,.07),rgba(147,108,255,.06)); }
+.gpxImport h2 { margin:0 0 8px; }
+.gpxImport p:not(.eyebrow) { margin:0; max-width:720px; }
+.gpxButton { display:inline-flex; align-items:center; justify-content:center; white-space:nowrap; }
+.gpxButton input { display:none; }
+.climbActions { display:flex; gap:8px; flex-wrap:wrap; }
+.dangerButton { color:#ff8f9f; border-color:rgba(255,98,125,.2); }
+@media (max-width: 700px) {
+  .gpxImport { grid-template-columns:1fr; }
+  .gpxButton { width:100%; }
+}
