@@ -407,3 +407,14 @@ button:focus-visible, input:focus-visible, .fileButton:focus-within { outline: 2
 .calibrationLabels { grid-column:1 / -1; display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:10px; color:var(--muted); }
 .calibrationLabels small:last-child { text-align:right; }
 .miniButton { min-height:32px; padding:5px 10px; font-size:.68rem; }
+
+.splashScreen, .fatalScreen { min-height:100svh; display:grid; place-items:center; align-content:center; text-align:center; padding:28px; background:radial-gradient(circle at 50% 28%,rgba(80,227,255,.12),transparent 28rem),var(--bg); }
+.splashScreen h1 { margin:16px 0 4px; font-size:2rem; letter-spacing:-.04em; }
+.splashScreen p { margin:0; color:var(--muted); }
+.splashScreen > i { display:block; width:180px; height:4px; border-radius:999px; overflow:hidden; background:rgba(255,255,255,.07); margin-top:22px; }
+.splashScreen > i b { display:block; height:100%; width:48%; background:linear-gradient(90deg,var(--cyan),var(--violet)); animation:splashLoad 1.2s ease-in-out infinite alternate; }
+@keyframes splashLoad { from { transform:translateX(-70%); } to { transform:translateX(180%); } }
+.fatalCard { width:min(500px,100%); padding:28px; border:1px solid var(--line); border-radius:24px; background:var(--panel); }
+.fatalCard > span { font-size:2rem; }
+.fatalCard h1 { font-size:1.8rem; }
+.fatalCard p:not(.eyebrow) { color:var(--muted); line-height:1.5; }
