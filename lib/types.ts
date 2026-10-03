@@ -40,9 +40,35 @@ export type WeekTarget = {
   maxHard: number;
 };
 
+export type TelemetrySample = {
+  t: number;
+  speedKmh?: number;
+  cadenceRpm?: number;
+  resistance?: number;
+  powerW?: number;
+  heartRate?: number;
+  distanceKm?: number;
+};
+
+export type SessionMetrics = {
+  source: "manual" | "ftms" | "mixed";
+  distanceKm?: number;
+  calories?: number;
+  avgSpeedKmh?: number;
+  avgCadenceRpm?: number;
+  maxCadenceRpm?: number;
+  avgPowerW?: number;
+  maxPowerW?: number;
+  avgHeartRate?: number;
+  maxHeartRate?: number;
+  avgResistance?: number;
+  samples?: TelemetrySample[];
+};
+
 export type CompletedSession = {
   id: string;
   templateId: string;
+  routeId?: string;
   date: string;
   duration: number;
   points: number;
@@ -52,6 +78,7 @@ export type CompletedSession = {
   bonus: boolean;
   rpe?: number;
   note?: string;
+  metrics?: SessionMetrics;
 };
 
 export type Measurement = {
