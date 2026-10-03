@@ -7,8 +7,9 @@ export type ActiveSessionSnapshot = {
   savedAt: number;
   workoutId: string;
   routeId?: string;
-  routeMode: "training" | "timeAttack";
+  routeMode: "training" | "timeAttack" | "segmentAttack";
   challengeId?: string;
+  segmentAttackIndex?: number;
   segmentIndex: number;
   secondsLeft: number;
   running: boolean;
@@ -71,7 +72,7 @@ export function restoreSessionSnapshot(
     secondsLeft: advanced.secondsLeft,
     running: advanced.completed ? false : snapshot.running,
     showFinish: snapshot.showFinish || advanced.completed,
-    timeAttackElapsedSeconds: snapshot.routeMode === "timeAttack" && snapshot.running
+    timeAttackElapsedSeconds: (snapshot.routeMode === "timeAttack" || snapshot.routeMode === "segmentAttack") && snapshot.running
       ? snapshot.timeAttackElapsedSeconds + Math.floor(elapsedSinceSave)
       : snapshot.timeAttackElapsedSeconds
   };
