@@ -55,8 +55,16 @@ export type TimeAttackSplit = {
   elapsedSeconds: number;
 };
 
+export type ChallengeResult = {
+  id: string;
+  success: boolean;
+  summary: string;
+  xpBonus: number;
+};
+
 export type SessionMetrics = {
   source: "manual" | "ftms" | "mixed";
+  challenge?: ChallengeResult;
   elapsedSeconds?: number;
   timeAttack?: boolean;
   checkpointSplits?: TimeAttackSplit[];
