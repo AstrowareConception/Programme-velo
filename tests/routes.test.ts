@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { resistanceForGrade } from "../lib/routes";
+import {
+  climbs,
+  remainingRouteStats,
+  resistanceForGrade,
+  routeCategory,
+  routeDifficulty,
+  routeSearchText,
+  routeTerrain
+} from "../lib/routes";
 
 describe("resistanceForGrade", () => {
   it("makes descents easy and steep climbs hard", () => {
@@ -14,5 +22,47 @@ describe("resistanceForGrade", () => {
     const grades = [-8,-4,-1,1,3,5,6,8,9,11,14];
     const levels = grades.map(resistanceForGrade);
     for (let i = 1; i < levels.length; i++) expect(levels[i]).toBeGreaterThanOrEqual(levels[i - 1]);
+  });
+});
+
+describe("route library", () => {
+  it("contains multiple climbs and at least one multi-col stage", () => {
+    expect(climbs.length).toBeGreaterThanOrEqual(8);
+    expect(climbs.some((route) => routeCategory(route) === "stage")).toBe(true);
+  });
+
+  it("keeps difficulty in the 1..5 range", () => {
+    climbs.forEach((route) => {
+      expect(routeDifficulty(route)).toBeGreaterThanOrEqual(1);
+      expect(routeDifficulty(route)).toBeLessThanOrEqual(5);
+    });
+  });
+
+  it("computes ascent/descent terrain coherently", () => {
+    const stage = climbs.find((route) => route.id === "chaussy-madeleine-stage");
+    expect(stage).toBeDefined();
+    const terrain = routeTerrain(stage!);
+    expect(terrain.ascentKm).toBeGreaterThan(20);
+    expect(terrain.descentKm).toBeGreaterThan(15);
+    expect(terrain.ascentKm + terrain.descentKm + terrain.flatKm).toBeCloseTo(stage!.distanceKm, 1);
+    expect(terrain.minGrade).toBeLessThan(0);
+  });
+
+  it("computes remaining distance and elevation gain", () => {
+    const galibier = climbs.find((route) => route.id === "galibier-valloire")!;
+    const start = remainingRouteStats(galibier, 0);
+    const late = remainingRouteStats(galibier, 15);
+    expect(start.distanceKm).toBeCloseTo(17, 2);
+    expect(start.elevationGainM).toBeGreaterThan(1100);
+    expect(late.distanceKm).toBeCloseTo(2, 2);
+    expect(late.elevationGainM).toBeLessThan(start.elevationGainM);
+  });
+
+  it("indexes names, regions and tags for search", () => {
+    const madeleine = climbs.find((route) => route.id === "madeleine-maurienne")!;
+    const searchable = routeSearchText(madeleine);
+    expect(searchable).toContain("madeleine");
+    expect(searchable).toContain("maurienne");
+    expect(searchable).toContain("tour de france");
   });
 });
