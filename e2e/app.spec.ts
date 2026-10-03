@@ -178,3 +178,21 @@ test("Segment Attack picker launches a quarter-route race", async ({ page }) => 
   await expect(page.getByText(/Secteur 3 · 15.7 km/)).toBeVisible();
   await expect(page.getByRole("button", { name: "Lancer le chrono" })).toBeVisible();
 });
+
+
+test("campaign panel opens the next discovery stage", async ({ page }) => {
+  await seed(page);
+  await page.goto("/");
+  await page.getByRole("button", { name: /Parcours/ }).click();
+
+  await expect(page.getByRole("heading", { name: "Découverte Provence" })).toBeVisible();
+  const campaign = page.getByRole("heading", { name: "Découverte Provence" }).locator("xpath=ancestor::article");
+  await expect(campaign).toContainText("0/4");
+  await expect(campaign).toContainText("Velleron – L’Isle-sur-la-Sorgue");
+
+  await campaign.getByRole("button", { name: /Continuer · Velleron/ }).click();
+
+  await expect(page.getByText("PARCOURS").first()).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Velleron – L’Isle-sur-la-Sorgue" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Démarrer la séance" })).toBeVisible();
+});
