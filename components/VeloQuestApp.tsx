@@ -28,7 +28,7 @@ import {
 } from "@/lib/data";
 import { compactTelemetry, cueSegment, formatClock, requestScreenWakeLock } from "@/lib/session";
 import { createBackup, estimateLocalBytes, normalizeState, parseBackup, safeLocalStorageWrite } from "@/lib/storage";
-import { captureSplits, checkpointKilometers, formatRaceTime, ghostDeltaSeconds, personalBest, routeAttempts } from "@/lib/time-attack";
+import { captureSplits, checkpointKilometers, formatRaceTime, ghostDeltaSeconds, ghostDistanceAtElapsed, personalBest, routeAttempts } from "@/lib/time-attack";
 
 type Tab = "dashboard" | "sessions" | "climbs" | "progress" | "more";
 type Energy = "easy" | "normal" | "hard";
@@ -344,6 +344,12 @@ export function VeloQuestApp() {
   const routeAttemptCount = activeClimb ? routeAttempts(state.sessions, activeClimb.id).length : 0;
   const ghostDelta = activeClimb && routeMode === "timeAttack"
     ? ghostDeltaSeconds(routeBest, currentRouteKm, activeClimb.distanceKm, timeAttackElapsedSeconds)
+    : undefined;
+  const ghostDistanceKm = activeClimb && routeMode === "timeAttack"
+    ? ghostDistanceAtElapsed(routeBest, timeAttackElapsedSeconds, activeClimb.distanceKm)
+    : undefined;
+  const ghostProgress = activeClimb && ghostDistanceKm !== undefined
+    ? Math.max(0, Math.min(1, ghostDistanceKm / activeClimb.distanceKm))
     : undefined;
   const routeCheckpoints = activeClimb ? checkpointKilometers(activeClimb.distanceKm) : [];
 
@@ -1149,8 +1155,8 @@ export function VeloQuestApp() {
                         <span><small>PB</small><strong>{routeBest?.metrics?.elapsedSeconds !== undefined ? formatRaceTime(routeBest.metrics.elapsedSeconds) : "—"}</strong></span>
                       </div>
                     )}
-                    <ClimbProfile climb={activeClimb} progress={climbProgress} ghostProgress={routeMode === "timeAttack" && routeBest?.metrics?.elapsedSeconds ? Math.min(1, timeAttackElapsedSeconds / routeBest.metrics.elapsedSeconds) : undefined} />
-                    <RouteMap climb={activeClimb} progress={climbProgress} ghostProgress={routeMode === "timeAttack" && routeBest?.metrics?.elapsedSeconds ? Math.min(1, timeAttackElapsedSeconds / routeBest.metrics.elapsedSeconds) : undefined} />
+                    <ClimbProfile climb={activeClimb} progress={climbProgress} ghostProgress={ghostProgress} />
+                    <RouteMap climb={activeClimb} progress={climbProgress} ghostProgress={ghostProgress} />
                     {routeMode === "timeAttack" && (
                       <div className="checkpointStrip">
                         {routeCheckpoints.map((km, index) => {
