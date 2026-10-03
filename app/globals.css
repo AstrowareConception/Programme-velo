@@ -398,3 +398,12 @@ button:focus-visible, input:focus-visible, .fileButton:focus-within { outline: 2
 .heroLevelProgress > i { display:block; height:6px; margin-top:7px; border-radius:999px; background:rgba(255,255,255,.07); overflow:hidden; }
 .heroLevelProgress > i b { display:block; height:100%; background:linear-gradient(90deg,var(--lime),var(--cyan)); }
 .heroRune em { margin-top:5px; color:var(--muted); font-style:normal; font-size:.55rem; max-width:90px; text-align:center; }
+
+.resistanceCalibration { display:grid; grid-template-columns:1fr auto; gap:10px 14px; align-items:center; padding:16px 0 4px; border-top:1px solid var(--line); }
+.resistanceCalibration > div:first-child strong, .resistanceCalibration > div:first-child small { display:block; }
+.resistanceCalibration > div:first-child small { color:var(--muted); margin-top:4px; line-height:1.35; }
+.resistanceCalibration > span { min-width:42px; text-align:center; color:var(--cyan); font-weight:900; font-size:1.1rem; }
+.resistanceCalibration > input { grid-column:1 / -1; width:100%; accent-color:var(--cyan); }
+.calibrationLabels { grid-column:1 / -1; display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:10px; color:var(--muted); }
+.calibrationLabels small:last-child { text-align:right; }
+.miniButton { min-height:32px; padding:5px 10px; font-size:.68rem; }
