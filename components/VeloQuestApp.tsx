@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { AppState, Measurement, TelemetrySample, WorkoutTemplate } from "@/lib/types";
+import type { AppState, Measurement, Preferences, TelemetrySample, WorkoutTemplate } from "@/lib/types";
 import { connectFtmsBike, hasWebBluetooth, type BikeConnection, type BikeTelemetry, webBluetoothHint } from "@/lib/ftms";
 import { ClimbProfile } from "@/components/ClimbProfile";
 import { RouteMap } from "@/components/RouteMap";
 import { MetricChart } from "@/components/MetricChart";
+import { InstallCard } from "@/components/InstallCard";
 import { climbs, climbToWorkout, type ClimbChallenge } from "@/lib/routes";
 import { parseGpxFile } from "@/lib/gpx";
 import {
@@ -19,10 +20,13 @@ import {
   weeklyStats,
   workouts,
   streak,
-  isPerfectWeek
+  isPerfectWeek,
+  defaultPreferences
 } from "@/lib/data";
+import { compactTelemetry, cueSegment, formatClock, requestScreenWakeLock } from "@/lib/session";
 
-type Tab = "dashboard" | "sessions" | "climbs" | "progress" | "badges" | "data";
+type Tab = "dashboard" | "sessions" | "climbs" | "progress" | "more";
+type Energy = "easy" | "normal" | "hard";
 const CUSTOM_ROUTES_KEY = "veloquest:custom-routes:v1";
 
 function pct(value: number, target: number) {
@@ -64,7 +68,12 @@ export function VeloQuestApp() {
   const [secondsLeft, setSecondsLeft] = useState(0);
   const [running, setRunning] = useState(false);
   const [showFinish, setShowFinish] = useState(false);
+  const [sessionStarted, setSessionStarted] = useState(false);
   const [showSetup, setShowSetup] = useState(false);
+  const [availableMinutes, setAvailableMinutes] = useState(35);
+  const [energy, setEnergy] = useState<Energy>("normal");
+  const [toast, setToast] = useState<string | null>(null);
+  const [online, setOnline] = useState(true);
   const [bike, setBike] = useState<BikeConnection | null>(null);
   const [telemetry, setTelemetry] = useState<BikeTelemetry>({});
   const [telemetrySamples, setTelemetrySamples] = useState<TelemetrySample[]>([]);
@@ -74,11 +83,16 @@ export function VeloQuestApp() {
   const [customClimbs, setCustomClimbs] = useState<ClimbChallenge[]>([]);
   const [gpxError, setGpxError] = useState<string | null>(null);
   const lastSampleAt = useRef(0);
+  const segmentDeadlineRef = useRef(0);
+  const wakeLockRef = useRef<any>(null);
 
   useEffect(() => {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
-      try { setState(JSON.parse(raw)); } catch { /* ignore corrupted backup */ }
+      try {
+        const parsed = JSON.parse(raw);
+        setState({ ...parsed, preferences: { ...defaultPreferences, ...(parsed.preferences ?? {}) } });
+      } catch { /* ignore corrupted backup */ }
     } else {
       setShowSetup(true);
     }
@@ -86,7 +100,16 @@ export function VeloQuestApp() {
     if (savedRoutes) {
       try { setCustomClimbs(JSON.parse(savedRoutes)); } catch { /* ignore corrupted custom routes */ }
     }
+    setOnline(navigator.onLine);
+    const goOnline = () => setOnline(true);
+    const goOffline = () => setOnline(false);
+    window.addEventListener("online", goOnline);
+    window.addEventListener("offline", goOffline);
     setHydrated(true);
+    return () => {
+      window.removeEventListener("online", goOnline);
+      window.removeEventListener("offline", goOffline);
+    };
   }, []);
 
   useEffect(() => {
@@ -98,30 +121,41 @@ export function VeloQuestApp() {
   }, [customClimbs, hydrated]);
 
   useEffect(() => {
-    if (!running || !active) return;
+    if (!running || !active || !sessionStarted) return;
+    segmentDeadlineRef.current = Date.now() + secondsLeft * 1000;
     const timer = window.setInterval(() => {
-      setSecondsLeft((seconds) => {
-        if (seconds > 1) return seconds - 1;
-        const next = segmentIndex + 1;
-        if (next >= active.segments.length) {
-          setRunning(false);
-          setShowFinish(true);
-          return 0;
-        }
-        setSegmentIndex(next);
-        return Math.round(active.segments[next].minutes * 60);
-      });
-    }, 1000);
+      const remaining = Math.max(0, Math.ceil((segmentDeadlineRef.current - Date.now()) / 1000));
+      if (remaining > 0) {
+        setSecondsLeft(remaining);
+        return;
+      }
+
+      const next = segmentIndex + 1;
+      if (next >= active.segments.length) {
+        setSecondsLeft(0);
+        setRunning(false);
+        setShowFinish(true);
+        setToast("Séance terminée — enregistre ta performance.");
+        return;
+      }
+
+      setSegmentIndex(next);
+      const nextSeconds = Math.round(active.segments[next].minutes * 60);
+      setSecondsLeft(nextSeconds);
+      segmentDeadlineRef.current = Date.now() + nextSeconds * 1000;
+      cueSegment(active.segments[next], { ...defaultPreferences, ...(state.preferences ?? {}) });
+    }, 250);
+
     return () => window.clearInterval(timer);
-  }, [running, active, segmentIndex]);
+  }, [running, active, segmentIndex, sessionStarted]);
 
   useEffect(() => {
     if (!running || !active || !bike) return;
     const now = Date.now();
-    if (now - lastSampleAt.current < 5000) return;
+    if (now - lastSampleAt.current < 10000) return;
     lastSampleAt.current = now;
     setTelemetrySamples((previous) => [
-      ...previous.slice(-719),
+      ...previous.slice(-359),
       {
         t: now,
         speedKmh: telemetry.speedKmh,
@@ -133,6 +167,8 @@ export function VeloQuestApp() {
       }
     ]);
   }, [telemetry, running, active, bike]);
+
+  const preferences: Preferences = { ...defaultPreferences, ...(state.preferences ?? {}) };
 
   const week = currentProgramWeek(state.profile.startDate);
   const target = weekTargets[week - 1];
@@ -179,17 +215,23 @@ export function VeloQuestApp() {
   }, [target.sessions, stats.sessions]);
 
   const recommendation = useMemo(() => {
+    const structured = workouts.filter((w) => !w.bonus && w.id !== "free-ride");
     const recentHard = [...state.sessions]
-      .filter((s) => s.intensity === "hard")
+      .filter((session) => session.intensity === "hard")
       .sort((a, b) => b.date.localeCompare(a.date))[0];
-    if (recentHard && Date.now() - new Date(recentHard.date).getTime() < 30 * 3600 * 1000) {
-      return workouts.find((w) => w.id === "endurance-45")!;
-    }
-    if (stats.hard < target.maxHard && stats.points < target.points) {
-      return workouts.find((w) => w.id === "progressive-35")!;
-    }
-    return workouts.find((w) => w.id === "endurance-70")!;
-  }, [state.sessions, stats.hard, stats.points, target.maxHard, target.points]);
+    const hardRecently = recentHard && Date.now() - new Date(recentHard.date).getTime() < 30 * 3600 * 1000;
+    const maxIntensity = hardRecently || stats.hard >= target.maxHard ? "moderate" : energy === "hard" ? "hard" : energy === "easy" ? "easy" : "moderate";
+    const rank = { easy: 1, moderate: 2, hard: 3 };
+    const candidates = structured
+      .filter((w) => w.duration <= availableMinutes + 5)
+      .filter((w) => rank[w.intensity] <= rank[maxIntensity])
+      .sort((a, b) => {
+        const intensityDelta = rank[b.intensity] - rank[a.intensity];
+        if (intensityDelta !== 0) return intensityDelta;
+        return b.duration - a.duration;
+      });
+    return candidates[0] ?? structured.sort((a, b) => a.duration - b.duration)[0];
+  }, [state.sessions, stats.hard, target.maxHard, availableMinutes, energy]);
 
   const climbProgress = useMemo(() => {
     if (!activeClimb || !active) return 0;
