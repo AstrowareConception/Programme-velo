@@ -74,6 +74,7 @@ export function VeloQuestApp() {
   const [energy, setEnergy] = useState<Energy>("normal");
   const [toast, setToast] = useState<string | null>(null);
   const [online, setOnline] = useState(true);
+  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
   const [bike, setBike] = useState<BikeConnection | null>(null);
   const [telemetry, setTelemetry] = useState<BikeTelemetry>({});
   const [telemetrySamples, setTelemetrySamples] = useState<TelemetrySample[]>([]);
@@ -221,6 +222,9 @@ export function VeloQuestApp() {
   const latestWaist = [...sortedMeasurements].reverse().find((m) => m.waist !== undefined)?.waist;
   const latestAbdomen = [...sortedMeasurements].reverse().find((m) => m.abdomen !== undefined)?.abdomen;
   const allClimbs = useMemo(() => [...climbs, ...customClimbs], [customClimbs]);
+  const selectedSession = selectedSessionId ? state.sessions.find((session) => session.id === selectedSessionId) : undefined;
+  const selectedTemplate = selectedSession ? workouts.find((w) => w.id === selectedSession.templateId) : undefined;
+  const selectedRoute = selectedSession ? allClimbs.find((c) => c.id === selectedSession.routeId) : undefined;
   const currentStreak = streak(state);
   const perfectWeek = isPerfectWeek(state, week);
   const totalDistance = state.sessions.reduce((sum, session) => sum + (session.metrics?.distanceKm ?? 0), 0);
@@ -530,6 +534,18 @@ export function VeloQuestApp() {
     }
   }
 
+  function resetLocalData() {
+    if (!window.confirm("Effacer le profil, l’historique, les mesures et les parcours personnels de cet appareil ?")) return;
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(CUSTOM_ROUTES_KEY);
+    setState(emptyState());
+    setCustomClimbs([]);
+    setSelectedSessionId(null);
+    setTab("dashboard");
+    setShowSetup(true);
+    setToast("Données locales réinitialisées.");
+  }
+
   async function importGpx(file?: File) {
     if (!file) return;
     setGpxError(null);
@@ -744,7 +760,7 @@ export function VeloQuestApp() {
                 const template = workouts.find((w) => w.id === session.templateId);
                 const route = allClimbs.find((c) => c.id === session.routeId);
                 return (
-                  <div key={session.id}>
+                  <button className="sessionHistoryRow" key={session.id} onClick={() => setSelectedSessionId(session.id)}>
                     <span>{dateLabel(session.date)}</span>
                     <div><strong>{route?.name ?? template?.name ?? session.templateId}</strong><small>{session.duration} min · {session.metrics?.source ?? "manuel"}</small></div>
                     <div className="historyMetrics">
@@ -752,8 +768,9 @@ export function VeloQuestApp() {
                       {session.metrics?.avgPowerW !== undefined && <span>{session.metrics.avgPowerW.toFixed(0)} W</span>}
                       {session.metrics?.avgHeartRate !== undefined && <span>{session.metrics.avgHeartRate.toFixed(0)} bpm</span>}
                       {session.rpe !== undefined && <span>RPE {session.rpe}</span>}
+                      <span>›</span>
                     </div>
-                  </div>
+                  </button>
                 );
               })}
               {!state.sessions.length && <p>Aucune séance enregistrée pour l’instant.</p>}
@@ -845,6 +862,7 @@ export function VeloQuestApp() {
             <button className="secondary" onClick={exportData}>Exporter une sauvegarde JSON</button>
             <button className="secondary" onClick={exportCsv}>Exporter séances + mesures en CSV</button>
             <label className="secondary fileButton">Importer une sauvegarde<input type="file" accept="application/json" onChange={(e) => importData(e.target.files?.[0])} /></label>
+            <button className="secondary dangerButton" onClick={resetLocalData}>Réinitialiser les données de cet appareil</button>
           </section>
         </section>
       )}
@@ -956,6 +974,33 @@ export function VeloQuestApp() {
         </div>
       )}
 
+      {selectedSession && (
+        <div className="modalBackdrop" onClick={() => setSelectedSessionId(null)}>
+          <section className="sessionModal historyDetail" onClick={(event) => event.stopPropagation()}>
+            <button className="close" aria-label="Fermer le détail" onClick={() => setSelectedSessionId(null)}>×</button>
+            <p className="eyebrow">JOURNAL</p>
+            <h2>{selectedRoute?.name ?? selectedTemplate?.name ?? selectedSession.templateId}</h2>
+            <p className="detailDate">{new Intl.DateTimeFormat("fr-FR", { dateStyle: "full", timeStyle: "short" }).format(new Date(selectedSession.date))}</p>
+            <div className="detailMetrics">
+              <DetailMetric label="Durée" value={`${selectedSession.duration} min`} />
+              <DetailMetric label="Distance" value={selectedSession.metrics?.distanceKm !== undefined ? `${selectedSession.metrics.distanceKm.toFixed(2)} km` : "—"} />
+              <DetailMetric label="Calories" value={selectedSession.metrics?.calories !== undefined ? `${selectedSession.metrics.calories} kcal` : "—"} />
+              <DetailMetric label="RPE" value={selectedSession.rpe !== undefined ? `${selectedSession.rpe}/10` : "—"} />
+              <DetailMetric label="RPM moyen" value={selectedSession.metrics?.avgCadenceRpm?.toFixed(0) ?? "—"} />
+              <DetailMetric label="RPM max" value={selectedSession.metrics?.maxCadenceRpm?.toFixed(0) ?? "—"} />
+              <DetailMetric label="Puissance moy." value={selectedSession.metrics?.avgPowerW !== undefined ? `${selectedSession.metrics.avgPowerW.toFixed(0)} W` : "—"} />
+              <DetailMetric label="Puissance max" value={selectedSession.metrics?.maxPowerW !== undefined ? `${selectedSession.metrics.maxPowerW.toFixed(0)} W` : "—"} />
+              <DetailMetric label="FC moyenne" value={selectedSession.metrics?.avgHeartRate !== undefined ? `${selectedSession.metrics.avgHeartRate.toFixed(0)} bpm` : "—"} />
+              <DetailMetric label="FC max" value={selectedSession.metrics?.maxHeartRate !== undefined ? `${selectedSession.metrics.maxHeartRate.toFixed(0)} bpm` : "—"} />
+              <DetailMetric label="Résistance moy." value={selectedSession.metrics?.avgResistance?.toFixed(1) ?? "—"} />
+              <DetailMetric label="Source" value={selectedSession.metrics?.source ?? "manuel"} />
+            </div>
+            {selectedSession.note && <div className="sessionNote"><small>NOTE</small><p>{selectedSession.note}</p></div>}
+            {selectedSession.metrics?.samples?.length ? <p className="finePrint">{selectedSession.metrics.samples.length} points de télémétrie compactés sont conservés avec cette séance.</p> : null}
+          </section>
+        </div>
+      )}
+
       {toast && <div className="toast" role="status">{toast}</div>}
 
       {showSetup && (
@@ -982,6 +1027,10 @@ export function VeloQuestApp() {
       )}
     </main>
   );
+}
+
+function DetailMetric({ label, value }: { label: string; value: string }) {
+  return <span><small>{label}</small><strong>{value}</strong></span>;
 }
 
 function ConsoleMetric({ label, value }: { label: string; value: string }) {
