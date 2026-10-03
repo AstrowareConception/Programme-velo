@@ -158,7 +158,7 @@ test("FTMS connection exposes live TEB5 telemetry and capabilities", async ({ pa
   await page.getByRole("button", { name: /Plus/ }).click();
   await expect(page.getByText("Control Point")).toBeVisible();
   await expect(page.getByText("Résistance cible")).toBeVisible();
-  await expect(page.getByText("1–32")).toBeVisible();
+  await expect(page.getByText("1–32", { exact: true })).toBeVisible();
 });
 
 test("FTMS control acknowledgement and auto resistance send real control-point commands", async ({ page }) => {
@@ -171,7 +171,8 @@ test("FTMS control acknowledgement and auto resistance send real control-point c
 
   await page.getByRole("button", { name: "Demander le contrôle FTMS" }).click();
   await expect(page.getByText("Contrôle accordé")).toBeVisible();
-  await page.getByLabel("Auto-résistance pour cette connexion").check();
+  await page.locator("label.toggleRow").filter({ hasText: "Auto-résistance pour cette connexion" }).click();
+  await expect(page.getByLabel("Auto-résistance pour cette connexion")).toBeChecked();
 
   await page.getByRole("button", { name: /Séances/ }).click();
   const card = page.getByRole("heading", { name: "Décrassage" }).locator("xpath=ancestor::article");
