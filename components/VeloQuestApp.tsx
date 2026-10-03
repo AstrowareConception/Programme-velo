@@ -143,6 +143,17 @@ export function VeloQuestApp() {
     };
   }, [telemetrySamples]);
 
+  useEffect(() => {
+    const badgeNavigator = navigator as Navigator & {
+      setAppBadge?: (value?: number) => Promise<void>;
+      clearAppBadge?: () => Promise<void>;
+    };
+    if (!badgeNavigator.setAppBadge) return;
+    const remaining = Math.max(0, target.sessions - stats.sessions);
+    if (remaining > 0) badgeNavigator.setAppBadge(remaining).catch(() => undefined);
+    else badgeNavigator.clearAppBadge?.().catch(() => undefined);
+  }, [target.sessions, stats.sessions]);
+
   const recommendation = useMemo(() => {
     const recentHard = [...state.sessions]
       .filter((s) => s.intensity === "hard")
@@ -366,7 +377,11 @@ export function VeloQuestApp() {
           <section className="card">
             <div className="sectionHead"><div><p className="eyebrow">BONUS</p><h2>Une petite marge ?</h2></div><span className="spark">+20 XP</span></div>
             <p>Ajoute 15 minutes faciles. Elles comptent dans ton volume et ta régularité, mais pas dans les points principaux. Les bonus XP sont plafonnés à 60 par semaine.</p>
-            <button className="secondary" onClick={() => launch(workouts.find((w) => w.id === "bonus-15")!)}>Micro bonus 15 min</button>
+            <div className="bonusChoices">
+              <button className="secondary" onClick={() => launch(workouts.find((w) => w.id === "bonus-10")!)}>10 min</button>
+              <button className="secondary" onClick={() => launch(workouts.find((w) => w.id === "bonus-15")!)}>15 min</button>
+              <button className="secondary" onClick={() => launch(workouts.find((w) => w.id === "bonus-20")!)}>20 min</button>
+            </div>
           </section>
 
           <section className="card">
