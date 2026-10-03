@@ -11,6 +11,7 @@ import { MetricChart } from "@/components/MetricChart";
 import { InstallCard } from "@/components/InstallCard";
 import { PerformanceRecords, SectorAnalysis } from "@/components/PerformancePanel";
 import { ProgressionPalmares } from "@/components/ProgressionPalmares";
+import { recommendAdaptiveWorkout } from "@/lib/coach";
 import {
   climbs,
   climbToWorkout,
@@ -104,6 +105,7 @@ export function VeloQuestApp() {
   const [showSetup, setShowSetup] = useState(false);
   const [availableMinutes, setAvailableMinutes] = useState(35);
   const [energy, setEnergy] = useState<Energy>("normal");
+  const [sessionResistanceDelta, setSessionResistanceDelta] = useState(0);
   const [toast, setToast] = useState<string | null>(null);
   const [online, setOnline] = useState(true);
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
@@ -348,24 +350,22 @@ export function VeloQuestApp() {
     else badgeNavigator.clearAppBadge?.().catch(() => undefined);
   }, [target.sessions, stats.sessions]);
 
-  const recommendation = useMemo(() => {
-    const structured = workouts.filter((w) => !w.bonus && w.id !== "free-ride");
-    const recentHard = [...state.sessions]
-      .filter((session) => session.intensity === "hard")
-      .sort((a, b) => b.date.localeCompare(a.date))[0];
-    const hardRecently = recentHard && Date.now() - new Date(recentHard.date).getTime() < 30 * 3600 * 1000;
-    const maxIntensity = hardRecently || stats.hard >= target.maxHard ? "moderate" : energy === "hard" ? "hard" : energy === "easy" ? "easy" : "moderate";
-    const rank = { easy: 1, moderate: 2, hard: 3 };
-    const candidates = structured
-      .filter((w) => w.duration <= availableMinutes + 5)
-      .filter((w) => rank[w.intensity] <= rank[maxIntensity])
-      .sort((a, b) => {
-        const intensityDelta = rank[b.intensity] - rank[a.intensity];
-        if (intensityDelta !== 0) return intensityDelta;
-        return b.duration - a.duration;
-      });
-    return candidates[0] ?? structured.sort((a, b) => a.duration - b.duration)[0];
-  }, [state.sessions, stats.hard, target.maxHard, availableMinutes, energy]);
+  const adaptiveCoach = useMemo(() => recommendAdaptiveWorkout({
+    state,
+    workouts,
+    target,
+    weekly: {
+      sessions: stats.sessions,
+      minutes: stats.minutes,
+      points: stats.points,
+      hard: stats.hard,
+      variety: stats.variety
+    },
+    availableMinutes,
+    energy
+  }), [state, target, stats.sessions, stats.minutes, stats.points, stats.hard, stats.variety, availableMinutes, energy]);
+
+  const recommendation = adaptiveCoach.workout;
 
   const totalSessionSeconds = active ? active.segments.reduce((sum, segment) => sum + segment.minutes * 60, 0) : 0;
   const elapsedBeforeSegment = active ? active.segments.slice(0, segmentIndex).reduce((sum, segment) => sum + segment.minutes * 60, 0) : 0;
@@ -423,7 +423,7 @@ export function VeloQuestApp() {
     const resistanceText = active.segments[segmentIndex]?.resistance ?? "";
     const values = resistanceText.match(/\d+(?:[.,]\d+)?/g)?.map((v) => Number(v.replace(",", "."))) ?? [];
     if (!values.length) return;
-    const targetLevel = values.reduce((sum, value) => sum + value, 0) / values.length + preferences.resistanceOffset;
+    const targetLevel = values.reduce((sum, value) => sum + value, 0) / values.length + preferences.resistanceOffset + sessionResistanceDelta;
     bike.setResistance(targetLevel).catch((error) => {
       setAutoResistanceControl(false);
       setBluetoothError(error instanceof Error ? error.message : "Pilotage automatique interrompu.");
@@ -507,11 +507,13 @@ export function VeloQuestApp() {
     setTelemetrySamples([]);
   }
 
-  function launch(workout: WorkoutTemplate, climb: ClimbChallenge | null = null, mode: RouteMode = "training") {
+  function launch(workout: WorkoutTemplate, climb: ClimbChallenge | null = null, mode: RouteMode = "training", resistanceDelta = 0) {
     setActive(workout);
     setActiveClimb(climb);
     setRouteMode(climb ? mode : "training");
+    setSessionResistanceDelta(Math.max(-1, Math.min(1, resistanceDelta)));
     setPauseCount(0);
+    setSessionResistanceDelta(0);
     setActiveChallenge(null);
     setTimeAttackElapsedSeconds(0);
     setTimeAttackSplits([]);
@@ -890,7 +892,7 @@ export function VeloQuestApp() {
           <section className="card coachCard">
             <div className="sectionHead">
               <div><p className="eyebrow">COACH EXPRESS</p><h2>Combien de temps et quelle énergie ?</h2></div>
-              <span className="coachStatus">{online ? "● prêt" : "○ hors ligne"}</span>
+              <span className={`coachStatus ${adaptiveCoach.load}`}>{adaptiveCoach.load === "recovery" ? "🌿 récupération" : adaptiveCoach.load === "push" ? "🔥 fenêtre d’effort" : "⚡ charge équilibrée"}</span>
             </div>
             <div className="coachSelectors">
               <div><small>Temps disponible</small><div className="choiceRow">{[20,30,35,45,60].map((minutes) => <button key={minutes} className={availableMinutes === minutes ? "choice active" : "choice"} onClick={() => setAvailableMinutes(minutes)}>{minutes} min</button>)}</div></div>
@@ -905,9 +907,11 @@ export function VeloQuestApp() {
                 <p className="eyebrow">RECOMMANDATION</p>
                 <h2>{recommendation.name}</h2>
                 <p>{recommendation.tagline}</p>
-                <div className="chips"><span>{recommendation.duration} min</span><span>{recommendation.points} pts</span><span>{recommendation.xp} XP</span><span>{recommendation.intensity === "hard" ? "intense" : recommendation.intensity === "moderate" ? "soutenu" : "facile"}</span></div>
+                <div className="chips"><span>{recommendation.duration} min</span><span>{recommendation.points} pts</span><span>{recommendation.xp} XP</span><span>{recommendation.intensity === "hard" ? "intense" : recommendation.intensity === "moderate" ? "soutenu" : "facile"}</span><span>{adaptiveCoach.personalization === "personalized" ? "coach personnalisé" : adaptiveCoach.personalization === "learning" ? "coach en apprentissage" : "profil initial"}</span></div>
+                <div className="coachReasons">{adaptiveCoach.reasons.slice(0,3).map((reason) => <span key={reason}>• {reason}</span>)}</div>
+                {adaptiveCoach.suggestedResistanceDelta !== 0 && <div className="coachTune">Ajustement proposé pour cette séance : <strong>{adaptiveCoach.suggestedResistanceDelta > 0 ? "+" : ""}{adaptiveCoach.suggestedResistanceDelta} niveau</strong> d’après tes RPE précédents.</div>}
               </div>
-              <button className="primary" onClick={() => launch(recommendation)}>Préparer la séance</button>
+              <button className="primary" onClick={() => launch(recommendation, null, "training", adaptiveCoach.suggestedResistanceDelta)}>Préparer la séance</button>
             </div>
           </section>
 
@@ -1256,7 +1260,7 @@ export function VeloQuestApp() {
       {active && (
         <div className="modalBackdrop">
           <div className={`sessionModal ${activeClimb ? "climbSession" : ""}`}>
-            <button className="close" aria-label="Fermer la séance" onClick={() => { setActive(null); setActiveClimb(null); setActiveChallenge(null); setRunning(false); setSessionStarted(false); }}>×</button>
+            <button className="close" aria-label="Fermer la séance" onClick={() => { setActive(null); setActiveClimb(null); setActiveChallenge(null); setSessionResistanceDelta(0); setRunning(false); setSessionStarted(false); }}>×</button>
 
             {showFinish ? (
               <form action={finishActive} className="finishForm">
@@ -1322,12 +1326,12 @@ export function VeloQuestApp() {
                   {active.segments.map((segment, index) => (
                     <button key={index} type="button" onClick={() => goToSegment(index)}>
                       <span>{String(index + 1).padStart(2, "0")}</span>
-                      <div><strong>{segment.label}</strong><small>{segment.minutes} min · niveau {adjustedResistance(segment.resistance, preferences.resistanceOffset)} · RPE {segment.rpe}</small></div>
+                      <div><strong>{segment.label}</strong><small>{segment.minutes} min · niveau {adjustedResistance(segment.resistance, preferences.resistanceOffset + sessionResistanceDelta)} · RPE {segment.rpe}</small></div>
                     </button>
                   ))}
                 </div>
                 <div className="previewFooter">
-                  <span>{preferences.keepScreenAwake ? "☀ écran actif" : "écran standard"} · {preferences.voiceCues ? "voix active" : preferences.soundCues ? "bips actifs" : "silencieux"}</span>
+                  <span>{preferences.keepScreenAwake ? "☀ écran actif" : "écran standard"} · {preferences.voiceCues ? "voix active" : preferences.soundCues ? "bips actifs" : "silencieux"}{sessionResistanceDelta ? ` · coach ${sessionResistanceDelta > 0 ? "+" : ""}${sessionResistanceDelta}` : ""}</span>
                   <button className="primary bigStart" onClick={beginSession}>{routeMode === "timeAttack" && activeClimb ? "Lancer le chrono" : "Démarrer la séance"}</button>
                 </div>
               </div>
@@ -1361,7 +1365,7 @@ export function VeloQuestApp() {
 
                 <div className="resistance">
                   <small>NIVEAU TEB5</small>
-                  <strong>{adjustedResistance(active.segments[segmentIndex].resistance, preferences.resistanceOffset)}</strong>
+                  <strong>{adjustedResistance(active.segments[segmentIndex].resistance, preferences.resistanceOffset + sessionResistanceDelta)}</strong>
                 </div>
                 <div className="timer" aria-live="off">{formatClock(secondsLeft)}</div>
                 <div className="sessionOverall">
@@ -1379,7 +1383,7 @@ export function VeloQuestApp() {
                   </div>
                 )}
                 {active.segments[segmentIndex + 1] && (
-                  <div className="nextSegment"><small>ENSUITE</small><strong>{active.segments[segmentIndex + 1].label}</strong><span>niveau {adjustedResistance(active.segments[segmentIndex + 1].resistance, preferences.resistanceOffset)}</span></div>
+                  <div className="nextSegment"><small>ENSUITE</small><strong>{active.segments[segmentIndex + 1].label}</strong><span>niveau {adjustedResistance(active.segments[segmentIndex + 1].resistance, preferences.resistanceOffset + sessionResistanceDelta)}</span></div>
                 )}
                 {active.segments.length <= 30 && <div className="segmentProgress">{active.segments.map((_, i) => <i key={i} className={i <= segmentIndex ? "done" : ""} />)}</div>}
                 <div className="modalActions three">
