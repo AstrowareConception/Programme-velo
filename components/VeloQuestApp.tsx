@@ -11,6 +11,7 @@ import { MetricChart } from "@/components/MetricChart";
 import { InstallCard } from "@/components/InstallCard";
 import { PerformanceRecords, SectorAnalysis } from "@/components/PerformancePanel";
 import { ProgressionPalmares } from "@/components/ProgressionPalmares";
+import { CampaignsPanel } from "@/components/CampaignsPanel";
 import { recommendAdaptiveWorkout } from "@/lib/coach";
 import {
   climbs,
@@ -1155,6 +1156,12 @@ export function VeloQuestApp() {
       {tab === "climbs" && (
         <section>
           <div className="pageHead"><p className="eyebrow">PARCOURS V2</p><h1>Cols, étapes & défis.</h1><p>Choisis une montée mythique, une étape multi-cols ou importe ton propre GPX. Les cartes de bibliothèque restent légères ; la carte interactive complète s’ouvre pendant la séance.</p></div>
+
+          <CampaignsPanel
+            sessions={state.sessions}
+            routes={allClimbs}
+            onLaunch={(route) => launch(climbToWorkout(route), route, "training")}
+          />
 
           <section className="card routeLibraryToolbar">
             <div className="routeSearchBox">
