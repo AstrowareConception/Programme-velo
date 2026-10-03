@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { captureSplits, checkpointKilometers, formatRaceTime, ghostDeltaSeconds, ghostDistanceAtElapsed, personalBest } from "../lib/time-attack";
+import { captureSplits, checkpointKilometers, formatRaceTime, ghostDeltaSeconds, ghostDistanceAtElapsed, personalBest, segmentAttempts, segmentBounds, segmentPersonalBest } from "../lib/time-attack";
 import type { CompletedSession } from "../lib/types";
 
 function attempt(seconds:number): CompletedSession {
@@ -43,5 +43,21 @@ describe("time attack helpers", () => {
       { t:1001000, distanceKm:70 }
     ];
     expect(ghostDistanceAtElapsed(best,500,20)).toBe(8);
+  });
+
+  it("computes quarter-sector bounds", () => {
+    expect(segmentBounds(40, 0)).toEqual({ startKm:0, endKm:10, distanceKm:10, startRatio:0, endRatio:.25 });
+    expect(segmentBounds(40, 2)).toEqual({ startKm:20, endKm:30, distanceKm:10, startRatio:.5, endRatio:.75 });
+  });
+
+  it("tracks personal best independently for each Segment Attack sector", () => {
+    const s1a=attempt(400); s1a.metrics!.timeAttack=undefined; s1a.metrics!.segmentAttackIndex=0;
+    const s1b=attempt(380); s1b.metrics!.timeAttack=undefined; s1b.metrics!.segmentAttackIndex=0;
+    const s2=attempt(300); s2.metrics!.timeAttack=undefined; s2.metrics!.segmentAttackIndex=1;
+    const sessions=[s1a,s1b,s2];
+
+    expect(segmentAttempts(sessions,"x",0)).toHaveLength(2);
+    expect(segmentPersonalBest(sessions,"x",0)?.metrics?.elapsedSeconds).toBe(380);
+    expect(segmentPersonalBest(sessions,"x",1)?.metrics?.elapsedSeconds).toBe(300);
   });
 });
