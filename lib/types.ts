@@ -65,6 +65,7 @@ export type ChallengeResult = {
 export type SessionMetrics = {
   source: "manual" | "ftms" | "mixed";
   challenge?: ChallengeResult;
+  completedRoute?: boolean;
   elapsedSeconds?: number;
   timeAttack?: boolean;
   checkpointSplits?: TimeAttackSplit[];

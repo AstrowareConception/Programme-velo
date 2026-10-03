@@ -10,6 +10,7 @@ import { RouteMap } from "@/components/RouteMap";
 import { MetricChart } from "@/components/MetricChart";
 import { InstallCard } from "@/components/InstallCard";
 import { PerformanceRecords, SectorAnalysis } from "@/components/PerformancePanel";
+import { ProgressionPalmares } from "@/components/ProgressionPalmares";
 import {
   climbs,
   climbToWorkout,
@@ -585,6 +586,7 @@ export function VeloQuestApp() {
             timeAttack: isTimeAttack || undefined,
             checkpointSplits: isTimeAttack ? timeAttackSplits : undefined,
             challenge: challengeResult,
+            completedRoute: activeClimb ? completedRoute : undefined,
             distanceKm: n(form, "distance") ?? autoMetrics.distanceKm ?? (activeClimb ? currentRouteKm : undefined),
             calories: n(form, "calories"),
             avgSpeedKmh: n(form, "avgSpeed") ?? autoMetrics.avgSpeedKmh,
@@ -1196,6 +1198,8 @@ export function VeloQuestApp() {
               </>
             )}
           </section>
+
+          <ProgressionPalmares sessions={state.sessions} routes={allClimbs} />
 
           <section>
             <div className="sectionHead subsectionTitle"><div><p className="eyebrow">GAMIFICATION</p><h2>Badges</h2></div><strong>{allBadges.filter((b) => b.unlocked).length}/{allBadges.length}</strong></div>
