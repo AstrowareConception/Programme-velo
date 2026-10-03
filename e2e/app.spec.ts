@@ -97,3 +97,54 @@ test("manifest is served with VeloQuest metadata", async ({ request }) => {
   expect(manifest.name).toBe("VeloQuest");
   expect(manifest.display).toBe("standalone");
 });
+
+
+test("route favorite persists and favorites filter isolates it", async ({ page }) => {
+  await seed(page);
+  await page.goto("/");
+  await page.getByRole("button", { name: /Parcours/ }).click();
+
+  await page.getByLabel("Rechercher").fill("Galibier");
+  const galibier = page.getByRole("heading", { name: "Col du Galibier" }).locator("xpath=ancestor::article");
+  await expect(galibier).toBeVisible();
+  await galibier.getByRole("button", { name: "Ajouter aux favoris" }).click();
+  await expect(galibier.getByRole("button", { name: "Retirer des favoris" })).toBeVisible();
+
+  await page.reload();
+  await page.getByRole("button", { name: /Parcours/ }).click();
+  await page.getByRole("button", { name: /Favoris/ }).click();
+
+  await expect(page.getByRole("heading", { name: "Col du Galibier" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Mont Ventoux" })).toHaveCount(0);
+});
+
+test("route filters can isolate multi-col stages", async ({ page }) => {
+  await seed(page);
+  await page.goto("/");
+  await page.getByRole("button", { name: /Parcours/ }).click();
+
+  await page.getByRole("button", { name: "Étapes" }).click();
+  await expect(page.getByRole("heading", { name: "Chaussy + Madeleine" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Col du Galibier" })).toHaveCount(0);
+  await expect(page.getByText(/1 parcours/)).toBeVisible();
+});
+
+test("challenge picker launches the selected mode and constraint", async ({ page }) => {
+  await seed(page);
+  await page.goto("/");
+  await page.getByRole("button", { name: /Parcours/ }).click();
+  await page.getByLabel("Rechercher").fill("Alpe d’Huez");
+
+  const route = page.getByRole("heading", { name: "Alpe d’Huez" }).locator("xpath=ancestor::article");
+  await route.getByRole("button", { name: /Défis/ }).click();
+
+  await expect(page.getByRole("heading", { name: "Choisis une contrainte." })).toBeVisible();
+  const pacing = page.getByRole("button", { name: /Pacing progressif/ });
+  await expect(pacing).toBeVisible();
+  await pacing.click();
+
+  await expect(page.getByText("TIME ATTACK").first()).toBeVisible();
+  await expect(page.getByText("DÉFI ACTIF")).toBeVisible();
+  await expect(page.getByText("Pacing progressif")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Lancer le chrono" })).toBeVisible();
+});
