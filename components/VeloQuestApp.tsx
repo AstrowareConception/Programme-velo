@@ -529,18 +529,40 @@ export function VeloQuestApp() {
                 ? "Sur iPhone/iPad, la PWA reste en mode guidé. Les données affichées par le vélo pourront être saisies en quelques secondes à la fin de la séance."
                 : "Connecte un vélo FTMS compatible pour enregistrer automatiquement les données diffusées."}</p>
             )}
+            {bike && (
+              <div className="capabilityStrip">
+                <span className={bike.capabilities.indoorBikeData ? "ok" : ""}>Télémétrie</span>
+                <span className={bike.capabilities.controlPoint ? "ok" : ""}>Control Point</span>
+                <span className={bike.capabilities.supportsResistanceTarget ? "ok" : ""}>Résistance pilotable</span>
+                {bike.capabilities.resistanceRange && <span className="ok">Plage {bike.capabilities.resistanceRange.min}–{bike.capabilities.resistanceRange.max}</span>}
+              </div>
+            )}
             {!bike && <button className="secondary" onClick={connectBike} disabled={connectingBike}>{connectingBike ? "Recherche du vélo…" : "Connecter le vélo"}</button>}
             {bluetoothError && <p className="errorText">{bluetoothError}</p>}
           </section>
 
-          <section className="card questCard">
-            <div>
-              <p className="eyebrow">QUÊTE RECOMMANDÉE</p>
-              <h2>{recommendation.name}</h2>
-              <p>{recommendation.tagline}</p>
-              <div className="chips"><span>{recommendation.duration} min</span><span>{recommendation.points} pts</span><span>{recommendation.xp} XP</span></div>
+          <section className="card coachCard">
+            <div className="sectionHead">
+              <div><p className="eyebrow">COACH EXPRESS</p><h2>Combien de temps et quelle énergie ?</h2></div>
+              <span className="coachStatus">{online ? "● prêt" : "○ hors ligne"}</span>
             </div>
-            <button className="primary" onClick={() => launch(recommendation)}>Commencer</button>
+            <div className="coachSelectors">
+              <div><small>Temps disponible</small><div className="choiceRow">{[20,30,35,45,60].map((minutes) => <button key={minutes} className={availableMinutes === minutes ? "choice active" : "choice"} onClick={() => setAvailableMinutes(minutes)}>{minutes} min</button>)}</div></div>
+              <div><small>Énergie du jour</small><div className="choiceRow">
+                <button className={energy === "easy" ? "choice active" : "choice"} onClick={() => setEnergy("easy")}>🌿 tranquille</button>
+                <button className={energy === "normal" ? "choice active" : "choice"} onClick={() => setEnergy("normal")}>⚡ normal</button>
+                <button className={energy === "hard" ? "choice active" : "choice"} onClick={() => setEnergy("hard")}>🔥 à fond</button>
+              </div></div>
+            </div>
+            <div className="coachRecommendation">
+              <div>
+                <p className="eyebrow">RECOMMANDATION</p>
+                <h2>{recommendation.name}</h2>
+                <p>{recommendation.tagline}</p>
+                <div className="chips"><span>{recommendation.duration} min</span><span>{recommendation.points} pts</span><span>{recommendation.xp} XP</span><span>{recommendation.intensity === "hard" ? "intense" : recommendation.intensity === "moderate" ? "soutenu" : "facile"}</span></div>
+              </div>
+              <button className="primary" onClick={() => launch(recommendation)}>Préparer la séance</button>
+            </div>
           </section>
 
           <section className="card">
@@ -676,23 +698,62 @@ export function VeloQuestApp() {
         </section>
       )}
 
-      {tab === "badges" && (
+      {tab === "more" && (
         <section>
-          <div className="pageHead"><p className="eyebrow">GAMIFICATION</p><h1>Badges</h1><p>La constance, la variété et la progression rapportent plus que le surentraînement.</p></div>
-          <div className="grid badgeGrid">
-            {allBadges.map((b) => (
-              <article className={`card badge ${b.unlocked ? "unlocked" : ""}`} key={b.id}>
-                <span className="badgeIcon">{b.icon}</span><div><h2>{b.name}</h2><p>{b.description}</p><small>{b.unlocked ? "Débloqué" : b.progress}</small></div>
-              </article>
-            ))}
-          </div>
-        </section>
-      )}
+          <div className="pageHead"><p className="eyebrow">PLUS</p><h1>Réglages, badges & données</h1><p>Tout ce qui personnalise VeloQuest sans encombrer la navigation principale.</p></div>
 
-      {tab === "data" && (
-        <section>
-          <div className="pageHead"><p className="eyebrow">PARAMÈTRES</p><h1>Données locales</h1><p>Aucun compte, aucun serveur : ta progression reste dans ce navigateur.</p></div>
+          <InstallCard />
+
+          <section className="card">
+            <div className="sectionHead"><div><p className="eyebrow">CONFORT DE SÉANCE</p><h2>Ton cockpit</h2></div><span className="spark">personnalisable</span></div>
+            <div className="toggleList">
+              <Toggle label="Signaux sonores" description="Un bip à chaque changement de segment." checked={preferences.soundCues} onChange={(v) => updatePreference("soundCues", v)} />
+              <Toggle label="Annonces vocales" description="Annonce le segment et le niveau de résistance." checked={preferences.voiceCues} onChange={(v) => updatePreference("voiceCues", v)} />
+              <Toggle label="Retour haptique" description="Vibration si le navigateur et l’appareil le permettent." checked={preferences.haptics} onChange={(v) => updatePreference("haptics", v)} />
+              <Toggle label="Garder l’écran éveillé" description="Empêche la mise en veille pendant une séance quand l’API est disponible." checked={preferences.keepScreenAwake} onChange={(v) => updatePreference("keepScreenAwake", v)} />
+              <Toggle label="Conserver la trace Bluetooth" description="Garde une trace compacte de la télémétrie pour l’historique." checked={preferences.keepTelemetryTrace} onChange={(v) => updatePreference("keepTelemetryTrace", v)} />
+            </div>
+          </section>
+
+          <section className="card">
+            <div className="sectionHead"><div><p className="eyebrow">BLUETOOTH LAB</p><h2>{bike ? bike.deviceName : "Diagnostic FTMS"}</h2></div><span className={bike ? "connectionState onlineText" : "connectionState"}>{bike ? "CONNECTÉ" : "OFFLINE"}</span></div>
+            {bike ? (
+              <>
+                <div className="consoleMetrics compact">
+                  <ConsoleMetric label="RPM" value={telemetry.cadenceRpm?.toFixed(0) ?? "—"} />
+                  <ConsoleMetric label="WATTS" value={telemetry.powerW?.toFixed(0) ?? "—"} />
+                  <ConsoleMetric label="LEVEL" value={telemetry.resistance?.toFixed(0) ?? "—"} />
+                  <ConsoleMetric label="BPM" value={telemetry.heartRate?.toFixed(0) ?? "—"} />
+                </div>
+                <div className="diagnosticGrid">
+                  <span><small>FTMS</small><strong>{bike.capabilities.ftms ? "OK" : "—"}</strong></span>
+                  <span><small>Control Point</small><strong>{bike.capabilities.controlPoint ? "OK" : "non"}</strong></span>
+                  <span><small>Résistance cible</small><strong>{bike.capabilities.supportsResistanceTarget ? "oui" : "non détectée"}</strong></span>
+                  <span><small>Plage</small><strong>{bike.capabilities.resistanceRange ? `${bike.capabilities.resistanceRange.min}–${bike.capabilities.resistanceRange.max}` : "inconnue"}</strong></span>
+                </div>
+                <p className="finePrint">Le pilotage automatique reste verrouillé jusqu’à validation sur le TEB5 réel. Les primitives FTMS sont déjà présentes dans l’application.</p>
+              </>
+            ) : (
+              <>
+                <p>{webBluetoothHint() === "ios" ? "iOS n’expose pas Web Bluetooth aux PWA. VeloQuest reste utilisable en mode guidé et saisie manuelle." : "Connecte le vélo pour inspecter précisément les caractéristiques FTMS qu’il expose."}</p>
+                <button className="secondary" onClick={connectBike} disabled={connectingBike}>{connectingBike ? "Recherche…" : "Lancer le diagnostic Bluetooth"}</button>
+              </>
+            )}
+          </section>
+
+          <section>
+            <div className="sectionHead subsectionTitle"><div><p className="eyebrow">GAMIFICATION</p><h2>Badges</h2></div><strong>{allBadges.filter((b) => b.unlocked).length}/{allBadges.length}</strong></div>
+            <div className="grid badgeGrid">
+              {allBadges.map((b) => (
+                <article className={`card badge ${b.unlocked ? "unlocked" : ""}`} key={b.id}>
+                  <span className="badgeIcon">{b.icon}</span><div><h2>{b.name}</h2><p>{b.description}</p><small>{b.unlocked ? "Débloqué" : b.progress}</small></div>
+                </article>
+              ))}
+            </div>
+          </section>
+
           <section className="card actionStack">
+            <div><p className="eyebrow">DONNÉES LOCALES</p><h2>Profil & sauvegardes</h2><p>Les données restent sur cet appareil tant que tu ne les exportes pas.</p></div>
             <button className="secondary" onClick={() => setShowSetup(true)}>Modifier le profil et les objectifs</button>
             <button className="secondary" onClick={exportData}>Exporter une sauvegarde JSON</button>
             <label className="secondary fileButton">Importer une sauvegarde<input type="file" accept="application/json" onChange={(e) => importData(e.target.files?.[0])} /></label>
@@ -700,13 +761,12 @@ export function VeloQuestApp() {
         </section>
       )}
 
-      <nav className="bottomNav">
+      <nav className="bottomNav" aria-label="Navigation principale">
         <NavButton active={tab === "dashboard"} onClick={() => setTab("dashboard")} icon="⌂" label="Quête" />
         <NavButton active={tab === "sessions"} onClick={() => setTab("sessions")} icon="⚡" label="Séances" />
-        <NavButton active={tab === "climbs"} onClick={() => setTab("climbs")} icon="▲" label="Cols" />
+        <NavButton active={tab === "climbs"} onClick={() => setTab("climbs")} icon="▲" label="Parcours" />
         <NavButton active={tab === "progress"} onClick={() => setTab("progress")} icon="↗" label="Suivi" />
-        <NavButton active={tab === "badges"} onClick={() => setTab("badges")} icon="✦" label="Badges" />
-        <NavButton active={tab === "data"} onClick={() => setTab("data")} icon="☰" label="Données" />
+        <NavButton active={tab === "more"} onClick={() => setTab("more")} icon="•••" label="Plus" />
       </nav>
 
       {active && (
