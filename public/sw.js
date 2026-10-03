@@ -1,5 +1,5 @@
 const CACHE = "veloquest-v1";
-const CORE = ["/", "/manifest.webmanifest", "/logo.svg", "/icon.svg", "/icon-192.png", "/icon-512.png"];
+const CORE = ["/", "/manifest.webmanifest", "/logo.svg", "/icon.svg"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(CORE)));
