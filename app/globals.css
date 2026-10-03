@@ -438,3 +438,47 @@ button:focus-visible, input:focus-visible, .fileButton:focus-within { outline: 2
 .legalSection p { margin-bottom:0; }
 @media (max-width:850px) { .guideSteps { grid-template-columns:1fr 1fr; } }
 @media (max-width:520px) { .guideSteps { grid-template-columns:1fr; } }
+
+.timeAttackSummary { display:grid; grid-template-columns:repeat(3,1fr); gap:7px; margin:14px 0; }
+.timeAttackSummary span { padding:10px; border:1px solid var(--line); border-radius:12px; background:rgba(255,255,255,.025); }
+.timeAttackSummary small, .timeAttackSummary strong { display:block; }
+.timeAttackSummary small { color:var(--muted); font-size:.55rem; letter-spacing:.1em; }
+.timeAttackSummary strong { margin-top:4px; font-size:.82rem; }
+.timeAttackButton { color:var(--gold); border-color:rgba(255,209,102,.24); }
+.timeAttackIntro { margin:14px 0; padding:12px 14px; border:1px solid rgba(255,209,102,.18); border-radius:13px; background:rgba(255,209,102,.035); }
+.timeAttackIntro strong { color:var(--gold); }
+.timeAttackIntro p { margin:5px 0 0; color:var(--muted); font-size:.75rem; line-height:1.45; }
+.timeAttackHud { display:grid; grid-template-columns:1.3fr 1fr 1fr; gap:7px; margin:10px 0; }
+.timeAttackHud span { padding:10px; border:1px solid var(--line); border-radius:12px; background:#080b12; text-align:center; }
+.timeAttackHud small, .timeAttackHud strong { display:block; }
+.timeAttackHud small { color:var(--muted); font-size:.54rem; letter-spacing:.1em; }
+.timeAttackHud strong { margin-top:4px; font-family:"SFMono-Regular",Consolas,monospace; font-size:1rem; }
+.timeAttackHud span:first-child strong { font-size:1.5rem; color:var(--gold); }
+.timeAttackHud .ahead strong { color:var(--lime); }
+.timeAttackHud .behind strong { color:var(--hot); }
+.checkpointStrip { display:grid; grid-template-columns:repeat(4,1fr); gap:5px; margin:10px 0 14px; }
+.checkpointStrip span { padding:8px 6px; text-align:center; border:1px solid var(--line); border-radius:10px; background:rgba(255,255,255,.02); }
+.checkpointStrip small, .checkpointStrip strong { display:block; }
+.checkpointStrip small { color:var(--muted); font-size:.5rem; letter-spacing:.08em; }
+.checkpointStrip strong { margin-top:3px; font-size:.7rem; }
+.checkpointStrip span.passed { border-color:rgba(185,255,102,.22); background:rgba(185,255,102,.04); }
+.checkpointStrip span.passed strong { color:var(--lime); }
+.raceFinishBanner { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:12px 0; }
+.raceFinishBanner span { padding:12px; border:1px solid rgba(255,209,102,.18); border-radius:12px; background:rgba(255,209,102,.035); }
+.raceFinishBanner small, .raceFinishBanner strong { display:block; }
+.raceFinishBanner small { color:var(--muted); font-size:.55rem; }
+.raceFinishBanner strong { margin-top:4px; color:var(--gold); font-family:"SFMono-Regular",Consolas,monospace; font-size:1.05rem; }
+.detailSplits { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin:12px 0; }
+.detailSplits span { padding:9px; border:1px solid var(--line); border-radius:10px; text-align:center; }
+.detailSplits small, .detailSplits strong { display:block; }
+.detailSplits small { color:var(--muted); font-size:.55rem; }
+.detailSplits strong { margin-top:3px; font-size:.74rem; }
+.ghostProfileLine { stroke:var(--gold); stroke-width:2; stroke-dasharray:4 6; opacity:.55; }
+.ghostProfilePoint { fill:var(--gold); stroke:#0c1222; stroke-width:3; opacity:.8; }
+@media (max-width:560px) {
+  .timeAttackSummary { grid-template-columns:1fr 1fr; }
+  .timeAttackSummary span:last-child { grid-column:1 / -1; }
+  .timeAttackHud { grid-template-columns:1fr 1fr; }
+  .timeAttackHud span:first-child { grid-column:1 / -1; }
+  .checkpointStrip, .detailSplits { grid-template-columns:1fr 1fr; }
+}

@@ -50,8 +50,16 @@ export type TelemetrySample = {
   distanceKm?: number;
 };
 
+export type TimeAttackSplit = {
+  km: number;
+  elapsedSeconds: number;
+};
+
 export type SessionMetrics = {
   source: "manual" | "ftms" | "mixed";
+  elapsedSeconds?: number;
+  timeAttack?: boolean;
+  checkpointSplits?: TimeAttackSplit[];
   distanceKm?: number;
   calories?: number;
   avgSpeedKmh?: number;
