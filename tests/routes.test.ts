@@ -26,9 +26,21 @@ describe("resistanceForGrade", () => {
 });
 
 describe("route library", () => {
-  it("contains multiple climbs and at least one multi-col stage", () => {
-    expect(climbs.length).toBeGreaterThanOrEqual(8);
+  it("contains a balanced mix of climbs and multi-profile stages", () => {
+    expect(climbs.length).toBeGreaterThanOrEqual(13);
     expect(climbs.some((route) => routeCategory(route) === "stage")).toBe(true);
+    expect(climbs.filter((route) => routeDifficulty(route) === 2).length).toBeGreaterThanOrEqual(3);
+    expect(climbs.filter((route) => routeDifficulty(route) === 3).length).toBeGreaterThanOrEqual(2);
+  });
+
+  it("offers easier stages with both climbing and descending terrain", () => {
+    const easierStages = climbs.filter((route) => routeCategory(route) === "stage" && routeDifficulty(route) <= 3);
+    expect(easierStages.length).toBeGreaterThanOrEqual(5);
+    easierStages.forEach((route) => {
+      const terrain = routeTerrain(route);
+      expect(terrain.ascentKm).toBeGreaterThan(0);
+      expect(terrain.descentKm).toBeGreaterThan(0);
+    });
   });
 
   it("keeps difficulty in the 1..5 range", () => {

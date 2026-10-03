@@ -8,6 +8,8 @@ export type ChallengeKind =
   | "negative_split"
   | "final_quarter"
   | "beat_pb"
+  | "beat_pb_2pct"
+  | "progressive_quarters"
   | "stage_finish";
 
 export type RouteChallenge = {
@@ -81,6 +83,25 @@ export const routeChallenges: RouteChallenge[] = [
     icon: "👻",
     baseMode: "timeAttack",
     xpBonus: 140,
+    requiresPb: true
+  },
+  {
+    id: "progressive-quarters",
+    kind: "progressive_quarters",
+    title: "Pacing progressif",
+    description: "Chaque quart du parcours doit être plus rapide que le précédent.",
+    icon: "📈",
+    baseMode: "timeAttack",
+    xpBonus: 130
+  },
+  {
+    id: "beat-pb-2pct",
+    kind: "beat_pb_2pct",
+    title: "Briseur de record",
+    description: "Améliore ton record personnel d’au moins 2 %.",
+    icon: "💥",
+    baseMode: "timeAttack",
+    xpBonus: 180,
     requiresPb: true
   },
   {
@@ -158,6 +179,33 @@ export function evaluateRouteChallenge(challenge: RouteChallenge, context: Chall
       return context.elapsedSeconds < context.pbBeforeSeconds
         ? success(`PB amélioré de ${Math.round(context.pbBeforeSeconds-context.elapsedSeconds)} s.`)
         : fail(`Il manque ${Math.round(context.elapsedSeconds-context.pbBeforeSeconds)} s pour battre le PB.`);
+
+    case "beat_pb_2pct": {
+      if (context.elapsedSeconds === undefined) return fail("Chrono final non disponible.");
+      if (context.pbBeforeSeconds === undefined) return fail("Aucun record de référence.");
+      const target = context.pbBeforeSeconds * 0.98;
+      return context.elapsedSeconds <= target
+        ? success(`PB amélioré de ${((1-context.elapsedSeconds/context.pbBeforeSeconds)*100).toFixed(1)} %.`)
+        : fail(`Objectif : ${Math.round(target)} s ou mieux.`);
+    }
+
+    case "progressive_quarters": {
+      if (context.elapsedSeconds === undefined) return fail("Chrono final non disponible.");
+      const q1 = splitAt(context.checkpointSplits, 0.25, context.route.distanceKm);
+      const q2 = splitAt(context.checkpointSplits, 0.5, context.route.distanceKm);
+      const q3 = splitAt(context.checkpointSplits, 0.75, context.route.distanceKm);
+      if (!q1 || !q2 || !q3) return fail("Splits 25/50/75 % non disponibles.");
+      const durations = [
+        q1.elapsedSeconds,
+        q2.elapsedSeconds - q1.elapsedSeconds,
+        q3.elapsedSeconds - q2.elapsedSeconds,
+        context.elapsedSeconds - q3.elapsedSeconds
+      ];
+      const progressive = durations.every((value, index) => index === 0 || value < durations[index - 1]);
+      return progressive
+        ? success("Chaque quart a été plus rapide que le précédent.")
+        : fail("Tous les quarts ne sont pas progressivement plus rapides.");
+    }
 
     case "stage_finish":
       return routeCategory(context.route) === "stage"

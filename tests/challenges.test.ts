@@ -46,6 +46,30 @@ describe("route challenges", () => {
     expect(evaluateRouteChallenge(challenge, { route, completedRoute:true, pauseCount:0, elapsedSeconds:1001, pbBeforeSeconds:1000 }).success).toBe(false);
   });
 
+  it("requires at least a 2 percent PB improvement", () => {
+    const challenge = routeChallenges.find((item) => item.id === "beat-pb-2pct")!;
+    expect(evaluateRouteChallenge(challenge, { route, completedRoute:true, pauseCount:0, elapsedSeconds:979, pbBeforeSeconds:1000 }).success).toBe(true);
+    expect(evaluateRouteChallenge(challenge, { route, completedRoute:true, pauseCount:0, elapsedSeconds:985, pbBeforeSeconds:1000 }).success).toBe(false);
+  });
+
+  it("validates progressively faster quarters", () => {
+    const challenge = routeChallenges.find((item) => item.id === "progressive-quarters")!;
+    const progressiveSplits = [
+      { km: route.distanceKm * .25, elapsedSeconds:320 },
+      { km: route.distanceKm * .5, elapsedSeconds:620 },
+      { km: route.distanceKm * .75, elapsedSeconds:900 },
+      { km: route.distanceKm, elapsedSeconds:1160 }
+    ];
+    const flatSplits = [
+      { km: route.distanceKm * .25, elapsedSeconds:300 },
+      { km: route.distanceKm * .5, elapsedSeconds:600 },
+      { km: route.distanceKm * .75, elapsedSeconds:900 },
+      { km: route.distanceKm, elapsedSeconds:1200 }
+    ];
+    expect(evaluateRouteChallenge(challenge, { route, completedRoute:true, pauseCount:0, elapsedSeconds:1160, checkpointSplits:progressiveSplits }).success).toBe(true);
+    expect(evaluateRouteChallenge(challenge, { route, completedRoute:true, pauseCount:0, elapsedSeconds:1200, checkpointSplits:flatSplits }).success).toBe(false);
+  });
+
   it("never succeeds if the route was not completed", () => {
     const challenge = routeChallenges.find((item) => item.id === "no-pause")!;
     expect(evaluateRouteChallenge(challenge, { route, completedRoute:false, pauseCount:0 }).success).toBe(false);
