@@ -510,7 +510,7 @@ export function VeloQuestApp() {
     setActiveClimb(climb);
     setRouteMode(climb ? mode : "training");
     setPauseCount(0);
-    if (!climb) setActiveChallenge(null);
+    setActiveChallenge(null);
     setTimeAttackElapsedSeconds(0);
     setTimeAttackSplits([]);
     timeAttackStartedAtRef.current = 0;
@@ -653,8 +653,8 @@ export function VeloQuestApp() {
 
   function launchChallenge(route: ClimbChallenge, challenge: RouteChallenge) {
     setChallengeRoute(null);
-    setActiveChallenge(challenge);
     launch(climbToWorkout(route), route, challenge.baseMode);
+    setActiveChallenge(challenge);
   }
 
   function updatePreference(key: keyof Omit<Preferences, "resistanceOffset">, value: boolean) {
@@ -1038,7 +1038,7 @@ export function VeloQuestApp() {
                     <div className="timeAttackSummary">
                       <span><small>RECORD</small><strong>{pb?.metrics?.elapsedSeconds !== undefined ? formatRaceTime(pb.metrics.elapsedSeconds) : "—"}</strong></span>
                       <span><small>TENTATIVES</small><strong>{attempts}</strong></span>
-                      <span><small>RÉCOMPENSE</small><strong>+{climb.xp} XP</strong></span>
+                      <span><small>DÉFIS RÉUSSIS</small><strong>{state.sessions.filter((session) => session.routeId === climb.id && session.metrics?.challenge?.success).length}</strong></span>
                     </div>
 
                     <p className="routeNote">{climb.note}</p>
@@ -1047,6 +1047,7 @@ export function VeloQuestApp() {
                     <div className="climbActions">
                       <button className="primary" onClick={() => launch(climbToWorkout(climb), climb, "training")}>Entraînement</button>
                       <button className="secondary timeAttackButton" onClick={() => launch(climbToWorkout(climb), climb, "timeAttack")}>⏱ Time Attack</button>
+                      <button className="secondary challengeButton" onClick={() => setChallengeRoute(climb)}>◆ Défis</button>
                       {climb.id.startsWith("gpx-") && <button className="secondary dangerButton" onClick={() => deleteCustomClimb(climb.id)}>Supprimer</button>}
                     </div>
                   </article>
@@ -1225,10 +1226,30 @@ export function VeloQuestApp() {
         <NavButton active={tab === "more"} onClick={() => setTab("more")} icon="•••" label="Plus" />
       </nav>
 
+      {challengeRoute && (
+        <div className="modalBackdrop" onClick={() => setChallengeRoute(null)}>
+          <section className="sessionModal challengePicker" onClick={(event) => event.stopPropagation()}>
+            <button className="close" aria-label="Fermer les défis" onClick={() => setChallengeRoute(null)}>×</button>
+            <p className="eyebrow">DÉFIS · {challengeRoute.name.toUpperCase()}</p>
+            <h2>Choisis une contrainte.</h2>
+            <p className="challengeLead">Les défis donnent un bonus XP uniquement s’ils sont réellement validés à l’arrivée. Les règles utilisant cadence ou chrono s’appuient sur FTMS quand il est disponible, sinon sur les valeurs saisies.</p>
+            <div className="challengeList">
+              {challengesForRoute(challengeRoute, Boolean(personalBest(state.sessions, challengeRoute.id))).map((challenge) => (
+                <button key={challenge.id} className="challengeChoice" onClick={() => launchChallenge(challengeRoute, challenge)}>
+                  <span>{challenge.icon}</span>
+                  <div><strong>{challenge.title}</strong><p>{challenge.description}</p><small>{challenge.baseMode === "timeAttack" ? "Time Attack" : "Entraînement"} · +{challenge.xpBonus} XP{challenge.requiresCadence ? " · cadence requise" : ""}</small></div>
+                  <em>›</em>
+                </button>
+              ))}
+            </div>
+          </section>
+        </div>
+      )}
+
       {active && (
         <div className="modalBackdrop">
           <div className={`sessionModal ${activeClimb ? "climbSession" : ""}`}>
-            <button className="close" aria-label="Fermer la séance" onClick={() => { setActive(null); setActiveClimb(null); setRunning(false); setSessionStarted(false); }}>×</button>
+            <button className="close" aria-label="Fermer la séance" onClick={() => { setActive(null); setActiveClimb(null); setActiveChallenge(null); setRunning(false); setSessionStarted(false); }}>×</button>
 
             {showFinish ? (
               <form action={finishActive} className="finishForm">
@@ -1276,6 +1297,12 @@ export function VeloQuestApp() {
                   <span><small>Segments</small><strong>{active.segments.length}</strong></span>
                 </div>
                 {bike && <div className="connectedNotice">✓ {bike.deviceName} connecté · télémétrie automatique activée</div>}
+                {activeChallenge && (
+                  <div className="activeChallengeBanner">
+                    <span>{activeChallenge.icon}</span>
+                    <div><small>DÉFI ACTIF</small><strong>{activeChallenge.title}</strong><p>{activeChallenge.description} · Bonus +{activeChallenge.xpBonus} XP</p></div>
+                  </div>
+                )}
                 {routeMode === "timeAttack" && activeClimb && (
                   <div className="timeAttackIntro">
                     <strong>{bike ? "Mode FTMS précis" : "Mode simulation"}</strong>
@@ -1383,6 +1410,13 @@ export function VeloQuestApp() {
               <DetailMetric label="Résistance moy." value={selectedSession.metrics?.avgResistance?.toFixed(1) ?? "—"} />
               <DetailMetric label="Source" value={selectedSession.metrics?.source ?? "manuel"} />
             </div>
+            {selectedSession.metrics?.challenge && (
+              <div className={selectedSession.metrics.challenge.success ? "challengeResult success" : "challengeResult failure"}>
+                <span>{selectedSession.metrics.challenge.success ? "✓" : "×"}</span>
+                <div><small>DÉFI</small><strong>{selectedSession.metrics.challenge.success ? "Réussi" : "Manqué"}</strong><p>{selectedSession.metrics.challenge.summary}</p></div>
+                <em>{selectedSession.metrics.challenge.success ? `+${selectedSession.metrics.challenge.xpBonus} XP` : "0 XP"}</em>
+              </div>
+            )}
             {selectedSession.metrics?.timeAttack && selectedSession.metrics.checkpointSplits?.length ? (
               <div className="detailSplits">{selectedSession.metrics.checkpointSplits.map((split) => <span key={split.km}><small>{split.km.toFixed(1)} km</small><strong>{formatRaceTime(split.elapsedSeconds)}</strong></span>)}</div>
             ) : null}
