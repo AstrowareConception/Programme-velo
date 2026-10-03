@@ -130,13 +130,16 @@ export const climbs: ClimbChallenge[] = [
 ];
 
 export function resistanceForGrade(grade: number) {
-  if (grade <= 1) return 9;
-  if (grade <= 3) return 13;
-  if (grade <= 5) return 17;
-  if (grade <= 6.5) return 20;
-  if (grade <= 8) return 23;
-  if (grade <= 9.5) return 25;
-  if (grade <= 11) return 27;
+  if (grade <= -5) return 5;
+  if (grade <= -2) return 6;
+  if (grade <= 0.5) return 8;
+  if (grade <= 2) return 11;
+  if (grade <= 4) return 15;
+  if (grade <= 5.5) return 18;
+  if (grade <= 7) return 21;
+  if (grade <= 8.5) return 23;
+  if (grade <= 10) return 25;
+  if (grade <= 12) return 27;
   return 29;
 }
 
@@ -147,14 +150,14 @@ export function climbToWorkout(climb: ClimbChallenge): WorkoutTemplate {
     const distance = Math.max(0.2, point.km - previous.km);
     // Baseline simulation at ~15 km/h. With FTMS connected, route progress
     // is based on actual distance instead of this time estimate.
-    const minutes = Math.max(2, Math.round((distance / 15) * 60));
+    const minutes = Math.max(0.5, Math.round(((distance / 15) * 60) * 2) / 2);
     const level = resistanceForGrade(point.grade);
     return {
       label: `${point.km.toFixed(1)} km · ${point.grade.toFixed(1)} %`,
       minutes,
       resistance: String(level),
-      rpe: point.grade >= 9 ? "8–9" : point.grade >= 7 ? "7–8" : point.grade >= 5 ? "6–7" : "5–6",
-      cadence: point.grade >= 8 ? "65–80" : "75–90"
+      rpe: point.grade >= 10 ? "8–9" : point.grade >= 7 ? "7–8" : point.grade >= 4 ? "6–7" : point.grade > 0 ? "4–6" : "2–4",
+      cadence: point.grade >= 8 ? "65–80" : point.grade >= 4 ? "70–85" : "80–95"
     };
   });
 
