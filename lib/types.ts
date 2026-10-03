@@ -104,6 +104,7 @@ export type Preferences = {
   haptics: boolean;
   keepScreenAwake: boolean;
   keepTelemetryTrace: boolean;
+  resistanceOffset: number;
 };
 
 export type AppState = {
