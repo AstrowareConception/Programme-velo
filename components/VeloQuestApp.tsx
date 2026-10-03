@@ -330,7 +330,16 @@ export function VeloQuestApp() {
     });
   }, [autoResistanceControl, controlGranted, running, sessionStarted, active, segmentIndex, bike]);
 
-  if (!hydrated) return null;
+  if (!hydrated) {
+    return (
+      <main className="splashScreen" aria-busy="true">
+        <Image src="/logo.svg" alt="" width={84} height={84} priority />
+        <h1>VeloQuest</h1>
+        <p>Préparation de ton cockpit…</p>
+        <i><b /></i>
+      </main>
+    );
+  }
 
   async function connectBike() {
     if (!hasWebBluetooth()) {
