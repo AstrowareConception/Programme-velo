@@ -53,6 +53,14 @@ function maximum(values: Array<number | undefined>) {
   return nums.length ? Math.max(...nums) : undefined;
 }
 
+function adjustedResistance(label: string, offset: number) {
+  if (!offset || label === "libre") return label;
+  const values = label.match(/\d+(?:[.,]\d+)?/g)?.map((value) => Number(value.replace(",", ".")));
+  if (!values?.length) return label;
+  const adjusted = values.map((value) => Math.max(1, Math.min(32, Math.round(value + offset))));
+  return adjusted.length === 1 ? String(adjusted[0]) : adjusted.join("–");
+}
+
 function n(form: FormData, key: string) {
   const raw = String(form.get(key) ?? "").trim().replace(",", ".");
   if (!raw) return undefined;
@@ -315,7 +323,7 @@ export function VeloQuestApp() {
     const resistanceText = active.segments[segmentIndex]?.resistance ?? "";
     const values = resistanceText.match(/\d+(?:[.,]\d+)?/g)?.map((v) => Number(v.replace(",", "."))) ?? [];
     if (!values.length) return;
-    const targetLevel = values.reduce((sum, value) => sum + value, 0) / values.length;
+    const targetLevel = values.reduce((sum, value) => sum + value, 0) / values.length + preferences.resistanceOffset;
     bike.setResistance(targetLevel).catch((error) => {
       setAutoResistanceControl(false);
       setBluetoothError(error instanceof Error ? error.message : "Pilotage automatique interrompu.");
@@ -482,10 +490,17 @@ export function VeloQuestApp() {
     if (sessionStarted) cueSegment(active.segments[next], preferences);
   }
 
-  function updatePreference(key: keyof Preferences, value: boolean) {
+  function updatePreference(key: keyof Omit<Preferences, "resistanceOffset">, value: boolean) {
     setState((prev) => ({
       ...prev,
       preferences: { ...defaultPreferences, ...(prev.preferences ?? {}), [key]: value }
+    }));
+  }
+
+  function updateResistanceOffset(value: number) {
+    setState((prev) => ({
+      ...prev,
+      preferences: { ...defaultPreferences, ...(prev.preferences ?? {}), resistanceOffset: Math.max(-4, Math.min(4, value)) }
     }));
   }
 
@@ -864,6 +879,12 @@ export function VeloQuestApp() {
               <Toggle label="Retour haptique" description="Vibration si le navigateur et l’appareil le permettent." checked={preferences.haptics} onChange={(v) => updatePreference("haptics", v)} />
               <Toggle label="Garder l’écran éveillé" description="Empêche la mise en veille pendant une séance quand l’API est disponible." checked={preferences.keepScreenAwake} onChange={(v) => updatePreference("keepScreenAwake", v)} />
               <Toggle label="Conserver la trace Bluetooth" description="Garde une trace compacte de la télémétrie pour l’historique." checked={preferences.keepTelemetryTrace} onChange={(v) => updatePreference("keepTelemetryTrace", v)} />
+              <div className="resistanceCalibration">
+                <div><strong>Calibration résistance TEB5</strong><small>Ajuste tous les niveaux guidés et automatiques sans modifier les séances.</small></div>
+                <span>{preferences.resistanceOffset > 0 ? `+${preferences.resistanceOffset}` : preferences.resistanceOffset}</span>
+                <input type="range" min="-4" max="4" step="1" value={preferences.resistanceOffset} onChange={(event) => updateResistanceOffset(Number(event.target.value))} />
+                <div className="calibrationLabels"><small>plus facile</small><button className="secondary miniButton" onClick={() => updateResistanceOffset(0)}>neutre</button><small>plus dur</small></div>
+              </div>
             </div>
           </section>
 
@@ -984,7 +1005,7 @@ export function VeloQuestApp() {
                   {active.segments.map((segment, index) => (
                     <button key={index} type="button" onClick={() => goToSegment(index)}>
                       <span>{String(index + 1).padStart(2, "0")}</span>
-                      <div><strong>{segment.label}</strong><small>{segment.minutes} min · niveau {segment.resistance} · RPE {segment.rpe}</small></div>
+                      <div><strong>{segment.label}</strong><small>{segment.minutes} min · niveau {adjustedResistance(segment.resistance, preferences.resistanceOffset)} · RPE {segment.rpe}</small></div>
                     </button>
                   ))}
                 </div>
@@ -1008,7 +1029,7 @@ export function VeloQuestApp() {
 
                 <div className="resistance">
                   <small>NIVEAU TEB5</small>
-                  <strong>{active.segments[segmentIndex].resistance}</strong>
+                  <strong>{adjustedResistance(active.segments[segmentIndex].resistance, preferences.resistanceOffset)}</strong>
                 </div>
                 <div className="timer" aria-live="off">{formatClock(secondsLeft)}</div>
                 <div className="sessionOverall">
@@ -1026,9 +1047,9 @@ export function VeloQuestApp() {
                   </div>
                 )}
                 {active.segments[segmentIndex + 1] && (
-                  <div className="nextSegment"><small>ENSUITE</small><strong>{active.segments[segmentIndex + 1].label}</strong><span>niveau {active.segments[segmentIndex + 1].resistance}</span></div>
+                  <div className="nextSegment"><small>ENSUITE</small><strong>{active.segments[segmentIndex + 1].label}</strong><span>niveau {adjustedResistance(active.segments[segmentIndex + 1].resistance, preferences.resistanceOffset)}</span></div>
                 )}
-                <div className="segmentProgress">{active.segments.map((_, i) => <i key={i} className={i <= segmentIndex ? "done" : ""} />)}</div>
+                {active.segments.length <= 30 && <div className="segmentProgress">{active.segments.map((_, i) => <i key={i} className={i <= segmentIndex ? "done" : ""} />)}</div>}
                 <div className="modalActions three">
                   <button className="secondary" disabled={segmentIndex === 0} onClick={() => goToSegment(segmentIndex - 1)}>← Précédent</button>
                   <button className="primary" onClick={togglePause}>{running ? "Pause" : "Reprendre"}</button>
