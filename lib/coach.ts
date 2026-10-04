@@ -1,4 +1,5 @@
 import type { AppState, WeekTarget, WorkoutTemplate } from "./types";
+import { guidanceSessions } from "./onboarding";
 
 export type CoachEnergy = "easy" | "normal" | "hard";
 
@@ -60,8 +61,10 @@ export function recommendAdaptiveWorkout({
     .map((session) => session.rpe as number);
   const avgRecentRpe = average(recentRpeValues);
   const lastTemplateId = recent[0]?.templateId;
+  const discovering = state.guidance?.status === "active" && guidanceSessions(state, now).length < 3;
 
   const recoveryNeeded =
+    discovering ||
     energy === "easy" ||
     last72.length >= 4 ||
     (avgRecentRpe !== undefined && avgRecentRpe >= 8.5) ||
@@ -94,6 +97,7 @@ export function recommendAdaptiveWorkout({
     if (last48Hard.length && workout.intensity === "hard") score -= 55;
 
     if (workout.id === lastTemplateId) score -= 22;
+    if (state.guidance?.status === "active" && state.guidance.goal === "endurance" && workout.kind === "endurance" && !recoveryNeeded) score += 8;
     if (varietyMissing > 0 && !recent.slice(0,6).some((session) => session.kind === workout.kind)) score += 18;
     if (pointsMissing >= 4 && workout.points >= 3 && !recoveryNeeded) score += 10;
 
@@ -104,6 +108,7 @@ export function recommendAdaptiveWorkout({
   const reasons: string[] = [];
 
   if (recoveryNeeded) {
+    if (discovering) reasons.push("Tes trois premiers repères se construisent avec des séances faciles.");
     if (energy === "easy") reasons.push("Tu as demandé une journée tranquille.");
     if (last72.length >= 4) reasons.push(`${last72.length} séances sur les 72 dernières heures : priorité à l’assimilation.`);
     if (avgRecentRpe !== undefined && avgRecentRpe >= 8.5) reasons.push(`RPE récent élevé (${avgRecentRpe.toFixed(1)}/10).`);
@@ -126,6 +131,7 @@ export function recommendAdaptiveWorkout({
     .map((session) => session.rpe as number);
   const sameWorkoutAvgRpe = average(sameWorkoutRpe);
   const suggestedResistanceDelta: -1 | 0 | 1 =
+    discovering ? 0 :
     sameWorkoutRpe.length >= 2 && sameWorkoutAvgRpe !== undefined && sameWorkoutAvgRpe <= 5.5 ? 1 :
     sameWorkoutRpe.length >= 2 && sameWorkoutAvgRpe !== undefined && sameWorkoutAvgRpe >= 9 ? -1 : 0;
 

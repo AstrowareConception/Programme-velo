@@ -65,6 +65,7 @@ export type ChallengeResult = {
 
 export type SessionMetrics = {
   source: "manual" | "ftms" | "mixed";
+  completedWorkout?: boolean;
   challenge?: ChallengeResult;
   completedRoute?: boolean;
   completedSegment?: boolean;
@@ -133,6 +134,17 @@ export type AppState = {
   measurements: Measurement[];
   preferences?: Preferences;
   favoriteRouteIds?: string[];
+  guidance?: Guidance;
+};
+
+export type Guidance = {
+  version: 1;
+  status: "setup" | "active" | "dismissed";
+  step: 0 | 1 | 2 | 3;
+  experience: "beginner" | "regular";
+  goal: "habit" | "endurance" | "explore";
+  sessionMinutes: 15 | 25 | 30;
+  weeklySessions: 2 | 3 | 4;
 };
 
 export type Badge = {

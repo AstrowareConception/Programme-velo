@@ -2,14 +2,26 @@
 
 ## 1. Premier lancement
 
-Renseigner :
+Le guide accompagne le premier lancement en quatre étapes :
 
-- un prénom ou pseudo ;
-- la date de départ du programme ;
-- éventuellement le poids et le tour de taille de départ ;
-- les objectifs correspondants.
+1. Un prénom ou pseudo facultatif, ce qui te motive et la date de départ si tu souhaites la changer. Tu peux aussi restaurer une sauvegarde dès cet écran.
+2. Ton point de départ (début/reprise ou pratique régulière), ton temps habituel de 15/25/30 minutes et un cap souple de 2/3/4 séances par semaine. Aucun jour imposé.
+3. Le mode manuel du vélo et le ressenti d’effort **RPE**, de 1 (très facile) à 10 (maximal). Tu peux commencer sans Bluetooth ; les niveaux 1–32 sont réglables à la main. Un son de changement de segment est facultatif.
+4. **Premiers tours de roue**, une première séance facile de 15 minutes. « Préparer ma première séance » ouvre la préparation ; le pédalage commence seulement après « Démarrer la séance ». « Plus tard, ouvrir ma quête » garde la proposition pour ton prochain passage.
 
-Ces informations restent dans le stockage local de l'appareil.
+Poids, tour de taille et objectifs corporels restent facultatifs, dans **Plus → Modifier le profil et les objectifs**. Toutes ces informations restent sur cet appareil. Le guide conserve son étape et tes choix après un rechargement.
+
+Tu peux choisir **Explorer librement** à tout moment, ou revenir au guide avec **Plus → Revoir le guide de démarrage**. Cela conserve ton historique et tes réglages. Un ancien profil n’est pas forcé à suivre ce guide.
+
+Si une séance interrompue attend déjà, le guide la signale et propose **Retrouver ma séance en cours**. La configuration ne la remplace pas par la séance de découverte ; utilise ensuite **Reprendre** sur Quête.
+
+### Une Quête qui se précise
+
+Après la configuration, la Quête donne une prochaine action et trois repères : découvrir les consignes, trouver ton rythme, choisir ton chemin. Une séance complète enregistrée d’au moins 10 minutes fait avancer ces repères. Les bonus, secteurs et tentatives explicitement incomplètes restent dans le journal mais ne les valident pas. Supprimer la séance recalcule aussi ces repères.
+
+Après ta première séance, le guide explique comment noter ton ressenti. Ensuite, il propose de découvrir les balades faciles. Après trois séances, tu peux choisir le temps et l’énergie du jour directement dans cette Quête simplifiée. Le coach tient compte du ressenti, des séances récentes et de la charge ; les premiers formats restent faciles. Les anciennes séances sans marqueur d’incomplétude et les séances saisies manuellement sont reconnues, sans validation physique indépendante.
+
+Ton cap personnel est un repère de régularité, pas une nouvelle mission donnant un bonus XP. Le programme de douze semaines et ses outils avancés restent disponibles en dépliant la section sous le guide. Le catalogue, les parcours, le suivi et Plus restent accessibles à tout moment. Ajuste les réglages durables avec « Ajuster mon démarrage » ; les choix du jour sont temporaires.
 
 ## 2. Choisir une séance
 
