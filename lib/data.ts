@@ -1,4 +1,5 @@
 import type { Badge, AppState, Preferences, WeekTarget, WorkoutTemplate } from "./types";
+import { campaignBonusXp, campaigns, campaignProgress, completedRouteIds } from "./campaigns";
 
 export const STORAGE_KEY = "veloquest:v1";
 
@@ -319,7 +320,7 @@ export function totalXp(state: AppState) {
     return s.points >= target.points && s.minutes >= target.minutes && s.sessions >= target.sessions && s.variety >= target.variety && s.hard <= target.maxHard;
   }).length;
   const bonusXp = weekTargets.reduce((sum, target) => sum + weeklyStats(state, target.week).bonusXp, 0);
-  return sessionXp + bonusXp + completedWeeks * 250;
+  return sessionXp + bonusXp + completedWeeks * 250 + campaignBonusXp(state.sessions);
 }
 
 export function levelForXp(xp: number) {
@@ -357,13 +358,24 @@ export function badges(state: AppState): Badge[] {
   const weightLost = state.profile.startWeight && latestWeight !== undefined ? state.profile.startWeight - latestWeight : 0;
   const waistLost = state.profile.startWaist && latestWaist !== undefined ? state.profile.startWaist - latestWaist : 0;
   const connected = state.sessions.filter((s) => s.metrics?.source === "ftms" || s.metrics?.source === "mixed");
-  const routeIds = new Set(state.sessions.filter((s) => s.routeId && s.metrics?.completedRoute !== false).map((s) => s.routeId).filter(Boolean));
+  const routeIds = completedRouteIds(state.sessions);
   const successfulChallenges = state.sessions.filter((s) => s.metrics?.challenge?.success);
   const uniqueChallengeIds = new Set(successfulChallenges.map((s) => s.metrics!.challenge!.id));
   const totalDistance = state.sessions.reduce((sum, s) => sum + (s.metrics?.distanceKm ?? 0), 0);
   const sessionsWithPower = state.sessions.filter((s) => (s.metrics?.avgPowerW ?? 0) > 0);
 
   return [
+    ...campaigns.map((campaign): Badge => {
+      const progress = campaignProgress(campaign, state.sessions);
+      return {
+        id: `campaign-${campaign.id}`,
+        name: campaign.title,
+        icon: campaign.icon,
+        description: `Terminer les ${progress.totalStages} étapes de la campagne. Bonus unique : ${campaign.xpBonus} XP.`,
+        unlocked: progress.complete,
+        progress: `${progress.completedStages}/${progress.totalStages}`
+      };
+    }),
     { id: "first", name: "Premier tour de roue", icon: "🚲", description: "Terminer une première séance.", unlocked: structured.length >= 1, progress: `${Math.min(structured.length, 1)}/1` },
     { id: "variety", name: "Explorateur", icon: "🧭", description: "Valider 5 familles de séances.", unlocked: kinds.size >= 5, progress: `${Math.min(kinds.size, 5)}/5` },
     { id: "perfect", name: "Semaine parfaite", icon: "👑", description: "Atteindre tous les objectifs d'une semaine sans dépasser la charge dure.", unlocked: perfectWeeks >= 1, progress: `${Math.min(perfectWeeks, 1)}/1` },

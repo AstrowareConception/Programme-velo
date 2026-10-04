@@ -35,7 +35,7 @@ export const routeCollections: RouteCollection[] = [
 
 export function isRouteCompleted(session: CompletedSession) {
   if (!session.routeId) return false;
-  return session.metrics?.completedRoute !== false;
+  return session.metrics?.completedRoute !== false && session.metrics?.segmentAttackIndex === undefined;
 }
 
 export function progressionStats(sessions: CompletedSession[], routes: ClimbChallenge[]) {

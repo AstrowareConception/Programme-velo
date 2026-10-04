@@ -178,3 +178,40 @@ test("Segment Attack picker launches a quarter-route race", async ({ page }) => 
   await expect(page.getByText(/Secteur 3 · 15.7 km/)).toBeVisible();
   await expect(page.getByRole("button", { name: "Lancer le chrono" })).toBeVisible();
 });
+
+
+test("campaign panel opens the next discovery stage", async ({ page }) => {
+  await seed(page);
+  await page.goto("/");
+  await page.getByRole("button", { name: /Parcours/ }).click();
+
+  await expect(page.getByRole("heading", { name: "Découverte Provence" })).toBeVisible();
+  const campaign = page.getByRole("heading", { name: "Découverte Provence" }).locator("xpath=ancestor::article");
+  await expect(campaign).toContainText("0/4");
+  await expect(campaign).toContainText("Velleron – L’Isle-sur-la-Sorgue");
+
+  await campaign.getByRole("button", { name: /Continuer · Velleron/ }).click();
+
+  await expect(page.getByText("PARCOURS").first()).toBeVisible();
+  const preflight = page.locator(".sessionPreview");
+  await expect(preflight.getByRole("heading", { name: "Velleron – L’Isle-sur-la-Sorgue" })).toBeVisible();
+  await expect(preflight.getByRole("button", { name: "Démarrer la séance" })).toBeVisible();
+});
+
+
+test("out-of-order campaign completion marks only the actual route", async ({ page }) => {
+  await page.addInitScript((value) => localStorage.setItem("veloquest:v1", JSON.stringify({
+    ...value,
+    sessions: [{ id: "late-stage", templateId: "climb-uchaux-loop", routeId: "uchaux-loop",
+      date: "2026-10-03T18:00:00Z", duration: 60, points: 3, xp: 100,
+      intensity: "moderate", kind: "hills", bonus: false,
+      metrics: { source: "manual", completedRoute: true } }]
+  })), state);
+  await page.goto("/");
+  await page.getByRole("button", { name: /Parcours/ }).click();
+  const campaign = page.getByRole("heading", { name: "Découverte Provence" }).locator("xpath=ancestor::article");
+  await expect(campaign).toContainText("1/4");
+  await expect(campaign.locator(".campaignStages > span").nth(0)).toHaveClass("current");
+  await expect(campaign.locator(".campaignStages > span").nth(2)).toHaveClass("done");
+  await expect(campaign.locator(".campaignStages > span.done")).toHaveCount(1);
+});

@@ -647,3 +647,33 @@ button:focus-visible, input:focus-visible, .fileButton:focus-within { outline: 2
   .segmentAttackChoice { grid-template-columns:auto 1fr; }
   .segmentAttackChoice > em { grid-column:2; }
 }
+
+.campaignSection { margin:18px 0 22px; }
+.campaignTitle { margin:0 3px 12px; }
+.campaignGrid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+.campaignCard { display:flex; flex-direction:column; min-height:300px; background:linear-gradient(145deg,rgba(80,227,255,.045),rgba(147,108,255,.045)); }
+.campaignCard.completed { border-color:rgba(185,255,102,.25); background:linear-gradient(145deg,rgba(185,255,102,.055),rgba(18,24,43,.9)); }
+.campaignHeader { display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:12px; }
+.campaignHeader > span { width:44px; height:44px; display:grid; place-items:center; border-radius:14px; background:rgba(255,255,255,.05); font-size:1.5rem; }
+.campaignHeader small { color:var(--muted); font-size:.62rem; }
+.campaignHeader h3 { margin:3px 0 0; font-size:1.15rem; }
+.campaignHeader em { font-style:normal; color:var(--cyan); font-weight:900; }
+.campaignCard.completed .campaignHeader em { color:var(--lime); }
+.campaignBar { display:grid; grid-template-columns:1fr auto; align-items:center; gap:10px; margin:12px 0; }
+.campaignBar i { height:6px; background:rgba(255,255,255,.07); border-radius:999px; overflow:hidden; }
+.campaignBar i b { display:block; height:100%; background:linear-gradient(90deg,var(--cyan),var(--violet)); }
+.campaignCard.completed .campaignBar i b { background:linear-gradient(90deg,var(--lime),var(--cyan)); }
+.campaignBar span { color:var(--muted); font-size:.66rem; }
+.campaignStages { display:grid; gap:6px; margin:4px 0 14px; }
+.campaignStages > span { display:grid; grid-template-columns:26px 1fr; align-items:center; gap:8px; color:#758098; }
+.campaignStages > span b { width:24px; height:24px; display:grid; place-items:center; border-radius:50%; background:rgba(255,255,255,.05); font-size:.65rem; }
+.campaignStages > span small { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.campaignStages > span.done { color:var(--lime); }
+.campaignStages > span.done b { color:#061017; background:var(--lime); }
+.campaignStages > span.current { color:var(--text); }
+.campaignStages > span.current b { color:#061017; background:var(--cyan); }
+.campaignFooter { margin-top:auto; padding-top:12px; border-top:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.campaignFooter > span { color:var(--muted); font-size:.67rem; }
+.campaignFooter > span strong { color:var(--gold); }
+.campaignComplete { color:var(--lime); font-size:.75rem; }
+@media (max-width:760px) { .campaignGrid { grid-template-columns:1fr; } }
