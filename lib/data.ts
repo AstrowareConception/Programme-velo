@@ -1,6 +1,8 @@
 import { localInputDate, localCalendarDay } from "./dates";
 import type { Badge, AppState, Preferences, WeekTarget, WorkoutTemplate } from "./types";
 import { campaignBonusXp, campaigns, campaignProgress, completedRouteIds } from "./campaigns";
+import { scenicRouteIds } from "./scenic-routes";
+import { discoveryWorkouts } from "./discovery-workouts";
 
 export const STORAGE_KEY = "veloquest:v1";
 
@@ -14,6 +16,7 @@ export const defaultPreferences: Preferences = {
 };
 
 export const workouts: WorkoutTemplate[] = [
+  ...discoveryWorkouts,
   {
     id: "recovery-30",
     name: "Décrassage",
@@ -367,8 +370,21 @@ export function badges(state: AppState): Badge[] {
   const uniqueChallengeIds = new Set(successfulChallenges.map((s) => s.metrics!.challenge!.id));
   const totalDistance = state.sessions.reduce((sum, s) => sum + (s.metrics?.distanceKm ?? 0), 0);
   const sessionsWithPower = state.sessions.filter((s) => (s.metrics?.avgPowerW ?? 0) > 0);
+  const scenicCount = scenicRouteIds.filter((id) => routeIds.has(id)).length;
+  // Preserve the historic relief counters; gentle rides have their own trophies.
+  const reliefCount = [...routeIds].filter((id) => !scenicRouteIds.includes(id)).length;
 
   return [
+    ...[
+      { id: "scenic-first", name: "Premier paysage", icon: "🌅", target: 1 },
+      { id: "scenic-three", name: "Flâneur de France", icon: "🧺", target: 3 },
+      { id: "scenic-all", name: "Atlas des balades", icon: "🗺️", target: scenicRouteIds.length }
+    ].map((trophy): Badge => ({
+      id: trophy.id, name: trophy.name, icon: trophy.icon,
+      description: `Terminer ${trophy.target} balade${trophy.target > 1 ? "s" : ""} différente${trophy.target > 1 ? "s" : ""}. Pauses libres, aucun chrono imposé.`,
+      unlocked: scenicCount >= trophy.target,
+      progress: `${Math.min(scenicCount, trophy.target)}/${trophy.target}`
+    })),
     ...campaigns.map((campaign): Badge => {
       const progress = campaignProgress(campaign, state.sessions);
       return {
@@ -391,8 +407,8 @@ export function badges(state: AppState): Badge[] {
     { id: "waist2", name: "Ceinture gagnée", icon: "📏", description: "Perdre 2 cm de tour de taille.", unlocked: waistLost >= 2, progress: `${Math.max(0, waistLost).toFixed(1)}/2 cm` },
     { id: "waist5", name: "Silhouette", icon: "🎯", description: "Perdre 5 cm de tour de taille.", unlocked: waistLost >= 5, progress: `${Math.max(0, waistLost).toFixed(1)}/5 cm` },
     { id: "connected", name: "Machine liée", icon: "📡", description: "Enregistrer une séance avec télémétrie FTMS.", unlocked: connected.length >= 1, progress: `${Math.min(connected.length, 1)}/1` },
-    { id: "climb1", name: "Premier sommet", icon: "⛰️", description: "Terminer un Col de légende.", unlocked: routeIds.size >= 1, progress: `${Math.min(routeIds.size, 1)}/1` },
-    { id: "climb3", name: "Collectionneur de cols", icon: "🏔️", description: "Terminer 3 cols différents.", unlocked: routeIds.size >= 3, progress: `${Math.min(routeIds.size, 3)}/3` },
+    { id: "climb1", name: "Premier relief", icon: "⛰️", description: "Terminer un parcours hors balades : col, étape ou GPX personnel. Les validations historiques sont conservées.", unlocked: reliefCount >= 1, progress: `${Math.min(reliefCount, 1)}/1` },
+    { id: "climb3", name: "Collectionneur de reliefs", icon: "🏔️", description: "Terminer 3 parcours différents hors balades. Les validations historiques sont conservées.", unlocked: reliefCount >= 3, progress: `${Math.min(reliefCount, 3)}/3` },
     { id: "distance100", name: "Centurion", icon: "🛣️", description: "Cumuler 100 km enregistrés.", unlocked: totalDistance >= 100, progress: `${Math.min(totalDistance, 100).toFixed(0)}/100 km` },
     { id: "power", name: "Watts up", icon: "⚡", description: "Enregistrer 5 séances avec une puissance moyenne.", unlocked: sessionsWithPower.length >= 5, progress: `${Math.min(sessionsWithPower.length, 5)}/5` },
     { id: "sessions10", name: "En selle", icon: "🔟", description: "Terminer 10 séances structurées.", unlocked: structured.length >= 10, progress: `${Math.min(structured.length, 10)}/10` },

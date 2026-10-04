@@ -53,7 +53,7 @@ Le pilotage automatique ne doit être utilisé qu'après validation du protocole
 
 ## 5. Micro-séances bonus
 
-Les bonus de 10, 15 ou 20 minutes doivent rester faciles.
+Les bonus de 10, 12, 15 ou 20 minutes doivent rester faciles. **Parenthèse souple** propose 12 minutes à RPE 2–3 avec peu de résistance et partage le même plafond de 60 XP par semaine.
 
 Ils :
 
@@ -76,11 +76,21 @@ L'onglet **Parcours** contient plusieurs ascensions et accepte des fichiers GPX.
 
 Le catalogue comprend des étapes accessibles de Provence et des Corniches à 2/5–3/5, avec montées, descentes et récupérations. Recherche, difficulté, catégories, tri et favoris aident à choisir.
 
-Les profils natifs sont simplifiés. Un GPX utilise les points de ton fichier et leur altitude ; ses valeurs dépendent de leur qualité. Avec distance FTMS, le marqueur suit la variation du compteur du vélo depuis le départ. Sans elle, la progression est simulée à partir du temps des segments. Les niveaux proposés sur 1–32 représentent l'effort conseillé, pas une reproduction physique exacte de la pente.
+Les profils des cols et étapes historiques sont simplifiés. Les sept balades utilisent des traces officielles et un relief lissé depuis leur altitude GPX ou les données IGN. Leur D+ est calculé sur le profil affiché et peut différer d’une fiche touristique. Un GPX personnel utilise les points de ton fichier et leur altitude ; ses valeurs dépendent de leur qualité. Avec distance FTMS, le marqueur suit la variation du compteur du vélo depuis le départ. Sans elle, la progression est simulée à partir du temps des segments. Les niveaux proposés sur 1–32 représentent l'effort conseillé, pas une reproduction physique exacte de la pente.
 
 **Time Attack** chronomètre un parcours entier avec record et fantôme. **Segment Attack** porte sur l'un des quatre secteurs, avec un record propre au secteur. Une tentative arrêtée avant l'arrivée ne devient pas un record valide.
 
-Les **défis** ajoutent une contrainte. Les **campagnes** regroupent plusieurs parcours : Découverte Provence, Tour Vallonné, Légendes du Tour et Défi des Alpes. Tu peux terminer les étapes dans le désordre : les coches suivent les vrais parcours achevés et « Continuer » propose le premier qui manque. Chaque campagne donne un badge et un bonus XP unique, quel que soit le nombre de répétitions. Un secteur ou une tentative incomplète ne valide pas une étape entière.
+Les **défis** ajoutent une contrainte. Les **campagnes** regroupent plusieurs parcours : Découverte Provence, Tour Vallonné, Légendes du Tour, Défi des Alpes et les carnets **Au fil de l’eau** / **Échappées patrimoine**. Tu peux terminer les étapes dans le désordre : les coches suivent les vrais parcours achevés et « Continuer » propose le premier qui manque. Chaque campagne donne un badge et un bonus XP unique, quel que soit le nombre de répétitions. Un secteur ou une tentative incomplète ne valide pas une étape entière.
+
+### Balades à 1/5
+
+Depuis **Parcours**, choisis **Explorer les 7 balades** ou le filtre **Balades**. Le catalogue propose le Der, la rive ouest d’Annecy, Chambord, l’île de Ré, le Marais poitevin, le canal du Midi et Tours–Villandry. **Découvrir le paysage** présente le lieu et les points d’intérêt. **Partir en balade** ouvre la préparation et un effort facile, RPE 2–4, avec niveaux de base 4–10 ; le réglage manuel reste disponible.
+
+Les pauses sont libres, les chronos et défis facultatifs. Une sortie à 1/5 peut être longue : le Der approche 140 minutes simulées, Chambord environ 25. Choisis selon ton temps, ou mets une balade en cours de côté pour la reprendre. Le lecteur contient aussi **Ton carnet de paysage**. La carte et le marqueur représentent l’itinéraire virtuel ; ils ne mesurent pas un déplacement extérieur.
+
+Les carnets sont des programmes de découverte sans jours imposés. Au fil de l’eau donne un bonus unique de 450 XP pour ses quatre balades complètes ; Échappées patrimoine, 300 XP pour ses trois balades. Premier paysage, Flâneur de France et Atlas des balades récompensent respectivement 1, 3 et 7 balades différentes. Refaire la même balade rapporte l’XP de séance, mais ne multiplie pas le bonus du carnet et ne remplace pas une nouvelle destination.
+
+Pour une séance courte sans parcours géographique, le catalogue **Séances** ajoute Roulage contemplatif (25 min), Cadence fluide (30 min) et Petites vagues (40 min). Ces formats conservent les missions du programme de douze semaines et les conseils du coach.
 
 ## 7. Suivi
 

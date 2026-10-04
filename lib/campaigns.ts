@@ -52,6 +52,19 @@ export const campaigns: Campaign[] = [
     routeIds: ["madeleine-maurienne","glandon-cuines","croix-de-fer-maurienne","iseran-bonneval","chaussy-madeleine-stage"],
     xpBonus: 1400,
     difficultyLabel: "4–5/5"
+  },
+  {
+    id: "waterside-notebook", title: "Au fil de l’eau", subtitle: "Carnet de 4 balades",
+    description: "Du Der à Annecy, du Marais poitevin au canal du Midi : quatre paysages d’eau, à découvrir sans objectif de vitesse et avec des pauses libres.",
+    icon: "🦢",
+    routeIds: ["lac-der-balade", "annecy-rive-ouest", "marais-poitevin-coulon-damvix", "canal-midi-carcassonne"],
+    xpBonus: 450, difficultyLabel: "1/5 · rythme doux"
+  },
+  {
+    id: "quiet-heritage", title: "Échappées patrimoine", subtitle: "Carnet de 3 balades",
+    description: "Chambord, la campagne de l’île de Ré et les berges du Cher jusqu’à Villandry : trois traversées pour associer mouvement et découverte.",
+    icon: "🏰", routeIds: ["chambord-petit-tour", "re-chemins-campagne", "loire-tours-villandry"],
+    xpBonus: 300, difficultyLabel: "1/5 · rythme doux"
   }
 ];
 
