@@ -130,8 +130,12 @@ for route_id, (key, url) in SOURCES.items():
         grade = 0 if not profile else (elevation-profile[-1]["elevation"])/((km-profile[-1]["km"])*10)
         profile.append({"km": km, "elevation": elevation, "grade": round(grade, 3)})
     # Keep bends for the map, independently from the training profile's stations.
-    stride = max(1, math.ceil((len(points)-1)/259))
-    coords = [points[i][:2] for i in sorted(set(range(0, len(points), stride)) | {len(points)-1})]
+    stride = max(1, math.ceil((len(points)-1)/(259-len(places))))
+    coordinate_indices = set(range(0, len(points), stride)) | {len(points)-1}
+    if places:
+        coordinate_indices.update(min(range(len(points)), key=lambda i: distance(points[i], anchor)) for _, _, anchor in anchors)
+    coordinate_indices = sorted(coordinate_indices)
+    coords = [points[i][:2] for i in coordinate_indices]
     gain = sum(max(0, b["elevation"]-a["elevation"]) for a, b in zip(profile, profile[1:]))
     result[route_id] = {
         "distanceKm": round(length, 6), "elevationGainM": round(gain),
@@ -144,6 +148,7 @@ for route_id, (key, url) in SOURCES.items():
     }
     if places:
         result[route_id]["places"] = places
+        result[route_id]["coordinateKm"] = [round(cumulative[i], 6) for i in coordinate_indices]
         result[route_id]["provenance"]["section"] = "Tronçon du GPX Cannes–Nice extrait et parcouru en sens inverse dans la simulation."
     print(route_id, round(length, 2), f"{round(gain)} m D+", f"max {result[route_id]['maxGrade']}%", result[route_id]["provenance"]["altitudeSource"], flush=True)
 

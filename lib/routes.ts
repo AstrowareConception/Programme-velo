@@ -26,6 +26,7 @@ export type ClimbChallenge = {
   xp: number;
   points: number;
   coordinates: [number, number][];
+  coordinateKm?: number[];
   profile: ClimbPoint[];
   note: string;
   category?: RouteCategory;
