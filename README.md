@@ -14,11 +14,11 @@ VéloQuest est une PWA personnelle Next.js / React / TypeScript. Elle associe un
 - Coach adaptatif local : temps disponible, énergie, historique, charge récente et RPE.
 - Préparation, lecteur guidé, pause, alertes sonores/vocales/haptiques, calibration et maintien de l'écran lorsque disponible.
 - Reprise locale d'une séance interrompue, y compris Time Attack, Segment Attack et défi actif.
-- **23 parcours natifs**, dont **9 balades à 1/5** et les cinq étapes Velleron, Vaison, Uchaux, Enclave des Papes et Corniches à **2/5–3/5** : bosses, descentes, faux-plats et récupérations, en complément des grands cols à 4/5–5/5.
-- Recherche, filtres, tri, favoris et import GPX avec persistance des parcours personnels.
+- **38 parcours natifs**, dont **14 balades à 1/5** et les cinq étapes Velleron, Vaison, Uchaux, Enclave des Papes et Corniches à **2/5–3/5** : bosses, descentes, faux-plats et récupérations, en complément des grands cols à 4/5–5/5.
+- Huit thèmes de découverte, recherche par ville ou repère (avec ou sans accents), filtres, tri, favoris et import GPX avec persistance des parcours personnels.
 - Time Attack, records de parcours, fantôme et temps intermédiaires ; Segment Attack sur quatre secteurs, avec records séparés.
-- Huit défis de parcours ; six campagnes : les quatre campagnes de Provence/montagne et deux carnets doux, Au fil de l’eau (+450 XP) et Échappées patrimoine (+300 XP).
-- Trophées de découverte : Premier paysage, Flâneur de France (3 balades différentes), Atlas des balades (7). Collection La France en douceur.
+- Huit défis de parcours ; **13 campagnes/carnets**, dont Passeport azuréen, Carnet du Verdon, Cartes postales de Provence, Les deux Corniches et Des forêts aux cimes. Sept nouveaux bonus uniques de 320 à 900 XP ; les six anciens objectifs restent inchangés.
+- Trophées de découverte : Premier paysage, Flâneur de France (3 balades différentes), Atlas des balades (7), plus six trophées de variété : 10/20 parcours natifs, 6 destinations PACA, 3 parcours azuréens, 4 territoires et les 5 difficultés. Collection La France en douceur inchangée.
 - XP, niveaux, badges, collections, palmarès et analyses de performance.
 - Journal, dates/heures locales, mesures datées de poids/taille/abdomen et suppression des saisies erronées.
 - Export/import JSON (v3, compatible v2 et ancien état simple), exports CSV et estimation du stockage local.
@@ -44,7 +44,9 @@ La suppression recalcule les semaines, niveaux, campagnes, badges, collections, 
 
 ## Balades et programmes de découverte
 
-Le filtre **Balades** et le raccourci **Explorer les 9 balades** ouvrent neuf parcours à 1/5 : tour du lac du Der, rive ouest d’Annecy, petit tour de Chambord, chemins en campagne de l’île de Ré, Coulon–Damvix, Carcassonne–Marseillette et Tours–Villandry, ainsi que Cagnes-sur-Mer–Cannes et son format court Golfe-Juan–Cannes. Les paysages et leurs points d’intérêt sont décrits sur les fiches et dans le lecteur.
+Le filtre **Balades** et le raccourci **Explorer les 14 balades** ouvrent quatorze parcours à 1/5 : tour du lac du Der, rive ouest d’Annecy, petit tour de Chambord, chemins en campagne de l’île de Ré, Coulon–Damvix, Carcassonne–Marseillette et Tours–Villandry, ainsi que Cagnes-sur-Mer–Cannes et son format court Golfe-Juan–Cannes. S’y ajoutent Menton–Garavan, le Calavon de Cavaillon à Apt, les canaux de Camargue gardoise, la baie de Somme et Erstein–Strasbourg. Les paysages et leurs points d’intérêt sont décrits sur les fiches et dans le lecteur.
+
+Les nouveaux profils à 2–5/5 complètent les cinq étapes historiques : Les Baux, Sainte-Croix et le plateau de Valensole, Castellane et ses deux lacs, Route des Crêtes du Verdon, Èze-sur-Mer–Menton, Nice–Menton par la Grande Corniche, Turini et Bonette, Roscoff–Morlaix et Blois–Chaumont. **Thème** combine paysages et difficultés ; **Campagnes et carnets** se déplie pour choisir un objectif de découverte ou sportif. Les lieux et leurs repères restent visibles avant le départ et pendant la séance.
 
 En mode balade, l’effort conseillé reste **RPE 2–4**, avec une résistance de base entre 4 et 10 sur 32, ajustable par la calibration. Les pauses sont libres. Les chronos et défis sont facultatifs ; aucune vitesse, cadence ou absence de pause n’est exigée pour les carnets. Une balade courte dure environ 25–27 minutes en simulation, mais le tour du Der approche 140 minutes : **1/5 décrit l’effort, pas la durée**. Les kilomètres restent ceux de la trace et ne sont pas compressés pour raccourcir la sortie. Une interruption sauvegardée peut être reprise.
 
@@ -116,3 +118,5 @@ La version est visible dans **Plus** et dans [l'endpoint de version](https://pro
 - [Sources des balades et méthode des profils](docs/SCENIC-ROUTES.md)
 
 Les niveaux proposés sont des repères : le ressenti, la récupération et les limites d'intensité du programme restent prioritaires. Projet personnel / expérimental.
+
+Les quinze nouvelles traces, leurs sections, les lieux traversés et les récompenses sont documentés dans [docs/EXPLORATION-ROUTES.md](docs/EXPLORATION-ROUTES.md). Les profils officiels lissés restent une représentation pour vélo d’appartement, sans guidage routier ni preuve de fonctionnement du TEB5 réel.

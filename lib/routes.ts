@@ -1,5 +1,6 @@
 import type { WorkoutTemplate } from "./types";
 import { scenicRoutes } from "./scenic-routes";
+import { explorationRoutes } from "./exploration-routes";
 
 export type RouteCategory = "climb" | "stage" | "scenic" | "imported";
 export type RouteDifficulty = 1 | 2 | 3 | 4 | 5;
@@ -615,7 +616,8 @@ export const climbs: ClimbChallenge[] = [
     sourceLabel: "Maurienne Tourisme",
     sourceUrl: "https://www.maurienne-tourisme.com/visiter_bouger/col-du-chaussy-et-de-la-madeleine-776865/"
   },
-  ...scenicRoutes
+  ...scenicRoutes,
+  ...explorationRoutes
 ];
 
 export function routeCategory(route: ClimbChallenge): RouteCategory {
@@ -677,7 +679,7 @@ export function remainingRouteStats(route: ClimbChallenge, currentKm: number) {
 }
 
 export function routeSearchText(route: ClimbChallenge) {
-  return [route.name, route.subtitle, route.region, ...(route.tags ?? [])].join(" ").toLocaleLowerCase("fr");
+  return [route.name, route.subtitle, route.region, ...(route.tags ?? []), ...(route.highlights ?? []), ...(route.places ?? []).flatMap((place) => [place.label, place.landmark])].join(" ").toLocaleLowerCase("fr").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
 export function resistanceForGrade(grade: number) {

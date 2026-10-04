@@ -675,6 +675,23 @@ button:focus-visible, input:focus-visible, .fileButton:focus-within { outline: 2
 }
 
 .campaignSection { margin:18px 0 22px; }
+.routeThemes { margin:22px 0; }
+.routeThemes > p { color:var(--muted); font-size:.85rem; }
+.routeThemeGrid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; }
+.themeCard { display:flex; flex-direction:column; align-items:flex-start; gap:7px; min-width:0; padding:16px; text-align:left; color:var(--text); background:rgba(80,227,255,.035); border:1px solid var(--line); border-radius:16px; }
+.themeCard[aria-pressed="true"] { border-color:var(--cyan); background:rgba(80,227,255,.1); }
+.themeCard > span { font-size:1.4rem; }
+.themeCard strong { font-size:.85rem; overflow-wrap:anywhere; }
+.themeCard small { color:var(--muted); font-size:.7rem; line-height:1.45; }
+.themeCard em { font-style:normal; font-size:.66rem; color:var(--cyan); margin-top:auto; }
+.routeThemeSelect { display:grid; gap:8px; margin:14px 0; font-size:.8rem; }
+.routeThemeSelect select { width:100%; }
+.campaignDrawer { border:1px solid var(--line); border-radius:16px; padding:16px; }
+.campaignDrawer > summary { cursor:pointer; font-weight:700; }
+.campaignDrawer > p { color:var(--muted); font-size:.8rem; line-height:1.6; }
+.campaignFilters { margin:14px 0; }
+@media (max-width:1000px) { .routeThemeGrid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media (max-width:760px) { .themeCard { padding:12px; } .campaignTitle { align-items:flex-start; } .campaignFooter { flex-wrap:wrap; } }
 .campaignTitle { margin:0 3px 12px; }
 .campaignGrid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
 .campaignCard { display:flex; flex-direction:column; min-height:300px; background:linear-gradient(145deg,rgba(80,227,255,.045),rgba(147,108,255,.045)); }

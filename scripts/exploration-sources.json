@@ -1,0 +1,630 @@
+{
+  "nice-menton-grande-corniche": {
+    "key": "nice-new",
+    "gpxUrl": "https://www.francevelotourisme.com/etape/gpx/600",
+    "places": [
+      {
+        "label": "Nice · port",
+        "landmark": "Départ du GPX vers la rade",
+        "endpoint": "start"
+      },
+      {
+        "label": "Villefranche-sur-Mer",
+        "landmark": "La rade vue depuis la route",
+        "coordinate": [
+          43.707342,
+          7.312357
+        ]
+      },
+      {
+        "label": "Èze · Grande Corniche",
+        "landmark": "Secteur du col, au-dessus du village",
+        "coordinate": [
+          43.736916,
+          7.35093
+        ]
+      },
+      {
+        "label": "La Turbie",
+        "landmark": "Le village et son héritage romain",
+        "coordinate": [
+          43.746422,
+          7.400921
+        ]
+      },
+      {
+        "label": "Roquebrune-Cap-Martin",
+        "landmark": "Descente vers le littoral",
+        "coordinate": [
+          43.764776,
+          7.45807
+        ]
+      },
+      {
+        "label": "Menton · vieux port",
+        "landmark": "Façades colorées face à la mer",
+        "coordinate": [
+          43.774391,
+          7.506211
+        ]
+      },
+      {
+        "label": "Menton · Garavan",
+        "landmark": "Extrémité de la trace, côté frontière",
+        "endpoint": "finish"
+      }
+    ]
+  },
+  "eze-menton-basse-corniche": {
+    "key": "corniches-new",
+    "gpxUrl": "https://static.apidae-tourisme.com/filestore/objets-touristiques/plans/32/150/23696928/t54471030_circuit%2Bvelo%2Bffc%2Bn-2%2B-.gpx",
+    "places": [
+      {
+        "label": "Èze-sur-Mer",
+        "landmark": "Départ sur la Basse Corniche",
+        "endpoint": "start"
+      },
+      {
+        "label": "Cap-d’Ail",
+        "landmark": "La route au-dessus du rivage",
+        "coordinate": [
+          43.722995,
+          7.408635
+        ]
+      },
+      {
+        "label": "Monaco · port",
+        "landmark": "Passage dans la principauté",
+        "coordinate": [
+          43.73435,
+          7.4214
+        ]
+      },
+      {
+        "label": "Monte-Carlo",
+        "landmark": "Quartier monégasque",
+        "coordinate": [
+          43.73765,
+          7.42775
+        ]
+      },
+      {
+        "label": "Roquebrune-Cap-Martin",
+        "landmark": "Retour sur la côte française",
+        "coordinate": [
+          43.756525,
+          7.476175
+        ]
+      },
+      {
+        "label": "Menton · vieux port",
+        "landmark": "Arrivée au pied des façades de la vieille ville",
+        "endpoint": "finish"
+      }
+    ],
+    "clip": [
+      [
+        43.722732,
+        7.357301
+      ],
+      [
+        43.774448,
+        7.505926
+      ]
+    ],
+    "section": "Tronçon aller Èze-sur-Mer–Menton extrait du Tour des Corniches ; aucun retour par la Grande Corniche."
+  },
+  "menton-garavan-promenade": {
+    "key": "nice-new",
+    "gpxUrl": "https://www.francevelotourisme.com/etape/gpx/600",
+    "places": [
+      {
+        "label": "Roquebrune-Cap-Martin · Carnolès",
+        "landmark": "Début du tronçon vers Menton",
+        "endpoint": "start"
+      },
+      {
+        "label": "Menton · vieux port",
+        "landmark": "Vieille ville et front de mer",
+        "coordinate": [
+          43.774391,
+          7.506211
+        ]
+      },
+      {
+        "label": "Menton · Garavan",
+        "landmark": "Arrivée du côté de la frontière italienne",
+        "endpoint": "finish"
+      }
+    ],
+    "clip": [
+      [
+        43.76571,
+        7.48839
+      ],
+      [
+        43.784287,
+        7.529909
+      ]
+    ],
+    "section": "Tronçon final Carnolès–Menton-Garavan du GPX Nice–Menton, sans l’ascension de la Grande Corniche."
+  },
+  "baux-alpilles-rocher": {
+    "key": "baux",
+    "gpxUrl": "https://admin.cheminsdesparcs.fr/api/fr/treks/133849/maussane-les-alpilles-tour-des-baux-de-provence-a-velo.gpx",
+    "places": [
+      {
+        "label": "Maussane-les-Alpilles",
+        "landmark": "Départ de la boucle",
+        "endpoint": "start"
+      },
+      {
+        "label": "Les Baux · Val d’Enfer",
+        "landmark": "Point haut de cette partie de la boucle",
+        "coordinate": [
+          43.75300867093891,
+          4.790571950859424
+        ]
+      },
+      {
+        "label": "Les Baux · Carrières de Lumières",
+        "landmark": "Passage sur la route devant les carrières",
+        "coordinate": [
+          43.75043570262037,
+          4.797128677237197
+        ]
+      },
+      {
+        "label": "Les Baux · Sainte-Berthe",
+        "landmark": "Vignes et retour vers la plaine",
+        "coordinate": [
+          43.74060005544199,
+          4.806243151433213
+        ]
+      },
+      {
+        "label": "Maussane · retour",
+        "landmark": "Fin de la boucle au village",
+        "endpoint": "finish"
+      }
+    ]
+  },
+  "sainte-croix-valensole": {
+    "key": "croix",
+    "gpxUrl": "https://admin.cheminsdesparcs.fr/api/fr/treks/130033/sainte-croix-du-verdon-balade-sensorielle-a-velo.gpx",
+    "places": [
+      {
+        "label": "Sainte-Croix-du-Verdon",
+        "landmark": "Le village au-dessus du lac",
+        "endpoint": "start"
+      },
+      {
+        "label": "Chaudon",
+        "landmark": "Hameau sur le plateau",
+        "coordinate": [
+          43.80684605175762,
+          6.1943157195517315
+        ]
+      },
+      {
+        "label": "Roumoules",
+        "landmark": "Traversée du village",
+        "coordinate": [
+          43.82527904659939,
+          6.128130197979317
+        ]
+      },
+      {
+        "label": "Riez",
+        "landmark": "Passage près du Colostre",
+        "coordinate": [
+          43.81738205665349,
+          6.094382285809841
+        ]
+      },
+      {
+        "label": "Montagnac",
+        "landmark": "Village du plateau",
+        "coordinate": [
+          43.77973153666084,
+          6.095296382773085
+        ]
+      },
+      {
+        "label": "Sainte-Croix · retour",
+        "landmark": "Retrouver le lac après les villages",
+        "endpoint": "finish"
+      }
+    ]
+  },
+  "castellane-deux-lacs": {
+    "key": "castellane",
+    "gpxUrl": "https://admin.cheminsdesparcs.fr/api/fr/treks/130759/castellane-le-tour-des-lacs.gpx",
+    "places": [
+      {
+        "label": "Castellane",
+        "landmark": "Départ près du centre",
+        "endpoint": "start"
+      },
+      {
+        "label": "Castellane · vers Chaudanne",
+        "landmark": "Carrefour vers le lac de Chaudanne",
+        "coordinate": [
+          43.842075865869425,
+          6.539180248910268
+        ]
+      },
+      {
+        "label": "Demandolx · carrefour",
+        "landmark": "Village accessible en détour, hors de la trace",
+        "coordinate": [
+          43.86913792008423,
+          6.574810713464102
+        ]
+      },
+      {
+        "label": "Croix de la Mission · secteur",
+        "landmark": "Panoramas avant la descente",
+        "coordinate": [
+          43.874551950745364,
+          6.563114583514107
+        ]
+      },
+      {
+        "label": "Barrage de Castillon",
+        "landmark": "Passage entre la retenue et la vallée",
+        "coordinate": [
+          43.883317770236886,
+          6.540573298952947
+        ]
+      },
+      {
+        "label": "Castellane · retour",
+        "landmark": "Arrivée de la boucle",
+        "endpoint": "finish"
+      }
+    ]
+  },
+  "verdon-route-cretes": {
+    "key": "canyon",
+    "gpxUrl": "https://admin.rando-alpes-haute-provence.fr/api/fr/treks/277070/grand-canyon-parcours-velo-n14.gpx",
+    "places": [
+      {
+        "label": "La Palud-sur-Verdon",
+        "landmark": "Départ du Grand Canyon",
+        "endpoint": "start"
+      },
+      {
+        "label": "Route des Crêtes · belvédères",
+        "landmark": "Premiers panoramas sur les gorges",
+        "coordinate": [
+          43.77525372628278,
+          6.384024964995703
+        ]
+      },
+      {
+        "label": "Belvédère du Tilleul · secteur",
+        "landmark": "Avant la descente de la boucle",
+        "coordinate": [
+          43.7555175940127,
+          6.370061337947846
+        ]
+      },
+      {
+        "label": "Chalet de la Maline",
+        "landmark": "Partie basse de la Route des Crêtes",
+        "coordinate": [
+          43.745305164155745,
+          6.338050719951892
+        ]
+      },
+      {
+        "label": "La Palud · retour",
+        "landmark": "Remontée et fin de boucle",
+        "endpoint": "finish"
+      }
+    ]
+  },
+  "turini-vesubie-sospel": {
+    "key": "turini",
+    "gpxUrl": "https://www.francevelotourisme.com/etape/gpx/896",
+    "places": [
+      {
+        "label": "Saint-Martin-Vésubie",
+        "landmark": "Départ dans la haute vallée",
+        "endpoint": "start"
+      },
+      {
+        "label": "Roquebillière",
+        "landmark": "Descente dans la vallée",
+        "coordinate": [
+          44.010126,
+          7.312653
+        ]
+      },
+      {
+        "label": "La Bollène-Vésubie",
+        "landmark": "Village avant l’ascension",
+        "coordinate": [
+          43.990302,
+          7.323471
+        ]
+      },
+      {
+        "label": "Col de Turini",
+        "landmark": "Changement de versant",
+        "coordinate": [
+          43.977589,
+          7.391505
+        ]
+      },
+      {
+        "label": "Moulinet",
+        "landmark": "Village dans la descente",
+        "coordinate": [
+          43.943062,
+          7.415092
+        ]
+      },
+      {
+        "label": "Sospel",
+        "landmark": "Arrivée dans la vallée de la Bévéra",
+        "endpoint": "finish"
+      }
+    ]
+  },
+  "bonette-ubaye-tinee": {
+    "key": "bonette",
+    "gpxUrl": "https://www.francevelotourisme.com/etape/gpx/893",
+    "places": [
+      {
+        "label": "Barcelonnette",
+        "landmark": "Départ dans la vallée de l’Ubaye",
+        "endpoint": "start"
+      },
+      {
+        "label": "Jausiers",
+        "landmark": "Début de la grande ascension",
+        "coordinate": [
+          44.418273,
+          6.731134
+        ]
+      },
+      {
+        "label": "Col de la Bonette",
+        "landmark": "Passage du col, sans boucle de la cime",
+        "coordinate": [
+          44.326625,
+          6.807558
+        ]
+      },
+      {
+        "label": "Saint-Étienne-de-Tinée",
+        "landmark": "Arrivée au bas du versant sud",
+        "endpoint": "finish"
+      }
+    ]
+  },
+  "luberon-calavon": {
+    "key": "luberon",
+    "gpxUrl": "https://www.francevelotourisme.com/etape/gpx/556",
+    "places": [
+      {
+        "label": "Cavaillon",
+        "landmark": "Départ de la liaison",
+        "endpoint": "start"
+      },
+      {
+        "label": "Robion · véloroute",
+        "landmark": "Voie verte au nord du village",
+        "coordinate": [
+          43.853551,
+          5.10224
+        ]
+      },
+      {
+        "label": "Coustellet",
+        "landmark": "Repère dans la traversée du Luberon",
+        "coordinate": [
+          43.867189,
+          5.145265
+        ]
+      },
+      {
+        "label": "Pont Julien",
+        "landmark": "Patrimoine romain près de la trace",
+        "coordinate": [
+          43.861755,
+          5.306788
+        ]
+      },
+      {
+        "label": "Apt",
+        "landmark": "Arrivée dans la vallée du Calavon",
+        "endpoint": "finish"
+      }
+    ]
+  },
+  "camargue-grau-gallician": {
+    "key": "camargue",
+    "gpxUrl": "https://www.francevelotourisme.com/etape/gpx/554",
+    "places": [
+      {
+        "label": "Le Grau-du-Roi",
+        "landmark": "Départ côté littoral",
+        "endpoint": "start"
+      },
+      {
+        "label": "Aigues-Mortes",
+        "landmark": "À hauteur de la ville fortifiée",
+        "coordinate": [
+          43.56599,
+          4.18555
+        ]
+      },
+      {
+        "label": "Gallician",
+        "landmark": "Arrivée près du canal et des marais",
+        "endpoint": "finish"
+      }
+    ],
+    "clip": [
+      [
+        43.539554,
+        4.1422
+      ],
+      [
+        43.637961,
+        4.298434
+      ]
+    ],
+    "section": "Tronçon Le Grau-du-Roi–Gallician du GPX vers Beaucaire ; ne rejoint ni Arles ni les Saintes-Maries."
+  },
+  "baie-somme-cayeux-crotoy": {
+    "key": "somme",
+    "gpxUrl": "https://www.francevelotourisme.com/etape/gpx/953",
+    "places": [
+      {
+        "label": "Cayeux-sur-Mer",
+        "landmark": "Départ de la Route Blanche",
+        "endpoint": "start"
+      },
+      {
+        "label": "Le Hourdel",
+        "landmark": "Pointe et horizon de la baie",
+        "coordinate": [
+          50.214365,
+          1.5642
+        ]
+      },
+      {
+        "label": "Saint-Valery-sur-Somme",
+        "landmark": "Secteur du port et du petit train",
+        "coordinate": [
+          50.177402,
+          1.647674
+        ]
+      },
+      {
+        "label": "Noyelles-sur-Mer · piste",
+        "landmark": "À hauteur de la liaison vers la gare",
+        "coordinate": [
+          50.18582,
+          1.699421
+        ]
+      },
+      {
+        "label": "Le Crotoy",
+        "landmark": "Arrivée de l’autre côté de la baie",
+        "endpoint": "finish"
+      }
+    ]
+  },
+  "bretagne-roscoff-morlaix": {
+    "key": "breton",
+    "gpxUrl": "https://www.francevelotourisme.com/etape/gpx/908",
+    "places": [
+      {
+        "label": "Roscoff",
+        "landmark": "Départ face à l’île de Batz",
+        "endpoint": "start"
+      },
+      {
+        "label": "Saint-Pol-de-Léon",
+        "landmark": "Cité et paysages du Léon",
+        "coordinate": [
+          48.683807,
+          -3.986718
+        ]
+      },
+      {
+        "label": "Kerlaudy · secteur",
+        "landmark": "Approche de l’estuaire",
+        "coordinate": [
+          48.655179,
+          -3.956156
+        ]
+      },
+      {
+        "label": "Estuaire de la Penzé",
+        "landmark": "Repère près de la rivière",
+        "coordinate": [
+          48.611518,
+          -3.944282
+        ]
+      },
+      {
+        "label": "Morlaix",
+        "landmark": "Arrivée dans la vallée",
+        "endpoint": "finish"
+      }
+    ]
+  },
+  "loire-blois-chaumont": {
+    "key": "loire-new",
+    "gpxUrl": "https://www.francevelotourisme.com/etape/gpx/102",
+    "places": [
+      {
+        "label": "Blois",
+        "landmark": "Départ de l’étape de Loire à Vélo",
+        "endpoint": "start"
+      },
+      {
+        "label": "Candé-sur-Beuvron",
+        "landmark": "Le Beuvron ramène vers le fleuve",
+        "coordinate": [
+          47.49381,
+          1.259617
+        ]
+      },
+      {
+        "label": "Chaumont-sur-Loire",
+        "landmark": "Arrivée près du domaine et de ses jardins",
+        "endpoint": "finish"
+      }
+    ]
+  },
+  "alsace-erstein-strasbourg": {
+    "key": "alsace",
+    "gpxUrl": "https://www.francevelotourisme.com/etape/gpx/125",
+    "places": [
+      {
+        "label": "Erstein · canal",
+        "landmark": "Départ sur la trace à hauteur d’Erstein",
+        "endpoint": "start"
+      },
+      {
+        "label": "Plobsheim · canal",
+        "landmark": "À hauteur du village, sur le chemin de halage",
+        "coordinate": [
+          48.472065,
+          7.717033
+        ]
+      },
+      {
+        "label": "Eschau · canal",
+        "landmark": "Églises et paysages du Ried à proximité",
+        "coordinate": [
+          48.48676,
+          7.722725
+        ]
+      },
+      {
+        "label": "Strasbourg · arrivée du canal",
+        "landmark": "Extrémité sud-est de la trace officielle",
+        "endpoint": "finish"
+      }
+    ],
+    "clip": [
+      [
+        48.425319,
+        7.698844
+      ],
+      [
+        48.574464,
+        7.767007
+      ]
+    ],
+    "section": "Tronçon final Erstein–Strasbourg, extrait du GPX Neuf-Brisach–Strasbourg. Le centre historique est hors trace."
+  }
+}
