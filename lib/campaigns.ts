@@ -1,4 +1,5 @@
 import type { CompletedSession } from "./types";
+import { isRouteCompleted } from "./progression";
 
 export type Campaign = {
   id: string;
@@ -57,7 +58,7 @@ export const campaigns: Campaign[] = [
 export function completedRouteIds(sessions: CompletedSession[]) {
   return new Set(
     sessions
-      .filter((session) => session.routeId && session.metrics?.completedRoute !== false && session.metrics?.segmentAttackIndex === undefined)
+      .filter(isRouteCompleted)
       .map((session) => session.routeId!)
   );
 }
@@ -69,6 +70,7 @@ export function campaignProgress(campaign: Campaign, sessions: CompletedSession[
   const complete = completedStages === campaign.routeIds.length;
 
   return {
+    completedRouteIds: completed,
     completedStages,
     totalStages: campaign.routeIds.length,
     percent: Math.round((completedStages / Math.max(1, campaign.routeIds.length)) * 100),

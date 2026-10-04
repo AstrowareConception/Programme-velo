@@ -38,7 +38,7 @@ export function CampaignsPanel({
               <div className="campaignStages">
                 {campaign.routeIds.map((routeId, index) => {
                   const route = routeMap.get(routeId);
-                  const completed = index < progress.completedStages || progress.complete;
+                  const completed = progress.completedRouteIds.has(routeId);
                   const current = routeId === progress.nextRouteId;
                   return (
                     <span className={completed ? "done" : current ? "current" : ""} key={routeId}>
@@ -49,7 +49,7 @@ export function CampaignsPanel({
                 })}
               </div>
               <div className="campaignFooter">
-                <span>Récompense <strong>+{campaign.xpBonus} XP</strong></span>
+                <span>Badge + récompense unique <strong>+{campaign.xpBonus} XP</strong></span>
                 {progress.complete
                   ? <strong className="campaignComplete">Campagne terminée</strong>
                   : nextRoute && <button className="secondary" onClick={() => onLaunch(nextRoute)}>Continuer · {nextRoute.name}</button>}
