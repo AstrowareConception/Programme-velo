@@ -47,6 +47,7 @@ export type TelemetrySample = {
   resistance?: number;
   powerW?: number;
   heartRate?: number;
+  calories?: number;
   distanceKm?: number;
 };
 
@@ -66,6 +67,7 @@ export type SessionMetrics = {
   source: "manual" | "ftms" | "mixed";
   challenge?: ChallengeResult;
   completedRoute?: boolean;
+  completedSegment?: boolean;
   elapsedSeconds?: number;
   timeAttack?: boolean;
   checkpointSplits?: TimeAttackSplit[];

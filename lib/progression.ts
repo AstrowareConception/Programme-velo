@@ -48,7 +48,7 @@ export function progressionStats(sessions: CompletedSession[], routes: ClimbChal
 
   const pbImprovementsByRoute = new Map<string, number>();
   const timeAttacks = sessions
-    .filter((session) => session.routeId && session.metrics?.timeAttack && typeof session.metrics.elapsedSeconds === "number")
+    .filter((session) => isRouteCompleted(session) && session.metrics?.timeAttack && Number.isFinite(session.metrics.elapsedSeconds) && (session.metrics.elapsedSeconds ?? 0) > 0)
     .sort((a,b) => a.date.localeCompare(b.date));
 
   const bestByRoute = new Map<string, number>();

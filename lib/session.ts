@@ -56,3 +56,11 @@ export async function requestScreenWakeLock() {
     return null;
   }
 }
+
+
+// Device energy is a cumulative counter, not necessarily reset at session start.
+export function counterDelta(values: Array<number | undefined>) {
+  const known = values.filter((value): value is number => typeof value === "number" && Number.isFinite(value));
+  if (known.length < 2) return undefined;
+  return known.slice(1).reduce((sum, value, index) => sum + Math.max(0, value - known[index]), 0);
+}

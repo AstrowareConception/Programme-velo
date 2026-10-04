@@ -61,3 +61,14 @@ describe("time attack helpers", () => {
     expect(segmentPersonalBest(sessions,"x",1)?.metrics?.elapsedSeconds).toBe(300);
   });
 });
+
+
+it("ignores partial route and sector attempts when selecting records", () => {
+  const valid = attempt(900); valid.metrics!.completedRoute = true;
+  const partial = attempt(20); partial.metrics!.completedRoute = false;
+  expect(personalBest([valid, partial], "x")?.metrics?.elapsedSeconds).toBe(900);
+  const sector = attempt(300); sector.metrics!.segmentAttackIndex = 0; sector.metrics!.completedSegment = true;
+  const unfinished = attempt(10); unfinished.metrics!.segmentAttackIndex = 0; unfinished.metrics!.completedSegment = false;
+  expect(segmentPersonalBest([sector, unfinished], "x", 0)?.metrics?.elapsedSeconds).toBe(300);
+  expect(personalBest([partial], "x")).toBeUndefined();
+});

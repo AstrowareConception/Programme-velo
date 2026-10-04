@@ -1,4 +1,4 @@
-const CACHE = "veloquest-v3";
+const CACHE = "veloquest-v4";
 const CORE = ["/", "/manifest.webmanifest", "/logo.svg", "/icon.svg"];
 
 self.addEventListener("install", (event) => {
@@ -20,7 +20,7 @@ self.addEventListener("fetch", (event) => {
   if (request.method !== "GET") return;
 
   const url = new URL(request.url);
-  if (url.origin !== self.location.origin) return;
+  if (url.origin !== self.location.origin || url.pathname === "/api/version") return;
 
   if (request.mode === "navigate") {
     event.respondWith(
