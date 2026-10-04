@@ -1,8 +1,8 @@
 export type RouteTheme = { id: string; title: string; icon: string; description: string; routeIds: string[] };
 
 export const routeThemes: RouteTheme[] = [
-  { id: "napoleon", title: "Route Napoléon", icon: "🦅", description: "Huit tronçons routiers de Golfe-Juan à Gap. Ordre libre ; la suite vers Grenoble reste à préparer.",
-    routeIds: ["napoleon-golfe-grasse", "napoleon-grasse-vallier", "napoleon-vallier-seranon", "napoleon-seranon-castellane", "napoleon-castellane-barreme", "napoleon-barreme-digne", "napoleon-digne-sisteron", "napoleon-sisteron-gap"] },
+  { id: "napoleon", title: "Route Napoléon", icon: "🦅", description: "Quatorze tronçons routiers de Golfe-Juan à Grenoble, avec deux carnets indépendants. Ordre libre.",
+    routeIds: ["napoleon-golfe-grasse", "napoleon-grasse-vallier", "napoleon-vallier-seranon", "napoleon-seranon-castellane", "napoleon-castellane-barreme", "napoleon-barreme-digne", "napoleon-digne-sisteron", "napoleon-sisteron-gap", "napoleon-gap-fare", "napoleon-fare-corps", "napoleon-corps-mure", "napoleon-mure-laffrey", "napoleon-laffrey-vizille", "napoleon-vizille-grenoble"] },
   { id: "azure", title: "Côte d’Azur", icon: "🍋", description: "Ports, villes et Corniches, de Cagnes à Menton.",
     routeIds: ["cagnes-cannes-littoral", "golfe-juan-cannes-balade", "menton-garavan-promenade", "eze-menton-basse-corniche", "nice-menton-grande-corniche", "nice-corniches-loop"] },
   { id: "verdon", title: "Lacs et gorges du Verdon", icon: "🦅", description: "Sainte-Croix, Castellane et le Grand Canyon.",

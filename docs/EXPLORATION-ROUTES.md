@@ -1,6 +1,6 @@
 # Carnets de France — extension du 4 octobre 2026
 
-Quinze parcours complètent les 23 destinations précédentes : 38 parcours à la livraison initiale, dont 14 balades à 1/5. Le catalogue actuel atteint **55 parcours et 22 balades**, avec les [formats courts, programmes et Route Napoléon](DISCOVERY-PROGRAMMES.md). Les dix nouveaux tracés PACA couvrent littoral, Alpilles, Luberon, Verdon et Alpes du Sud. Les fiches sont écrites pour VéloQuest ; le relief représenté provient des traces officielles, sans visite ni liaison ajoutée.
+Quinze parcours complètent les 23 destinations précédentes : 38 parcours à la livraison initiale, dont 14 balades à 1/5. Le catalogue actuel atteint **61 parcours et 22 balades**, avec les [formats courts, programmes et Route Napoléon](DISCOVERY-PROGRAMMES.md). Les dix nouveaux tracés PACA couvrent littoral, Alpilles, Luberon, Verdon et Alpes du Sud. Les fiches sont écrites pour VéloQuest ; le relief représenté provient des traces officielles, sans visite ni liaison ajoutée.
 
 | Parcours | Difficulté | Distance GPX | D+ du profil lissé | Villes et repères, dans le sens proposé | Source |
 | --- | ---: | ---: | ---: | --- | --- |

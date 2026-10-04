@@ -93,3 +93,9 @@ Avant fusion : `npm run typecheck`, `npm test`, `npm run test:e2e`, `npm run bui
 Aucun essai TEB5 physique ni validation Safari/iPhone physique n'est réalisé par les tests Chromium. Prochaine étape matérielle : suivre `docs/TEB5-BLUETOOTH-VALIDATION.md` et conserver un relevé de la télémétrie et du contrôle effectifs.
 
 Le document d'état externe livré après déploiement complète ce point avec les commits finaux, PR et résultats réellement observés, sans anticiper la publication.
+
+## Route Napoléon jusqu’à Grenoble
+
+Six étapes ajoutent Gap–La Fare (col Bayard), La Fare–Corps, Corps–La Mure, La Mure–Laffrey, Laffrey–Vizille et Vizille–Grenoble par Brié/Eybens. Catalogue : 61 parcours, 22 balades, neuf thèmes, 17 campagnes/carnets et 62 badges. Le thème Route Napoléon contient 14 étapes ; le nouveau carnet de six étapes apporte 700 XP uniques. Dauphiné en poche (3/6) et Traversée impériale (14/14) ne donnent pas d’XP supplémentaire. Les huit étapes, 900 XP et trophées précédents restent inchangés.
+
+Une seule trace nommée du GPX Michelin Grenoble–Embrun, inversée et découpée ; altitudes IGN lissées. Le générateur refuse les mélanges de traces et un checksum changé. Jonctions internes vérifiées ; départ à Gap situé environ 260 m de l’ancienne arrivée, sans liaison ajoutée. Descente Laffrey–Vizille conservée, sans inventer une montée. [Sources, distances et limites](DISCOVERY-PROGRAMMES.md). Cache PWA v11 ; aucun changement de clé locale. Les quatre contrôles sur le SHA proposé, les vérifications mobile/ordinateur et les références de fusion/déploiement sont consignés dans le document externe d’état de reprise une fois terminés.

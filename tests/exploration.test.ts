@@ -18,13 +18,13 @@ const badge = (sessions: CompletedSession[], id: string) => discoveryBadges(sess
 describe("documented exploration routes", () => {
   it("adds fifteen sourced destinations across all five difficulties without changing the original objectives", () => {
     expect(explorationRoutes).toHaveLength(15);
-    expect(climbs).toHaveLength(55);
+    expect(climbs).toHaveLength(61);
     expect(climbs.filter((r) => r.category === "scenic")).toHaveLength(22);
     expect(new Set(explorationRoutes.map((r) => r.difficulty))).toEqual(new Set([1, 2, 3, 4, 5]));
     expect(routeCollections.find((c) => c.id === "scenic-france")?.routeIds).toHaveLength(7);
     expect(campaigns.find((c) => c.id === "quiet-heritage")?.xpBonus).toBe(300);
     expect(campaigns.find((c) => c.id === "waterside-notebook")?.routeIds).toHaveLength(4);
-    expect(new Set(climbs.map((r) => r.id)).size).toBe(55);
+    expect(new Set(climbs.map((r) => r.id)).size).toBe(61);
   });
 
   it("keeps source checksums, coherent terrain and ordered real-distance landmarks on every new route", () => {

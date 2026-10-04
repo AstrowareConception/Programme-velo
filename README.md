@@ -17,10 +17,10 @@ VéloQuest est une PWA personnelle Next.js / React / TypeScript. Elle associe un
 - Coach adaptatif local : temps disponible, énergie, historique, charge récente et RPE.
 - Préparation, lecteur guidé, pause, alertes sonores/vocales/haptiques, calibration et maintien de l'écran lorsque disponible.
 - Reprise locale d'une séance interrompue, y compris Time Attack, Segment Attack et défi actif.
-- **55 parcours natifs**, dont **22 balades à 1/5** et les cinq étapes Velleron, Vaison, Uchaux, Enclave des Papes et Corniches à **2/5–3/5** : bosses, descentes, faux-plats et récupérations, en complément des grands cols à 4/5–5/5.
-- Neuf thèmes de découverte, dont **Route Napoléon** (huit tronçons de Golfe-Juan à Gap), recherche par ville ou repère (avec ou sans accents), filtres, tri, favoris et import GPX avec persistance des parcours personnels.
+- **61 parcours natifs**, dont **22 balades à 1/5** et les cinq étapes Velleron, Vaison, Uchaux, Enclave des Papes et Corniches à **2/5–3/5** : bosses, descentes, faux-plats et récupérations, en complément des grands cols à 4/5–5/5.
+- Neuf thèmes de découverte, dont **Route Napoléon** (quatorze tronçons de Golfe-Juan à Grenoble), recherche par ville ou repère (avec ou sans accents), filtres, tri, favoris et import GPX avec persistance des parcours personnels.
 - Time Attack, records de parcours, fantôme et temps intermédiaires ; Segment Attack sur quatre secteurs, avec records séparés.
-- Huit défis de parcours ; **16 campagnes/carnets**, dont Passeport azuréen, Carnet du Verdon, Cartes postales de Provence, Les deux Corniches et Des forêts aux cimes. Les objectifs précédents restent inchangés ; Escales du Sud, Un paysage en 30 minutes et Route Napoléon ajoutent des bonus uniques de 220, 180 et 900 XP.
+- Huit défis de parcours ; **17 campagnes/carnets**, dont Passeport azuréen, Carnet du Verdon, Cartes postales de Provence, Les deux Corniches et Des forêts aux cimes. Les objectifs précédents restent inchangés ; Escales du Sud, Un paysage en 30 minutes et Route Napoléon ajoutent des bonus uniques de 220, 180 et 900 XP.
 - Trophées de découverte : Premier paysage, Flâneur de France (3 balades différentes), Atlas des balades (7), plus six trophées de variété : 10/20 parcours natifs, 6 destinations PACA, 3 parcours azuréens, 4 territoires et les 5 difficultés. Collection La France en douceur inchangée.
 - XP, niveaux, badges, collections, palmarès et analyses de performance.
 - Journal, dates/heures locales, mesures datées de poids/taille/abdomen et suppression des saisies erronées.
@@ -60,7 +60,7 @@ Les deux premiers carnets sont des programmes souples de découverte, en complé
 Voir [les sources et la méthode des profils](docs/SCENIC-ROUTES.md). Ces traces ne servent pas de guide de navigation extérieure.
 
 
-La **Route Napoléon** réunit huit étapes routières de **Golfe-Juan à Gap**, à 2/5–3/5 : Grasse, Saint-Vallier-de-Thiey, Séranon, Castellane, Barrême, Digne et Sisteron jalonnent le voyage. Le thème regroupe ces parcours ; le carnet accepte toutes les étapes dans le désordre, avec un trophée et **900 XP uniques**. Le tracé officiel CRT PACA est découpé sans liaisons inventées, avec altitudes IGN lissées. **La suite de Gap à Grenoble reste à préparer.** Les étapes restent indépendantes ; le lecteur permet d’en retrouver une puis de reprendre sa séance. Voir [les nouvelles destinations et programmes](docs/DISCOVERY-PROGRAMMES.md).
+La **Route Napoléon** réunit huit étapes routières de **Golfe-Juan à Gap**, à 2/5–3/5 : Grasse, Saint-Vallier-de-Thiey, Séranon, Castellane, Barrême, Digne et Sisteron jalonnent le voyage. Le thème regroupe ces parcours ; le carnet accepte toutes les étapes dans le désordre, avec un trophée et **900 XP uniques**. Le tracé officiel CRT PACA est découpé sans liaisons inventées, avec altitudes IGN lissées. La suite **Gap–Grenoble** ajoute six étapes par le col Bayard, Corps, La Mure, Laffrey, Vizille, Brié et Eybens, issues d’une seule trace Michelin publiée, avec altitudes IGN. Un carnet distinct offre **700 XP uniques** ; « Dauphiné en poche » (3/6) et « Traversée impériale » (14/14) ajoutent deux trophées sans XP supplémentaire. Le départ à Gap est distant d’environ 260 m de l’arrivée précédente, sans liaison ajoutée. Les étapes restent indépendantes ; le lecteur permet d’en retrouver une puis de reprendre sa séance. Voir [les nouvelles destinations et programmes](docs/DISCOVERY-PROGRAMMES.md).
 
 ## Géographie, simulation et mesures
 

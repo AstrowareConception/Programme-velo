@@ -188,7 +188,7 @@ test("campaign panel opens the next discovery stage", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: /Parcours/ }).click();
 
-  await page.getByText("Campagnes et carnets · 16 objectifs à découvrir", { exact: true }).click();
+  await page.getByText("Campagnes et carnets · 17 objectifs à découvrir", { exact: true }).click();
   const campaign = page.getByRole("heading", { name: "Découverte Provence" }).locator("xpath=ancestor::article");
   await expect(campaign).toContainText("0/4");
   await expect(campaign).toContainText("Velleron – L’Isle-sur-la-Sorgue");
@@ -212,7 +212,7 @@ test("out-of-order campaign completion marks only the actual route", async ({ pa
   })), state);
   await page.goto("/");
   await page.getByRole("button", { name: /Parcours/ }).click();
-  await page.getByText("Campagnes et carnets · 16 objectifs à découvrir", { exact: true }).click();
+  await page.getByText("Campagnes et carnets · 17 objectifs à découvrir", { exact: true }).click();
   const campaign = page.getByRole("heading", { name: "Découverte Provence" }).locator("xpath=ancestor::article");
   await expect(campaign).toContainText("1/4");
   await expect(campaign.locator(".campaignStages > span").nth(0)).toHaveClass("current");
