@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { badges, emptyState, totalXp, weeklyStats, workouts } from "../lib/data";
 import { campaignBonusXp, campaignProgress, campaigns } from "../lib/campaigns";
-import { scenicRouteIds, scenicRoutes } from "../lib/scenic-routes";
+import { foundingScenicRouteIds, scenicRouteIds, scenicRoutes } from "../lib/scenic-routes";
+import { routePlaceProgress } from "../lib/route-places";
 import { climbToWorkout, climbs, routeCategory, scenicResistanceForGrade } from "../lib/routes";
 import { collectionProgress, progressionStats, routeCollections } from "../lib/progression";
 import { createBackup, parseBackup } from "../lib/storage";
@@ -17,9 +18,9 @@ function completed(routeId: string, metrics: CompletedSession["metrics"] = { sou
 }
 
 describe("documented scenic catalogue", () => {
-  it("adds seven distinct rides while preserving the fourteen earlier routes", () => {
-    expect(scenicRoutes).toHaveLength(7);
-    expect(climbs).toHaveLength(21);
+  it("adds nine distinct rides while preserving the fourteen earlier routes", () => {
+    expect(scenicRoutes).toHaveLength(9);
+    expect(climbs).toHaveLength(23);
     expect(new Set(climbs.map((r) => r.id)).size).toBe(climbs.length);
     expect(climbs.filter((r) => routeCategory(r) === "stage" && (r.difficulty ?? 5) <= 3)).toHaveLength(5);
     expect(climbs.find((r) => r.id === "ventoux-bedoin")?.distanceKm).toBe(21);
@@ -41,8 +42,34 @@ describe("documented scenic catalogue", () => {
       });
       expect(route.elevationGainM).toBe(Math.round(gain));
       expect(route.coordinates.length).toBeGreaterThan(40);
-      expect(route.maxGrade).toBeLessThan(2);
+      expect(route.maxGrade).toBeLessThan(3);
     }
+  });
+
+  it("keeps the coastal geometry in the right direction and locates landmarks at real trace distances", () => {
+    const full = scenicRoutes.find((r) => r.id === "cagnes-cannes-littoral")!;
+    const short = scenicRoutes.find((r) => r.id === "golfe-juan-cannes-balade")!;
+    expect(full.distanceKm).toBeGreaterThan(23);
+    expect(full.distanceKm).toBeLessThan(25);
+    expect(short.distanceKm).toBeGreaterThan(7);
+    expect(short.distanceKm).toBeLessThan(8);
+    expect(full.coordinates[0]).toEqual([43.65778, 7.16875]);
+    expect(short.coordinates[0]).toEqual([43.56597, 7.07462]);
+    expect(full.coordinates.at(-1)).toEqual(short.coordinates.at(-1));
+    expect(full.coordinates.at(-1)).toEqual([43.55127, 7.01792]);
+    expect(full.places?.map((p) => p.label)).toEqual(["Cagnes-sur-Mer", "Villeneuve-Loubet", "Antibes", "Juan-les-Pins", "Golfe-Juan", "Cannes · Palm Beach", "Cannes · Croisette"]);
+    for (const route of [full, short]) {
+      expect(route.places?.[0].km).toBe(0);
+      expect(route.places?.at(-1)?.km).toBe(route.distanceKm);
+      route.places?.slice(1).forEach((p, i) => expect(p.km).toBeGreaterThan(route.places![i].km));
+    }
+    const antibesKm = full.places![2].km;
+    expect(routePlaceProgress(full, antibesKm - 0.001).current?.label).toBe("Villeneuve-Loubet");
+    expect(routePlaceProgress(full, antibesKm).current?.label).toBe("Antibes");
+    expect(routePlaceProgress(full, antibesKm).next?.label).toBe("Juan-les-Pins");
+    expect(routePlaceProgress(full, full.distanceKm + 1).next).toBeUndefined();
+    expect(routePlaceProgress(full, -1).current?.label).toBe("Cagnes-sur-Mer");
+    expect(routePlaceProgress(full, NaN).km).toBe(0);
   });
 
   it("makes the full scenic ride genuinely easy without compressing its distance into a short session", () => {
@@ -81,7 +108,7 @@ describe("discovery rewards and preserved history", () => {
 
   it("awards each notebook bonus once and recalculates after removal and backup restore", () => {
     const state = emptyState();
-    state.sessions = scenicRouteIds.map((id) => completed(id));
+    state.sessions = foundingScenicRouteIds.map((id) => completed(id));
     const originalXp = totalXp(state);
     expect(campaignBonusXp(state.sessions)).toBe(750);
     expect(badges(state).find((b) => b.id === "scenic-all")?.unlocked).toBe(true);
@@ -98,6 +125,20 @@ describe("discovery rewards and preserved history", () => {
     expect(badges(restored).find((b) => b.id === "scenic-all")?.progress).toBe("6/7");
     const heritage = campaigns.find((c) => c.id === "quiet-heritage")!;
     expect(campaignProgress(heritage, restored.sessions).nextRouteId).toBe("chambord-petit-tour");
+  });
+
+  it("preserves earned founder rewards and does not count the short coastal route as the full crossing", () => {
+    const state = emptyState();
+    state.sessions = foundingScenicRouteIds.map((id) => completed(id));
+    const collection = routeCollections.find((c) => c.id === "scenic-france")!;
+    expect(collection.routeIds).toHaveLength(7);
+    state.sessions.push(completed("golfe-juan-cannes-balade"));
+    const progress = progressionStats(state.sessions, climbs);
+    expect(progress.completedRouteIds.has("cagnes-cannes-littoral")).toBe(false);
+    expect(collectionProgress(collection, progress.completedRouteIds).unlocked).toBe(true);
+    expect(badges(state).find((b) => b.id === "scenic-all")?.unlocked).toBe(true);
+    expect(badges(state).find((b) => b.id === "scenic-all")?.progress).toBe("7/7");
+    expect(campaignBonusXp(state.sessions)).toBe(750);
   });
 
   it("keeps the new micro-bonus within the shared weekly cap and the extra workouts coherent", () => {

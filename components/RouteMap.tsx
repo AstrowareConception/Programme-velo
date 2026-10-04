@@ -2,19 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import type { ClimbChallenge } from "@/lib/routes";
-
-function positionAt(climb: ClimbChallenge, progress: number): [number, number] {
-  const fraction = Math.max(0, Math.min(1, progress));
-  const scaled = fraction * (climb.coordinates.length - 1);
-  const index = Math.min(climb.coordinates.length - 2, Math.floor(scaled));
-  const part = scaled - index;
-  const a = climb.coordinates[index];
-  const b = climb.coordinates[index + 1] ?? a;
-  return [
-    a[0] + (b[0] - a[0]) * part,
-    a[1] + (b[1] - a[1]) * part
-  ];
-}
+import { routePositionAt } from "@/lib/route-map-position";
 
 export function RouteMap({
   climb,
@@ -53,12 +41,12 @@ export function RouteMap({
       L.circleMarker(start, { radius: 6 }).bindTooltip("Départ").addTo(map);
       L.circleMarker(end, { radius: 6 }).bindTooltip("Arrivée").addTo(map);
 
-      riderRef.current = L.circleMarker(positionAt(climb, progress), { radius: 9, weight: 4 })
+      riderRef.current = L.circleMarker(routePositionAt(climb, progress), { radius: 9, weight: 4 })
         .bindTooltip("Toi")
         .addTo(map);
 
       if (ghostProgress !== undefined) {
-        ghostRef.current = L.circleMarker(positionAt(climb, ghostProgress), {
+        ghostRef.current = L.circleMarker(routePositionAt(climb, ghostProgress), {
           radius: 7,
           weight: 2,
           dashArray: "4 4",
@@ -79,7 +67,7 @@ export function RouteMap({
 
   useEffect(() => {
     if (!riderRef.current || !climb.coordinates.length) return;
-    riderRef.current.setLatLng(positionAt(climb, progress));
+    riderRef.current.setLatLng(routePositionAt(climb, progress));
   }, [climb, progress]);
 
   useEffect(() => {
@@ -92,7 +80,7 @@ export function RouteMap({
         }
         return;
       }
-      const pos = positionAt(climb, ghostProgress);
+      const pos = routePositionAt(climb, ghostProgress);
       if (ghostRef.current) ghostRef.current.setLatLng(pos);
       else {
         ghostRef.current = L.circleMarker(pos, {

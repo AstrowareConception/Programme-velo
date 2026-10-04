@@ -14,14 +14,14 @@ async function stored(page: Page) { return page.evaluate(() => JSON.parse(localS
 function chambordCard(page: Page) { return page.getByRole("heading", { name: "Chambord · petit tour", exact: true }).locator("xpath=ancestor::article"); }
 async function browse(page: Page) {
   await page.getByRole("button", { name: /Parcours/ }).click();
-  await page.getByRole("button", { name: "Explorer les 7 balades" }).click();
+  await page.getByRole("button", { name: "Explorer les 9 balades" }).click();
 }
 
 test("scenic catalogue, landscape, map profile and favorites work without overflow", async ({ page }, testInfo) => {
   const errors: string[] = []; page.on("pageerror", (error) => errors.push(error.message));
   await seed(page); await page.goto("/"); await browse(page);
-  await expect(page.locator(".routeLibraryCard")).toHaveCount(7);
-  await expect(page.locator(".routeLibraryCard").filter({ hasText: "Difficulté 1/5" })).toHaveCount(7);
+  await expect(page.locator(".routeLibraryCard")).toHaveCount(9);
+  await expect(page.locator(".routeLibraryCard").filter({ hasText: "Difficulté 1/5" })).toHaveCount(9);
   await page.getByLabel("Rechercher").fill("Chambord");
   const card = chambordCard(page);
   await card.getByText("Découvrir le paysage", { exact: true }).click();
@@ -41,6 +41,49 @@ test("scenic catalogue, landscape, map profile and favorites work without overfl
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.screenshot({ path: testInfo.outputPath("balade-preparation.png") });
   expect(errors).toEqual([]);
+});
+
+test("coastal landmarks follow the ride through towns and survive a pause and reload", async ({ page }, testInfo) => {
+  const errors: string[] = []; page.on("pageerror", (error) => errors.push(error.message));
+  await page.clock.install(); await seed(page); await page.goto("/"); await browse(page);
+  const card = page.getByRole("heading", { name: "Côte d’Azur · Cagnes-sur-Mer → Cannes", exact: true }).locator("xpath=ancestor::article");
+  await card.getByText("Les villes traversées · 7 repères", { exact: true }).click();
+  await expect(card.locator(".routePlaces li strong")).toHaveText(["Cagnes-sur-Mer", "Villeneuve-Loubet", "Antibes", "Juan-les-Pins", "Golfe-Juan", "Cannes · Palm Beach", "Cannes · Croisette"]);
+  await card.getByRole("button", { name: "Partir en balade" }).click();
+  await expect(page.locator(".previewStats")).toContainText("facile");
+  await page.getByRole("button", { name: "Démarrer la séance" }).click();
+  await expect(page.locator(".routePlaceNow strong")).toHaveText("Cagnes-sur-Mer");
+  await expect(page.locator(".routePlaceNow")).toContainText("À suivre : Villeneuve-Loubet");
+  await page.clock.fastForward(41 * 60 * 1000);
+  await expect(page.locator(".routePlaceNow strong")).toHaveText("Antibes");
+  await expect(page.locator(".routePlaceNow")).toContainText("À suivre : Juan-les-Pins");
+  await page.getByRole("button", { name: "Pause", exact: true }).click(); await page.reload();
+  await page.getByRole("button", { name: "Reprendre", exact: true }).click();
+  await expect(page.locator(".routePlaceNow strong")).toHaveText("Antibes");
+  await page.locator(".routePlaceNow").scrollIntoViewIfNeeded();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.screenshot({ path: testInfo.outputPath("littoral-antibes.png") });
+  expect(errors).toEqual([]);
+});
+
+test("the short coastal ride finishes at Cannes and never validates Cagnes to Cannes", async ({ page }) => {
+  await page.clock.install(); await seed(page); await page.goto("/"); await browse(page);
+  const card = page.getByRole("heading", { name: "Côte d’Azur · Golfe-Juan → Cannes", exact: true }).locator("xpath=ancestor::article");
+  await card.getByRole("button", { name: "Partir en balade" }).click();
+  await expect(page.locator(".previewStats")).toContainText("30 min");
+  await page.getByRole("button", { name: "Démarrer la séance" }).click();
+  await page.clock.fastForward(31 * 60 * 1000);
+  await expect(page.getByLabel("Date et heure de la séance")).toBeVisible();
+  await page.getByRole("button", { name: /Valider la quête/ }).click();
+  await expect.poll(async () => (await stored(page)).sessions.length).toBe(1);
+  const saved = (await stored(page)).sessions[0];
+  expect(saved.routeId).toBe("golfe-juan-cannes-balade");
+  expect(saved.metrics.completedRoute).toBe(true);
+  await page.reload(); await browse(page);
+  const full = page.getByRole("heading", { name: "Côte d’Azur · Cagnes-sur-Mer → Cannes", exact: true }).locator("xpath=ancestor::article");
+  await expect(full.locator(".timeAttackSummary")).toContainText("TENTATIVES0");
+  await page.getByRole("button", { name: /Plus/ }).click();
+  await expect(page.locator(".badge").filter({ has: page.getByRole("heading", { name: "Premier paysage", exact: true }) })).toContainText("Débloqué");
 });
 
 test("a fully ridden scenic route earns its notebook and deletion restores the missing stage", async ({ page }) => {

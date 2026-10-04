@@ -24,7 +24,20 @@ SOURCES = {
     "marais-poitevin-coulon-damvix": ("coulon", "https://www.francevelotourisme.com/etape/gpx/173"),
     "canal-midi-carcassonne": ("midi", "https://www.francevelotourisme.com/etape/gpx/254"),
     "loire-tours-villandry": ("loire", "https://www.francevelotourisme.com/etape/gpx/106"),
+    "cagnes-cannes-littoral": ("azure-forward", "https://www.francevelotourisme.com/etape/gpx/599"),
+    "golfe-juan-cannes-balade": ("azure-forward", "https://www.francevelotourisme.com/etape/gpx/599"),
 }
+# Reference points on the official Cannes -> Nice geometry. They identify
+# landmarks, not administrative town boundaries. Distances come from the trace.
+AZURE_PLACES = [
+    ("Cagnes-sur-Mer", "Cros-de-Cagnes · départ face à la mer", (43.65778, 7.16875)),
+    ("Villeneuve-Loubet", "À hauteur de Marina Baie des Anges", (43.63901, 7.13796)),
+    ("Antibes", "Port Vauban et vieux remparts", (43.58407, 7.12391)),
+    ("Juan-les-Pins", "Traversée de la station balnéaire", (43.568865, 7.10991)),
+    ("Golfe-Juan", "À hauteur du vieux port", (43.56597, 7.07462)),
+    ("Cannes · Palm Beach", "Pointe de la Croisette", (43.53727, 7.03828)),
+    ("Cannes · Croisette", "Arrivée près du Palais des Festivals", (43.55127, 7.01792)),
+]
 CACHE = Path(".cache/scenic-profiles")
 CACHE.mkdir(parents=True, exist_ok=True)
 
@@ -62,10 +75,23 @@ for route_id, (key, url) in SOURCES.items():
             points.append(point)
     if len(points) < 2:
         raise ValueError(f"{route_id}: insufficient geometry")
+    places = []
+    if route_id in ("cagnes-cannes-littoral", "golfe-juan-cannes-balade"):
+        anchors = AZURE_PLACES if route_id == "cagnes-cannes-littoral" else AZURE_PLACES[4:]
+        indices = [min(range(len(points)), key=lambda i: distance(points[i], anchor[2])) for anchor in anchors]
+        if any(distance(points[i], anchor[2]) > 0.05 for i, anchor in zip(indices, anchors)):
+            raise ValueError(f"{route_id}: official trace no longer matches the coastal landmarks")
+        if any(a <= b for a, b in zip(indices, indices[1:])):
+            raise ValueError(f"{route_id}: invalid direction or town order in source GPX")
+        points = list(reversed(points[indices[-1]:indices[0]+1]))
     cumulative = [0]
     for a, b in zip(points, points[1:]):
         cumulative.append(cumulative[-1] + distance(a, b))
     length = cumulative[-1]
+    if route_id in ("cagnes-cannes-littoral", "golfe-juan-cannes-balade"):
+        for label, landmark, anchor in anchors:
+            i = min(range(len(points)), key=lambda i: distance(points[i], anchor))
+            places.append({"label": label, "landmark": landmark, "km": round(cumulative[i], 6)})
     stations = [i*0.25 for i in range(math.ceil(length/0.25))] + [length]
     sampled = [interpolate(points, cumulative, km) for km in stations]
     uses_ign = any(point[2] is None for point in points)
@@ -94,14 +120,22 @@ for route_id, (key, url) in SOURCES.items():
     smooth = [statistics.mean(median[max(0, i-1):i+2]) for i in range(len(sampled))]
     smooth[0], smooth[-1] = sampled[0][2], sampled[-1][2]
     indices = sorted(set(range(0, len(sampled), 2)) | {len(sampled)-1})
+    if places and len(indices) > 2 and length-stations[indices[-2]] < 0.125:
+        # An 8 m final interval exaggerates endpoint noise into a steep ramp.
+        # Keep the real endpoint and merge that tiny tail into the previous span.
+        indices.pop(-2)
     profile = []
     for i in indices:
         km, elevation = round(stations[i], 6), round(smooth[i], 2)
         grade = 0 if not profile else (elevation-profile[-1]["elevation"])/((km-profile[-1]["km"])*10)
         profile.append({"km": km, "elevation": elevation, "grade": round(grade, 3)})
     # Keep bends for the map, independently from the training profile's stations.
-    stride = max(1, math.ceil((len(points)-1)/259))
-    coords = [points[i][:2] for i in sorted(set(range(0, len(points), stride)) | {len(points)-1})]
+    stride = max(1, math.ceil((len(points)-1)/(259-len(places))))
+    coordinate_indices = set(range(0, len(points), stride)) | {len(points)-1}
+    if places:
+        coordinate_indices.update(min(range(len(points)), key=lambda i: distance(points[i], anchor)) for _, _, anchor in anchors)
+    coordinate_indices = sorted(coordinate_indices)
+    coords = [points[i][:2] for i in coordinate_indices]
     gain = sum(max(0, b["elevation"]-a["elevation"]) for a, b in zip(profile, profile[1:]))
     result[route_id] = {
         "distanceKm": round(length, 6), "elevationGainM": round(gain),
@@ -112,6 +146,10 @@ for route_id, (key, url) in SOURCES.items():
                        "altitudeSource": "IGN RGE ALTI" if uses_ign else "GPX officiel",
                        "checkedOn": datetime.now(timezone.utc).date().isoformat(), "profileStepM": 500},
     }
+    if places:
+        result[route_id]["places"] = places
+        result[route_id]["coordinateKm"] = [round(cumulative[i], 6) for i in coordinate_indices]
+        result[route_id]["provenance"]["section"] = "Tronçon du GPX Cannes–Nice extrait et parcouru en sens inverse dans la simulation."
     print(route_id, round(length, 2), f"{round(gain)} m D+", f"max {result[route_id]['maxGrade']}%", result[route_id]["provenance"]["altitudeSource"], flush=True)
 
 Path("lib/scenic-profiles.json").write_text(json.dumps(result, ensure_ascii=False, separators=(",", ":"))+"\n")

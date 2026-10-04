@@ -10,6 +10,8 @@ export type ClimbPoint = {
   grade: number;
 };
 
+export type RoutePlace = { label: string; landmark: string; km: number };
+
 export type ClimbChallenge = {
   id: string;
   name: string;
@@ -24,6 +26,7 @@ export type ClimbChallenge = {
   xp: number;
   points: number;
   coordinates: [number, number][];
+  coordinateKm?: number[];
   profile: ClimbPoint[];
   note: string;
   category?: RouteCategory;
@@ -34,7 +37,8 @@ export type ClimbChallenge = {
   sourceUrl?: string;
   scenery?: string;
   highlights?: string[];
-  provenance?: { gpxUrl: string; gpxSha256: string; altitudeSource: string; checkedOn: string; profileStepM: number };
+  places?: RoutePlace[];
+  provenance?: { gpxUrl: string; gpxSha256: string; altitudeSource: string; checkedOn: string; profileStepM: number; section?: string };
 };
 
 export const climbs: ClimbChallenge[] = [

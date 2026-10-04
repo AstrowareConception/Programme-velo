@@ -7,6 +7,7 @@ import type { AppState, Measurement, Preferences, TelemetrySample, TimeAttackSpl
 import { connectFtmsBike, hasWebBluetooth, type BikeConnection, type BikeTelemetry, webBluetoothHint } from "@/lib/ftms";
 import { ClimbProfile } from "@/components/ClimbProfile";
 import { RouteMap } from "@/components/RouteMap";
+import { RoutePlaces } from "@/components/RoutePlaces";
 import { MetricChart } from "@/components/MetricChart";
 import { InstallCard } from "@/components/InstallCard";
 import { PerformanceRecords, SectorAnalysis } from "@/components/PerformancePanel";
@@ -1187,11 +1188,11 @@ export function VeloQuestApp() {
           <div className="pageHead"><p className="eyebrow">PARCOURS</p><h1>Cols, étapes & balades.</h1><p>Une sortie douce, une étape vallonnée, une montée mythique ou ton propre GPX. La carte interactive complète s’ouvre pendant la séance.</p></div>
 
           <section className="card scenicIntro">
-            <div><p className="eyebrow">BALADES · 1/5</p><h2>La France, à ton rythme.</h2><p>Sept traces officielles, des paysages d’eau et de patrimoine. Relief lissé, effort doux, pauses libres : découvre sans objectif de chrono. Vérifie la durée estimée, même sur terrain facile.</p></div>
+            <div><p className="eyebrow">BALADES · 1/5</p><h2>La France, à ton rythme.</h2><p>Des traces officielles, des paysages d’eau, de patrimoine et du littoral azuréen. Relief lissé, effort doux, pauses libres : découvre sans objectif de chrono. Vérifie la durée estimée, même sur terrain facile.</p></div>
             <button className="primary" onClick={() => {
               setRouteSearch(""); setRouteCategoryFilter("scenic"); setRouteDifficultyFilter(1); setRouteFavoritesOnly(false);
               document.getElementById("route-library")?.scrollIntoView({ behavior: "smooth", block: "start" });
-            }}>Explorer les 7 balades</button>
+            }}>Explorer les {climbs.filter((route) => routeCategory(route) === "scenic").length} balades</button>
           </section>
 
           <CampaignsPanel
@@ -1293,6 +1294,7 @@ export function VeloQuestApp() {
                     </div>
 
                     {climb.scenery && <details className="sceneryDetails"><summary>Découvrir le paysage</summary><p>{climb.scenery}</p><div className="routeTags">{climb.highlights?.map((highlight) => <span key={highlight}>{highlight}</span>)}</div></details>}
+                    <RoutePlaces route={climb} />
 
                     <div className="timeAttackSummary">
                       <span><small>RECORD</small><strong>{pb?.metrics?.elapsedSeconds !== undefined ? formatRaceTime(pb.metrics.elapsedSeconds) : "—"}</strong></span>
@@ -1586,6 +1588,7 @@ export function VeloQuestApp() {
                 <h2>{active.name}</h2>
                 <p className="previewDescription">{scenicSession ? "RPE 2–4, résistance douce et pauses libres. Parcours entier, sans objectif de chrono : choisis selon la durée estimée et ton énergie." : active.description}</p>
                 {scenicSession && <details className="sceneryDetails"><summary>Découvrir le paysage et son profil</summary><p>{activeClimb?.scenery}</p><small>{activeClimb?.note}</small></details>}
+                {scenicSession && activeClimb && <RoutePlaces route={activeClimb} />}
                 <div className="previewStats">
                   <span><small>{(routeMode === "timeAttack" || routeMode === "segmentAttack") && activeClimb ? "Record" : "Durée"}</small><strong>{(routeMode === "timeAttack" || routeMode === "segmentAttack") && activeClimb ? (activeRaceBest?.metrics?.elapsedSeconds !== undefined ? formatRaceTime(activeRaceBest.metrics.elapsedSeconds) : "à établir") : `${active.duration} min`}</strong></span>
                   <span><small>Intensité</small><strong>{active.intensity === "hard" ? "dure" : active.intensity === "moderate" ? "soutenue" : "facile"}</strong></span>
@@ -1640,6 +1643,7 @@ export function VeloQuestApp() {
                     )}
                     <ClimbProfile climb={activeClimb} progress={climbProgress} ghostProgress={ghostProgress} />
                     <RouteMap climb={activeClimb} progress={climbProgress} ghostProgress={ghostProgress} />
+                    <RoutePlaces route={activeClimb} currentKm={currentRouteKm} />
                     {activeClimb.scenery && routeMode === "training" && <details className="sceneryDetails"><summary>Ton carnet de paysage</summary><p>{activeClimb.scenery}</p><div className="routeTags">{activeClimb.highlights?.map((highlight) => <span key={highlight}>{highlight}</span>)}</div><small>Pauses libres. La progression affichée reste virtuelle sans distance FTMS.</small></details>}
                     {routeMode === "timeAttack" && (
                       <div className="checkpointStrip">
