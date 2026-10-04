@@ -147,9 +147,21 @@ Faire périodiquement une sauvegarde JSON, notamment avant de changer de télép
 
 ## 10. Installation PWA
 
-Sur un navigateur compatible, utiliser le bouton d'installation proposé.
+Ouvre **Plus**, puis touche le cadre **Installe VeloQuest comme une app**, son texte ou son bouton. Tout le cadre est une action accessible au clavier.
 
-Sur iPhone : utiliser le menu de partage puis **Ajouter à l'écran d'accueil** / **Ouvrir comme app web**.
+Si ton navigateur fournit une invitation, ce clic ouvre sa vraie confirmation d’installation. Confirme dans cette fenêtre pour installer. Tu peux aussi annuler ; pour réessayer, il faut une nouvelle invitation du navigateur ou son menu. Accepter l’invitation et avoir terminé l’installation sont deux états distincts.
+
+Si la confirmation directe n’est pas disponible, un guide s’ouvre avec les étapes de ton navigateur :
+
+- iPhone/iPad : menu **Partager**, puis **Sur l’écran d’accueil** / **Ajouter à l’écran d’accueil** ; active **Ouvrir comme app web** si proposé et confirme **Ajouter**. Si cette option manque dans ton navigateur, ouvre cette adresse dans Safari.
+- Safari sur Mac : **Partager → Ajouter au Dock → Ajouter**.
+- Chrome/Edge/Android : icône d’installation ou menu du navigateur ; les intitulés dépendent de sa version.
+
+**J’ai compris** ou Échap ferme ce guide. Si une invitation arrive pendant qu’il est ouvert, **Installer maintenant** apparaît. Une app lancée depuis son icône affiche l’état installé ; le navigateur ne permet pas toujours de détecter une installation depuis un onglet ordinaire.
+
+Ton historique est local. Avant de changer de navigateur ou d’appareil, exporte une sauvegarde JSON dans Plus. L’installation et l’ouverture du guide ne réinitialisent aucune donnée.
+
+Références : [invitation native du navigateur](https://web.dev/articles/customize-install), [Safari sur iPhone](https://support.apple.com/fr-fr/guide/iphone/iphea86e5236/ios), [Safari sur Mac](https://support.apple.com/fr-fr/guide/safari/ibrw9e991864/mac).
 
 La PWA offre un affichage plein écran et un cache local. Les cartes distantes ne sont pas garanties hors connexion.
 

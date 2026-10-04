@@ -52,6 +52,16 @@ Les comptes existants sans champ `guidance` conservent leur interface. Plus perm
 
 Couverture ajoutée : brouillon/rechargement/retour, mode manuel sans mesures, préparation/pause/reprise/arrivée/RPE, exclusion d’une séance interrompue et retour après suppression, anciens profils et sauvegardes, progression jusqu’aux choix du jour et exploration des balades. Les quatre commandes doivent réussir sur le commit exact proposé avant intégration ; le document externe consignera SHA, PR, CI et version publique observée après livraison.
 
+## Livraison du démarrage accompagné et installation active
+
+Le démarrage accompagné a été livré par la PR 23 : commit proposé `ce3138f80dfb06643a3ac5bfc04757c790a1b602`, CI 37194554311 réussie, fusion `709e8e3879269404bc8fd9bbbff2329492040058`. Les quatre commandes passent sur les deux SHA : 82 tests unitaires et 68 tests navigateur. La production READY, `/api/version` et Plus concordent.
+
+La branche `feat/actionable-installation` transforme tout le cadre de Plus en bouton accessible. Un fournisseur monté dès l’accueil conserve `beforeinstallprompt` avant l’ouverture de Plus et entre les onglets. Le clic appelle `prompt()` dans l’action utilisateur ; chaque événement est consommé une seule fois, même après annulation. Double clic, rejet et invitation tardive sont gérés. L’acceptation est distinguée de `appinstalled` ; lancement autonome et installation pendant la visite actualisent le cadre.
+
+Sans invitation, un dialogue natif présente des étapes pour iPhone/iPad (y compris mode bureau), Safari Mac, Android, Edge et Chrome, ou un menu générique. Échap et le bouton de fermeture rendent le focus au cadre. Aucune API ne permet de forcer la fenêtre native lorsque le navigateur ne la fournit pas. Aucun historique ni réglage n’est écrit par cette fonctionnalité. Le manifeste ajoute deux icônes PNG 192/512, rendues depuis le même dessin que le SVG et prégénérées au build ; leur disponibilité, type, signature et dimensions sont vérifiés. Cache PWA v8.
+
+Les tests simulent les événements et les identités de navigateur dans Chromium sur mobile et ordinateur. Ils vérifient le contrat de l’interface, pas une installation réelle sur Safari/iPhone ou Android. Les quatre contrôles sur le SHA exact, la CI, la fusion et la production seront consignés dans le document d’état externe après vérification.
+
 ## Règles de données
 
 Clés inchangées : `veloquest:v1`, `veloquest:custom-routes:v1`, `veloquest:active-session:v1`. Backups v3, v2 et anciens états conservés. Le nouvel indicateur optionnel `completedSegment` identifie les tentatives de secteur incomplètes ; son absence dans un ancien historique reste compatible.

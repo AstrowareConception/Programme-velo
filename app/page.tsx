@@ -1,5 +1,6 @@
 import { VeloQuestApp } from "@/components/VeloQuestApp";
+import { InstallProvider } from "@/components/InstallProvider";
 
 export default function Home() {
-  return <VeloQuestApp />;
+  return <InstallProvider><VeloQuestApp /></InstallProvider>;
 }

@@ -1,0 +1,15 @@
+import { ImageResponse } from "next/og";
+
+// Raster fallbacks reproduce the existing vector mark without external assets or fonts.
+export function renderPwaIcon(size: number) {
+  return new ImageResponse(
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width={size} height={size}>
+      <defs><linearGradient id="g" x1="18" y1="18" x2="110" y2="110"><stop stopColor="#50E3FF" /><stop offset="1" stopColor="#936CFF" /></linearGradient></defs>
+      <rect width="128" height="128" rx="30" fill="#0C1020" />
+      <path d="M27 38 52 94h21l28-56H82L63 78 46 38H27Z" fill="url(#g)" />
+      <path d="M83 31c13 3 22 10 29 20" fill="none" stroke="#B9FF66" strokeWidth="7" strokeLinecap="round" />
+      <circle cx="93" cy="89" r="8" fill="#B9FF66" />
+    </svg>,
+    { width: size, height: size }
+  );
+}

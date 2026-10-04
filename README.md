@@ -75,6 +75,8 @@ Aucun compte ni backend métier : profil, historique, mesures, préférences et 
 
 Les semaines suivent le calendrier local, y compris lors d'un changement d'heure. Les séances sont sauvegardées comme instants UTC et affichées dans le fuseau courant de l'appareil. Une mesure datée est enregistrée à midi local pour préserver le jour au moment de la saisie.
 
+Dans **Plus**, le cadre **Installer VeloQuest** est entièrement cliquable. Il ouvre la confirmation native dès que le navigateur fournit une invitation d’installation ; sinon il ouvre les étapes adaptées à l’appareil. L’invitation est conservée dès l’accueil, même avant d’ouvrir Plus. Sur iPhone/iPad, le guide explique l’ajout à l’écran d’accueil ; sur Safari Mac, l’ajout au Dock. Le navigateur conserve la décision et la confirmation finales. Une annulation reste possible et ne modifie aucune séance.
+
 La PWA met en cache l'interface après chargement. Les cartes distantes demandent du réseau ; les capacités hors connexion dépendent de ce qui a déjà été chargé. Faire un export avant de changer de téléphone ou d'effacer les données du navigateur. Les cartes OpenStreetMap et l'hébergement Vercel impliquent des requêtes réseau ordinaires. [Confidentialité](https://programme-velo.vercel.app/confidentialite).
 
 ## Développement et validation
