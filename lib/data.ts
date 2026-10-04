@@ -378,7 +378,7 @@ export function badges(state: AppState): Badge[] {
     ...[
       { id: "scenic-first", name: "Premier paysage", icon: "🌅", target: 1 },
       { id: "scenic-three", name: "Flâneur de France", icon: "🧺", target: 3 },
-      { id: "scenic-all", name: "Atlas des balades", icon: "🗺️", target: scenicRouteIds.length }
+      { id: "scenic-all", name: "Atlas des balades", icon: "🗺️", target: 7 }
     ].map((trophy): Badge => ({
       id: trophy.id, name: trophy.name, icon: trophy.icon,
       description: `Terminer ${trophy.target} balade${trophy.target > 1 ? "s" : ""} différente${trophy.target > 1 ? "s" : ""}. Pauses libres, aucun chrono imposé.`,

@@ -64,10 +64,30 @@ const destinations = [
     highlights: ["Tours", "Rive sud du Cher", "Villandry"],
     sourceLabel: "France Vélo Tourisme · La Loire à Vélo",
     sourceUrl: "https://www.francevelotourisme.com/itineraire/la-loire-a-velo-eurovelo-6/tours-villandry"
+  },
+  {
+    id: "cagnes-cannes-littoral", name: "Côte d’Azur · Cagnes-sur-Mer → Cannes", subtitle: "La Littorale, de ville en ville",
+    region: "Alpes-Maritimes · Côte d’Azur", xp: 130, points: 2,
+    tags: ["Côte d’Azur", "mer", "La Littorale", "villes", "panoramique"],
+    scenery: "Depuis le Cros-de-Cagnes, la Méditerranée accompagne la balade vers Villeneuve-Loubet et les silhouettes de Marina Baie des Anges. Antibes apporte ses ports et ses remparts, puis une courte ondulation rejoint Juan-les-Pins. Golfe-Juan ouvre la dernière partie, avant Palm Beach et la Croisette à Cannes. Des lieux familiers à retrouver tranquillement, avec des repères de ville au fil des kilomètres.",
+    highlights: ["Cros-de-Cagnes", "Villeneuve-Loubet", "Antibes", "Juan-les-Pins", "Golfe-Juan", "Palm Beach", "La Croisette"],
+    sourceLabel: "France Vélo Tourisme · La Méditerranée à vélo",
+    sourceUrl: "https://www.francevelotourisme.com/itineraire/la-mediterranee-a-velo-eurovelo-8/cannes-nice"
+  },
+  {
+    id: "golfe-juan-cannes-balade", name: "Côte d’Azur · Golfe-Juan → Cannes", subtitle: "Le petit format, ports et Croisette",
+    region: "Alpes-Maritimes · Côte d’Azur", xp: 60, points: 1,
+    tags: ["Côte d’Azur", "mer", "court", "La Littorale", "Croisette"],
+    scenery: "Une parenthèse au bord de la Méditerranée, depuis le port de Golfe-Juan vers Cannes. La trace rejoint la pointe de la Croisette à Palm Beach, puis remonte le front de mer jusqu’au Palais des Festivals. Le relief reste discret, avec une petite ondulation sur la liaison. Ce format court se termine à Cannes et laisse le temps de savourer la côte sans entreprendre toute la traversée depuis Cagnes-sur-Mer.",
+    highlights: ["Golfe-Juan", "Palm Beach", "La Croisette", "Palais des Festivals"],
+    sourceLabel: "France Vélo Tourisme · La Méditerranée à vélo",
+    sourceUrl: "https://www.francevelotourisme.com/itineraire/la-mediterranee-a-velo-eurovelo-8/cannes-nice"
   }
 ] as const;
 
 export const scenicRouteIds: string[] = destinations.map((destination) => destination.id);
+// Keep this collection's original requirements stable as the catalogue grows.
+export const foundingScenicRouteIds = ["lac-der-balade", "annecy-rive-ouest", "chambord-petit-tour", "re-chemins-campagne", "marais-poitevin-coulon-damvix", "canal-midi-carcassonne", "loire-tours-villandry"];
 
 export const scenicRoutes: ClimbChallenge[] = destinations.map((destination) => {
   const data = profiles[destination.id];
@@ -79,7 +99,7 @@ export const scenicRoutes: ClimbChallenge[] = destinations.map((destination) => 
     difficulty: 1,
     tags: [...destination.tags],
     highlights: [...destination.highlights],
-    featured: destination.id === "chambord-petit-tour" || destination.id === "lac-der-balade",
+    featured: ["chambord-petit-tour", "lac-der-balade", "cagnes-cannes-littoral", "golfe-juan-cannes-balade"].includes(destination.id),
     note: `Trace officielle · relief lissé depuis ${data.provenance.altitudeSource}. D+ calculé sur le profil représenté. Effort doux, pauses libres ; la difficulté 1/5 décrit l’effort conseillé, pas la durée.`,
   };
 });

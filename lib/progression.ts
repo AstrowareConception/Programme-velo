@@ -1,6 +1,6 @@
 import type { CompletedSession } from "./types";
 import type { ClimbChallenge } from "./routes";
-import { scenicRouteIds } from "./scenic-routes";
+import { foundingScenicRouteIds } from "./scenic-routes";
 
 export type RouteCollection = {
   id: string;
@@ -34,8 +34,8 @@ export const routeCollections: RouteCollection[] = [
   },
   {
     id: "scenic-france", title: "La France en douceur",
-    description: "Collectionne les sept balades : lacs, canaux, île et patrimoine. Les répétitions ne remplacent pas les découvertes.",
-    icon: "🌿", routeIds: scenicRouteIds
+    description: "Collectionne les sept balades fondatrices : lacs, canaux, île et patrimoine. Leurs objectifs restent inchangés quand le catalogue grandit.",
+    icon: "🌿", routeIds: foundingScenicRouteIds
   }
 ];
 
