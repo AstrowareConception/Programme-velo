@@ -5,11 +5,12 @@ import type { Guidance, Preferences, Profile, WorkoutTemplate } from "@/lib/type
 
 const titles = ["Bienvenue, commençons simplement.", "Quel rythme te convient ?", "Ton vélo, simplement.", "Ta première séance est prête."];
 
-export function OnboardingWizard({ guide, profile, preferences, firstWorkout, onChange, onProfile, onPreferences, onFinish, onSkip, onImport }: {
+export function OnboardingWizard({ guide, profile, preferences, firstWorkout, hasInterruptedSession, onChange, onProfile, onPreferences, onFinish, onSkip, onImport }: {
   guide: Guidance;
   profile: Profile;
   preferences: Preferences;
   firstWorkout: WorkoutTemplate;
+  hasInterruptedSession: boolean;
   onChange: (guide: Guidance) => void;
   onProfile: (profile: Profile) => void;
   onPreferences: (preferences: Preferences) => void;
@@ -29,7 +30,7 @@ export function OnboardingWizard({ guide, profile, preferences, firstWorkout, on
   const submit = (event: FormEvent) => {
     event.preventDefault();
     if (guide.step < 3) change({ step: (guide.step + 1) as Guidance["step"] });
-    else onFinish(true);
+    else onFinish(!hasInterruptedSession);
   };
   return (
     <dialog ref={dialog} className="onboardingDialog" aria-labelledby="onboarding-title" onCancel={(event) => { event.preventDefault(); onSkip(); }}>
@@ -38,6 +39,7 @@ export function OnboardingWizard({ guide, profile, preferences, firstWorkout, on
         <p className="onboardingStep">Étape {guide.step + 1} sur 4 <span>· Tu peux revenir en arrière</span></p>
         <div className="onboardingBar" aria-hidden="true">{titles.map((_, i) => <i key={i} className={i <= guide.step ? "done" : ""} />)}</div>
         <h2 id="onboarding-title" ref={heading} tabIndex={-1}>{titles[guide.step]}</h2>
+        {hasInterruptedSession && <div className="guideHint">Une séance interrompue est conservée. Retrouve-la sur Quête avant de préparer une nouvelle séance.</div>}
         {guide.step === 0 && <div className="form">
           <p>Quelques repères, une première séance, puis la suite à ton rythme. Aucun compte à créer : tes données restent sur cet appareil.</p>
           <label>Prénom ou pseudo <span className="optionalLabel">facultatif</span><input name="name" value={profile.name} placeholder="Comment t’appeler ?" maxLength={80} onChange={(event) => onProfile({ ...profile, name: event.target.value })} /></label>
@@ -75,9 +77,10 @@ export function OnboardingWizard({ guide, profile, preferences, firstWorkout, on
         </div>}
         <div className="onboardingActions">
           {guide.step > 0 && <button type="button" className="secondary" onClick={() => change({ step: (guide.step - 1) as Guidance["step"] })}>Retour</button>}
-          <button type="submit" className="primary">{guide.step === 3 ? "Préparer ma première séance" : "Continuer"}</button>
+          <button type="submit" className="primary">{guide.step === 3 ? hasInterruptedSession ? "Retrouver ma séance en cours" : "Préparer ma première séance" : "Continuer"}</button>
         </div>
         {guide.step === 3 && <button type="button" className="secondary fullWidth" onClick={() => onFinish(false)}>Plus tard, ouvrir ma quête</button>}
+        {hasInterruptedSession && guide.step < 3 && <button type="button" className="secondary fullWidth" onClick={() => onFinish(false)}>Retrouver ma séance en cours</button>}
         <button type="button" className="onboardingSkip" onClick={onSkip}>Explorer librement</button>
       </form>
     </dialog>

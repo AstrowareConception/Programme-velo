@@ -929,7 +929,7 @@ export function VeloQuestApp() {
     setAvailableMinutes(state.guidance?.sessionMinutes ?? 15);
     setEnergy("normal");
     setTab("dashboard");
-    if (start) launch(firstGuidedWorkout(workouts));
+    if (start && !resumeSnapshot) launch(firstGuidedWorkout(workouts));
   }
 
   function leaveGuidance() {
@@ -1814,8 +1814,9 @@ export function VeloQuestApp() {
           </form>
         </div>
       )}
-      {hydrated && state.guidance?.status === "setup" && !resumeSnapshot && !active && <OnboardingWizard
+      {hydrated && state.guidance?.status === "setup" && !active && <OnboardingWizard
         guide={state.guidance} profile={state.profile} preferences={preferences} firstWorkout={firstGuidedWorkout(workouts)}
+        hasInterruptedSession={Boolean(resumeSnapshot)}
         onChange={(guide) => setState((previous) => ({ ...previous, guidance: guide }))}
         onProfile={(profile) => setState((previous) => ({ ...previous, profile }))}
         onPreferences={(prefs) => setState((previous) => ({ ...previous, preferences: prefs }))}

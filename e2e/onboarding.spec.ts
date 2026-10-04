@@ -162,3 +162,26 @@ test("restoring an older backup from the welcome screen exits setup and restores
   expect((await stored(page)).guidance).toBeUndefined();
   await page.reload(); expect((await stored(page)).sessions).toEqual(oldState.sessions);
 });
+
+test("reopening the guide preserves an interrupted race and offers its recovery instead of a new workout", async ({ page }) => {
+  await page.addInitScript(() => {
+    if (!localStorage.getItem("veloquest:v1")) localStorage.setItem("veloquest:v1", JSON.stringify({ profile: { name: "QA Reprise", startDate: "2026-10-01" }, sessions: [], measurements: [] }));
+    if (!localStorage.getItem("veloquest:active-session:v1")) localStorage.setItem("veloquest:active-session:v1", JSON.stringify({ version: 1, savedAt: Date.now(), workoutId: "climb-sorgue-velleron-loop", routeId: "sorgue-velleron-loop", routeMode: "timeAttack", segmentIndex: 0, secondsLeft: 500, running: false, sessionStarted: true, showFinish: false, timeAttackElapsedSeconds: 30, timeAttackSplits: [], pauseCount: 1, sessionResistanceDelta: -1, telemetrySamples: [], hadBikeConnection: false }));
+  });
+  await page.goto("/");
+  const before = await page.evaluate(() => localStorage.getItem("veloquest:active-session:v1"));
+  await page.getByRole("button", { name: /Plus/ }).click();
+  await page.getByRole("button", { name: "Revoir le guide de démarrage" }).click();
+  await expect(page.getByRole("dialog")).toContainText("Une séance interrompue est conservée");
+  await page.getByRole("button", { name: "Continuer", exact: true }).click();
+  await page.reload(); await expect(page.getByRole("dialog")).toBeVisible();
+  for (let i = 0; i < 2; i++) await page.getByRole("button", { name: "Continuer", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Préparer ma première séance", exact: true })).toHaveCount(0);
+  await page.getByRole("button", { name: "Retrouver ma séance en cours", exact: true }).click();
+  await expect(page.getByText("SÉANCE INTERROMPUE")).toBeVisible();
+  expect(await page.evaluate(() => localStorage.getItem("veloquest:active-session:v1"))).toBe(before);
+  await page.getByRole("button", { name: "Reprendre", exact: true }).click();
+  await expect(page.locator(".timeAttackHud")).toBeVisible();
+  await expect(page.locator(".timeAttackHud")).toContainText("CHRONO0:30");
+  expect((await stored(page)).sessions).toHaveLength(0);
+});

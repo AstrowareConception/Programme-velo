@@ -32,7 +32,7 @@ La Quête affiche ensuite une prochaine action et trois repères : découvrir le
 
 Les trois premiers repères privilégient les formats faciles. Après trois séances, les choix du jour (temps et énergie) apparaissent et le coach exploite la charge et le ressenti. Un débutant accompagné évite les séances difficiles avant six réalisations ; un RPE récent de 8 ou plus ramène les suggestions aux formats faciles. Le cap personnel n’attribue pas de bonus et ne remplace pas les missions XP du programme de douze semaines, accessibles dans une section dépliable. Les balades et tous les autres onglets restent libres.
 
-Le guide et ses réglages sont sauvegardés avec les données locales et le JSON v3. Une interruption de configuration reprend à la même étape. **Explorer librement** permet de sortir du guide ; **Plus → Revoir le guide de démarrage** permet d’y revenir sans effacer les séances, mesures, favoris ou dates. Les anciennes sauvegardes sans guide n’en déclenchent pas un automatiquement. Les choix du jour restent temporaires ; le cap du guide est conservé.
+Le guide et ses réglages sont sauvegardés avec les données locales et le JSON v3. Une interruption de configuration reprend à la même étape. **Explorer librement** permet de sortir du guide ; **Plus → Revoir le guide de démarrage** permet d’y revenir sans effacer les séances, mesures, favoris ou dates. Si une séance interrompue existe, le guide la signale et renvoie vers sa reprise plutôt que de la remplacer par la première séance. Les anciennes sauvegardes sans guide n’en déclenchent pas un automatiquement. Les choix du jour restent temporaires ; le cap du guide est conservé.
 
 ## Campagnes et historique
 

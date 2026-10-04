@@ -13,6 +13,8 @@ Poids, tour de taille et objectifs corporels restent facultatifs, dans **Plus �
 
 Tu peux choisir **Explorer librement** à tout moment, ou revenir au guide avec **Plus → Revoir le guide de démarrage**. Cela conserve ton historique et tes réglages. Un ancien profil n’est pas forcé à suivre ce guide.
 
+Si une séance interrompue attend déjà, le guide la signale et propose **Retrouver ma séance en cours**. La configuration ne la remplace pas par la séance de découverte ; utilise ensuite **Reprendre** sur Quête.
+
 ### Une Quête qui se précise
 
 Après la configuration, la Quête donne une prochaine action et trois repères : découvrir les consignes, trouver ton rythme, choisir ton chemin. Une séance complète enregistrée d’au moins 10 minutes fait avancer ces repères. Les bonus, secteurs et tentatives explicitement incomplètes restent dans le journal mais ne les valident pas. Supprimer la séance recalcule aussi ces repères.
