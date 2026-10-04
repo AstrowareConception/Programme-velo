@@ -56,5 +56,71 @@ export const discoveryWorkouts: WorkoutTemplate[] = [
       { label: "Délier les jambes", minutes: 6, resistance: "5–7", rpe: "2–3", cadence: "70–85" },
       { label: "Terminer doucement", minutes: 3, resistance: "4–5", rpe: "2", cadence: "libre" }
     ]
+  },
+  {
+    id: "breathing-18", name: "Souffle tranquille", tagline: "Dix-huit minutes pour trouver ton confort.",
+    kind: "recovery", duration: 18, points: 1, xp: 30, intensity: "easy",
+    description: "Un rythme auquel tu peux parler facilement. Ajuste la résistance manuellement pour rester à RPE 2–3 ; la durée ne constitue pas un objectif de vitesse.",
+    segments: [
+      { label: "Se mettre en mouvement", minutes: 3, resistance: "4–5", rpe: "2", cadence: "libre" },
+      { label: "Respiration confortable", minutes: 12, resistance: "5–7", rpe: "2–3", cadence: "70–85" },
+      { label: "Relâcher", minutes: 3, resistance: "4–5", rpe: "2", cadence: "libre" }
+    ]
+  },
+  {
+    id: "soft-cadence-20", name: "Cadence douce", tagline: "Quatre petits paliers, sans sprint.",
+    kind: "ladder", duration: 20, points: 1, xp: 35, intensity: "easy",
+    description: "Change doucement de cadence sans durcir l’effort. Les tours par minute sont indicatifs : privilégie un mouvement souple et réduis le niveau si nécessaire.",
+    segments: [
+      { label: "Cadence de départ", minutes: 5, resistance: "4–6", rpe: "2", cadence: "65–75" },
+      { label: "Un peu plus fluide", minutes: 5, resistance: "5–7", rpe: "2–3", cadence: "70–80" },
+      { label: "Souplesse", minutes: 5, resistance: "5–7", rpe: "3", cadence: "75–85" },
+      { label: "Redescendre tranquillement", minutes: 5, resistance: "4–6", rpe: "2", cadence: "libre" }
+    ]
+  },
+  {
+    id: "false-flats-20", name: "Faux-plats en douceur", tagline: "Une ondulation légère et un retour facile.",
+    kind: "progressive", duration: 20, points: 1, xp: 35, intensity: "easy",
+    description: "Découvre les changements de résistance avec une seule petite ondulation. Les niveaux 1–32 du TEB5 se règlent à la main ; reste entre RPE 2 et 4.",
+    segments: [
+      { label: "Terrain roulant", minutes: 5, resistance: "5–7", rpe: "2–3", cadence: "70–85" },
+      { label: "Premier faux-plat", minutes: 5, resistance: "7–9", rpe: "3", cadence: "70–85" },
+      { label: "Petite ondulation", minutes: 5, resistance: "8–10", rpe: "3–4", cadence: "70–85" },
+      { label: "Retour facile", minutes: 5, resistance: "4–6", rpe: "2", cadence: "libre" }
+    ]
+  },
+  {
+    id: "two-hills-25", name: "Deux petites collines", tagline: "Deux efforts courts séparés par une vraie récupération.",
+    kind: "hills", duration: 25, points: 2, xp: 45, intensity: "moderate",
+    description: "Une première séance vallonnée courte, lorsque les séances faciles sont confortables. Vise RPE 4–5 sur les deux collines et allège librement la résistance.",
+    segments: [
+      { label: "Échauffement roulant", minutes: 5, resistance: "6–8", rpe: "2–3", cadence: "70–85" },
+      { label: "Première colline", minutes: 5, resistance: "10–12", rpe: "4–5", cadence: "70–85" },
+      { label: "Descente et récupération", minutes: 5, resistance: "5–7", rpe: "2–3", cadence: "libre" },
+      { label: "Deuxième colline", minutes: 5, resistance: "11–13", rpe: "4–5", cadence: "70–85" },
+      { label: "Retour au calme", minutes: 5, resistance: "4–6", rpe: "2", cadence: "libre" }
+    ]
+  },
+  {
+    id: "nomadic-endurance-30", name: "Endurance nomade", tagline: "Des changements de rythme, toujours faciles.",
+    kind: "endurance", duration: 30, points: 1, xp: 45, intensity: "easy",
+    description: "Alterne deux plages de pédalage régulier avec un passage plus souple. Aucun sprint : conserve RPE 2–4 et choisis une cadence confortable.",
+    segments: [
+      { label: "Départ", minutes: 5, resistance: "5–7", rpe: "2–3", cadence: "70–80" },
+      { label: "Rythme régulier", minutes: 7, resistance: "7–9", rpe: "3–4", cadence: "75–85" },
+      { label: "Respirer et relâcher", minutes: 6, resistance: "5–7", rpe: "2–3", cadence: "70–80" },
+      { label: "Deuxième passage", minutes: 7, resistance: "7–9", rpe: "3–4", cadence: "75–85" },
+      { label: "Retour au calme", minutes: 5, resistance: "4–6", rpe: "2", cadence: "libre" }
+    ]
+  },
+  {
+    id: "bonus-pause-8", name: "Pause active", tagline: "Huit minutes pour délier les jambes.",
+    kind: "bonus", duration: 8, points: 0, xp: 12, intensity: "easy", bonus: true,
+    description: "Un bonus doux, dans le plafond commun de 60 XP par semaine. Ce petit format ne valide pas un programme guidé et ne remplace pas une séance structurée.",
+    segments: [
+      { label: "Commencer doucement", minutes: 3, resistance: "4–5", rpe: "2", cadence: "libre" },
+      { label: "Délier les jambes", minutes: 3, resistance: "5–6", rpe: "2–3", cadence: "libre" },
+      { label: "Terminer", minutes: 2, resistance: "4–5", rpe: "2", cadence: "libre" }
+    ]
   }
 ];

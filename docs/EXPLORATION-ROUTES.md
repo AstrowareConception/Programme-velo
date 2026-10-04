@@ -1,6 +1,6 @@
 # Carnets de France — extension du 4 octobre 2026
 
-Quinze parcours complètent les 23 destinations précédentes : 38 parcours au total, dont 14 balades à 1/5. Les dix nouveaux tracés PACA couvrent littoral, Alpilles, Luberon, Verdon et Alpes du Sud. Les fiches sont écrites pour VéloQuest ; le relief représenté provient des traces officielles, sans visite ni liaison ajoutée.
+Quinze parcours complètent les 23 destinations précédentes : 38 parcours à la livraison initiale, dont 14 balades à 1/5. Le catalogue actuel atteint **55 parcours et 22 balades**, avec les [formats courts, programmes et Route Napoléon](DISCOVERY-PROGRAMMES.md). Les dix nouveaux tracés PACA couvrent littoral, Alpilles, Luberon, Verdon et Alpes du Sud. Les fiches sont écrites pour VéloQuest ; le relief représenté provient des traces officielles, sans visite ni liaison ajoutée.
 
 | Parcours | Difficulté | Distance GPX | D+ du profil lissé | Villes et repères, dans le sens proposé | Source |
 | --- | ---: | ---: | ---: | --- | --- |
@@ -34,7 +34,7 @@ La difficulté est une consigne VéloQuest pour le vélo d’appartement. Les ba
 
 ## Thèmes et récompenses
 
-Huit thèmes servent au choix et au filtrage, sans stockage de nouvelle progression. Leurs compteurs utilisent les parcours complets de l’historique. Les sept nouveaux objectifs ont des listes fixes :
+Neuf thèmes servent au choix et au filtrage, sans stockage de nouvelle progression. Leurs compteurs utilisent les parcours complets de l’historique. Les sept nouveaux objectifs ont des listes fixes :
 
 | Carnet / campagne | Étapes | Bonus unique |
 | --- | --- | ---: |
@@ -46,7 +46,7 @@ Huit thèmes servent au choix et au filtrage, sans stockage de nouvelle progress
 | Canaux et châteaux | Chambord, Blois–Chaumont, canal du Midi, canal d’Alsace | 500 XP |
 | Des forêts aux cimes | Turini, Bonette | 900 XP |
 
-Six trophées ne donnent pas d’XP supplémentaire : Carnet de voyage (10 parcours natifs distincts), Grand voyageur (20), Enfant du Sud (6 parmi 18 destinations PACA fixes), Riviera en poche (3 parmi les six parcours du thème azuréen), Aux quatre horizons (4 parmi 10 territoires explicitement définis), Toute la palette (une réalisation native dans chacune des cinq difficultés). Les GPX personnels ne comptent pas dans ces nouveaux trophées de catalogue.
+Six trophées ne donnent pas d’XP supplémentaire : Carnet de voyage (10 parcours natifs distincts), Grand voyageur (20), Enfant du Sud (6 parmi 18 destinations PACA fixes), Riviera en poche (3 parmi les huit parcours du thème azuréen), Aux quatre horizons (4 parmi 10 territoires explicitement définis), Toute la palette (une réalisation native dans chacune des cinq difficultés). Les GPX personnels ne comptent pas dans ces nouveaux trophées de catalogue.
 
 Les six campagnes précédentes et les collections historiques ne sont pas modifiées. Atlas garde son seuil de sept balades distinctes. Une réalisation peut compter dans plusieurs objectifs qui contiennent sa route. Répétitions : XP ordinaire de séance, jamais duplication du bonus ou d’une découverte. Suppression de la dernière réalisation : progrès, trophées et bonus recalculés. Les séances anciennes sans indicateur d’incomplétude restent compatibles, sans preuve physique indépendante. Toute tentative marquée incomplète et tous les Segment Attacks, même mal marqués complets, sont exclus.
 

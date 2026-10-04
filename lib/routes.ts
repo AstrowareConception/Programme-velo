@@ -1,6 +1,9 @@
 import type { WorkoutTemplate } from "./types";
 import { scenicRoutes } from "./scenic-routes";
 import { explorationRoutes } from "./exploration-routes";
+import { shortRoutes } from "./short-rides";
+import { napoleonRoutes } from "./napoleon-routes";
+import { enrichRouteDescription } from "./route-descriptions";
 
 export type RouteCategory = "climb" | "stage" | "scenic" | "imported";
 export type RouteDifficulty = 1 | 2 | 3 | 4 | 5;
@@ -32,6 +35,8 @@ export type ClimbChallenge = {
   note: string;
   category?: RouteCategory;
   difficulty?: RouteDifficulty;
+  effort?: "easy" | "moderate" | "hard";
+  parentRouteId?: string;
   tags?: string[];
   featured?: boolean;
   sourceLabel?: string;
@@ -39,10 +44,11 @@ export type ClimbChallenge = {
   scenery?: string;
   highlights?: string[];
   places?: RoutePlace[];
+  placesNote?: string;
   provenance?: { gpxUrl: string; gpxSha256: string; altitudeSource: string; checkedOn: string; profileStepM: number; section?: string };
 };
 
-export const climbs: ClimbChallenge[] = [
+const nativeRoutes: ClimbChallenge[] = [
   {
     id: "alpe-dhuez",
     name: "Alpe d’Huez",
@@ -617,8 +623,11 @@ export const climbs: ClimbChallenge[] = [
     sourceUrl: "https://www.maurienne-tourisme.com/visiter_bouger/col-du-chaussy-et-de-la-madeleine-776865/"
   },
   ...scenicRoutes,
-  ...explorationRoutes
+  ...explorationRoutes,
+  ...shortRoutes,
+  ...napoleonRoutes
 ];
+export const climbs = nativeRoutes.map(enrichRouteDescription);
 
 export function routeCategory(route: ClimbChallenge): RouteCategory {
   if (route.category) return route.category;
@@ -699,18 +708,19 @@ export function resistanceForGrade(grade: number) {
 
 export function climbToWorkout(climb: ClimbChallenge): WorkoutTemplate {
   const scenic = routeCategory(climb) === "scenic";
+  const moderate = climb.effort === "moderate";
   const segments = climb.profile.slice(1).map((point, index) => {
     const previous = climb.profile[index];
     const distance = Math.max(0.2, point.km - previous.km);
     // Baseline simulation at ~15 km/h. With FTMS connected, route progress
     // is based on actual distance instead of this time estimate.
     const minutes = Math.max(0.5, Math.round(((distance / 15) * 60) * 2) / 2);
-    const level = scenic ? scenicResistanceForGrade(point.grade) : resistanceForGrade(point.grade);
+    const level = scenic ? scenicResistanceForGrade(point.grade) : moderate ? Math.max(4, Math.min(14, Math.round(8 + point.grade * .65))) : resistanceForGrade(point.grade);
     return {
       label: `${point.km.toFixed(1)} km · ${point.grade.toFixed(1)} %`,
       minutes,
       resistance: String(level),
-      rpe: scenic ? "2–4" : point.grade >= 10 ? "8–9" : point.grade >= 7 ? "7–8" : point.grade >= 4 ? "6–7" : point.grade > 0 ? "4–6" : "2–4",
+      rpe: scenic ? "2–4" : moderate ? point.grade > 1 ? "4–5" : "2–3" : point.grade >= 10 ? "8–9" : point.grade >= 7 ? "7–8" : point.grade >= 4 ? "6–7" : point.grade > 0 ? "4–6" : "2–4",
       cadence: scenic ? "70–90" : point.grade >= 8 ? "65–80" : point.grade >= 4 ? "70–85" : "80–95"
     };
   });
@@ -723,7 +733,7 @@ export function climbToWorkout(climb: ClimbChallenge): WorkoutTemplate {
     duration: segments.reduce((sum, segment) => sum + segment.minutes, 0),
     points: climb.points,
     xp: climb.xp,
-    intensity: scenic ? "easy" : "hard",
+    intensity: scenic ? "easy" : moderate ? "moderate" : "hard",
     description: scenic ? `${climb.scenery} ${climb.note}` : climb.note,
     segments
   };

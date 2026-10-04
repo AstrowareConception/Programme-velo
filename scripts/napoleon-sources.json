@@ -1,0 +1,378 @@
+{
+  "napoleon-golfe-grasse": {
+    "key": "napoleon",
+    "gpxUrl": "https://provence-alpes-cotedazur.com/app/uploads/crt-paca/2020/07/gps-routenapoleon-1.zip",
+    "gpxMember": "gps-garmin/itineraire-15.gpx",
+    "trackOnly": true,
+    "reverse": true,
+    "altitudeSource": "IGN RGE ALTI",
+    "clip": [
+      [
+        43.56864,
+        7.077
+      ],
+      [
+        43.65866,
+        6.92587
+      ]
+    ],
+    "section": "Tronçon Golfe-Juan → Grasse, extrait du tracé routier touristique CRT PACA et inversé vers le nord. Aucun tronçon au-delà de Gap, ni GR 406 pédestre.",
+    "places": [
+      {
+        "label": "Golfe-Juan",
+        "landmark": "Ville du débarquement de 1815 · départ du tronçon routier.",
+        "coordinate": [
+          43.56864,
+          7.077
+        ]
+      },
+      {
+        "label": "Cannes",
+        "landmark": "Traversée de Cannes avant les collines de l’arrière-pays.",
+        "coordinate": [
+          43.554,
+          7.01825
+        ]
+      },
+      {
+        "label": "Le Cannet",
+        "landmark": "Les collines au-dessus de la baie de Cannes.",
+        "coordinate": [
+          43.57626,
+          7.01905
+        ]
+      },
+      {
+        "label": "Mougins · secteur routier",
+        "landmark": "Passage sur la route touristique, sans détour au village perché.",
+        "coordinate": [
+          43.60561,
+          6.99362
+        ]
+      },
+      {
+        "label": "Mouans-Sartoux",
+        "landmark": "Une ville entre le littoral cannois et Grasse.",
+        "coordinate": [
+          43.62041,
+          6.97077
+        ]
+      },
+      {
+        "label": "Grasse",
+        "landmark": "Le pays des parfums, au pied des Préalpes.",
+        "coordinate": [
+          43.65866,
+          6.92587
+        ]
+      }
+    ]
+  },
+  "napoleon-grasse-vallier": {
+    "key": "napoleon",
+    "gpxUrl": "https://provence-alpes-cotedazur.com/app/uploads/crt-paca/2020/07/gps-routenapoleon-1.zip",
+    "gpxMember": "gps-garmin/itineraire-15.gpx",
+    "trackOnly": true,
+    "reverse": true,
+    "altitudeSource": "IGN RGE ALTI",
+    "clip": [
+      [
+        43.65866,
+        6.92587
+      ],
+      [
+        43.69978,
+        6.84855
+      ]
+    ],
+    "section": "Tronçon Grasse → Saint-Vallier-de-Thiey, extrait du tracé routier touristique CRT PACA et inversé vers le nord. Aucun tronçon au-delà de Gap, ni GR 406 pédestre.",
+    "places": [
+      {
+        "label": "Grasse",
+        "landmark": "Le pays des parfums, au pied des Préalpes.",
+        "coordinate": [
+          43.65866,
+          6.92587
+        ]
+      },
+      {
+        "label": "Saint-Vallier-de-Thiey",
+        "landmark": "Halte de la Route Napoléon dans les Préalpes grassoises.",
+        "coordinate": [
+          43.69978,
+          6.84855
+        ]
+      }
+    ]
+  },
+  "napoleon-vallier-seranon": {
+    "key": "napoleon",
+    "gpxUrl": "https://provence-alpes-cotedazur.com/app/uploads/crt-paca/2020/07/gps-routenapoleon-1.zip",
+    "gpxMember": "gps-garmin/itineraire-15.gpx",
+    "trackOnly": true,
+    "reverse": true,
+    "altitudeSource": "IGN RGE ALTI",
+    "clip": [
+      [
+        43.69978,
+        6.84855
+      ],
+      [
+        43.77107,
+        6.70322
+      ]
+    ],
+    "section": "Tronçon Saint-Vallier-de-Thiey → Séranon · carrefour de la Route Napoléon, extrait du tracé routier touristique CRT PACA et inversé vers le nord. Aucun tronçon au-delà de Gap, ni GR 406 pédestre.",
+    "places": [
+      {
+        "label": "Saint-Vallier-de-Thiey",
+        "landmark": "Halte de la Route Napoléon dans les Préalpes grassoises.",
+        "coordinate": [
+          43.69978,
+          6.84855
+        ]
+      },
+      {
+        "label": "Escragnolles · route au-dessus du village",
+        "landmark": "Le village reste en contrebas de la trace.",
+        "coordinate": [
+          43.73072,
+          6.78346
+        ]
+      },
+      {
+        "label": "Séranon · carrefour de la Route Napoléon",
+        "landmark": "Carrefour routier du haut pays, sans détour au centre du village.",
+        "coordinate": [
+          43.77107,
+          6.70322
+        ]
+      }
+    ]
+  },
+  "napoleon-seranon-castellane": {
+    "key": "napoleon",
+    "gpxUrl": "https://provence-alpes-cotedazur.com/app/uploads/crt-paca/2020/07/gps-routenapoleon-1.zip",
+    "gpxMember": "gps-garmin/itineraire-15.gpx",
+    "trackOnly": true,
+    "reverse": true,
+    "altitudeSource": "IGN RGE ALTI",
+    "clip": [
+      [
+        43.77107,
+        6.70322
+      ],
+      [
+        43.84701,
+        6.51324
+      ]
+    ],
+    "section": "Tronçon Séranon · carrefour de la Route Napoléon → Castellane, extrait du tracé routier touristique CRT PACA et inversé vers le nord. Aucun tronçon au-delà de Gap, ni GR 406 pédestre.",
+    "places": [
+      {
+        "label": "Séranon · carrefour de la Route Napoléon",
+        "landmark": "Carrefour routier du haut pays, sans détour au centre du village.",
+        "coordinate": [
+          43.77107,
+          6.70322
+        ]
+      },
+      {
+        "label": "La Garde",
+        "landmark": "Dernier village repéré avant la descente vers Castellane.",
+        "coordinate": [
+          43.83145,
+          6.55135
+        ]
+      },
+      {
+        "label": "Castellane",
+        "landmark": "La vallée du Verdon et le rocher de Notre-Dame du Roc.",
+        "coordinate": [
+          43.84701,
+          6.51324
+        ]
+      }
+    ]
+  },
+  "napoleon-castellane-barreme": {
+    "key": "napoleon",
+    "gpxUrl": "https://provence-alpes-cotedazur.com/app/uploads/crt-paca/2020/07/gps-routenapoleon-1.zip",
+    "gpxMember": "gps-garmin/itineraire-15.gpx",
+    "trackOnly": true,
+    "reverse": true,
+    "altitudeSource": "IGN RGE ALTI",
+    "clip": [
+      [
+        43.84701,
+        6.51324
+      ],
+      [
+        43.95325,
+        6.36818
+      ]
+    ],
+    "section": "Tronçon Castellane → Barrême, extrait du tracé routier touristique CRT PACA et inversé vers le nord. Aucun tronçon au-delà de Gap, ni GR 406 pédestre.",
+    "places": [
+      {
+        "label": "Castellane",
+        "landmark": "La vallée du Verdon et le rocher de Notre-Dame du Roc.",
+        "coordinate": [
+          43.84701,
+          6.51324
+        ]
+      },
+      {
+        "label": "Col des Lèques · secteur du col",
+        "landmark": "Paysage minéral du Géoparc · les sentiers des Siréniens restent hors trace.",
+        "coordinate": [
+          43.86862,
+          6.47129
+        ]
+      },
+      {
+        "label": "Barrême",
+        "landmark": "Village de Haute-Provence associé au patrimoine géologique.",
+        "coordinate": [
+          43.95325,
+          6.36818
+        ]
+      }
+    ]
+  },
+  "napoleon-barreme-digne": {
+    "key": "napoleon",
+    "gpxUrl": "https://provence-alpes-cotedazur.com/app/uploads/crt-paca/2020/07/gps-routenapoleon-1.zip",
+    "gpxMember": "gps-garmin/itineraire-15.gpx",
+    "trackOnly": true,
+    "reverse": true,
+    "altitudeSource": "IGN RGE ALTI",
+    "clip": [
+      [
+        43.95325,
+        6.36818
+      ],
+      [
+        44.09118,
+        6.23169
+      ]
+    ],
+    "section": "Tronçon Barrême → Digne-les-Bains, extrait du tracé routier touristique CRT PACA et inversé vers le nord. Aucun tronçon au-delà de Gap, ni GR 406 pédestre.",
+    "places": [
+      {
+        "label": "Barrême",
+        "landmark": "Village de Haute-Provence associé au patrimoine géologique.",
+        "coordinate": [
+          43.95325,
+          6.36818
+        ]
+      },
+      {
+        "label": "Digne-les-Bains",
+        "landmark": "La vallée de la Bléone et la ville thermale.",
+        "coordinate": [
+          44.09118,
+          6.23169
+        ]
+      }
+    ]
+  },
+  "napoleon-digne-sisteron": {
+    "key": "napoleon",
+    "gpxUrl": "https://provence-alpes-cotedazur.com/app/uploads/crt-paca/2020/07/gps-routenapoleon-1.zip",
+    "gpxMember": "gps-garmin/itineraire-15.gpx",
+    "trackOnly": true,
+    "reverse": true,
+    "altitudeSource": "IGN RGE ALTI",
+    "clip": [
+      [
+        44.09118,
+        6.23169
+      ],
+      [
+        44.19688,
+        5.94373
+      ]
+    ],
+    "section": "Tronçon Digne-les-Bains → Sisteron, extrait du tracé routier touristique CRT PACA et inversé vers le nord. Aucun tronçon au-delà de Gap, ni GR 406 pédestre.",
+    "places": [
+      {
+        "label": "Digne-les-Bains",
+        "landmark": "La vallée de la Bléone et la ville thermale.",
+        "coordinate": [
+          44.09118,
+          6.23169
+        ]
+      },
+      {
+        "label": "Malijai",
+        "landmark": "Le château rappelle une halte de l’épopée impériale.",
+        "coordinate": [
+          44.04475,
+          6.03049
+        ]
+      },
+      {
+        "label": "Château-Arnoux-Saint-Auban",
+        "landmark": "Passage routier près de la Durance, sans détour au centre de Volonne.",
+        "coordinate": [
+          44.09377,
+          6.00971
+        ]
+      },
+      {
+        "label": "Sisteron",
+        "landmark": "La citadelle et le rocher de la Baume encadrent la Durance.",
+        "coordinate": [
+          44.19688,
+          5.94373
+        ]
+      }
+    ]
+  },
+  "napoleon-sisteron-gap": {
+    "key": "napoleon",
+    "gpxUrl": "https://provence-alpes-cotedazur.com/app/uploads/crt-paca/2020/07/gps-routenapoleon-1.zip",
+    "gpxMember": "gps-garmin/itineraire-15.gpx",
+    "trackOnly": true,
+    "reverse": true,
+    "altitudeSource": "IGN RGE ALTI",
+    "clip": [
+      [
+        44.19688,
+        5.94373
+      ],
+      [
+        44.55964,
+        6.07997
+      ]
+    ],
+    "section": "Tronçon Sisteron → Gap, extrait du tracé routier touristique CRT PACA et inversé vers le nord. Aucun tronçon au-delà de Gap, ni GR 406 pédestre.",
+    "places": [
+      {
+        "label": "Sisteron",
+        "landmark": "La citadelle et le rocher de la Baume encadrent la Durance.",
+        "coordinate": [
+          44.19688,
+          5.94373
+        ]
+      },
+      {
+        "label": "Le Poët · secteur routier",
+        "landmark": "Passage vers le bassin gapençais ; le centre du village n’est pas ajouté.",
+        "coordinate": [
+          44.28897,
+          5.89764
+        ]
+      },
+      {
+        "label": "Gap",
+        "landmark": "Arrivée de ce carnet · le col Bayard et Grenoble ne sont pas inclus.",
+        "coordinate": [
+          44.55964,
+          6.07997
+        ]
+      }
+    ]
+  }
+}
