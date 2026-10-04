@@ -129,7 +129,7 @@ test("route filters can isolate multi-col stages", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: /Parcours/ }).click();
 
-  await page.getByRole("button", { name: "Étapes" }).click();
+  await page.getByRole("button", { name: "Étapes", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Chaussy + Madeleine" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Villages médiévaux de Vaison" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Tour des Corniches" })).toBeVisible();
