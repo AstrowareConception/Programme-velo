@@ -121,6 +121,15 @@ export const campaigns: Campaign[] = [
   { id: "napoleon-dauphine", title: "Route Napoléon · de Gap à Grenoble", subtitle: "Carnet de 6 étapes · ordre libre", icon: "🏔️", group: "sport", difficultyLabel: "2–3/5", xpBonus: 700,
     description: "Col Bayard, Champsaur, Corps, La Mure, Laffrey, Vizille, Brié et Eybens : six tronçons jusqu’à Grenoble. Chaque étape complète compte une seule fois. Ce carnet ajoute un objectif distinct ; les huit étapes et les 900 XP du carnet de la mer à Gap restent inchangés.",
     routeIds: ["napoleon-gap-fare", "napoleon-fare-corps", "napoleon-corps-mure", "napoleon-mure-laffrey", "napoleon-laffrey-vizille", "napoleon-vizille-grenoble"] },
+  { id: "esterel-notebook", title: "Estérel · entre mer et forêt", subtitle: "4 étapes · ordre libre", icon: "🪨", group: "sport", difficultyLabel: "1–3/5", xpBonus: 600,
+    description: "Trois étapes sur la Corniche d’Or, de Saint-Raphaël à Théoule par Agay, Anthéor et Le Trayas, puis un retour plus long par l’intérieur de l’Estérel. Chaque parcours complet compte une seule fois ; les deux formats courts ne remplacent pas leurs étapes parentes.",
+    routeIds: ["esterel-raphael-agay", "esterel-agay-trayas", "esterel-trayas-theoule", "esterel-theoule-raphael"] },
+  { id: "esterel-parentheses", title: "Parenthèses de l’Estérel", subtitle: "2 petites échappées", icon: "🌊", group: "discovery", difficultyLabel: "1/5", xpBonus: 100,
+    description: "Saint-Raphaël–Boulouris et Agay–Anthéor : deux courts extraits de 15 à 30 minutes, au rythme de la découverte. Un carnet indépendant : ces sorties ne valident ni les longues étapes ni le trophée des trois étapes côtières.",
+    routeIds: ["esterel-raphael-boulouris-short", "esterel-agay-antheor-short"] },
+  { id: "napoleon-short-notebook", title: "Route Napoléon · petites escales", subtitle: "4 formats de 15 à 30 minutes", icon: "🦅", group: "discovery", difficultyLabel: "1/5", xpBonus: 180,
+    description: "Golfe-Juan–Cannes, Mougins–Mouans-Sartoux, Malijai–Château-Arnoux et Saint-Théoffrey–Laffrey : quatre extraits doux, à faire dans l’ordre de ton choix. Un bonus unique et une validation propre à chaque escale, sans terminer les grandes étapes dont elles sont issues.",
+    routeIds: ["napoleon-golfe-cannes-short", "napoleon-mougins-mouans-short", "napoleon-malijai-chateau-short", "napoleon-theoffrey-laffrey-short"] },
 ];
 
 export function completedRouteIds(sessions: CompletedSession[]) {

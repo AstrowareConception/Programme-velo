@@ -1,9 +1,12 @@
+import { esterelRouteIds, esterelCoastalRouteIds, esterelShortRouteIds } from "./esterel-routes";
+import { napoleonShortRouteIds } from "./napoleon-short-routes";
+
 export type RouteTheme = { id: string; title: string; icon: string; description: string; routeIds: string[] };
 
 export const routeThemes: RouteTheme[] = [
-  { id: "napoleon", title: "Route Napoléon", icon: "🦅", description: "Quatorze tronçons routiers de Golfe-Juan à Grenoble, avec deux carnets indépendants. Ordre libre.",
+  { id: "napoleon", title: "Route Napoléon", icon: "🦅", description: "Quatorze grandes étapes et quatre escales courtes, de Golfe-Juan à Grenoble. Trois carnets indépendants, ordre libre.",
     routeIds: ["napoleon-golfe-grasse", "napoleon-grasse-vallier", "napoleon-vallier-seranon", "napoleon-seranon-castellane", "napoleon-castellane-barreme", "napoleon-barreme-digne", "napoleon-digne-sisteron", "napoleon-sisteron-gap", "napoleon-gap-fare", "napoleon-fare-corps", "napoleon-corps-mure", "napoleon-mure-laffrey", "napoleon-laffrey-vizille", "napoleon-vizille-grenoble"] },
-  { id: "azure", title: "Côte d’Azur", icon: "🍋", description: "Ports, villes et Corniches, de Cagnes à Menton.",
+  { id: "azure", title: "Côte d’Azur", icon: "🍋", description: "Ports, villes et Corniches, de Saint-Raphaël à Menton.",
     routeIds: ["cagnes-cannes-littoral", "golfe-juan-cannes-balade", "menton-garavan-promenade", "eze-menton-basse-corniche", "nice-menton-grande-corniche", "nice-corniches-loop"] },
   { id: "verdon", title: "Lacs et gorges du Verdon", icon: "🦅", description: "Sainte-Croix, Castellane et le Grand Canyon.",
     routeIds: ["sainte-croix-valensole", "castellane-deux-lacs", "verdon-route-cretes"] },
@@ -17,16 +20,18 @@ export const routeThemes: RouteTheme[] = [
     routeIds: ["chambord-petit-tour", "loire-tours-villandry", "loire-blois-chaumont", "baux-alpilles-rocher", "camargue-grau-gallician", "vaison-medieval-loop"] },
   { id: "waterways", title: "Canaux et voies vertes", icon: "🌾", description: "Calavon, Alsace, Midi, marais et canal de Camargue.",
     routeIds: ["marais-poitevin-coulon-damvix", "canal-midi-carcassonne", "luberon-calavon", "alsace-erstein-strasbourg", "camargue-grau-gallician"] },
+  { id: "esterel", title: "Estérel et Corniche d’Or", icon: "🪨", description: "Saint-Raphaël, Agay, Anthéor, Le Trayas et Théoule : mer et forêt, avec deux petits formats.", routeIds: [...esterelRouteIds] },
   { id: "mountains", title: "Cols et haute montagne", icon: "⛰️", description: "Grands cols, Turini et Bonette : les journées sportives.",
     routeIds: ["alpe-dhuez", "ventoux-bedoin", "tourmalet-est", "galibier-valloire", "madeleine-maurienne", "glandon-cuines", "croix-de-fer-maurienne", "iseran-bonneval", "chaussy-madeleine-stage", "turini-vesubie-sospel", "bonette-ubaye-tinee"] }
 ];
 
 const shortThemeRoutes: Record<string, string[]> = {
-  azure: ["antibes-golfe-juan-short", "eze-cap-ail-short"],
+  napoleon: [...napoleonShortRouteIds],
+  azure: ["antibes-golfe-juan-short", "eze-cap-ail-short", ...esterelRouteIds],
   verdon: ["riez-montagnac-short"],
   provence: ["baux-maussane-short", "riez-montagnac-short"],
   lakes: ["sevrier-annecy-short"],
-  coasts: ["antibes-golfe-juan-short", "eze-cap-ail-short", "grau-aigues-short", "cayeux-hourdel-short", "noyelles-crotoy-short"],
+  coasts: ["antibes-golfe-juan-short", "eze-cap-ail-short", "grau-aigues-short", "cayeux-hourdel-short", "noyelles-crotoy-short", ...esterelCoastalRouteIds, ...esterelShortRouteIds],
   heritage: ["baux-maussane-short", "grau-aigues-short", "cande-chaumont-short"],
   waterways: ["grau-aigues-short", "cande-chaumont-short"]
 };

@@ -1,0 +1,222 @@
+{
+  "esterel-raphael-agay": {
+    "key": "corniche-or",
+    "gpxUrl": "https://static.apidae-tourisme.com/filestore/objets-touristiques/plans/217/248/16709849/velo_corniche_d_or.gpx",
+    "gpxSha256": "9b26c6245ee9b868b583ad6257ca7840ad0a4a105f4cda74354b4da3da563eb5",
+    "trackOnly": true,
+    "altitudeSource": "IGN RGE ALTI",
+    "clip": [
+      [
+        43.422869,
+        6.766303
+      ],
+      [
+        43.431773,
+        6.857207
+      ]
+    ],
+    "section": "Saint-Raphaël → Agay : première partie côtière du circuit, sans retour par la RN7.",
+    "places": [
+      {
+        "label": "Saint-Raphaël",
+        "landmark": "Départ près du Vieux-Port, sur le GPX publié.",
+        "endpoint": "start"
+      },
+      {
+        "label": "Boulouris",
+        "landmark": "Quartier côtier de Saint-Raphaël, sur la route du bord de mer.",
+        "coordinate": [
+          43.414713,
+          6.806917
+        ]
+      },
+      {
+        "label": "Le Dramont · secteur routier",
+        "landmark": "Le cap et l’île d’Or appartiennent au paysage ; aucun détour vers la plage ou le sémaphore.",
+        "coordinate": [
+          43.418944,
+          6.85197
+        ]
+      },
+      {
+        "label": "Agay",
+        "landmark": "Arrivée dans la baie, près du débouché de la rivière.",
+        "endpoint": "finish"
+      }
+    ]
+  },
+  "esterel-agay-trayas": {
+    "key": "corniche-or",
+    "gpxUrl": "https://static.apidae-tourisme.com/filestore/objets-touristiques/plans/217/248/16709849/velo_corniche_d_or.gpx",
+    "gpxSha256": "9b26c6245ee9b868b583ad6257ca7840ad0a4a105f4cda74354b4da3da563eb5",
+    "trackOnly": true,
+    "altitudeSource": "IGN RGE ALTI",
+    "clip": [
+      [
+        43.431773,
+        6.857207
+      ],
+      [
+        43.473524,
+        6.923356
+      ]
+    ],
+    "section": "Agay → Le Trayas : section côtière du circuit, sans excursion dans les calanques.",
+    "places": [
+      {
+        "label": "Agay",
+        "landmark": "Départ dans la baie sur la Corniche d’Or.",
+        "endpoint": "start"
+      },
+      {
+        "label": "Anthéor",
+        "landmark": "Passage sur la corniche dans le quartier côtier, près du viaduc.",
+        "coordinate": [
+          43.435084,
+          6.893036
+        ]
+      },
+      {
+        "label": "Le Trayas",
+        "landmark": "Arrivée sur la route côtière dans le quartier, sans détour vers la gare.",
+        "endpoint": "finish"
+      }
+    ]
+  },
+  "esterel-trayas-theoule": {
+    "key": "corniche-or",
+    "gpxUrl": "https://static.apidae-tourisme.com/filestore/objets-touristiques/plans/217/248/16709849/velo_corniche_d_or.gpx",
+    "gpxSha256": "9b26c6245ee9b868b583ad6257ca7840ad0a4a105f4cda74354b4da3da563eb5",
+    "trackOnly": true,
+    "altitudeSource": "IGN RGE ALTI",
+    "clip": [
+      [
+        43.473524,
+        6.923356
+      ],
+      [
+        43.50779,
+        6.94015
+      ]
+    ],
+    "section": "Le Trayas → Théoule-sur-Mer : fin du tronçon littoral, sans retour par la RN7.",
+    "places": [
+      {
+        "label": "Le Trayas",
+        "landmark": "Départ sur la Corniche d’Or, dans le quartier côtier.",
+        "endpoint": "start"
+      },
+      {
+        "label": "Théoule-sur-Mer",
+        "landmark": "Arrivée sur la route à hauteur du centre ; pas de détour au port.",
+        "endpoint": "finish"
+      }
+    ]
+  },
+  "esterel-theoule-raphael": {
+    "key": "corniche-or",
+    "gpxUrl": "https://static.apidae-tourisme.com/filestore/objets-touristiques/plans/217/248/16709849/velo_corniche_d_or.gpx",
+    "gpxSha256": "9b26c6245ee9b868b583ad6257ca7840ad0a4a105f4cda74354b4da3da563eb5",
+    "trackOnly": true,
+    "altitudeSource": "IGN RGE ALTI",
+    "clip": [
+      [
+        43.50779,
+        6.94015
+      ],
+      [
+        43.423284,
+        6.766272
+      ]
+    ],
+    "section": "Théoule-sur-Mer → Saint-Raphaël : retour vallonné par l’intérieur de l’Estérel, distinct des étapes côtières.",
+    "places": [
+      {
+        "label": "Théoule-sur-Mer",
+        "landmark": "Départ sur la route côtière avant le retour par l’intérieur.",
+        "endpoint": "start"
+      },
+      {
+        "label": "La Napoule · secteur routier",
+        "landmark": "La route bifurque vers l’arrière-pays, sans visite du château.",
+        "coordinate": [
+          43.521933,
+          6.937165
+        ]
+      },
+      {
+        "label": "Estérel · RN7",
+        "landmark": "Point haut du tracé publié sur la traversée forestière.",
+        "coordinate": [
+          43.509027,
+          6.810713
+        ]
+      },
+      {
+        "label": "Saint-Raphaël",
+        "landmark": "Retour au point final du GPX publié, près du Vieux-Port.",
+        "endpoint": "finish"
+      }
+    ]
+  },
+  "esterel-raphael-boulouris-short": {
+    "key": "corniche-or",
+    "gpxUrl": "https://static.apidae-tourisme.com/filestore/objets-touristiques/plans/217/248/16709849/velo_corniche_d_or.gpx",
+    "gpxSha256": "9b26c6245ee9b868b583ad6257ca7840ad0a4a105f4cda74354b4da3da563eb5",
+    "trackOnly": true,
+    "altitudeSource": "IGN RGE ALTI",
+    "clip": [
+      [
+        43.422869,
+        6.766303
+      ],
+      [
+        43.414713,
+        6.806917
+      ]
+    ],
+    "section": "Saint-Raphaël → Boulouris : petit extrait indépendant de Saint-Raphaël–Agay.",
+    "places": [
+      {
+        "label": "Saint-Raphaël",
+        "landmark": "Départ près du Vieux-Port.",
+        "endpoint": "start"
+      },
+      {
+        "label": "Boulouris",
+        "landmark": "Arrivée sur la route côtière dans le quartier ; pas de détour vers la gare.",
+        "endpoint": "finish"
+      }
+    ]
+  },
+  "esterel-agay-antheor-short": {
+    "key": "corniche-or",
+    "gpxUrl": "https://static.apidae-tourisme.com/filestore/objets-touristiques/plans/217/248/16709849/velo_corniche_d_or.gpx",
+    "gpxSha256": "9b26c6245ee9b868b583ad6257ca7840ad0a4a105f4cda74354b4da3da563eb5",
+    "trackOnly": true,
+    "altitudeSource": "IGN RGE ALTI",
+    "clip": [
+      [
+        43.431773,
+        6.857207
+      ],
+      [
+        43.435084,
+        6.893036
+      ]
+    ],
+    "section": "Agay → Anthéor : petit extrait indépendant d’Agay–Le Trayas.",
+    "places": [
+      {
+        "label": "Agay",
+        "landmark": "La baie ouvre cette courte sortie sur la Corniche d’Or.",
+        "endpoint": "start"
+      },
+      {
+        "label": "Anthéor",
+        "landmark": "Arrivée sur la route près du quartier et du viaduc, sans descendre à la plage.",
+        "endpoint": "finish"
+      }
+    ]
+  }
+}

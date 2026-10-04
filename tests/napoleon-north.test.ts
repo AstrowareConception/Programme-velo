@@ -3,6 +3,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } from "nod
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
+import { napoleonShortRouteIds } from "../lib/napoleon-short-routes";
 import { napoleonNorthRoutes, napoleonNorthRouteIds } from "../lib/napoleon-north-routes";
 import { napoleonRouteIds, napoleonRoutes } from "../lib/napoleon-routes";
 import { routeThemes } from "../lib/route-themes";
@@ -24,7 +25,7 @@ describe("Route Napoléon from Gap to Grenoble", () => {
     expect(napoleonNorthRoutes.at(-1)?.coordinates.at(-1)).toEqual([45.183293, 5.737984]);
     expect(napoleonNorthRoutes[0].coordinates[0]).not.toEqual(napoleonRoutes.at(-1)?.coordinates.at(-1));
     napoleonNorthRoutes.slice(1).forEach((route, index) => expect(route.coordinates[0]).toEqual(napoleonNorthRoutes[index].coordinates.at(-1)));
-    expect(routeThemes.find((item) => item.id === "napoleon")?.routeIds).toEqual([...napoleonRouteIds, ...napoleonNorthRouteIds]);
+    expect(routeThemes.find((item) => item.id === "napoleon")?.routeIds).toEqual([...napoleonRouteIds, ...napoleonNorthRouteIds, ...napoleonShortRouteIds]);
     for (const route of napoleonNorthRoutes) {
       expect(route.provenance?.trackName).toBe("Grenoble -> Embrun (167,3 km)");
       expect(route.provenance?.gpxSha256).toBe("8f3c12217c9c4199fcfaa66fca6f28be77bbe436e6e59f97b1cb22369bad8b36");
