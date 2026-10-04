@@ -10,6 +10,7 @@ export type Campaign = {
   routeIds: string[];
   xpBonus: number;
   difficultyLabel: string;
+  group?: "discovery" | "sport";
 };
 
 export const campaigns: Campaign[] = [
@@ -65,6 +66,48 @@ export const campaigns: Campaign[] = [
     description: "Chambord, la campagne de l’île de Ré et les berges du Cher jusqu’à Villandry : trois traversées pour associer mouvement et découverte.",
     icon: "🏰", routeIds: ["chambord-petit-tour", "re-chemins-campagne", "loire-tours-villandry"],
     xpBonus: 300, difficultyLabel: "1/5 · rythme doux"
+  },
+  {
+    id: "azure-passport", title: "Passeport azuréen", subtitle: "3 balades au bord de mer",
+    description: "Golfe-Juan–Cannes, la traversée depuis Cagnes et la promenade mentonnaise : prends le temps de découvrir les ports et les villes. Le format court et le trajet complet sont deux étapes distinctes.",
+    icon: "🍋", routeIds: ["golfe-juan-cannes-balade", "cagnes-cannes-littoral", "menton-garavan-promenade"],
+    xpBonus: 320, difficultyLabel: "1/5 · pauses libres", group: "discovery"
+  },
+  {
+    id: "riviera-corniches", title: "Les deux Corniches", subtitle: "3 étapes de la Riviera",
+    description: "Èze-sur-Mer et Monaco par la Basse Corniche, Nice–Menton par les hauteurs, puis le Tour des Corniches. Une même côte se découvre depuis trois profils différents.",
+    icon: "🌅", routeIds: ["eze-menton-basse-corniche", "nice-menton-grande-corniche", "nice-corniches-loop"],
+    xpBonus: 600, difficultyLabel: "2–3/5", group: "sport"
+  },
+  {
+    id: "verdon-journal", title: "Carnet du Verdon", subtitle: "3 paysages d’eau et de roche",
+    description: "Le lac de Sainte-Croix et son plateau, les lacs de Castellane, puis la Route des Crêtes. Progresse des villages aux rampes du Grand Canyon, avec des descentes pour récupérer.",
+    icon: "🦅", routeIds: ["sainte-croix-valensole", "castellane-deux-lacs", "verdon-route-cretes"],
+    xpBonus: 750, difficultyLabel: "2–4/5", group: "sport"
+  },
+  {
+    id: "provence-postcards", title: "Cartes postales de Provence", subtitle: "3 sorties entre villages et vallées",
+    description: "Le Calavon jusqu’à Apt, les petites routes de Velleron et le tour du rocher des Baux. Découvre trois ambiances provençales à ton rythme.",
+    icon: "🫒", routeIds: ["luberon-calavon", "sorgue-velleron-loop", "baux-alpilles-rocher"],
+    xpBonus: 400, difficultyLabel: "1–2/5", group: "discovery"
+  },
+  {
+    id: "coast-to-coast", title: "Les horizons marins", subtitle: "4 escales en France",
+    description: "Camargue gardoise, baie de Somme, Bretagne et île de Ré : ports, marais et estuaires. La Bretagne apporte les bosses ; chaque escale complète compte, quel que soit l’ordre.",
+    icon: "⚓", routeIds: ["camargue-grau-gallician", "baie-somme-cayeux-crotoy", "bretagne-roscoff-morlaix", "re-chemins-campagne"],
+    xpBonus: 650, difficultyLabel: "1–2/5", group: "discovery"
+  },
+  {
+    id: "canals-and-castles", title: "Canaux et châteaux", subtitle: "4 étapes de patrimoine",
+    description: "Chambord, Blois–Chaumont, le canal du Midi et le canal d’Alsace vers Strasbourg. Un carnet de découverte, sans condition de chrono ni de connexion au vélo.",
+    icon: "🗝️", routeIds: ["chambord-petit-tour", "loire-blois-chaumont", "canal-midi-carcassonne", "alsace-erstein-strasbourg"],
+    xpBonus: 500, difficultyLabel: "1–2/5", group: "discovery"
+  },
+  {
+    id: "southern-alps", title: "Des forêts aux cimes", subtitle: "2 grandes traversées des Alpes du Sud",
+    description: "Franchis le Turini entre Vésubie et Sospel, puis la Bonette entre Ubaye et Tinée. Deux étapes exigeantes à préparer avec des sorties plus douces entre les ascensions.",
+    icon: "🏔️", routeIds: ["turini-vesubie-sospel", "bonette-ubaye-tinee"],
+    xpBonus: 900, difficultyLabel: "4–5/5", group: "sport"
   }
 ];
 

@@ -2,6 +2,8 @@ import { localInputDate, localCalendarDay } from "./dates";
 import type { Badge, AppState, Preferences, WeekTarget, WorkoutTemplate } from "./types";
 import { campaignBonusXp, campaigns, campaignProgress, completedRouteIds } from "./campaigns";
 import { scenicRouteIds } from "./scenic-routes";
+import { explorationRoutes } from "./exploration-routes";
+import { discoveryBadges } from "./discovery-objectives";
 import { discoveryWorkouts } from "./discovery-workouts";
 import { initialGuidance } from "./onboarding";
 
@@ -372,11 +374,13 @@ export function badges(state: AppState): Badge[] {
   const uniqueChallengeIds = new Set(successfulChallenges.map((s) => s.metrics!.challenge!.id));
   const totalDistance = state.sessions.reduce((sum, s) => sum + (s.metrics?.distanceKm ?? 0), 0);
   const sessionsWithPower = state.sessions.filter((s) => (s.metrics?.avgPowerW ?? 0) > 0);
-  const scenicCount = scenicRouteIds.filter((id) => routeIds.has(id)).length;
+  const gentleRouteIds = [...scenicRouteIds, ...explorationRoutes.filter((route) => route.category === "scenic").map((route) => route.id)];
+  const scenicCount = gentleRouteIds.filter((id) => routeIds.has(id)).length;
   // Preserve the historic relief counters; gentle rides have their own trophies.
-  const reliefCount = [...routeIds].filter((id) => !scenicRouteIds.includes(id)).length;
+  const reliefCount = [...routeIds].filter((id) => !gentleRouteIds.includes(id)).length;
 
   return [
+    ...discoveryBadges(state.sessions),
     ...[
       { id: "scenic-first", name: "Premier paysage", icon: "🌅", target: 1 },
       { id: "scenic-three", name: "Flâneur de France", icon: "🧺", target: 3 },

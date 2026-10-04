@@ -145,7 +145,7 @@ test("the third full session reveals daily choices and easy rides while hard ene
   await expect(guideCard(page).locator(".guideWorkout")).not.toContainText("intense");
   await page.screenshot({ path: testInfo.outputPath("onboarding-programme-progressif.png"), fullPage: true });
   await guideCard(page).getByRole("button", { name: "Explorer les balades faciles" }).click();
-  await expect(page.locator(".routeLibraryCard")).toHaveCount(9);
+  await expect(page.locator(".routeLibraryCard")).toHaveCount(14);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.reload(); await page.getByRole("button", { name: /Quête/ }).click();
   await expect(guideCard(page).locator(".guideMilestones .done")).toHaveCount(3);

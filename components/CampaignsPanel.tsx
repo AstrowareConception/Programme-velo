@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import type { CompletedSession } from "@/lib/types";
 import type { ClimbChallenge } from "@/lib/routes";
 import { campaignProgress, campaigns } from "@/lib/campaigns";
@@ -14,6 +15,16 @@ export function CampaignsPanel({
   onLaunch: (route: ClimbChallenge) => void;
 }) {
   const routeMap = new Map(routes.map((route) => [route.id, route]));
+  const [filter, setFilter] = useState<"all" | "discovery" | "sport" | "progress">("all");
+  const visible = campaigns.filter((campaign) => {
+    if (filter === "all") return true;
+    if (filter === "progress") {
+      const progress = campaignProgress(campaign, sessions);
+      return progress.completedStages > 0 && !progress.complete;
+    }
+    const group = campaign.group ?? (["waterside-notebook", "quiet-heritage"].includes(campaign.id) ? "discovery" : "sport");
+    return group === filter;
+  });
 
   return (
     <section className="campaignSection">
@@ -22,8 +33,15 @@ export function CampaignsPanel({
         <span className="spark">{campaigns.filter((campaign) => campaignProgress(campaign, sessions).complete).length}/{campaigns.length} terminées</span>
       </div>
 
+      <details className="campaignDrawer">
+        <summary>Campagnes et carnets · {campaigns.length} objectifs à découvrir</summary>
+        <p>Les étapes peuvent être faites dans le désordre. Seuls les parcours complets valident un objectif ; les pauses restent libres. Retrouve les trophées de variété dans Plus.</p>
+        <div className="choiceRow campaignFilters" aria-label="Filtrer les campagnes">
+          {([["all", "Tous les objectifs"], ["discovery", "Découverte"], ["sport", "Sport"], ["progress", "En cours"]] as const).map(([value, label]) =>
+            <button className={filter === value ? "choice active" : "choice"} aria-pressed={filter === value} key={value} onClick={() => setFilter(value)}>{label}</button>)}
+        </div>
       <div className="campaignGrid">
-        {campaigns.map((campaign) => {
+        {visible.map((campaign) => {
           const progress = campaignProgress(campaign, sessions);
           const nextRoute = progress.nextRouteId ? routeMap.get(progress.nextRouteId) : undefined;
           return (
@@ -58,6 +76,8 @@ export function CampaignsPanel({
           );
         })}
       </div>
+        {visible.length === 0 && <p>Aucun objectif en cours. Choisis un carnet de découverte ou une campagne sportive pour commencer.</p>}
+      </details>
     </section>
   );
 }

@@ -16,6 +16,8 @@ import { InstallCard } from "@/components/InstallCard";
 import { PerformanceRecords, SectorAnalysis } from "@/components/PerformancePanel";
 import { ProgressionPalmares } from "@/components/ProgressionPalmares";
 import { CampaignsPanel } from "@/components/CampaignsPanel";
+import { RouteThemesPanel } from "@/components/RouteThemesPanel";
+import { routeThemes } from "@/lib/route-themes";
 import { recommendAdaptiveWorkout } from "@/lib/coach";
 import {
   climbs,
@@ -139,6 +141,7 @@ export function VeloQuestApp() {
   const [customClimbs, setCustomClimbs] = useState<ClimbChallenge[]>([]);
   const [gpxError, setGpxError] = useState<string | null>(null);
   const [routeSearch, setRouteSearch] = useState("");
+  const [routeThemeId, setRouteThemeId] = useState("");
   const [routeCategoryFilter, setRouteCategoryFilter] = useState<"all" | RouteCategory>("all");
   const [routeDifficultyFilter, setRouteDifficultyFilter] = useState<0 | 1 | 2 | 3 | 4 | 5>(0);
   const [routeFavoritesOnly, setRouteFavoritesOnly] = useState(false);
@@ -366,8 +369,10 @@ export function VeloQuestApp() {
   const allClimbs = useMemo(() => [...climbs, ...customClimbs], [customClimbs]);
   const favoriteRouteIds = state.favoriteRouteIds ?? [];
   const visibleRoutes = useMemo(() => {
-    const query = routeSearch.trim().toLocaleLowerCase("fr");
+    const query = routeSearch.trim().toLocaleLowerCase("fr").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const theme = routeThemes.find((item) => item.id === routeThemeId);
     const filtered = allClimbs.filter((route) => {
+      if (theme && !theme.routeIds.includes(route.id)) return false;
       if (query && !routeSearchText(route).includes(query)) return false;
       if (routeCategoryFilter !== "all" && routeCategory(route) !== routeCategoryFilter) return false;
       if (routeDifficultyFilter && routeDifficulty(route) !== routeDifficultyFilter) return false;
@@ -386,7 +391,7 @@ export function VeloQuestApp() {
       }
       return Number(Boolean(b.featured)) - Number(Boolean(a.featured)) || routeDifficulty(b) - routeDifficulty(a);
     });
-  }, [allClimbs, routeSearch, routeCategoryFilter, routeDifficultyFilter, routeFavoritesOnly, routeSort, favoriteRouteIds, state.sessions]);
+  }, [allClimbs, routeSearch, routeThemeId, routeCategoryFilter, routeDifficultyFilter, routeFavoritesOnly, routeSort, favoriteRouteIds, state.sessions]);
   const selectedSession = selectedSessionId ? state.sessions.find((session) => session.id === selectedSessionId) : undefined;
   const selectedTemplate = selectedSession ? workouts.find((w) => w.id === selectedSession.templateId) : undefined;
   const selectedRoute = selectedSession ? allClimbs.find((c) => c.id === selectedSession.routeId) : undefined;
@@ -939,6 +944,7 @@ export function VeloQuestApp() {
 
   function exploreGentleRides() {
     setRouteSearch("");
+    setRouteThemeId("");
     setRouteCategoryFilter("scenic");
     setRouteDifficultyFilter(1);
     setRouteFavoritesOnly(false);
@@ -1240,10 +1246,15 @@ export function VeloQuestApp() {
           <section className="card scenicIntro">
             <div><p className="eyebrow">BALADES · 1/5</p><h2>La France, à ton rythme.</h2><p>Des traces officielles, des paysages d’eau, de patrimoine et du littoral azuréen. Relief lissé, effort doux, pauses libres : découvre sans objectif de chrono. Vérifie la durée estimée, même sur terrain facile.</p></div>
             <button className="primary" onClick={() => {
-              setRouteSearch(""); setRouteCategoryFilter("scenic"); setRouteDifficultyFilter(1); setRouteFavoritesOnly(false);
+              setRouteSearch(""); setRouteThemeId(""); setRouteCategoryFilter("scenic"); setRouteDifficultyFilter(1); setRouteFavoritesOnly(false);
               document.getElementById("route-library")?.scrollIntoView({ behavior: "smooth", block: "start" });
             }}>Explorer les {climbs.filter((route) => routeCategory(route) === "scenic").length} balades</button>
           </section>
+
+          <RouteThemesPanel sessions={state.sessions} selectedId={routeThemeId} onSelect={(id) => {
+            setRouteThemeId(id); setRouteSearch(""); setRouteCategoryFilter("all"); setRouteDifficultyFilter(0); setRouteFavoritesOnly(false);
+            document.getElementById("route-library")?.scrollIntoView({ behavior: "smooth", block: "start" });
+          }} />
 
           <CampaignsPanel
             sessions={state.sessions}
@@ -1254,7 +1265,13 @@ export function VeloQuestApp() {
           <section className="card routeLibraryToolbar" id="route-library">
             <div className="routeSearchBox">
               <label htmlFor="route-search">Rechercher</label>
-              <input id="route-search" value={routeSearch} onChange={(event) => setRouteSearch(event.target.value)} placeholder="Galibier, Alpes, Tour de France…" />
+              <input id="route-search" value={routeSearch} onChange={(event) => setRouteSearch(event.target.value)} placeholder="Èze, Menton, Verdon, Alsace…" />
+            </div>
+            <div className="routeThemeSelect"><label htmlFor="route-theme">Thème</label>
+              <select id="route-theme" value={routeThemeId} onChange={(event) => setRouteThemeId(event.target.value)}>
+                <option value="">Tous les paysages</option>
+                {routeThemes.map((theme) => <option key={theme.id} value={theme.id}>{theme.title}</option>)}
+              </select>
             </div>
             <div className="routeFilterGroup">
               <small>Catégorie</small>
@@ -1367,7 +1384,7 @@ export function VeloQuestApp() {
               })}
             </div>
           ) : (
-            <section className="card routeEmpty"><span>⌕</span><h2>Aucun parcours ne correspond.</h2><p>Modifie les filtres ou importe un GPX personnel.</p><button className="secondary" onClick={() => { setRouteSearch(""); setRouteCategoryFilter("all"); setRouteDifficultyFilter(0); setRouteFavoritesOnly(false); }}>Réinitialiser les filtres</button></section>
+            <section className="card routeEmpty"><span>⌕</span><h2>Aucun parcours ne correspond.</h2><p>Modifie les filtres ou importe un GPX personnel.</p><button className="secondary" onClick={() => { setRouteSearch(""); setRouteThemeId(""); setRouteCategoryFilter("all"); setRouteDifficultyFilter(0); setRouteFavoritesOnly(false); }}>Réinitialiser les filtres</button></section>
           )}
         </section>
       )}
@@ -1638,8 +1655,8 @@ export function VeloQuestApp() {
                 <p className="eyebrow">{activeClimb ? (routeMode === "timeAttack" ? "TIME ATTACK" : routeMode === "segmentAttack" ? "SEGMENT ATTACK" : routeCategory(activeClimb) === "scenic" ? "BALADE · 1/5" : "PARCOURS") : "PRÉPARATION"}</p>
                 <h2>{active.name}</h2>
                 <p className="previewDescription">{scenicSession ? "RPE 2–4, résistance douce et pauses libres. Parcours entier, sans objectif de chrono : choisis selon la durée estimée et ton énergie." : active.description}</p>
-                {scenicSession && <details className="sceneryDetails"><summary>Découvrir le paysage et son profil</summary><p>{activeClimb?.scenery}</p><small>{activeClimb?.note}</small></details>}
-                {scenicSession && activeClimb && <RoutePlaces route={activeClimb} />}
+                {activeClimb?.scenery && <details className="sceneryDetails"><summary>Découvrir le paysage et son profil</summary><p>{activeClimb.scenery}</p><small>{activeClimb.note}</small></details>}
+                {activeClimb && <RoutePlaces route={activeClimb} />}
                 <div className="previewStats">
                   <span><small>{(routeMode === "timeAttack" || routeMode === "segmentAttack") && activeClimb ? "Record" : "Durée"}</small><strong>{(routeMode === "timeAttack" || routeMode === "segmentAttack") && activeClimb ? (activeRaceBest?.metrics?.elapsedSeconds !== undefined ? formatRaceTime(activeRaceBest.metrics.elapsedSeconds) : "à établir") : `${active.duration} min`}</strong></span>
                   <span><small>Intensité</small><strong>{active.intensity === "hard" ? "dure" : active.intensity === "moderate" ? "soutenue" : "facile"}</strong></span>

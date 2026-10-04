@@ -62,6 +62,16 @@ Sans invitation, un dialogue natif présente des étapes pour iPhone/iPad (y com
 
 Les tests simulent les événements et les identités de navigateur dans Chromium sur mobile et ordinateur. Ils vérifient le contrat de l’interface, pas une installation réelle sur Safari/iPhone ou Android. Les quatre contrôles sur le SHA exact, la CI, la fusion et la production seront consignés dans le document d’état externe après vérification.
 
+## Installation livrée et extension du catalogue
+
+L’installation active est intégrée par la PR 24 (`9e8b28f41118868524ad37198f69c32b5e74e1f7`, CI 37196952419 réussie), fusionnée en `12c289160794fa6c713983422fe72564ed8b65f4`. Les quatre commandes ont été exécutées sur ces deux commits : 82 tests unitaires et 92 tests navigateur. Vercel READY, `/api/version` et Plus concordaient. Un incident local de cache Next ENOTEMPTY a été résolu avant fusion, sans changement du SHA. Les essais ne prouvent pas une installation complète sur les appareils physiques.
+
+Le lot `feat/atlas-france-paca`, fondé sur ce main, ajoute quinze GPX officiels documentés : dix destinations PACA, Camargue gardoise, Bretagne, Somme, Loire et Alsace. Catalogue : 38 parcours, 14 balades, huit thèmes, 13 campagnes/carnets. Sept nouveaux objectifs attribuent un bonus unique ; six trophées de variété n’ajoutent pas de XP. Les anciennes destinations, exigences, seuils Atlas et XP de campagne restent inchangés.
+
+Les repères sont projetés sur les GPX et utilisent leurs kilomètres cumulés. Les nouveaux tracés gardent les passages réels, leurs altitudes lissées et leur SHA-256 ; limites et sections sont dans `docs/EXPLORATION-ROUTES.md`. La Bonette s’arrête au col sans boucle de la cime ; la Basse Corniche passe par Èze-sur-Mer/Monaco, la Grande Corniche suit un autre tracé. Le lecteur annonce l’arrivée propre à chaque parcours, et non systématiquement la Croisette. Recherche par lieux et accents normalisés. Les campagnes se déplient à la demande et se filtrent.
+
+La couverture comprend 89 tests unitaires et 104 cas navigateur, 52 sur chaque format. Elle contrôle profils/lieux, thèmes, objectifs réels dans le désordre, répétitions, suppression, sauvegardes, secteurs exclus et conservation des mesures/favoris/reprise. Les quatre contrôles sur le commit exact, la CI, la fusion et la production sont consignés dans le document externe après livraison. Cache PWA v9 ; aucune dépendance ni clé locale ajoutée.
+
 ## Règles de données
 
 Clés inchangées : `veloquest:v1`, `veloquest:custom-routes:v1`, `veloquest:active-session:v1`. Backups v3, v2 et anciens états conservés. Le nouvel indicateur optionnel `completedSegment` identifie les tentatives de secteur incomplètes ; son absence dans un ancien historique reste compatible.

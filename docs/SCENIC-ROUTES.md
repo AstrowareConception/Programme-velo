@@ -1,6 +1,6 @@
 # Balades de France — sources et limites
 
-Les neuf balades sont fondées sur des traces publiques des organismes qui présentent ces itinéraires. La géométrie est issue des GPX indiqués ci-dessous. Le texte de découverte a été écrit pour VéloQuest ; aucune photographie ou description touristique n’est reproduite.
+Les neuf balades historiques sont fondées sur des traces publiques des organismes qui présentent ces itinéraires. La géométrie est issue des GPX indiqués ci-dessous. Le texte de découverte a été écrit pour VéloQuest ; aucune photographie ou description touristique n’est reproduite.
 
 | Balade | Distance calculée | Altitude utilisée | Fiche et fournisseur de trace |
 | --- | ---: | --- | --- |
@@ -13,6 +13,8 @@ Les neuf balades sont fondées sur des traces publiques des organismes qui prés
 | Tours–Villandry | 21,800 km | GPX officiel | [France Vélo Tourisme / La Loire à Vélo](https://www.francevelotourisme.com/itineraire/la-loire-a-velo-eurovelo-6/tours-villandry) |
 | Cagnes-sur-Mer–Cannes | 23,810 km | GPX officiel, tronçon inversé | [France Vélo Tourisme / EV8 Cannes–Nice](https://www.francevelotourisme.com/itineraire/la-mediterranee-a-velo-eurovelo-8/cannes-nice) |
 | Golfe-Juan–Cannes | 7,508 km | Même GPX, tronçon court inversé | [France Vélo Tourisme / EV8 Cannes–Nice](https://www.francevelotourisme.com/itineraire/la-mediterranee-a-velo-eurovelo-8/cannes-nice) |
+
+Les cinq nouvelles balades et dix nouvelles étapes portent le catalogue à 38 parcours, dont 14 balades. Leur provenance, leurs villes et leurs objectifs sont documentés dans [EXPLORATION-ROUTES.md](EXPLORATION-ROUTES.md). Le présent document conserve les neuf traces antérieures et leurs conditions de récompense.
 
 ## Ce que représente le profil
 

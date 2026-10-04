@@ -12,7 +12,7 @@ export function RoutePlaces({ route, currentKm }: { route: ClimbChallenge; curre
         <small>REPÈRE ACTUEL · {kilometers(progress.km)} km virtuels</small>
         <strong aria-live="polite">{progress.current?.label ?? "Départ"}</strong>
         <p>{progress.current?.landmark}</p>
-        <span>{progress.next ? `À suivre : ${progress.next.label} · dans ${kilometers(progress.next.km - progress.km)} km` : "Arrivée sur la Croisette"}</span>
+        <span>{progress.next ? `À suivre : ${progress.next.label} · dans ${kilometers(progress.next.km - progress.km)} km` : `Arrivée · ${route.places.at(-1)?.label}`}</span>
       </div>}
       <details>
         <summary>Les villes traversées · {route.places.length} repères</summary>
