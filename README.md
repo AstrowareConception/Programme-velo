@@ -9,14 +9,15 @@ VéloQuest est une PWA personnelle Next.js / React / TypeScript. Elle associe un
 ## Fonctions disponibles
 
 - Programme de douze semaines : objectifs de minutes, points, séances et variété, avec un plafond de séances difficiles.
-- Catalogue libre, micro-séances de 10/15/20 minutes, séance libre et saisie rétroactive.
+- Catalogue libre, micro-séances de 10/12/15/20 minutes, séance libre et saisie rétroactive. Nouveaux formats : Roulage contemplatif (25 min), Cadence fluide (30 min), Petites vagues (40 min), Parenthèse souple (12 min bonus).
 - Coach adaptatif local : temps disponible, énergie, historique, charge récente et RPE.
 - Préparation, lecteur guidé, pause, alertes sonores/vocales/haptiques, calibration et maintien de l'écran lorsque disponible.
 - Reprise locale d'une séance interrompue, y compris Time Attack, Segment Attack et défi actif.
-- **14 parcours natifs**, dont Velleron, Vaison, Uchaux, Enclave des Papes et Corniches à **2/5–3/5** : bosses, descentes, faux-plats et récupérations, en complément des grands cols à 4/5–5/5.
+- **21 parcours natifs**, dont **7 balades à 1/5** et les cinq étapes Velleron, Vaison, Uchaux, Enclave des Papes et Corniches à **2/5–3/5** : bosses, descentes, faux-plats et récupérations, en complément des grands cols à 4/5–5/5.
 - Recherche, filtres, tri, favoris et import GPX avec persistance des parcours personnels.
 - Time Attack, records de parcours, fantôme et temps intermédiaires ; Segment Attack sur quatre secteurs, avec records séparés.
-- Huit défis de parcours ; quatre campagnes : Découverte Provence (+500 XP), Tour Vallonné (+600), Légendes du Tour (+1 000), Défi des Alpes (+1 400).
+- Huit défis de parcours ; six campagnes : les quatre campagnes de Provence/montagne et deux carnets doux, Au fil de l’eau (+450 XP) et Échappées patrimoine (+300 XP).
+- Trophées de découverte : Premier paysage, Flâneur de France (3 balades différentes), Atlas des balades (7). Collection La France en douceur.
 - XP, niveaux, badges, collections, palmarès et analyses de performance.
 - Journal, dates/heures locales, mesures datées de poids/taille/abdomen et suppression des saisies erronées.
 - Export/import JSON (v3, compatible v2 et ancien état simple), exports CSV et estimation du stockage local.
@@ -30,11 +31,22 @@ Chaque campagne achevée débloque un badge et un **bonus unique calculé à par
 
 La suppression recalcule les semaines, niveaux, campagnes, badges, collections, statistiques et records depuis les séances restantes. Si la dernière réalisation d'une étape est supprimée, le bonus et le badge de cette campagne disparaissent ; une autre réalisation complète conserve l'étape. Les XP déjà attribués aux autres séances restent leurs valeurs enregistrées : les anciennes récompenses de record/défi ne sont pas réécrites rétroactivement.
 
+## Balades et programmes de découverte
+
+Le filtre **Balades** et le raccourci **Explorer les 7 balades** ouvrent une offre à 1/5 : tour du lac du Der, rive ouest d’Annecy, petit tour de Chambord, chemins en campagne de l’île de Ré, Coulon–Damvix, Carcassonne–Marseillette et Tours–Villandry. Les paysages et leurs points d’intérêt sont décrits sur les fiches et dans le lecteur.
+
+En mode balade, l’effort conseillé reste **RPE 2–4**, avec une résistance de base entre 4 et 10 sur 32, ajustable par la calibration. Les pauses sont libres. Les chronos et défis sont facultatifs ; aucune vitesse, cadence ou absence de pause n’est exigée pour les carnets. Une balade courte dure environ 25–27 minutes en simulation, mais le tour du Der approche 140 minutes : **1/5 décrit l’effort, pas la durée**. Les kilomètres restent ceux de la trace et ne sont pas compressés pour raccourcir la sortie. Une interruption sauvegardée peut être reprise.
+
+Les deux carnets sont des programmes souples de découverte, en complément des douze semaines. Au fil de l’eau regroupe Der, Annecy, Marais poitevin et canal du Midi ; Échappées patrimoine associe Chambord, île de Ré et Villandry. Leurs cinq nouveaux badges comprennent deux badges de campagne et trois trophées de diversité. Les répétitions ne font pas progresser le nombre de paysages différents ; les bonus de carnet sont uniques, les séances gardent leur XP habituel. Les badges historiques `climb1` / `climb3` sont désormais nommés Premier relief / Collectionneur de reliefs : leurs validations antérieures sont conservées, les nouvelles balades disposent de leurs propres trophées.
+
+Voir [les sources et la méthode des profils](docs/SCENIC-ROUTES.md). Ces traces ne servent pas de guide de navigation extérieure.
+
 ## Géographie, simulation et mesures
 
 | Source | Ce qu'elle représente | Limites |
 | --- | --- | --- |
-| Parcours natif | Profil géographique simplifié et coordonnées de référence | Ni trace GPS relevée ni itinéraire routier de navigation |
+| Cols et étapes natifs historiques | Profil géographique simplifié et coordonnées de référence | Ni trace GPS relevée ni itinéraire routier de navigation |
+| Balades natives | Géométrie issue d’un GPX officiel ; altitude GPX, ou terrain IGN RGE ALTI si le GPX n’en contient pas | Profil lissé et échantillonné à 500 m ; D+ calculé sur ce profil, différent du total d’une fiche touristique ; ni relevé indépendant ni navigation |
 | GPX importé | Distance et altitude calculées depuis les points du fichier ; pente lissée sur environ 250 m | Dépend de la qualité GPS et altimétrique ; le D+ reste calculé |
 | Simulation | Progression estimée à partir du temps des segments, résistance suggérée sur 1–32 | Aucun kilomètre extérieur mesuré ; chrono distinct d'une validation physique |
 | FTMS | Données transmises par le compteur du vélo ; progression relative à la distance au départ | La précision et les capacités dépendent du firmware et de l'exemplaire |
@@ -86,5 +98,6 @@ La version est visible dans **Plus** et dans [l'endpoint de version](https://pro
 - [Guide utilisateur](docs/USER-GUIDE.md)
 - [Validation Bluetooth du TEB5](docs/TEB5-BLUETOOTH-VALIDATION.md)
 - [État technique de reprise](docs/PROJECT-STATE.md)
+- [Sources des balades et méthode des profils](docs/SCENIC-ROUTES.md)
 
 Les niveaux proposés sont des repères : le ressenti, la récupération et les limites d'intensité du programme restent prioritaires. Projet personnel / expérimental.

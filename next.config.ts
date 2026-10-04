@@ -3,6 +3,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  devIndicators: false,
   env: {
     NEXT_PUBLIC_BUILD_COMMIT: process.env.VERCEL_GIT_COMMIT_SHA || (() => {
       try { return execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim(); }

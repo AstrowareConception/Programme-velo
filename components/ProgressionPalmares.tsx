@@ -9,7 +9,7 @@ export function ProgressionPalmares({ sessions, routes }: { sessions: CompletedS
 
   return (
     <section className="card palmares">
-      <div className="sectionHead"><div><p className="eyebrow">PALMARÈS</p><h2>Ta saison VeloQuest</h2></div><span className="spark">{stats.uniqueRoutes} sommet{stats.uniqueRoutes > 1 ? "s" : ""}</span></div>
+      <div className="sectionHead"><div><p className="eyebrow">PALMARÈS</p><h2>Ta saison VeloQuest</h2></div><span className="spark">{stats.uniqueRoutes} parcours distinct{stats.uniqueRoutes > 1 ? "s" : ""}</span></div>
       <div className="palmaresStats">
         <span><small>D+ virtuel</small><strong>{Math.round(stats.virtualElevationGainM / 100) / 10} km</strong></span>
         <span><small>Parcours terminés</small><strong>{stats.totalRouteCompletions}</strong></span>

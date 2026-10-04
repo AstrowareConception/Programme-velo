@@ -1,6 +1,7 @@
 import type { WorkoutTemplate } from "./types";
+import { scenicRoutes } from "./scenic-routes";
 
-export type RouteCategory = "climb" | "stage" | "imported";
+export type RouteCategory = "climb" | "stage" | "scenic" | "imported";
 export type RouteDifficulty = 1 | 2 | 3 | 4 | 5;
 
 export type ClimbPoint = {
@@ -31,6 +32,9 @@ export type ClimbChallenge = {
   featured?: boolean;
   sourceLabel?: string;
   sourceUrl?: string;
+  scenery?: string;
+  highlights?: string[];
+  provenance?: { gpxUrl: string; gpxSha256: string; altitudeSource: string; checkedOn: string; profileStepM: number };
 };
 
 export const climbs: ClimbChallenge[] = [
@@ -606,7 +610,8 @@ export const climbs: ClimbChallenge[] = [
     featured: true,
     sourceLabel: "Maurienne Tourisme",
     sourceUrl: "https://www.maurienne-tourisme.com/visiter_bouger/col-du-chaussy-et-de-la-madeleine-776865/"
-  }
+  },
+  ...scenicRoutes
 ];
 
 export function routeCategory(route: ClimbChallenge): RouteCategory {
@@ -687,19 +692,20 @@ export function resistanceForGrade(grade: number) {
 
 
 export function climbToWorkout(climb: ClimbChallenge): WorkoutTemplate {
+  const scenic = routeCategory(climb) === "scenic";
   const segments = climb.profile.slice(1).map((point, index) => {
     const previous = climb.profile[index];
     const distance = Math.max(0.2, point.km - previous.km);
     // Baseline simulation at ~15 km/h. With FTMS connected, route progress
     // is based on actual distance instead of this time estimate.
     const minutes = Math.max(0.5, Math.round(((distance / 15) * 60) * 2) / 2);
-    const level = resistanceForGrade(point.grade);
+    const level = scenic ? scenicResistanceForGrade(point.grade) : resistanceForGrade(point.grade);
     return {
       label: `${point.km.toFixed(1)} km · ${point.grade.toFixed(1)} %`,
       minutes,
       resistance: String(level),
-      rpe: point.grade >= 10 ? "8–9" : point.grade >= 7 ? "7–8" : point.grade >= 4 ? "6–7" : point.grade > 0 ? "4–6" : "2–4",
-      cadence: point.grade >= 8 ? "65–80" : point.grade >= 4 ? "70–85" : "80–95"
+      rpe: scenic ? "2–4" : point.grade >= 10 ? "8–9" : point.grade >= 7 ? "7–8" : point.grade >= 4 ? "6–7" : point.grade > 0 ? "4–6" : "2–4",
+      cadence: scenic ? "70–90" : point.grade >= 8 ? "65–80" : point.grade >= 4 ? "70–85" : "80–95"
     };
   });
 
@@ -707,14 +713,19 @@ export function climbToWorkout(climb: ClimbChallenge): WorkoutTemplate {
     id: `climb-${climb.id}`,
     name: climb.name,
     tagline: climb.subtitle,
-    kind: "hills",
+    kind: scenic ? "endurance" : "hills",
     duration: segments.reduce((sum, segment) => sum + segment.minutes, 0),
     points: climb.points,
     xp: climb.xp,
-    intensity: "hard",
-    description: climb.note,
+    intensity: scenic ? "easy" : "hard",
+    description: scenic ? `${climb.scenery} ${climb.note}` : climb.note,
     segments
   };
+}
+
+export function scenicResistanceForGrade(grade: number) {
+  // The real terrain remains visible; indoor effort is deliberately gentle.
+  return Math.max(4, Math.min(10, Math.round(7 + grade)));
 }
 
 

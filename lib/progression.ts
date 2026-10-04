@@ -1,5 +1,6 @@
 import type { CompletedSession } from "./types";
 import type { ClimbChallenge } from "./routes";
+import { scenicRouteIds } from "./scenic-routes";
 
 export type RouteCollection = {
   id: string;
@@ -30,6 +31,11 @@ export const routeCollections: RouteCollection[] = [
     description: "Termine l’étape multi-cols Chaussy + Madeleine.",
     icon: "🗻",
     routeIds: ["chaussy-madeleine-stage"]
+  },
+  {
+    id: "scenic-france", title: "La France en douceur",
+    description: "Collectionne les sept balades : lacs, canaux, île et patrimoine. Les répétitions ne remplacent pas les découvertes.",
+    icon: "🌿", routeIds: scenicRouteIds
   }
 ];
 

@@ -17,7 +17,9 @@ export function ClimbProfile({
   const min = Math.min(...climb.profile.map((p) => p.elevation));
   const max = Math.max(...climb.profile.map((p) => p.elevation));
   const x = (km: number) => pad + (km / climb.distanceKm) * (width - pad * 2);
-  const y = (e: number) => height - pad - ((e - min) / Math.max(1, max - min)) * (height - pad * 2);
+  // A flat ride should not look like an alpine pass because of a few metres.
+  const elevationSpan = Math.max(50, max - min);
+  const y = (e: number) => height - pad - ((e - min) / elevationSpan) * (height - pad * 2);
   const path = climb.profile.map((p, i) => `${i === 0 ? "M" : "L"} ${x(p.km)} ${y(p.elevation)}`).join(" ");
 
   const position = (fraction: number) => {
@@ -50,6 +52,7 @@ export function ClimbProfile({
         <circle cx={rider.cx} cy={rider.cy} r="8" fill="currentColor" />
       </svg>
       <div className="profileScale"><span>0 km</span><strong>{rider.km.toFixed(1)} km</strong><span>{climb.distanceKm.toFixed(1)} km</span></div>
+      <div className="profileAltitude">Altitude du profil : {Math.round(min)}–{Math.round(max)} m{climb.provenance ? " · relief lissé" : ""}</div>
     </div>
   );
 }

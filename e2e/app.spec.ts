@@ -51,7 +51,7 @@ test("route library filters and opens Time Attack", async ({ page }) => {
   await seed(page);
   await page.goto("/");
   await page.getByRole("button", { name: /Parcours/ }).click();
-  await expect(page.getByRole("heading", { name: "Cols, étapes & défis." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Cols, étapes & balades." })).toBeVisible();
 
   await page.getByLabel("Rechercher").fill("Galibier");
   const card = page.getByRole("heading", { name: "Col du Galibier" }).locator("xpath=ancestor::article");

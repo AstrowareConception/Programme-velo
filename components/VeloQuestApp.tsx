@@ -258,6 +258,7 @@ export function VeloQuestApp() {
       }
 
       if (next >= active.segments.length) {
+        setSegmentIndex(active.segments.length - 1);
         setSecondsLeft(0);
         setRunning(false);
         setShowFinish(true);
@@ -439,6 +440,7 @@ export function VeloQuestApp() {
   const totalSessionSeconds = active ? active.segments.reduce((sum, segment) => sum + segment.minutes * 60, 0) : 0;
   const elapsedBeforeSegment = active ? active.segments.slice(0, segmentIndex).reduce((sum, segment) => sum + segment.minutes * 60, 0) : 0;
   const currentSegmentSeconds = active ? active.segments[segmentIndex]?.minutes * 60 || 0 : 0;
+  const scenicSession = activeClimb?.category === "scenic";
   const sessionElapsedSeconds = active ? elapsedBeforeSegment + Math.max(0, currentSegmentSeconds - secondsLeft) : 0;
   const sessionProgressPercent = totalSessionSeconds ? Math.min(100, Math.round((sessionElapsedSeconds / totalSessionSeconds) * 100)) : 0;
 
@@ -1151,6 +1153,7 @@ export function VeloQuestApp() {
             <p>Ajoute 15 minutes faciles. Elles comptent dans ton volume et ta régularité, mais pas dans les points principaux. Les bonus XP sont plafonnés à 60 par semaine.</p>
             <div className="bonusChoices">
               <button className="secondary" onClick={() => launch(workouts.find((w) => w.id === "bonus-10")!)}>10 min</button>
+              <button className="secondary" onClick={() => launch(workouts.find((w) => w.id === "bonus-soft-12")!)}>12 min souples</button>
               <button className="secondary" onClick={() => launch(workouts.find((w) => w.id === "bonus-15")!)}>15 min</button>
               <button className="secondary" onClick={() => launch(workouts.find((w) => w.id === "bonus-20")!)}>20 min</button>
             </div>
@@ -1181,7 +1184,15 @@ export function VeloQuestApp() {
 
       {tab === "climbs" && (
         <section>
-          <div className="pageHead"><p className="eyebrow">PARCOURS V2</p><h1>Cols, étapes & défis.</h1><p>Choisis une montée mythique, une étape multi-cols ou importe ton propre GPX. Les cartes de bibliothèque restent légères ; la carte interactive complète s’ouvre pendant la séance.</p></div>
+          <div className="pageHead"><p className="eyebrow">PARCOURS</p><h1>Cols, étapes & balades.</h1><p>Une sortie douce, une étape vallonnée, une montée mythique ou ton propre GPX. La carte interactive complète s’ouvre pendant la séance.</p></div>
+
+          <section className="card scenicIntro">
+            <div><p className="eyebrow">BALADES · 1/5</p><h2>La France, à ton rythme.</h2><p>Sept traces officielles, des paysages d’eau et de patrimoine. Relief lissé, effort doux, pauses libres : découvre sans objectif de chrono. Vérifie la durée estimée, même sur terrain facile.</p></div>
+            <button className="primary" onClick={() => {
+              setRouteSearch(""); setRouteCategoryFilter("scenic"); setRouteDifficultyFilter(1); setRouteFavoritesOnly(false);
+              document.getElementById("route-library")?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}>Explorer les 7 balades</button>
+          </section>
 
           <CampaignsPanel
             sessions={state.sessions}
@@ -1189,7 +1200,7 @@ export function VeloQuestApp() {
             onLaunch={(route) => launch(climbToWorkout(route), route, "training")}
           />
 
-          <section className="card routeLibraryToolbar">
+          <section className="card routeLibraryToolbar" id="route-library">
             <div className="routeSearchBox">
               <label htmlFor="route-search">Rechercher</label>
               <input id="route-search" value={routeSearch} onChange={(event) => setRouteSearch(event.target.value)} placeholder="Galibier, Alpes, Tour de France…" />
@@ -1201,6 +1212,7 @@ export function VeloQuestApp() {
                   ["all", "Tout"],
                   ["climb", "Cols"],
                   ["stage", "Étapes"],
+                  ["scenic", "Balades"],
                   ["imported", "Mes GPX"]
                 ] as const).map(([value,label]) => (
                   <button key={value} className={routeCategoryFilter === value ? "choice active" : "choice"} onClick={() => setRouteCategoryFilter(value)}>{label}</button>
@@ -1250,11 +1262,11 @@ export function VeloQuestApp() {
                 const favorite = favoriteRouteIds.includes(climb.id);
 
                 return (
-                  <article className={`card routeLibraryCard ${climb.featured ? "featured" : ""}`} key={climb.id}>
+                  <article className={`card routeLibraryCard ${climb.featured ? "featured" : ""} ${category === "scenic" ? "scenicCard" : ""}`} key={climb.id}>
                     <div className="routeCardTop">
                       <div>
                         <div className="routeBadges">
-                          <span>{category === "stage" ? "ÉTAPE" : category === "imported" ? "GPX" : "COL"}</span>
+                          <span>{category === "scenic" ? "BALADE" : category === "stage" ? "ÉTAPE" : category === "imported" ? "GPX" : "COL"}</span>
                           {climb.featured && <span className="featuredTag">SÉLECTION</span>}
                         </div>
                         <p className="eyebrow">{climb.region.toUpperCase()}</p>
@@ -1265,6 +1277,7 @@ export function VeloQuestApp() {
                     </div>
 
                     <div className="routeDifficulty"><span>{"★".repeat(difficulty)}{"☆".repeat(5-difficulty)}</span><small>Difficulté {difficulty}/5</small></div>
+                    {category === "scenic" && <div className="scenicPace"><span>🌿 RPE 2–4 · pauses libres</span><span>≈ {climbToWorkout(climb).duration} min simulées</span></div>}
 
                     <div className="climbStats compactStats">
                       <span><strong>{climb.distanceKm.toFixed(1)}</strong> km</span>
@@ -1279,6 +1292,8 @@ export function VeloQuestApp() {
                       {(climb.tags ?? []).slice(0,5).map((tag) => <span key={tag}>{tag}</span>)}
                     </div>
 
+                    {climb.scenery && <details className="sceneryDetails"><summary>Découvrir le paysage</summary><p>{climb.scenery}</p><div className="routeTags">{climb.highlights?.map((highlight) => <span key={highlight}>{highlight}</span>)}</div></details>}
+
                     <div className="timeAttackSummary">
                       <span><small>RECORD</small><strong>{pb?.metrics?.elapsedSeconds !== undefined ? formatRaceTime(pb.metrics.elapsedSeconds) : "—"}</strong></span>
                       <span><small>TENTATIVES</small><strong>{attempts}</strong></span>
@@ -1289,7 +1304,7 @@ export function VeloQuestApp() {
                     {climb.sourceUrl && <a className="routeSource" href={climb.sourceUrl} target="_blank" rel="noreferrer">Source : {climb.sourceLabel ?? "fiche officielle"} ↗</a>}
 
                     <div className="climbActions">
-                      <button className="primary" onClick={() => launch(climbToWorkout(climb), climb, "training")}>Entraînement</button>
+                      <button className="primary" onClick={() => launch(climbToWorkout(climb), climb, "training")}>{category === "scenic" ? "Partir en balade" : "Entraînement"}</button>
                       <button className="secondary timeAttackButton" onClick={() => launch(climbToWorkout(climb), climb, "timeAttack")}>⏱ Time Attack</button>
                       <button className="secondary segmentAttackButton" onClick={() => setSegmentAttackRoute(climb)}>⚡ Segments</button>
                       <button className="secondary challengeButton" onClick={() => setChallengeRoute(climb)}>◆ Défis</button>
@@ -1567,9 +1582,10 @@ export function VeloQuestApp() {
               </form>
             ) : !sessionStarted ? (
               <div className="sessionPreview">
-                <p className="eyebrow">{activeClimb ? (routeMode === "timeAttack" ? "TIME ATTACK" : routeMode === "segmentAttack" ? "SEGMENT ATTACK" : "PARCOURS") : "PRÉPARATION"}</p>
+                <p className="eyebrow">{activeClimb ? (routeMode === "timeAttack" ? "TIME ATTACK" : routeMode === "segmentAttack" ? "SEGMENT ATTACK" : routeCategory(activeClimb) === "scenic" ? "BALADE · 1/5" : "PARCOURS") : "PRÉPARATION"}</p>
                 <h2>{active.name}</h2>
-                <p className="previewDescription">{active.description}</p>
+                <p className="previewDescription">{scenicSession ? "RPE 2–4, résistance douce et pauses libres. Parcours entier, sans objectif de chrono : choisis selon la durée estimée et ton énergie." : active.description}</p>
+                {scenicSession && <details className="sceneryDetails"><summary>Découvrir le paysage et son profil</summary><p>{activeClimb?.scenery}</p><small>{activeClimb?.note}</small></details>}
                 <div className="previewStats">
                   <span><small>{(routeMode === "timeAttack" || routeMode === "segmentAttack") && activeClimb ? "Record" : "Durée"}</small><strong>{(routeMode === "timeAttack" || routeMode === "segmentAttack") && activeClimb ? (activeRaceBest?.metrics?.elapsedSeconds !== undefined ? formatRaceTime(activeRaceBest.metrics.elapsedSeconds) : "à établir") : `${active.duration} min`}</strong></span>
                   <span><small>Intensité</small><strong>{active.intensity === "hard" ? "dure" : active.intensity === "moderate" ? "soutenue" : "facile"}</strong></span>
@@ -1591,14 +1607,17 @@ export function VeloQuestApp() {
                       : "Sans distance Bluetooth, le profil avance sur le scénario temporel. Tu pourras saisir le chrono réel du vélo à l’arrivée."}</p>
                   </div>
                 )}
-                <div className="segmentPlan">
+                <details className="segmentPlanDisclosure" open={!scenicSession}>
+                  <summary>Voir les {active.segments.length} segments et les niveaux</summary>
+                  <div className="segmentPlan">
                   {active.segments.map((segment, index) => (
                     <button key={index} type="button" onClick={() => goToSegment(index)}>
                       <span>{String(index + 1).padStart(2, "0")}</span>
                       <div><strong>{segment.label}</strong><small>{segment.minutes} min · niveau {adjustedResistance(segment.resistance, preferences.resistanceOffset + sessionResistanceDelta)} · RPE {segment.rpe}</small></div>
                     </button>
                   ))}
-                </div>
+                  </div>
+                </details>
                 <div className="previewFooter">
                   <span>{preferences.keepScreenAwake ? "☀ écran actif" : "écran standard"} · {preferences.voiceCues ? "voix active" : preferences.soundCues ? "bips actifs" : "silencieux"}{sessionResistanceDelta ? ` · coach ${sessionResistanceDelta > 0 ? "+" : ""}${sessionResistanceDelta}` : ""}</span>
                   <button className="primary bigStart" onClick={beginSession}>{(routeMode === "timeAttack" || routeMode === "segmentAttack") && activeClimb ? "Lancer le chrono" : "Démarrer la séance"}</button>
@@ -1606,7 +1625,7 @@ export function VeloQuestApp() {
               </div>
             ) : (
               <>
-                <p className="eyebrow">{activeClimb ? "COL DE LÉGENDE" : active.name.toUpperCase()}</p>
+                <p className="eyebrow">{activeClimb ? routeCategory(activeClimb) === "scenic" ? "BALADE · RYTHME DOUX" : routeCategory(activeClimb) === "stage" ? "ÉTAPE" : "COL DE LÉGENDE" : active.name.toUpperCase()}</p>
                 <h2>{active.segments[segmentIndex].label}</h2>
 
                 {activeClimb && (
@@ -1621,6 +1640,7 @@ export function VeloQuestApp() {
                     )}
                     <ClimbProfile climb={activeClimb} progress={climbProgress} ghostProgress={ghostProgress} />
                     <RouteMap climb={activeClimb} progress={climbProgress} ghostProgress={ghostProgress} />
+                    {activeClimb.scenery && routeMode === "training" && <details className="sceneryDetails"><summary>Ton carnet de paysage</summary><p>{activeClimb.scenery}</p><div className="routeTags">{activeClimb.highlights?.map((highlight) => <span key={highlight}>{highlight}</span>)}</div><small>Pauses libres. La progression affichée reste virtuelle sans distance FTMS.</small></details>}
                     {routeMode === "timeAttack" && (
                       <div className="checkpointStrip">
                         {routeCheckpoints.map((km, index) => {

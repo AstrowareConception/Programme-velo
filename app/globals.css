@@ -175,6 +175,20 @@ button { cursor: pointer; }
 .profileWrap svg { width:100%; height:auto; display:block; }
 .profileScale { display:flex; justify-content:space-between; align-items:center; color:var(--muted); font-size:.68rem; padding:0 8px 7px; }
 .profileScale strong { color:var(--cyan); }
+.profileAltitude { color:var(--muted); font-size:.65rem; padding:0 8px 8px; }
+.scenicIntro { display:flex; gap:20px; align-items:center; margin-bottom:18px; background:linear-gradient(120deg,rgba(78,193,144,.12),rgba(18,24,43,.95)); border-color:rgba(78,193,144,.28); }
+.scenicIntro > div { flex:1; min-width:0; }
+.scenicIntro > button { flex-shrink:0; }
+.scenicIntro h2 { margin:4px 0 10px; }
+.scenicCard { border-color:rgba(78,193,144,.24); }
+.scenicPace { display:flex; flex-wrap:wrap; gap:8px 12px; margin:10px 0; color:#a8e7c9; font-size:.72rem; }
+.sceneryDetails { border-top:1px solid var(--line); padding:12px 0; margin-bottom:8px; font-size:.8rem; }
+.sceneryDetails summary { cursor:pointer; color:#a8e7c9; font-weight:700; }
+.sceneryDetails p { line-height:1.65; }
+.segmentPlanDisclosure { margin:14px 0; }
+.segmentPlanDisclosure summary { cursor:pointer; font-size:.8rem; color:var(--muted); }
+#route-library { scroll-margin-top:24px; }
+@media (max-width:760px) { .scenicIntro { flex-direction:column; align-items:stretch; } }
 .routeMap { width:100%; height:300px; border-radius:16px; overflow:hidden; border:1px solid var(--line); margin:12px 0; background:#0a0f1d; }
 .routeMap .leaflet-control-attribution { font-size:8px; }
 .finePrint { font-size:.72rem; color:#77839c !important; }
