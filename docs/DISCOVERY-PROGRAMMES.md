@@ -1,6 +1,6 @@
 # Formats courts, programmes découverte et Route Napoléon
 
-Catalogue actuel : **61 parcours, 22 balades à 1/5, 9 thèmes, 17 campagnes/carnets et 62 badges**. Les exigences précédentes et le trophée PACA (18 destinations fixes) restent inchangés. Aucune clé locale supplémentaire.
+Catalogue actuel : **71 parcours, 29 balades à 1/5, 10 thèmes, 20 campagnes/carnets et 67 badges**. Les exigences précédentes et le trophée PACA (18 destinations fixes) restent inchangés. Aucune clé locale supplémentaire.
 
 ## Neuf nouveaux formats courts
 
@@ -78,7 +78,7 @@ Six modèles supplémentaires portent les séances découverte à onze : Souffle
 
 ## Fiches historiques harmonisées
 
-Les quatorze cols et étapes historiques reçoivent paysage, points d’intérêt et repères, sans changer ID, relief, géométrie, difficulté, XP ou records. Leurs kilomètres intermédiaires sont **indicatifs, sans positions GPS relevées**, ce que la fiche et le lecteur signalent. Les sept premières balades reçoivent des lieux projetés sur leurs GPX vérifiés par SHA-256, sans recalcul des profils. Chambord et Ré n’ont aucune succession inventée de villages : départ et arrivée complètent leurs paysages. Les 61 fiches proposent les mêmes familles d’informations.
+Les quatorze cols et étapes historiques reçoivent paysage, points d’intérêt et repères, sans changer ID, relief, géométrie, difficulté, XP ou records. Leurs kilomètres intermédiaires sont **indicatifs, sans positions GPS relevées**, ce que la fiche et le lecteur signalent. Les sept premières balades reçoivent des lieux projetés sur leurs GPX vérifiés par SHA-256, sans recalcul des profils. Chambord et Ré n’ont aucune succession inventée de villages : départ et arrivée complètent leurs paysages. Les 71 fiches proposent les mêmes familles d’informations.
 
 Références complémentaires : [Alpe d’Huez](https://www.alpedhuez.com/fr/activites/activites-ete/velo/les-21-virages/), [Ventoux](https://www.parcduventoux.fr/a-voir-a-faire/decouvrir-en-douceur/decouvrir-le-ventoux-a-velo/), [Tourmalet](https://www.tourisme-hautes-pyrenees.com/voyage-aux-pyrenees/les-grands-sites/col-tourmalet/), [Iseran depuis Bonneval](https://www.velo-maurienne.com/equipement/montee-cyclo-du-col-de-liseran-depuis-bonneval-sur-arc-bonneval-sur-arc/), [Vaison](https://www.cheminsdesparcs.fr/fr/trek/134087-VAISON-LA-ROMAINE----Les-villages-Medievaux-a-velo), [Enclave](https://provence-alpes-cotedazur.com/que-faire/itineraires-randonnee/28-tour-de-lenclave-a-velo-valreas-fr-4346718/), [Velleron](https://provence-alpes-cotedazur.com/que-faire/itineraires-randonnee/11-du-ventoux-a-lisle-sur-la-sorgue-velleron-fr-4347403/). Les autres références Maurienne/Corniches restent sur leurs fiches. Les paysages sont décrits, sans images filmées du trajet.
 
@@ -94,3 +94,7 @@ python3 scripts/build-legacy-places.py
 Le dernier script utilise les GPX historiques vérifiés du cache : télécharger ces fichiers depuis les URL de `build-scenic-profiles.py`, sans réécrire les profils publiés si seul le cache est nécessaire. Les réponses IGN et GPX sont conservées dans le cache ignoré. Le SHA enregistré porte sur le membre GPX extrait de l’archive. Aucune requête géographique/IGN pendant une séance.
 
 Tests : profils/sources, jonctions, validations indépendantes, ordre libre, incomplets/secteurs exclus, XP uniques, suppression, réimport, reprise, mobile et ordinateur. Le TEB5 réel et les installations physiques restent à tester ; les essais FTMS simulés ne les prouvent pas.
+
+## Estérel et escales Napoléon
+
+Dix sorties supplémentaires, dont six nouveaux formats courts de 15–27 minutes. Les 13 membres des anciens objectifs courts restent fixes ; les nouveaux petits formats ont leurs propres carnets. Le thème Napoléon contient 14 grandes étapes et 4 escales, sans changement des trophées 3/8, 3/6 et 14/14. [Parcours, trois bonus uniques et sources](ESTEREL-ESCALES.md).

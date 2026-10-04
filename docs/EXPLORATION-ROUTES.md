@@ -1,6 +1,6 @@
 # Carnets de France — extension du 4 octobre 2026
 
-Quinze parcours complètent les 23 destinations précédentes : 38 parcours à la livraison initiale, dont 14 balades à 1/5. Le catalogue actuel atteint **61 parcours et 22 balades**, avec les [formats courts, programmes et Route Napoléon](DISCOVERY-PROGRAMMES.md). Les dix nouveaux tracés PACA couvrent littoral, Alpilles, Luberon, Verdon et Alpes du Sud. Les fiches sont écrites pour VéloQuest ; le relief représenté provient des traces officielles, sans visite ni liaison ajoutée.
+Quinze parcours complètent les 23 destinations précédentes : 38 parcours à la livraison initiale, dont 14 balades à 1/5. Le catalogue actuel atteint **71 parcours et 29 balades**, avec les [formats courts, programmes et Route Napoléon](DISCOVERY-PROGRAMMES.md). Les dix nouveaux tracés PACA couvrent littoral, Alpilles, Luberon, Verdon et Alpes du Sud. Les fiches sont écrites pour VéloQuest ; le relief représenté provient des traces officielles, sans visite ni liaison ajoutée.
 
 | Parcours | Difficulté | Distance GPX | D+ du profil lissé | Villes et repères, dans le sens proposé | Source |
 | --- | ---: | ---: | ---: | --- | --- |
@@ -59,3 +59,5 @@ python3 scripts/build-exploration-profiles.py
 Le script lit `scripts/exploration-sources.json`, les extraits explicites et les références de repères, puis écrit `lib/exploration-profiles.json`. Il ne modifie pas les neuf balades antérieures. Le cache ignoré `.cache/scenic-profiles` conserve les GPX téléchargés ; déplacer les fichiers concernés pour une actualisation, puis comparer les nouvelles géométries et checksums. Textes, difficultés et récompenses sont dans `lib/exploration-routes.ts`, thèmes dans `lib/route-themes.ts`, trophées dans `lib/discovery-objectives.ts`, carnets dans `lib/campaigns.ts`. Aucun appel touristique ou IGN n’est nécessaire pendant une séance.
 
 Contrôles obligatoires sur le commit proposé : typecheck, tests unitaires, tests navigateur mobile/ordinateur et build. Les captures et essais matériels réels sont distingués dans le document de reprise.
+
+Le lot [Estérel et petites escales Napoléon](ESTEREL-ESCALES.md) ajoute dix sorties avec altitudes IGN, trois carnets et deux trophées. Les profils et objectifs documentés ici restent inchangés.

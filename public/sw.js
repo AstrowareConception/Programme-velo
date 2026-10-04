@@ -1,4 +1,4 @@
-const CACHE = "veloquest-v11";
+const CACHE = "veloquest-v12";
 const CORE = ["/", "/manifest.webmanifest", "/logo.svg", "/icon.svg", "/pwa-icon/192", "/pwa-icon/512"];
 
 self.addEventListener("install", (event) => {

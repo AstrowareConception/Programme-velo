@@ -1,0 +1,142 @@
+{
+  "napoleon-golfe-cannes-short": {
+    "key": "napoleon",
+    "gpxUrl": "https://provence-alpes-cotedazur.com/app/uploads/crt-paca/2020/07/gps-routenapoleon-1.zip",
+    "gpxMember": "gps-garmin/itineraire-15.gpx",
+    "trackOnly": true,
+    "reverse": true,
+    "altitudeSource": "IGN RGE ALTI",
+    "parentRouteId": "napoleon-golfe-grasse",
+    "clip": [
+      [
+        43.56864,
+        7.077
+      ],
+      [
+        43.554,
+        7.01825
+      ]
+    ],
+    "section": "Golfe-Juan → Cannes : court extrait du parcours napoleon-golfe-grasse, avec validation indépendante.",
+    "places": [
+      {
+        "label": "Golfe-Juan",
+        "landmark": "Départ routier dans Golfe-Juan, au nord du front de mer.",
+        "endpoint": "start"
+      },
+      {
+        "label": "Cannes",
+        "landmark": "Arrivée sur la route dans Cannes, sans boucle de la Croisette.",
+        "endpoint": "finish"
+      }
+    ],
+    "gpxSha256": "5c8763c46bdd1a51684f85573d47c8bf45237a82657480997d1cbee8ba77dc8b"
+  },
+  "napoleon-mougins-mouans-short": {
+    "key": "napoleon",
+    "gpxUrl": "https://provence-alpes-cotedazur.com/app/uploads/crt-paca/2020/07/gps-routenapoleon-1.zip",
+    "gpxMember": "gps-garmin/itineraire-15.gpx",
+    "trackOnly": true,
+    "reverse": true,
+    "altitudeSource": "IGN RGE ALTI",
+    "parentRouteId": "napoleon-golfe-grasse",
+    "clip": [
+      [
+        43.60561,
+        6.99362
+      ],
+      [
+        43.62041,
+        6.97077
+      ]
+    ],
+    "section": "Mougins · secteur routier → Mouans-Sartoux : court extrait du parcours napoleon-golfe-grasse, avec validation indépendante.",
+    "places": [
+      {
+        "label": "Mougins · secteur routier",
+        "landmark": "Départ sur la Route Napoléon, sans détour au village perché.",
+        "endpoint": "start"
+      },
+      {
+        "label": "Mouans-Sartoux",
+        "landmark": "Arrivée à Mouans-Sartoux sur la trace publiée.",
+        "endpoint": "finish"
+      }
+    ],
+    "gpxSha256": "5c8763c46bdd1a51684f85573d47c8bf45237a82657480997d1cbee8ba77dc8b"
+  },
+  "napoleon-malijai-chateau-short": {
+    "key": "napoleon",
+    "gpxUrl": "https://provence-alpes-cotedazur.com/app/uploads/crt-paca/2020/07/gps-routenapoleon-1.zip",
+    "gpxMember": "gps-garmin/itineraire-15.gpx",
+    "trackOnly": true,
+    "reverse": true,
+    "altitudeSource": "IGN RGE ALTI",
+    "parentRouteId": "napoleon-digne-sisteron",
+    "clip": [
+      [
+        44.04475,
+        6.03049
+      ],
+      [
+        44.09377,
+        6.00971
+      ]
+    ],
+    "section": "Malijai → Château-Arnoux-Saint-Auban : court extrait du parcours napoleon-digne-sisteron, avec validation indépendante.",
+    "places": [
+      {
+        "label": "Malijai",
+        "landmark": "Départ sur la route touristique à Malijai.",
+        "endpoint": "start"
+      },
+      {
+        "label": "Château-Arnoux-Saint-Auban",
+        "landmark": "Arrivée sur la route à Château-Arnoux-Saint-Auban, sans détour vers Volonne.",
+        "endpoint": "finish"
+      }
+    ],
+    "gpxSha256": "5c8763c46bdd1a51684f85573d47c8bf45237a82657480997d1cbee8ba77dc8b"
+  },
+  "napoleon-theoffrey-laffrey-short": {
+    "key": "napoleon-michelin-north",
+    "gpxUrl": "https://editions.michelin.com/gpx/2023/moto/31_LA%20ROUTE%20NAPOL%C3%89ON%201%20%28GRENOBLE-EMBRUN%29_6080100.gpx",
+    "gpxSha256": "8f3c12217c9c4199fcfaa66fca6f28be77bbe436e6e59f97b1cb22369bad8b36",
+    "trackOnly": true,
+    "trackName": "Grenoble -> Embrun (167,3 km)",
+    "reverse": true,
+    "altitudeSource": "IGN RGE ALTI",
+    "parentRouteId": "napoleon-mure-laffrey",
+    "clip": [
+      [
+        44.990615,
+        5.773149
+      ],
+      [
+        45.026411,
+        5.772556
+      ]
+    ],
+    "section": "Saint-Théoffrey → Laffrey : court extrait du parcours napoleon-mure-laffrey, avec validation indépendante.",
+    "places": [
+      {
+        "label": "Saint-Théoffrey",
+        "landmark": "Départ sur la route du plateau matheysin.",
+        "endpoint": "start"
+      },
+      {
+        "label": "Prairie de la Rencontre · secteur routier",
+        "landmark": "Le monument reste à l’écart de la route ; aucune visite ou liaison vers le lac ajoutée.",
+        "coordinate": [
+          45.016465,
+          5.774538
+        ]
+      },
+      {
+        "label": "Laffrey",
+        "landmark": "Arrivée dans Laffrey, sans boucle au bord du lac.",
+        "endpoint": "finish"
+      }
+    ]
+  }
+}

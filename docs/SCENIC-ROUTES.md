@@ -14,7 +14,7 @@ Les neuf balades historiques sont fondées sur des traces publiques des organism
 | Cagnes-sur-Mer–Cannes | 23,810 km | GPX officiel, tronçon inversé | [France Vélo Tourisme / EV8 Cannes–Nice](https://www.francevelotourisme.com/itineraire/la-mediterranee-a-velo-eurovelo-8/cannes-nice) |
 | Golfe-Juan–Cannes | 7,508 km | Même GPX, tronçon court inversé | [France Vélo Tourisme / EV8 Cannes–Nice](https://www.francevelotourisme.com/itineraire/la-mediterranee-a-velo-eurovelo-8/cannes-nice) |
 
-Les cinq nouvelles balades et dix nouvelles étapes portaient le catalogue à 38 parcours, dont 14 balades. Leur provenance, leurs villes et leurs objectifs sont documentés dans [EXPLORATION-ROUTES.md](EXPLORATION-ROUTES.md). Le lot suivant porte le total à **61 parcours, dont 22 balades**, avec neuf formats courts et quatorze étapes de la Route Napoléon ([sources et limites](DISCOVERY-PROGRAMMES.md)). Les sept premières balades disposent désormais de repères locaux, sans changement de leur géométrie ni de leur relief. Le présent document conserve les neuf traces antérieures et leurs conditions de récompense.
+Les cinq nouvelles balades et dix nouvelles étapes portaient le catalogue à 38 parcours, dont 14 balades. Leur provenance, leurs villes et leurs objectifs sont documentés dans [EXPLORATION-ROUTES.md](EXPLORATION-ROUTES.md). Le lot suivant porte le total à **71 parcours, dont 29 balades**, avec neuf formats courts et quatorze étapes de la Route Napoléon ([sources et limites](DISCOVERY-PROGRAMMES.md)). Les sept premières balades disposent désormais de repères locaux, sans changement de leur géométrie ni de leur relief. Le présent document conserve les neuf traces antérieures et leurs conditions de récompense.
 
 ## Ce que représente le profil
 
@@ -57,3 +57,5 @@ python3 scripts/build-scenic-profiles.py
 Le générateur nécessite uniquement Python standard et un accès réseau aux sources et à l’IGN. Il utilise un cache ignoré par Git dans `.cache/scenic-profiles`. Pour une actualisation réelle des sources, déplacer ce cache avant de relancer ; conserver l’ancienne version pour comparer les différences. Aucun appel IGN n’est fait par l’application pendant la séance : les profils dérivés sont intégrés au build et consultables hors connexion après chargement.
 
 Après une modification, vérifier la géométrie et le relief, puis exécuter les quatre contrôles du projet avant publication. La disponibilité des services source n’est pas garantie. Les traces intégrées ne constituent pas un guidage routier et n’établissent pas la compatibilité FTMS du TEB5 physique.
+
+Le lot [Estérel et petites escales Napoléon](ESTEREL-ESCALES.md) ajoute dix sorties avec altitudes IGN, trois carnets et deux trophées. Les profils et objectifs documentés ici restent inchangés.

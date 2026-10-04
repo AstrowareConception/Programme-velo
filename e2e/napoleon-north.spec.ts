@@ -13,14 +13,14 @@ async function seed(page: Page, sessions: object[] = []) {
 }
 const card = (page: Page, name: string) => page.getByRole("heading", { name, exact: true }).locator("xpath=ancestor::article");
 const browse = (page: Page) => page.getByRole("button", { name: /Parcours/ }).click();
-const objectives = (page: Page) => page.getByText("Campagnes et carnets · 17 objectifs à découvrir", { exact: true }).click();
+const objectives = (page: Page) => page.getByText("Campagnes et carnets · 20 objectifs à découvrir", { exact: true }).click();
 const stored = (page: Page) => page.evaluate(() => JSON.parse(localStorage.getItem("veloquest:v1")!));
 const overflow = (page: Page) => page.evaluate(() => document.documentElement.scrollWidth > innerWidth);
 
 test("the northern sections expose actual towns, Bayard terrain and the independent Gap junction", async ({ page }, testInfo) => {
   const errors: string[] = []; page.on("pageerror", (error) => errors.push(error.message));
   await seed(page); await browse(page); await page.getByLabel("Thème", { exact: true }).selectOption("napoleon");
-  await expect(page.locator(".routeLibraryCard")).toHaveCount(14);
+  await expect(page.locator(".routeLibraryCard")).toHaveCount(18);
   await page.getByLabel("Rechercher").fill("col bayard");
   const route = card(page, "Route Napoléon · Gap → La Fare");
   await route.getByText("Découvrir le paysage", { exact: true }).click(); await expect(route).toContainText("Champsaur");

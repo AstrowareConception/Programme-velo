@@ -5,6 +5,8 @@ import { discoveryTerritories, routeThemes } from "./route-themes";
 import { shortRouteIds } from "./short-rides";
 import { napoleonRouteIds } from "./napoleon-routes";
 import { napoleonNorthRouteIds } from "./napoleon-north-routes";
+import { esterelCoastalRouteIds } from "./esterel-routes";
+import { napoleonShortRouteIds } from "./napoleon-short-routes";
 
 export function discoveryBadges(sessions: CompletedSession[]): Badge[] {
   const completed = completedRouteIds(sessions);
@@ -16,7 +18,11 @@ export function discoveryBadges(sessions: CompletedSession[]): Badge[] {
   const shortCount = shortRouteIds.filter((id) => completed.has(id)).length;
   const napoleonCount = napoleonRouteIds.filter((id) => completed.has(id)).length;
   const northCount = napoleonNorthRouteIds.filter((id) => completed.has(id)).length;
+  const esterelCoastCount = esterelCoastalRouteIds.filter((id) => completed.has(id)).length;
+  const napoleonShortCount = napoleonShortRouteIds.filter((id) => completed.has(id)).length;
   return [
+    { id: "esterel-red-rocks", name: "Roches rouges", icon: "🪨", description: "Terminer les 3 étapes côtières de Saint-Raphaël à Théoule, par Agay et Le Trayas. Les deux formats courts ne les remplacent pas. Aucun chrono ni XP supplémentaire.", target: 3, count: esterelCoastCount },
+    { id: "napoleon-pocket-eagle", name: "Aigle de poche", icon: "🦅", description: "Terminer 2 escales différentes parmi les 4 formats courts du carnet Route Napoléon · petites escales. Les grandes étapes gardent leurs propres trophées. Aucun XP supplémentaire.", target: 2, count: napoleonShortCount },
     { id: "short-three", name: "Petites échappées", icon: "🌼", description: "Terminer 3 formats courts différents parmi les 13 tronçons de 15 à 30 minutes du carnet. Pauses libres.", target: 3, count: shortCount },
     { id: "short-six", name: "Collection de parenthèses", icon: "🧺", description: "Terminer 6 formats courts différents parmi les 13 du carnet. Répéter un tronçon ne compte pas comme une nouvelle découverte.", target: 6, count: shortCount },
     { id: "napoleon-three", name: "Premiers aigles", icon: "🦅", description: "Terminer 3 tronçons différents de la Route Napoléon entre Golfe-Juan et Gap. Aucun ordre imposé.", target: 3, count: napoleonCount },
