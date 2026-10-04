@@ -1,0 +1,266 @@
+{
+  "napoleon-gap-fare": {
+    "key": "napoleon-michelin-north",
+    "gpxUrl": "https://editions.michelin.com/gpx/2023/moto/31_LA%20ROUTE%20NAPOL%C3%89ON%201%20%28GRENOBLE-EMBRUN%29_6080100.gpx",
+    "gpxSha256": "8f3c12217c9c4199fcfaa66fca6f28be77bbe436e6e59f97b1cb22369bad8b36",
+    "trackOnly": true,
+    "trackName": "Grenoble -> Embrun (167,3 km)",
+    "reverse": true,
+    "altitudeSource": "IGN RGE ALTI",
+    "clip": [
+      [
+        44.557793,
+        6.081951
+      ],
+      [
+        44.670354,
+        6.076661
+      ]
+    ],
+    "section": "Gap → La Fare-en-Champsaur · extrait inversé de la seule trace Grenoble → Embrun",
+    "places": [
+      {
+        "label": "Gap",
+        "landmark": "Départ sur la trace publiée dans Gap, distinct de l’arrivée du carnet Golfe-Juan–Gap.",
+        "endpoint": "start"
+      },
+      {
+        "label": "Col Bayard",
+        "landmark": "Passage à 1 245 m entre le bassin de Gap et le Champsaur.",
+        "coordinate": [
+          44.619366,
+          6.08202
+        ]
+      },
+      {
+        "label": "La Fare-en-Champsaur",
+        "landmark": "Arrivée dans le Champsaur, au pied du versant nord du col.",
+        "endpoint": "finish"
+      }
+    ]
+  },
+  "napoleon-fare-corps": {
+    "key": "napoleon-michelin-north",
+    "gpxUrl": "https://editions.michelin.com/gpx/2023/moto/31_LA%20ROUTE%20NAPOL%C3%89ON%201%20%28GRENOBLE-EMBRUN%29_6080100.gpx",
+    "gpxSha256": "8f3c12217c9c4199fcfaa66fca6f28be77bbe436e6e59f97b1cb22369bad8b36",
+    "trackOnly": true,
+    "trackName": "Grenoble -> Embrun (167,3 km)",
+    "reverse": true,
+    "altitudeSource": "IGN RGE ALTI",
+    "clip": [
+      [
+        44.670354,
+        6.076661
+      ],
+      [
+        44.819696,
+        5.94701
+      ]
+    ],
+    "section": "La Fare-en-Champsaur → Corps · extrait inversé de la seule trace Grenoble → Embrun",
+    "places": [
+      {
+        "label": "La Fare-en-Champsaur",
+        "landmark": "Départ au pied du col Bayard, sur la route touristique.",
+        "endpoint": "start"
+      },
+      {
+        "label": "Les Barraques · Saint-Bonnet",
+        "landmark": "Secteur routier à l’ouest du bourg : aucun détour vers le centre de Saint-Bonnet.",
+        "coordinate": [
+          44.677857,
+          6.069878
+        ]
+      },
+      {
+        "label": "Saint-Firmin · carrefour",
+        "landmark": "Porte du Valgaudemar, sans remonter la vallée ni rejoindre le centre du village.",
+        "coordinate": [
+          44.772421,
+          6.023784
+        ]
+      },
+      {
+        "label": "Corps",
+        "landmark": "Arrivée dans Corps ; la montée vers La Salette reste hors parcours.",
+        "endpoint": "finish"
+      }
+    ]
+  },
+  "napoleon-corps-mure": {
+    "key": "napoleon-michelin-north",
+    "gpxUrl": "https://editions.michelin.com/gpx/2023/moto/31_LA%20ROUTE%20NAPOL%C3%89ON%201%20%28GRENOBLE-EMBRUN%29_6080100.gpx",
+    "gpxSha256": "8f3c12217c9c4199fcfaa66fca6f28be77bbe436e6e59f97b1cb22369bad8b36",
+    "trackOnly": true,
+    "trackName": "Grenoble -> Embrun (167,3 km)",
+    "reverse": true,
+    "altitudeSource": "IGN RGE ALTI",
+    "clip": [
+      [
+        44.819696,
+        5.94701
+      ],
+      [
+        44.905508,
+        5.787491
+      ]
+    ],
+    "section": "Corps → La Mure · extrait inversé de la seule trace Grenoble → Embrun",
+    "places": [
+      {
+        "label": "Corps",
+        "landmark": "Halte impériale du Beaumont, avec l’Obiou et le Sautet dans le paysage.",
+        "endpoint": "start"
+      },
+      {
+        "label": "La Salle-en-Beaumont · secteur routier",
+        "landmark": "Traversée du Beaumont par la route publiée, sans ajouter une boucle dans le village.",
+        "coordinate": [
+          44.864402,
+          5.864134
+        ]
+      },
+      {
+        "label": "La Mure",
+        "landmark": "Arrivée sur le plateau matheysin, sans détour vers le Petit Train ou Monteynard.",
+        "endpoint": "finish"
+      }
+    ]
+  },
+  "napoleon-mure-laffrey": {
+    "key": "napoleon-michelin-north",
+    "gpxUrl": "https://editions.michelin.com/gpx/2023/moto/31_LA%20ROUTE%20NAPOL%C3%89ON%201%20%28GRENOBLE-EMBRUN%29_6080100.gpx",
+    "gpxSha256": "8f3c12217c9c4199fcfaa66fca6f28be77bbe436e6e59f97b1cb22369bad8b36",
+    "trackOnly": true,
+    "trackName": "Grenoble -> Embrun (167,3 km)",
+    "reverse": true,
+    "altitudeSource": "IGN RGE ALTI",
+    "clip": [
+      [
+        44.905508,
+        5.787491
+      ],
+      [
+        45.026411,
+        5.772556
+      ]
+    ],
+    "section": "La Mure → Laffrey · extrait inversé de la seule trace Grenoble → Embrun",
+    "places": [
+      {
+        "label": "La Mure",
+        "landmark": "Bourg de la Matheysine et mémoire minière du plateau.",
+        "endpoint": "start"
+      },
+      {
+        "label": "Pierre-Châtel · secteur routier",
+        "landmark": "La route longe le secteur oriental du bourg sur le plateau matheysin.",
+        "coordinate": [
+          44.958539,
+          5.780829
+        ]
+      },
+      {
+        "label": "Saint-Théoffrey",
+        "landmark": "Relief ouvert entre les lacs du plateau.",
+        "coordinate": [
+          44.990615,
+          5.773149
+        ]
+      },
+      {
+        "label": "Prairie de la Rencontre · secteur routier",
+        "landmark": "Le monument se trouve vers le lac, à l’écart du tracé : aucune visite ou liaison au bord de l’eau ajoutée.",
+        "coordinate": [
+          45.016465,
+          5.774538
+        ]
+      },
+      {
+        "label": "Laffrey",
+        "landmark": "Arrivée dans Laffrey, sans boucle autour des lacs.",
+        "endpoint": "finish"
+      }
+    ]
+  },
+  "napoleon-laffrey-vizille": {
+    "key": "napoleon-michelin-north",
+    "gpxUrl": "https://editions.michelin.com/gpx/2023/moto/31_LA%20ROUTE%20NAPOL%C3%89ON%201%20%28GRENOBLE-EMBRUN%29_6080100.gpx",
+    "gpxSha256": "8f3c12217c9c4199fcfaa66fca6f28be77bbe436e6e59f97b1cb22369bad8b36",
+    "trackOnly": true,
+    "trackName": "Grenoble -> Embrun (167,3 km)",
+    "reverse": true,
+    "altitudeSource": "IGN RGE ALTI",
+    "clip": [
+      [
+        45.026411,
+        5.772556
+      ],
+      [
+        45.07788,
+        5.766494
+      ]
+    ],
+    "section": "Laffrey → Vizille · extrait inversé de la seule trace Grenoble → Embrun",
+    "places": [
+      {
+        "label": "Laffrey",
+        "landmark": "Départ sur le plateau, avant la longue descente vers la Romanche.",
+        "endpoint": "start"
+      },
+      {
+        "label": "Vizille",
+        "landmark": "Arrivée près du pont sur la Romanche ; le domaine du château reste une visite distincte.",
+        "endpoint": "finish"
+      }
+    ]
+  },
+  "napoleon-vizille-grenoble": {
+    "key": "napoleon-michelin-north",
+    "gpxUrl": "https://editions.michelin.com/gpx/2023/moto/31_LA%20ROUTE%20NAPOL%C3%89ON%201%20%28GRENOBLE-EMBRUN%29_6080100.gpx",
+    "gpxSha256": "8f3c12217c9c4199fcfaa66fca6f28be77bbe436e6e59f97b1cb22369bad8b36",
+    "trackOnly": true,
+    "trackName": "Grenoble -> Embrun (167,3 km)",
+    "reverse": true,
+    "altitudeSource": "IGN RGE ALTI",
+    "clip": [
+      [
+        45.07788,
+        5.766494
+      ],
+      [
+        45.183293,
+        5.737984
+      ]
+    ],
+    "section": "Vizille → Grenoble · extrait inversé de la seule trace Grenoble → Embrun",
+    "places": [
+      {
+        "label": "Vizille",
+        "landmark": "Départ dans le secteur routier de Vizille, près de la Romanche.",
+        "endpoint": "start"
+      },
+      {
+        "label": "Brié-et-Angonnes · secteur routier",
+        "landmark": "Remontée vers le plateau au-dessus de la vallée de la Romanche.",
+        "coordinate": [
+          45.11264,
+          5.785233
+        ]
+      },
+      {
+        "label": "Eybens",
+        "landmark": "Retour dans l’agglomération, au pied des reliefs de Belledonne.",
+        "coordinate": [
+          45.149179,
+          5.750498
+        ]
+      },
+      {
+        "label": "Grenoble",
+        "landmark": "Arrivée sur la trace publiée dans Grenoble ; aucune montée vers la Bastille ajoutée.",
+        "endpoint": "finish"
+      }
+    ]
+  }
+}

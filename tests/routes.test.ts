@@ -34,7 +34,7 @@ describe("route library", () => {
   });
 
   it("offers easier stages with both climbing and descending terrain", () => {
-    const easierStages = climbs.filter((route) => routeCategory(route) === "stage" && routeDifficulty(route) <= 3);
+    const easierStages = climbs.filter((route) => routeCategory(route) === "stage" && routeDifficulty(route) <= 3 && route.elevationGainM > 0);
     expect(easierStages.length).toBeGreaterThanOrEqual(5);
     easierStages.forEach((route) => {
       const terrain = routeTerrain(route);

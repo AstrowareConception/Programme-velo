@@ -118,6 +118,9 @@ export const campaigns: Campaign[] = [
   { id: "half-hour-postcards", title: "Un paysage en 30 minutes", subtitle: "4 escales au fil de l’eau", icon: "📮", group: "discovery", difficultyLabel: "1/5", xpBonus: 180,
     description: "Sevrier–Annecy, le Grau-du-Roi–Aigues-Mortes, Cayeux–Le Hourdel et Candé–Chaumont. Quatre tronçons indépendants ; terminer un format court ne valide pas le parcours complet dont il est extrait.",
     routeIds: ["sevrier-annecy-short", "grau-aigues-short", "cayeux-hourdel-short", "cande-chaumont-short"] },
+  { id: "napoleon-dauphine", title: "Route Napoléon · de Gap à Grenoble", subtitle: "Carnet de 6 étapes · ordre libre", icon: "🏔️", group: "sport", difficultyLabel: "2–3/5", xpBonus: 700,
+    description: "Col Bayard, Champsaur, Corps, La Mure, Laffrey, Vizille, Brié et Eybens : six tronçons jusqu’à Grenoble. Chaque étape complète compte une seule fois. Ce carnet ajoute un objectif distinct ; les huit étapes et les 900 XP du carnet de la mer à Gap restent inchangés.",
+    routeIds: ["napoleon-gap-fare", "napoleon-fare-corps", "napoleon-corps-mure", "napoleon-mure-laffrey", "napoleon-laffrey-vizille", "napoleon-vizille-grenoble"] },
 ];
 
 export function completedRouteIds(sessions: CompletedSession[]) {

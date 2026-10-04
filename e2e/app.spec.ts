@@ -134,7 +134,7 @@ test("route filters can isolate multi-col stages", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Villages médiévaux de Vaison" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Tour des Corniches" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Col du Galibier" })).toHaveCount(0);
-  await expect(page.locator(".routeToolbarBottom")).toContainText("25 parcours");
+  await expect(page.locator(".routeToolbarBottom")).toContainText("31 parcours");
 });
 
 test("challenge picker launches the selected mode and constraint", async ({ page }) => {
@@ -188,7 +188,7 @@ test("campaign panel opens the next discovery stage", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: /Parcours/ }).click();
 
-  await page.getByText("Campagnes et carnets · 16 objectifs à découvrir", { exact: true }).click();
+  await page.getByText("Campagnes et carnets · 17 objectifs à découvrir", { exact: true }).click();
   const campaign = page.getByRole("heading", { name: "Découverte Provence" }).locator("xpath=ancestor::article");
   await expect(campaign).toContainText("0/4");
   await expect(campaign).toContainText("Velleron – L’Isle-sur-la-Sorgue");
@@ -212,7 +212,7 @@ test("out-of-order campaign completion marks only the actual route", async ({ pa
   })), state);
   await page.goto("/");
   await page.getByRole("button", { name: /Parcours/ }).click();
-  await page.getByText("Campagnes et carnets · 16 objectifs à découvrir", { exact: true }).click();
+  await page.getByText("Campagnes et carnets · 17 objectifs à découvrir", { exact: true }).click();
   const campaign = page.getByRole("heading", { name: "Découverte Provence" }).locator("xpath=ancestor::article");
   await expect(campaign).toContainText("1/4");
   await expect(campaign.locator(".campaignStages > span").nth(0)).toHaveClass("current");

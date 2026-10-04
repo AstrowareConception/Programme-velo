@@ -49,8 +49,17 @@ for route_id, source in json.loads(Path(args.sources).read_text()).items():
             downloaded = zipfile.ZipFile(io.BytesIO(downloaded)).read(source['gpxMember'])
         path.write_bytes(downloaded)
     raw = path.read_bytes()
+    if source.get('gpxSha256') and hashlib.sha256(raw).hexdigest() != source['gpxSha256']:
+        raise ValueError(f'{route_id}: published GPX changed; review before rebuilding')
+    geometry = ET.fromstring(raw)
+    if source.get('trackName'):
+        tracks = [node for node in geometry.iter() if node.tag.split('}')[-1] == 'trk'
+                  and any(child.tag.split('}')[-1] == 'name' and child.text == source['trackName'] for child in node)]
+        if len(tracks) != 1 or not source.get('trackOnly'):
+            raise ValueError(f'{route_id}: expected one named track; do not join alternative itineraries')
+        geometry = tracks[0]
     points = []
-    for node in ET.fromstring(raw).iter():
+    for node in geometry.iter():
         if node.tag.split('}')[-1] not in (('trkpt',) if source.get('trackOnly') else ('trkpt', 'rtept')):
             continue
         altitude = next((float(child.text) for child in node if child.tag.split('}')[-1] == 'ele'), None)
@@ -127,6 +136,8 @@ for route_id, source in json.loads(Path(args.sources).read_text()).items():
                   'altitudeSource': source.get('altitudeSource', 'GPX officiel'), 'checkedOn': datetime.now(timezone.utc).date().isoformat(), 'profileStepM': 500}
     if source.get('gpxMember'):
         provenance['gpxMember'] = source['gpxMember']
+    if source.get('trackName'):
+        provenance['trackName'] = source['trackName']
     if 'section' in source:
         provenance['section'] = source['section']
     result[route_id] = {

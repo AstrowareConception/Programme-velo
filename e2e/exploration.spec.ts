@@ -14,14 +14,14 @@ async function seed(page: Page, sessions: object[] = []) {
 }
 const browse = (page: Page) => page.getByRole("button", { name: /Parcours/ }).click();
 const card = (page: Page, name: string) => page.getByRole("heading", { name, exact: true }).locator("xpath=ancestor::article");
-const objectives = (page: Page) => page.getByText("Campagnes et carnets · 16 objectifs à découvrir", { exact: true }).click();
+const objectives = (page: Page) => page.getByText("Campagnes et carnets · 17 objectifs à découvrir", { exact: true }).click();
 const stored = (page: Page) => page.evaluate(() => JSON.parse(localStorage.getItem("veloquest:v1")!));
 const overflow = (page: Page) => page.evaluate(() => document.documentElement.scrollWidth > innerWidth);
 
 test("themes, towns and all difficulties filter the expanded catalogue without overflow", async ({ page }, testInfo) => {
   const errors: string[] = []; page.on("pageerror", (e) => errors.push(e.message));
   await seed(page); await browse(page);
-  await expect(page.locator(".routeLibraryCard")).toHaveCount(55);
+  await expect(page.locator(".routeLibraryCard")).toHaveCount(61);
   await expect(page.locator(".themeCard")).toHaveCount(9);
   await expect(page.locator(".campaignDrawer")).not.toHaveAttribute("open");
   await page.getByRole("button", { name: /Côte d’Azur Ports/ }).click();

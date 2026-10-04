@@ -3,6 +3,7 @@ import { scenicRoutes } from "./scenic-routes";
 import { explorationRoutes } from "./exploration-routes";
 import { shortRoutes } from "./short-rides";
 import { napoleonRoutes } from "./napoleon-routes";
+import { napoleonNorthRoutes } from "./napoleon-north-routes";
 import { enrichRouteDescription } from "./route-descriptions";
 
 export type RouteCategory = "climb" | "stage" | "scenic" | "imported";
@@ -45,7 +46,7 @@ export type ClimbChallenge = {
   highlights?: string[];
   places?: RoutePlace[];
   placesNote?: string;
-  provenance?: { gpxUrl: string; gpxSha256: string; altitudeSource: string; checkedOn: string; profileStepM: number; section?: string };
+  provenance?: { gpxUrl: string; gpxSha256: string; altitudeSource: string; checkedOn: string; profileStepM: number; section?: string; trackName?: string };
 };
 
 const nativeRoutes: ClimbChallenge[] = [
@@ -625,7 +626,8 @@ const nativeRoutes: ClimbChallenge[] = [
   ...scenicRoutes,
   ...explorationRoutes,
   ...shortRoutes,
-  ...napoleonRoutes
+  ...napoleonRoutes,
+  ...napoleonNorthRoutes
 ];
 export const climbs = nativeRoutes.map(enrichRouteDescription);
 

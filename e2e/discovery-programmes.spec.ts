@@ -13,16 +13,16 @@ async function seed(page: Page, sessions: object[] = []) {
 const card = (page: Page, name: string) => page.getByRole("heading", { name, exact: true }).locator("xpath=ancestor::article");
 const browse = (page: Page) => page.getByRole("button", { name: /Parcours/ }).click();
 const stored = (page: Page) => page.evaluate(() => JSON.parse(localStorage.getItem("veloquest:v1")!));
-const objectives = (page: Page) => page.getByText("Campagnes et carnets · 16 objectifs à découvrir", { exact: true }).click();
+const objectives = (page: Page) => page.getByText("Campagnes et carnets · 17 objectifs à découvrir", { exact: true }).click();
 async function programs(page: Page) {
   if (await page.locator(".workoutPrograms").getAttribute("open") === null) await page.getByText("Programmes découverte · 3 chemins pour progresser", { exact: true }).click();
 }
 const overflow = (page: Page) => page.evaluate(() => document.documentElement.scrollWidth > innerWidth);
 
-test("Route Napoléon groups eight sourced road sections and prepares local landmarks", async ({ page }, testInfo) => {
+test("Route Napoléon groups fourteen sourced road sections and prepares local landmarks", async ({ page }, testInfo) => {
   const errors: string[] = []; page.on("pageerror", (error) => errors.push(error.message));
-  await seed(page); await browse(page); await page.getByRole("button", { name: /Route Napoléon Huit tronçons/ }).click();
-  await expect(page.locator(".routeLibraryCard")).toHaveCount(8);
+  await seed(page); await browse(page); await page.getByRole("button", { name: /Route Napoléon Quatorze tronçons/ }).click();
+  await expect(page.locator(".routeLibraryCard")).toHaveCount(14);
   await expect(page.getByLabel("Thème", { exact: true })).toHaveValue("napoleon");
   const route = card(page, "Route Napoléon · Golfe-Juan → Grasse");
   await route.getByText("Découvrir le paysage", { exact: true }).click();
