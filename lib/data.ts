@@ -5,6 +5,8 @@ import { scenicRouteIds } from "./scenic-routes";
 import { explorationRoutes } from "./exploration-routes";
 import { discoveryBadges } from "./discovery-objectives";
 import { discoveryWorkouts } from "./discovery-workouts";
+import { shortRoutes } from "./short-rides";
+import { workoutProgramBadges, workoutProgramBonusXp } from "./workout-programs";
 import { initialGuidance } from "./onboarding";
 
 export const STORAGE_KEY = "veloquest:v1";
@@ -331,7 +333,7 @@ export function totalXp(state: AppState) {
     return s.points >= target.points && s.minutes >= target.minutes && s.sessions >= target.sessions && s.variety >= target.variety && s.hard <= target.maxHard;
   }).length;
   const bonusXp = weekTargets.reduce((sum, target) => sum + weeklyStats(state, target.week).bonusXp, 0);
-  return sessionXp + bonusXp + completedWeeks * 250 + campaignBonusXp(state.sessions);
+  return sessionXp + bonusXp + completedWeeks * 250 + campaignBonusXp(state.sessions) + workoutProgramBonusXp(state.sessions);
 }
 
 export function levelForXp(xp: number) {
@@ -374,13 +376,14 @@ export function badges(state: AppState): Badge[] {
   const uniqueChallengeIds = new Set(successfulChallenges.map((s) => s.metrics!.challenge!.id));
   const totalDistance = state.sessions.reduce((sum, s) => sum + (s.metrics?.distanceKm ?? 0), 0);
   const sessionsWithPower = state.sessions.filter((s) => (s.metrics?.avgPowerW ?? 0) > 0);
-  const gentleRouteIds = [...scenicRouteIds, ...explorationRoutes.filter((route) => route.category === "scenic").map((route) => route.id)];
+  const gentleRouteIds = [...scenicRouteIds, ...explorationRoutes.filter((route) => route.category === "scenic").map((route) => route.id), ...shortRoutes.filter((route) => route.category === "scenic").map((route) => route.id)];
   const scenicCount = gentleRouteIds.filter((id) => routeIds.has(id)).length;
   // Preserve the historic relief counters; gentle rides have their own trophies.
   const reliefCount = [...routeIds].filter((id) => !gentleRouteIds.includes(id)).length;
 
   return [
     ...discoveryBadges(state.sessions),
+    ...workoutProgramBadges(state.sessions),
     ...[
       { id: "scenic-first", name: "Premier paysage", icon: "🌅", target: 1 },
       { id: "scenic-three", name: "Flâneur de France", icon: "🧺", target: 3 },

@@ -108,7 +108,16 @@ export const campaigns: Campaign[] = [
     description: "Franchis le Turini entre Vésubie et Sospel, puis la Bonette entre Ubaye et Tinée. Deux étapes exigeantes à préparer avec des sorties plus douces entre les ascensions.",
     icon: "🏔️", routeIds: ["turini-vesubie-sospel", "bonette-ubaye-tinee"],
     xpBonus: 900, difficultyLabel: "4–5/5", group: "sport"
-  }
+  },
+  { id: "napoleon-paca", title: "Route Napoléon · de la mer à Gap", subtitle: "Carnet de 8 étapes · ordre libre", icon: "🦅", group: "sport", difficultyLabel: "2–3/5", xpBonus: 900,
+    description: "Golfe-Juan, Grasse, Saint-Vallier, Séranon, Castellane, Barrême, Digne, Sisteron et Gap : huit tronçons routiers, à enchaîner au fil de tes séances dans l’ordre de ton choix. La partie au-delà de Gap n’est pas incluse. Chaque étape complète compte une seule fois pour le carnet.",
+    routeIds: ["napoleon-golfe-grasse", "napoleon-grasse-vallier", "napoleon-vallier-seranon", "napoleon-seranon-castellane", "napoleon-castellane-barreme", "napoleon-barreme-digne", "napoleon-digne-sisteron", "napoleon-sisteron-gap"] },
+  { id: "southern-escales", title: "Escales du Sud", subtitle: "5 petits formats", icon: "☀️", group: "discovery", difficultyLabel: "1–2/5", xpBonus: 220,
+    description: "Antibes, Èze-sur-Mer, les Baux, le pays de Riez et Menton : des sorties courtes de 15 à 30 minutes. Le tronçon de Riez comporte des rampes ; choisis librement ton étape et ton niveau d’effort.",
+    routeIds: ["antibes-golfe-juan-short", "eze-cap-ail-short", "baux-maussane-short", "riez-montagnac-short", "menton-garavan-promenade"] },
+  { id: "half-hour-postcards", title: "Un paysage en 30 minutes", subtitle: "4 escales au fil de l’eau", icon: "📮", group: "discovery", difficultyLabel: "1/5", xpBonus: 180,
+    description: "Sevrier–Annecy, le Grau-du-Roi–Aigues-Mortes, Cayeux–Le Hourdel et Candé–Chaumont. Quatre tronçons indépendants ; terminer un format court ne valide pas le parcours complet dont il est extrait.",
+    routeIds: ["sevrier-annecy-short", "grau-aigues-short", "cayeux-hourdel-short", "cande-chaumont-short"] },
 ];
 
 export function completedRouteIds(sessions: CompletedSession[]) {

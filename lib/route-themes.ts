@@ -1,6 +1,8 @@
 export type RouteTheme = { id: string; title: string; icon: string; description: string; routeIds: string[] };
 
 export const routeThemes: RouteTheme[] = [
+  { id: "napoleon", title: "Route Napoléon", icon: "🦅", description: "Huit tronçons routiers de Golfe-Juan à Gap. Ordre libre ; la suite vers Grenoble reste à préparer.",
+    routeIds: ["napoleon-golfe-grasse", "napoleon-grasse-vallier", "napoleon-vallier-seranon", "napoleon-seranon-castellane", "napoleon-castellane-barreme", "napoleon-barreme-digne", "napoleon-digne-sisteron", "napoleon-sisteron-gap"] },
   { id: "azure", title: "Côte d’Azur", icon: "🍋", description: "Ports, villes et Corniches, de Cagnes à Menton.",
     routeIds: ["cagnes-cannes-littoral", "golfe-juan-cannes-balade", "menton-garavan-promenade", "eze-menton-basse-corniche", "nice-menton-grande-corniche", "nice-corniches-loop"] },
   { id: "verdon", title: "Lacs et gorges du Verdon", icon: "🦅", description: "Sainte-Croix, Castellane et le Grand Canyon.",
@@ -18,6 +20,17 @@ export const routeThemes: RouteTheme[] = [
   { id: "mountains", title: "Cols et haute montagne", icon: "⛰️", description: "Grands cols, Turini et Bonette : les journées sportives.",
     routeIds: ["alpe-dhuez", "ventoux-bedoin", "tourmalet-est", "galibier-valloire", "madeleine-maurienne", "glandon-cuines", "croix-de-fer-maurienne", "iseran-bonneval", "chaussy-madeleine-stage", "turini-vesubie-sospel", "bonette-ubaye-tinee"] }
 ];
+
+const shortThemeRoutes: Record<string, string[]> = {
+  azure: ["antibes-golfe-juan-short", "eze-cap-ail-short"],
+  verdon: ["riez-montagnac-short"],
+  provence: ["baux-maussane-short", "riez-montagnac-short"],
+  lakes: ["sevrier-annecy-short"],
+  coasts: ["antibes-golfe-juan-short", "eze-cap-ail-short", "grau-aigues-short", "cayeux-hourdel-short", "noyelles-crotoy-short"],
+  heritage: ["baux-maussane-short", "grau-aigues-short", "cande-chaumont-short"],
+  waterways: ["grau-aigues-short", "cande-chaumont-short"]
+};
+routeThemes.forEach((theme) => theme.routeIds.push(...(shortThemeRoutes[theme.id] ?? [])));
 
 // Fixed destinations for the regional trophy: additions never raise its target.
 export const discoveryTerritories = [

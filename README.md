@@ -11,13 +11,16 @@ VéloQuest est une PWA personnelle Next.js / React / TypeScript. Elle associe un
 - Démarrage accompagné en quatre étapes, profil et mesures facultatives, première séance douce de 15 min, puis Quête simplifiée et découverte progressive du coach et des balades. Les comptes existants conservent leur interface.
 - Programme de douze semaines : objectifs de minutes, points, séances et variété, avec un plafond de séances difficiles.
 - Catalogue libre, micro-séances de 10/12/15/20 minutes, séance libre et saisie rétroactive. Nouveaux formats : Roulage contemplatif (25 min), Cadence fluide (30 min), Petites vagues (40 min), Parenthèse souple (12 min bonus).
+- Trois **programmes découverte** souples, onze séances de découverte dont six nouveaux formats de 8 à 30 minutes ; trophée et bonus unique de 120/140/160 XP selon le programme.
+- Neuf **formats courts** extraits des GPX existants, avec filtre de durée simulée et deux nouveaux carnets. Un tronçon court ne valide pas son parcours parent.
+- Fiches harmonisées sur tous les parcours : paysages, lieux, sources et limites. Les repères des quatorze profils historiques restent indicatifs.
 - Coach adaptatif local : temps disponible, énergie, historique, charge récente et RPE.
 - Préparation, lecteur guidé, pause, alertes sonores/vocales/haptiques, calibration et maintien de l'écran lorsque disponible.
 - Reprise locale d'une séance interrompue, y compris Time Attack, Segment Attack et défi actif.
-- **38 parcours natifs**, dont **14 balades à 1/5** et les cinq étapes Velleron, Vaison, Uchaux, Enclave des Papes et Corniches à **2/5–3/5** : bosses, descentes, faux-plats et récupérations, en complément des grands cols à 4/5–5/5.
-- Huit thèmes de découverte, recherche par ville ou repère (avec ou sans accents), filtres, tri, favoris et import GPX avec persistance des parcours personnels.
+- **55 parcours natifs**, dont **22 balades à 1/5** et les cinq étapes Velleron, Vaison, Uchaux, Enclave des Papes et Corniches à **2/5–3/5** : bosses, descentes, faux-plats et récupérations, en complément des grands cols à 4/5–5/5.
+- Neuf thèmes de découverte, dont **Route Napoléon** (huit tronçons de Golfe-Juan à Gap), recherche par ville ou repère (avec ou sans accents), filtres, tri, favoris et import GPX avec persistance des parcours personnels.
 - Time Attack, records de parcours, fantôme et temps intermédiaires ; Segment Attack sur quatre secteurs, avec records séparés.
-- Huit défis de parcours ; **13 campagnes/carnets**, dont Passeport azuréen, Carnet du Verdon, Cartes postales de Provence, Les deux Corniches et Des forêts aux cimes. Sept nouveaux bonus uniques de 320 à 900 XP ; les six anciens objectifs restent inchangés.
+- Huit défis de parcours ; **16 campagnes/carnets**, dont Passeport azuréen, Carnet du Verdon, Cartes postales de Provence, Les deux Corniches et Des forêts aux cimes. Les objectifs précédents restent inchangés ; Escales du Sud, Un paysage en 30 minutes et Route Napoléon ajoutent des bonus uniques de 220, 180 et 900 XP.
 - Trophées de découverte : Premier paysage, Flâneur de France (3 balades différentes), Atlas des balades (7), plus six trophées de variété : 10/20 parcours natifs, 6 destinations PACA, 3 parcours azuréens, 4 territoires et les 5 difficultés. Collection La France en douceur inchangée.
 - XP, niveaux, badges, collections, palmarès et analyses de performance.
 - Journal, dates/heures locales, mesures datées de poids/taille/abdomen et suppression des saisies erronées.
@@ -44,7 +47,7 @@ La suppression recalcule les semaines, niveaux, campagnes, badges, collections, 
 
 ## Balades et programmes de découverte
 
-Le filtre **Balades** et le raccourci **Explorer les 14 balades** ouvrent quatorze parcours à 1/5 : tour du lac du Der, rive ouest d’Annecy, petit tour de Chambord, chemins en campagne de l’île de Ré, Coulon–Damvix, Carcassonne–Marseillette et Tours–Villandry, ainsi que Cagnes-sur-Mer–Cannes et son format court Golfe-Juan–Cannes. S’y ajoutent Menton–Garavan, le Calavon de Cavaillon à Apt, les canaux de Camargue gardoise, la baie de Somme et Erstein–Strasbourg. Les paysages et leurs points d’intérêt sont décrits sur les fiches et dans le lecteur.
+Le filtre **Balades** et le raccourci **Explorer les 22 balades** ouvrent vingt-deux parcours à 1/5 : tour du lac du Der, rive ouest d’Annecy, petit tour de Chambord, chemins en campagne de l’île de Ré, Coulon–Damvix, Carcassonne–Marseillette et Tours–Villandry, ainsi que Cagnes-sur-Mer–Cannes et son format court Golfe-Juan–Cannes. S’y ajoutent Menton–Garavan, le Calavon de Cavaillon à Apt, les canaux de Camargue gardoise, la baie de Somme et Erstein–Strasbourg. Les paysages et leurs points d’intérêt sont décrits sur les fiches et dans le lecteur.
 
 Les nouveaux profils à 2–5/5 complètent les cinq étapes historiques : Les Baux, Sainte-Croix et le plateau de Valensole, Castellane et ses deux lacs, Route des Crêtes du Verdon, Èze-sur-Mer–Menton, Nice–Menton par la Grande Corniche, Turini et Bonette, Roscoff–Morlaix et Blois–Chaumont. **Thème** combine paysages et difficultés ; **Campagnes et carnets** se déplie pour choisir un objectif de découverte ou sportif. Les lieux et leurs repères restent visibles avant le départ et pendant la séance.
 
@@ -52,9 +55,12 @@ En mode balade, l’effort conseillé reste **RPE 2–4**, avec une résistance 
 
 La **Côte d’Azur** se découvre de Cagnes-sur-Mer à Cannes (23,8 km, environ 95 minutes simulées), ou sur le petit format **Golfe-Juan → Cannes** (7,5 km, environ 30 minutes). Les fiches et la préparation présentent les villes, quartiers et repères kilométriques. Pendant la séance, le dernier repère atteint et le suivant accompagnent la carte : Villeneuve-Loubet, Antibes, Juan-les-Pins, Golfe-Juan, Palm Beach et la Croisette. Les kilomètres viennent de la trace ; les repères ne définissent pas les frontières des communes. Le format court a son propre identifiant et ne valide pas la traversée complète.
 
-Les deux carnets sont des programmes souples de découverte, en complément des douze semaines. Au fil de l’eau regroupe Der, Annecy, Marais poitevin et canal du Midi ; Échappées patrimoine associe Chambord, île de Ré et Villandry. Leurs cinq nouveaux badges comprennent deux badges de campagne et trois trophées de diversité. Les répétitions ne font pas progresser le nombre de paysages différents ; les bonus de carnet sont uniques, les séances gardent leur XP habituel. Les badges historiques `climb1` / `climb3` sont désormais nommés Premier relief / Collectionneur de reliefs : leurs validations antérieures sont conservées, les nouvelles balades disposent de leurs propres trophées. Atlas des balades garde son seuil de 7 destinations différentes ; La France en douceur conserve les sept parcours fondateurs pour préserver les récompenses déjà obtenues.
+Les deux premiers carnets sont des programmes souples de découverte, en complément des douze semaines. Au fil de l’eau regroupe Der, Annecy, Marais poitevin et canal du Midi ; Échappées patrimoine associe Chambord, île de Ré et Villandry. Leurs cinq nouveaux badges comprennent deux badges de campagne et trois trophées de diversité. Les répétitions ne font pas progresser le nombre de paysages différents ; les bonus de carnet sont uniques, les séances gardent leur XP habituel. Les badges historiques `climb1` / `climb3` sont désormais nommés Premier relief / Collectionneur de reliefs : leurs validations antérieures sont conservées, les nouvelles balades disposent de leurs propres trophées. Atlas des balades garde son seuil de 7 destinations différentes ; La France en douceur conserve les sept parcours fondateurs pour préserver les récompenses déjà obtenues.
 
 Voir [les sources et la méthode des profils](docs/SCENIC-ROUTES.md). Ces traces ne servent pas de guide de navigation extérieure.
+
+
+La **Route Napoléon** réunit huit étapes routières de **Golfe-Juan à Gap**, à 2/5–3/5 : Grasse, Saint-Vallier-de-Thiey, Séranon, Castellane, Barrême, Digne et Sisteron jalonnent le voyage. Le thème regroupe ces parcours ; le carnet accepte toutes les étapes dans le désordre, avec un trophée et **900 XP uniques**. Le tracé officiel CRT PACA est découpé sans liaisons inventées, avec altitudes IGN lissées. **La suite de Gap à Grenoble reste à préparer.** Les étapes restent indépendantes ; le lecteur permet d’en retrouver une puis de reprendre sa séance. Voir [les nouvelles destinations et programmes](docs/DISCOVERY-PROGRAMMES.md).
 
 ## Géographie, simulation et mesures
 

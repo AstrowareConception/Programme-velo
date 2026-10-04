@@ -22,7 +22,7 @@ export function RoutePlaces({ route, currentKm }: { route: ClimbChallenge; curre
             <div><strong>{place.label}</strong><small>{place.landmark}</small></div>
           </li>)}
         </ol>
-        <small>Repères approximatifs sur la trace, sans frontières communales. Progression virtuelle ou distance reçue du vélo.</small>
+        <small>{route.placesNote ?? "Repères approximatifs sur la trace, sans frontières communales. Progression virtuelle ou distance reçue du vélo."}</small>
       </details>
     </section>
   );

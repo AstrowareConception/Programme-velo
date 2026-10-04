@@ -179,6 +179,12 @@ button { cursor: pointer; }
 .scenicIntro { display:flex; gap:20px; align-items:center; margin-bottom:18px; background:linear-gradient(120deg,rgba(78,193,144,.12),rgba(18,24,43,.95)); border-color:rgba(78,193,144,.28); }
 .scenicIntro > div { flex:1; min-width:0; }
 .scenicIntro > button { flex-shrink:0; }
+.scenicActions { display:grid; gap:10px; min-width:180px; }
+.workoutPrograms { margin-bottom:24px; }
+.programSteps { display:grid; gap:8px; margin:16px 0; }
+.programSteps button { display:flex; flex-direction:column; gap:5px; text-align:left; white-space:normal; }
+.programSteps .done { border-color:var(--lime); }
+.programSteps small { color:var(--muted); }
 .scenicIntro h2 { margin:4px 0 10px; }
 .scenicCard { border-color:rgba(78,193,144,.24); }
 .scenicPace { display:flex; flex-wrap:wrap; gap:8px 12px; margin:10px 0; color:#a8e7c9; font-size:.72rem; }

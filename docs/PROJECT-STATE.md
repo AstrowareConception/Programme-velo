@@ -72,6 +72,14 @@ Les repères sont projetés sur les GPX et utilisent leurs kilomètres cumulés.
 
 La couverture comprend 89 tests unitaires et 104 cas navigateur, 52 sur chaque format. Elle contrôle profils/lieux, thèmes, objectifs réels dans le désordre, répétitions, suppression, sauvegardes, secteurs exclus et conservation des mesures/favoris/reprise. Les quatre contrôles sur le commit exact, la CI, la fusion et la production sont consignés dans le document externe après livraison. Cache PWA v9 ; aucune dépendance ni clé locale ajoutée.
 
+## Formats courts, Route Napoléon et programmes découverte
+
+Le lot suivant ajoute neuf extraits GPX de 15–30 minutes et huit sections routières de la Route Napoléon, de Golfe-Juan à Gap. Total : 55 parcours, 22 balades, neuf thèmes, 16 campagnes/carnets, 59 badges. Trois programmes découverte, ordre libre, bonus uniques et recalcul après suppression. Six nouveaux modèles de séances/bonus ; filtre de durée simulée combinable.
+
+Fiches harmonisées : paysage, points d’intérêt et lieux. Les quatorze profils historiques sont conservés, leurs repères explicitement indicatifs. Les sept balades initiales reçoivent des lieux sans changer leurs profils. La Route Napoléon utilise uniquement les points de trace du GPX CRT PACA, altitudes IGN lissées ; au-delà de Gap reste à préparer. [Sources, portée et règles](DISCOVERY-PROGRAMMES.md). Cache PWA v10.
+
+Couverture préparée : 101 tests unitaires, 116 cas navigateur (58 mobile, 58 ordinateur). Contrôles obligatoires sur le commit exact proposé ; CI, fusion et production seront consignées dans le document de reprise externe après observation.
+
 ## Règles de données
 
 Clés inchangées : `veloquest:v1`, `veloquest:custom-routes:v1`, `veloquest:active-session:v1`. Backups v3, v2 et anciens états conservés. Le nouvel indicateur optionnel `completedSegment` identifie les tentatives de secteur incomplètes ; son absence dans un ancien historique reste compatible.

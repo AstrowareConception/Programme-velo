@@ -36,6 +36,20 @@ VeloQuest tient aussi compte de la charge intense déjà réalisée dans la sema
 
 Le planning n'impose pas un jour précis : l'objectif est d'atteindre les missions hebdomadaires en respectant une variété suffisante et un plafond de séances dures.
 
+### Programmes découverte
+
+Dans **Séances**, déplie « Programmes découverte ». Trois chemins proposent de trouver ton rythme, découvrir les ondulations ou travailler la souplesse. Chaque bouton ouvre la préparation de la séance indiquée. Tu peux les faire dans l’ordre de ton choix, sans date imposée, et faire des pauses. Seule une séance complète valide sa case. Une ancienne saisie sans indicateur de fin doit avoir au moins la durée prévue. Les tentatives incomplètes, les parcours et les bonus ne valident pas ces programmes.
+
+Chaque programme offre un trophée et un bonus unique (120, 160 ou 140 XP). Une même séance peut contribuer à deux programmes, mais la répéter ne redonne pas leur bonus. Supprimer la dernière séance requise recalcule progression et récompense. « Pause active », huit minutes, reste dans le plafond commun de 60 XP de bonus hebdomadaires.
+
+### Formats courts et Route Napoléon
+
+Dans **Parcours**, « Une balade en 30 minutes » propose douze balades faciles. Le filtre **Durée simulée** se combine avec thème, catégorie, difficulté, recherche et favoris. Les durées sont celles de la simulation, pauses en supplément ; la distance reçue du vélo peut faire progresser différemment. Riez–Montagnac est un treizième format court à 2/5, avec des rampes visibles et un effort modéré. Les neuf nouveaux extraits ont leur propre validation ; ils ne terminent jamais le parcours parent.
+
+Le thème **Route Napoléon** réunit huit étapes routières de Golfe-Juan à Gap. Retrouve Grasse, Saint-Vallier, Séranon, Castellane, Barrême, Digne et Sisteron, puis choisis n’importe quelle étape. Le carnet « Route Napoléon · de la mer à Gap » valide les huit parcours entiers dans l’ordre de ton choix : trophée et 900 XP uniques. Trois tronçons différents débloquent « Premiers aigles ». La partie Gap–Grenoble reste à préparer. Les étapes sont des séances séparées : la fin d’une étape ne lance pas automatiquement la suivante.
+
+Tous les parcours proposent désormais paysage, points d’intérêt et lieux repérés sur la fiche, avant le départ et dans le lecteur. Les quatorze anciens cols/étapes gardent leur profil simplifié ; leurs kilomètres intermédiaires de découverte sont indicatifs, sans position GPS relevée. Les GPX conservent leur géométrie officielle et des altitudes lissées. Tout cela représente une simulation pour vélo d’intérieur, sans guidage routier ni preuve de mesure du TEB5 réel.
+
 ## 3. Pendant la séance
 
 Avant de démarrer, le pré-vol affiche tous les segments.

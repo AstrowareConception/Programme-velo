@@ -14,24 +14,24 @@ async function seed(page: Page, sessions: object[] = []) {
 }
 const browse = (page: Page) => page.getByRole("button", { name: /Parcours/ }).click();
 const card = (page: Page, name: string) => page.getByRole("heading", { name, exact: true }).locator("xpath=ancestor::article");
-const objectives = (page: Page) => page.getByText("Campagnes et carnets · 13 objectifs à découvrir", { exact: true }).click();
+const objectives = (page: Page) => page.getByText("Campagnes et carnets · 16 objectifs à découvrir", { exact: true }).click();
 const stored = (page: Page) => page.evaluate(() => JSON.parse(localStorage.getItem("veloquest:v1")!));
 const overflow = (page: Page) => page.evaluate(() => document.documentElement.scrollWidth > innerWidth);
 
 test("themes, towns and all difficulties filter the expanded catalogue without overflow", async ({ page }, testInfo) => {
   const errors: string[] = []; page.on("pageerror", (e) => errors.push(e.message));
   await seed(page); await browse(page);
-  await expect(page.locator(".routeLibraryCard")).toHaveCount(38);
-  await expect(page.locator(".themeCard")).toHaveCount(8);
+  await expect(page.locator(".routeLibraryCard")).toHaveCount(55);
+  await expect(page.locator(".themeCard")).toHaveCount(9);
   await expect(page.locator(".campaignDrawer")).not.toHaveAttribute("open");
   await page.getByRole("button", { name: /Côte d’Azur Ports/ }).click();
   await expect(page.getByLabel("Thème", { exact: true })).toHaveValue("azure");
-  await expect(page.locator(".routeLibraryCard")).toHaveCount(6);
+  await expect(page.locator(".routeLibraryCard")).toHaveCount(8);
   await page.getByLabel("Rechercher").fill("monaco");
-  await expect(page.locator(".routeLibraryCard")).toHaveCount(1);
+  await expect(page.locator(".routeLibraryCard")).toHaveCount(2);
   await expect(card(page, "Èze-sur-Mer → Menton")).toBeVisible();
   await page.getByLabel("Rechercher").fill("eze");
-  await expect(page.locator(".routeLibraryCard")).toHaveCount(3);
+  await expect(page.locator(".routeLibraryCard")).toHaveCount(4);
   await page.getByLabel("Thème", { exact: true }).selectOption("");
   await page.getByLabel("Rechercher").fill("");
   for (const level of [1, 2, 3, 4, 5]) {
@@ -40,8 +40,8 @@ test("themes, towns and all difficulties filter the expanded catalogue without o
     const counts = await page.locator(".routeLibraryCard").count();
     await expect(page.locator(".routeLibraryCard").filter({ hasText: `Difficulté ${level}/5` })).toHaveCount(counts);
   }
-  await page.getByRole("button", { name: "Explorer les 14 balades", exact: true }).click();
-  await expect(page.locator(".routeLibraryCard")).toHaveCount(14);
+  await page.getByRole("button", { name: "Explorer les 22 balades", exact: true }).click();
+  await expect(page.locator(".routeLibraryCard")).toHaveCount(22);
   expect(await overflow(page)).toBe(false);
   await page.screenshot({ path: testInfo.outputPath("nouveaux-themes-et-balades.png") });
   expect(errors).toEqual([]);
@@ -50,7 +50,7 @@ test("themes, towns and all difficulties filter the expanded catalogue without o
 test("Verdon villages and real landmarks appear on the card and stage preparation", async ({ page }, testInfo) => {
   await seed(page); await browse(page);
   await page.getByRole("button", { name: /Lacs et gorges du Verdon/ }).click();
-  await expect(page.locator(".routeLibraryCard")).toHaveCount(3);
+  await expect(page.locator(".routeLibraryCard")).toHaveCount(4);
   const route = card(page, "Sainte-Croix · lac et plateau");
   await route.getByText("Les villes traversées · 6 repères", { exact: true }).click();
   await expect(route.locator(".routePlaces li strong")).toHaveText(["Sainte-Croix-du-Verdon", "Chaudon", "Roumoules", "Riez", "Montagnac", "Sainte-Croix · retour"]);

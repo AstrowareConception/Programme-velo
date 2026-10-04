@@ -14,7 +14,7 @@ Les neuf balades historiques sont fondées sur des traces publiques des organism
 | Cagnes-sur-Mer–Cannes | 23,810 km | GPX officiel, tronçon inversé | [France Vélo Tourisme / EV8 Cannes–Nice](https://www.francevelotourisme.com/itineraire/la-mediterranee-a-velo-eurovelo-8/cannes-nice) |
 | Golfe-Juan–Cannes | 7,508 km | Même GPX, tronçon court inversé | [France Vélo Tourisme / EV8 Cannes–Nice](https://www.francevelotourisme.com/itineraire/la-mediterranee-a-velo-eurovelo-8/cannes-nice) |
 
-Les cinq nouvelles balades et dix nouvelles étapes portent le catalogue à 38 parcours, dont 14 balades. Leur provenance, leurs villes et leurs objectifs sont documentés dans [EXPLORATION-ROUTES.md](EXPLORATION-ROUTES.md). Le présent document conserve les neuf traces antérieures et leurs conditions de récompense.
+Les cinq nouvelles balades et dix nouvelles étapes portaient le catalogue à 38 parcours, dont 14 balades. Leur provenance, leurs villes et leurs objectifs sont documentés dans [EXPLORATION-ROUTES.md](EXPLORATION-ROUTES.md). Le lot suivant porte le total à **55 parcours, dont 22 balades**, avec neuf formats courts et huit étapes de la Route Napoléon ([sources et limites](DISCOVERY-PROGRAMMES.md)). Les sept premières balades disposent désormais de repères locaux, sans changement de leur géométrie ni de leur relief. Le présent document conserve les neuf traces antérieures et leurs conditions de récompense.
 
 ## Ce que représente le profil
 

@@ -1,0 +1,272 @@
+{
+  "antibes-golfe-juan-short": {
+    "parentRouteId": "cagnes-cannes-littoral",
+    "key": "azure-forward",
+    "gpxUrl": "https://www.francevelotourisme.com/etape/gpx/599",
+    "reverse": true,
+    "clip": [
+      [
+        43.58407,
+        7.12391
+      ],
+      [
+        43.56597,
+        7.07462
+      ]
+    ],
+    "section": "Antibes–Golfe-Juan via Juan-les-Pins, tronçon du GPX Cannes–Nice parcouru en sens inverse.",
+    "places": [
+      {
+        "label": "Antibes",
+        "landmark": "Port Vauban et remparts",
+        "endpoint": "start"
+      },
+      {
+        "label": "Juan-les-Pins",
+        "landmark": "La station et ses plages",
+        "coordinate": [
+          43.568865,
+          7.10991
+        ]
+      },
+      {
+        "label": "Golfe-Juan",
+        "landmark": "Arrivée à hauteur du vieux port",
+        "endpoint": "finish"
+      }
+    ]
+  },
+  "eze-cap-ail-short": {
+    "parentRouteId": "eze-menton-basse-corniche",
+    "key": "corniches-new",
+    "gpxUrl": "https://static.apidae-tourisme.com/filestore/objets-touristiques/plans/32/150/23696928/t54471030_circuit%2Bvelo%2Bffc%2Bn-2%2B-.gpx",
+    "clip": [
+      [
+        43.722732,
+        7.357301
+      ],
+      [
+        43.722995,
+        7.408635
+      ]
+    ],
+    "section": "Èze-sur-Mer–Cap-d’Ail : début de la Basse Corniche, sans Monaco, Menton ou retour par les hauteurs.",
+    "places": [
+      {
+        "label": "Èze-sur-Mer",
+        "landmark": "Départ sur la Basse Corniche",
+        "endpoint": "start"
+      },
+      {
+        "label": "Cap-d’Ail",
+        "landmark": "Arrivée sur la corniche à Cap-d’Ail",
+        "endpoint": "finish"
+      }
+    ]
+  },
+  "baux-maussane-short": {
+    "parentRouteId": "baux-alpilles-rocher",
+    "key": "baux",
+    "gpxUrl": "https://admin.cheminsdesparcs.fr/api/fr/treks/133849/maussane-les-alpilles-tour-des-baux-de-provence-a-velo.gpx",
+    "clip": [
+      [
+        43.7504357,
+        4.7971287
+      ],
+      [
+        43.7209666,
+        4.8093903
+      ]
+    ],
+    "section": "Fin du Tour des Baux : Carrières de Lumières–Sainte-Berthe–Maussane, sans ascension du Val d’Enfer ni boucle complète.",
+    "places": [
+      {
+        "label": "Les Baux · Carrières de Lumières",
+        "landmark": "Départ devant les carrières, sans visite intérieure",
+        "endpoint": "start"
+      },
+      {
+        "label": "Les Baux · Sainte-Berthe",
+        "landmark": "Chemin dans les paysages des Alpilles",
+        "coordinate": [
+          43.7406001,
+          4.8062432
+        ]
+      },
+      {
+        "label": "Maussane-les-Alpilles",
+        "landmark": "Arrivée au village",
+        "endpoint": "finish"
+      }
+    ],
+    "clipFinishAtEnd": true
+  },
+  "riez-montagnac-short": {
+    "parentRouteId": "sainte-croix-valensole",
+    "key": "croix",
+    "gpxUrl": "https://admin.cheminsdesparcs.fr/api/fr/treks/130033/sainte-croix-du-verdon-balade-sensorielle-a-velo.gpx",
+    "clip": [
+      [
+        43.8173821,
+        6.0943823
+      ],
+      [
+        43.7797315,
+        6.0952964
+      ]
+    ],
+    "section": "Riez–Montagnac, section du plateau du Verdon ; ni lac de Sainte-Croix, ni Roumoules, ni Moustiers sur ce tronçon.",
+    "places": [
+      {
+        "label": "Riez",
+        "landmark": "Passage près du Colostre",
+        "endpoint": "start"
+      },
+      {
+        "label": "Montagnac",
+        "landmark": "Arrivée au village du plateau",
+        "endpoint": "finish"
+      }
+    ]
+  },
+  "grau-aigues-short": {
+    "parentRouteId": "camargue-grau-gallician",
+    "key": "camargue",
+    "gpxUrl": "https://www.francevelotourisme.com/etape/gpx/554",
+    "clip": [
+      [
+        43.539554,
+        4.1422
+      ],
+      [
+        43.56599,
+        4.18555
+      ]
+    ],
+    "section": "Le Grau-du-Roi–Aigues-Mortes : début du GPX vers Beaucaire, sans poursuivre jusqu’à Gallician.",
+    "places": [
+      {
+        "label": "Le Grau-du-Roi",
+        "landmark": "Départ du GPX dans la ville portuaire",
+        "endpoint": "start"
+      },
+      {
+        "label": "Aigues-Mortes",
+        "landmark": "Arrivée près de la cité fortifiée",
+        "endpoint": "finish"
+      }
+    ]
+  },
+  "cayeux-hourdel-short": {
+    "parentRouteId": "baie-somme-cayeux-crotoy",
+    "key": "somme",
+    "gpxUrl": "https://www.francevelotourisme.com/etape/gpx/953",
+    "clip": [
+      [
+        50.180874,
+        1.490778
+      ],
+      [
+        50.214365,
+        1.5642
+      ]
+    ],
+    "section": "Cayeux-sur-Mer–Le Hourdel : première partie de la baie, sans Saint-Valery, Noyelles ou Le Crotoy.",
+    "places": [
+      {
+        "label": "Cayeux-sur-Mer",
+        "landmark": "Départ de la station",
+        "endpoint": "start"
+      },
+      {
+        "label": "Le Hourdel",
+        "landmark": "Arrivée au petit port de la baie",
+        "endpoint": "finish"
+      }
+    ]
+  },
+  "noyelles-crotoy-short": {
+    "parentRouteId": "baie-somme-cayeux-crotoy",
+    "key": "somme",
+    "gpxUrl": "https://www.francevelotourisme.com/etape/gpx/953",
+    "clip": [
+      [
+        50.18582,
+        1.699421
+      ],
+      [
+        50.223321,
+        1.634615
+      ]
+    ],
+    "section": "Noyelles-sur-Mer–Le Crotoy : dernière partie de la trace, sans détour ferroviaire ni traversée complète de la baie.",
+    "places": [
+      {
+        "label": "Noyelles-sur-Mer · piste",
+        "landmark": "Départ sur le tracé, sans liaison ajoutée vers la gare",
+        "endpoint": "start"
+      },
+      {
+        "label": "Le Crotoy",
+        "landmark": "La ville et le panorama sur la baie",
+        "endpoint": "finish"
+      }
+    ]
+  },
+  "cande-chaumont-short": {
+    "parentRouteId": "loire-blois-chaumont",
+    "key": "loire-new",
+    "gpxUrl": "https://www.francevelotourisme.com/etape/gpx/102",
+    "clip": [
+      [
+        47.49381,
+        1.259617
+      ],
+      [
+        47.483681,
+        1.192017
+      ]
+    ],
+    "section": "Candé-sur-Beuvron–Chaumont-sur-Loire, dernière partie de Blois–Chaumont, sans visite du domaine ni départ de Blois.",
+    "places": [
+      {
+        "label": "Candé-sur-Beuvron",
+        "landmark": "Le Beuvron retrouve la route cyclable",
+        "endpoint": "start"
+      },
+      {
+        "label": "Chaumont-sur-Loire",
+        "landmark": "Arrivée à la ville en bord de Loire",
+        "endpoint": "finish"
+      }
+    ]
+  },
+  "sevrier-annecy-short": {
+    "parentRouteId": "annecy-rive-ouest",
+    "key": "annecy",
+    "gpxUrl": "https://geotrek.auvergnerhonealpes-tourisme.com/api/fr/treks/3963/tour-des-bauges-a-velo-lac-dannecy-de-doussard-a-annecy.gpx",
+    "clip": [
+      [
+        45.862133,
+        6.143079
+      ],
+      [
+        45.90166300000001,
+        6.121585999999999
+      ]
+    ],
+    "section": "Sevrier–Annecy, dernière partie de la V62 sur la rive ouest ; pas le tour du lac ni une visite de la vieille ville.",
+    "places": [
+      {
+        "label": "Sevrier · voie verte",
+        "landmark": "Départ dans la commune sur la V62",
+        "endpoint": "start"
+      },
+      {
+        "label": "Annecy · arrivée de la V62",
+        "landmark": "Fin du GPX, aux portes de la ville",
+        "endpoint": "finish"
+      }
+    ]
+  }
+}

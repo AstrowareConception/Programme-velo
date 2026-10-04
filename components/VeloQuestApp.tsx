@@ -8,6 +8,7 @@ import { connectFtmsBike, hasWebBluetooth, type BikeConnection, type BikeTelemet
 import { ClimbProfile } from "@/components/ClimbProfile";
 import { RouteMap } from "@/components/RouteMap";
 import { RoutePlaces } from "@/components/RoutePlaces";
+import { WorkoutProgramsPanel } from "@/components/WorkoutProgramsPanel";
 import { OnboardingWizard } from "@/components/OnboardingWizard";
 import { GettingStartedCard } from "@/components/GettingStartedCard";
 import { firstGuidedWorkout, guidanceCandidates, guidanceSessions, initialGuidance } from "@/lib/onboarding";
@@ -146,6 +147,7 @@ export function VeloQuestApp() {
   const [routeDifficultyFilter, setRouteDifficultyFilter] = useState<0 | 1 | 2 | 3 | 4 | 5>(0);
   const [routeFavoritesOnly, setRouteFavoritesOnly] = useState(false);
   const [routeSort, setRouteSort] = useState<"featured" | "distance" | "elevation" | "difficulty" | "pb">("featured");
+  const [routeDuration, setRouteDuration] = useState<"all" | "30" | "60" | "long">("all");
   const [resumeSnapshot, setResumeSnapshot] = useState<ActiveSessionSnapshot | null>(null);
   const lastSampleAt = useRef(0);
   const activeSnapshotRef = useRef<ActiveSessionSnapshot | null>(null);
@@ -377,6 +379,12 @@ export function VeloQuestApp() {
       if (routeCategoryFilter !== "all" && routeCategory(route) !== routeCategoryFilter) return false;
       if (routeDifficultyFilter && routeDifficulty(route) !== routeDifficultyFilter) return false;
       if (routeFavoritesOnly && !favoriteRouteIds.includes(route.id)) return false;
+      if (routeDuration !== "all") {
+        const minutes = climbToWorkout(route).duration;
+        if (routeDuration === "30" && minutes > 30) return false;
+        if (routeDuration === "60" && (minutes <= 30 || minutes > 60)) return false;
+        if (routeDuration === "long" && minutes <= 60) return false;
+      }
       return true;
     });
 
@@ -391,7 +399,7 @@ export function VeloQuestApp() {
       }
       return Number(Boolean(b.featured)) - Number(Boolean(a.featured)) || routeDifficulty(b) - routeDifficulty(a);
     });
-  }, [allClimbs, routeSearch, routeThemeId, routeCategoryFilter, routeDifficultyFilter, routeFavoritesOnly, routeSort, favoriteRouteIds, state.sessions]);
+  }, [allClimbs, routeSearch, routeThemeId, routeCategoryFilter, routeDifficultyFilter, routeFavoritesOnly, routeDuration, routeSort, favoriteRouteIds, state.sessions]);
   const selectedSession = selectedSessionId ? state.sessions.find((session) => session.id === selectedSessionId) : undefined;
   const selectedTemplate = selectedSession ? workouts.find((w) => w.id === selectedSession.templateId) : undefined;
   const selectedRoute = selectedSession ? allClimbs.find((c) => c.id === selectedSession.routeId) : undefined;
@@ -943,6 +951,7 @@ export function VeloQuestApp() {
   }
 
   function exploreGentleRides() {
+    setRouteDuration("all");
     setRouteSearch("");
     setRouteThemeId("");
     setRouteCategoryFilter("scenic");
@@ -1226,6 +1235,7 @@ export function VeloQuestApp() {
       {tab === "sessions" && (
         <section>
           <div className="pageHead pageHeadActions"><div><p className="eyebrow">CATALOGUE</p><h1>Choisis ta quête</h1><p>Du décrassage au HIIT. Le ressenti reste prioritaire sur le numéro de résistance.</p></div><button className="secondary" onClick={openManualLog}>+ Enregistrer une séance déjà faite</button></div>
+          <WorkoutProgramsPanel sessions={state.sessions} workouts={workouts} onLaunch={(workout) => launch(workout)} />
           <div className="grid workoutGrid">
             {workouts.map((w) => (
               <article className={`card workoutCard ${w.bonus ? "bonusCard" : ""}`} key={w.id}>
@@ -1245,13 +1255,19 @@ export function VeloQuestApp() {
 
           <section className="card scenicIntro">
             <div><p className="eyebrow">BALADES · 1/5</p><h2>La France, à ton rythme.</h2><p>Des traces officielles, des paysages d’eau, de patrimoine et du littoral azuréen. Relief lissé, effort doux, pauses libres : découvre sans objectif de chrono. Vérifie la durée estimée, même sur terrain facile.</p></div>
-            <button className="primary" onClick={() => {
+            <div className="scenicActions"><button className="primary" onClick={() => {
+              setRouteDuration("all");
               setRouteSearch(""); setRouteThemeId(""); setRouteCategoryFilter("scenic"); setRouteDifficultyFilter(1); setRouteFavoritesOnly(false);
               document.getElementById("route-library")?.scrollIntoView({ behavior: "smooth", block: "start" });
             }}>Explorer les {climbs.filter((route) => routeCategory(route) === "scenic").length} balades</button>
+            <button className="secondary" onClick={() => {
+              setRouteSearch(""); setRouteThemeId(""); setRouteCategoryFilter("scenic"); setRouteDifficultyFilter(1); setRouteFavoritesOnly(false); setRouteDuration("30");
+              document.getElementById("route-library")?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}>Une balade en 30 minutes</button></div>
           </section>
 
           <RouteThemesPanel sessions={state.sessions} selectedId={routeThemeId} onSelect={(id) => {
+            setRouteDuration("all");
             setRouteThemeId(id); setRouteSearch(""); setRouteCategoryFilter("all"); setRouteDifficultyFilter(0); setRouteFavoritesOnly(false);
             document.getElementById("route-library")?.scrollIntoView({ behavior: "smooth", block: "start" });
           }} />
@@ -1271,6 +1287,11 @@ export function VeloQuestApp() {
               <select id="route-theme" value={routeThemeId} onChange={(event) => setRouteThemeId(event.target.value)}>
                 <option value="">Tous les paysages</option>
                 {routeThemes.map((theme) => <option key={theme.id} value={theme.id}>{theme.title}</option>)}
+              </select>
+            </div>
+            <div className="routeThemeSelect"><label htmlFor="route-duration">Durée simulée</label>
+              <select id="route-duration" value={routeDuration} onChange={(event) => setRouteDuration(event.target.value as typeof routeDuration)}>
+                <option value="all">Toutes les durées</option><option value="30">30 min ou moins</option><option value="60">Plus de 30 à 60 min</option><option value="long">Plus de 60 min</option>
               </select>
             </div>
             <div className="routeFilterGroup">
@@ -1336,6 +1357,7 @@ export function VeloQuestApp() {
                         <div className="routeBadges">
                           <span>{category === "scenic" ? "BALADE" : category === "stage" ? "ÉTAPE" : category === "imported" ? "GPX" : "COL"}</span>
                           {climb.featured && <span className="featuredTag">SÉLECTION</span>}
+                          {climb.parentRouteId && <span>FORMAT COURT</span>}
                         </div>
                         <p className="eyebrow">{climb.region.toUpperCase()}</p>
                         <h2>{climb.name}</h2>
@@ -1384,7 +1406,7 @@ export function VeloQuestApp() {
               })}
             </div>
           ) : (
-            <section className="card routeEmpty"><span>⌕</span><h2>Aucun parcours ne correspond.</h2><p>Modifie les filtres ou importe un GPX personnel.</p><button className="secondary" onClick={() => { setRouteSearch(""); setRouteThemeId(""); setRouteCategoryFilter("all"); setRouteDifficultyFilter(0); setRouteFavoritesOnly(false); }}>Réinitialiser les filtres</button></section>
+            <section className="card routeEmpty"><span>⌕</span><h2>Aucun parcours ne correspond.</h2><p>Modifie les filtres ou importe un GPX personnel.</p><button className="secondary" onClick={() => { setRouteDuration("all"); setRouteSearch(""); setRouteThemeId(""); setRouteCategoryFilter("all"); setRouteDifficultyFilter(0); setRouteFavoritesOnly(false); }}>Réinitialiser les filtres</button></section>
           )}
         </section>
       )}
@@ -1654,7 +1676,7 @@ export function VeloQuestApp() {
               <div className="sessionPreview">
                 <p className="eyebrow">{activeClimb ? (routeMode === "timeAttack" ? "TIME ATTACK" : routeMode === "segmentAttack" ? "SEGMENT ATTACK" : routeCategory(activeClimb) === "scenic" ? "BALADE · 1/5" : "PARCOURS") : "PRÉPARATION"}</p>
                 <h2>{active.name}</h2>
-                <p className="previewDescription">{scenicSession ? "RPE 2–4, résistance douce et pauses libres. Parcours entier, sans objectif de chrono : choisis selon la durée estimée et ton énergie." : active.description}</p>
+                <p className="previewDescription">{scenicSession ? "RPE 2–4, résistance douce et pauses libres. Parcours entier, sans objectif de chrono : choisis selon la durée estimée et ton énergie." : activeClimb?.subtitle ?? active.description}</p>
                 {activeClimb?.scenery && <details className="sceneryDetails"><summary>Découvrir le paysage et son profil</summary><p>{activeClimb.scenery}</p><small>{activeClimb.note}</small></details>}
                 {activeClimb && <RoutePlaces route={activeClimb} />}
                 <div className="previewStats">
