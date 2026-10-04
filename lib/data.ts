@@ -3,6 +3,7 @@ import type { Badge, AppState, Preferences, WeekTarget, WorkoutTemplate } from "
 import { campaignBonusXp, campaigns, campaignProgress, completedRouteIds } from "./campaigns";
 import { scenicRouteIds } from "./scenic-routes";
 import { discoveryWorkouts } from "./discovery-workouts";
+import { initialGuidance } from "./onboarding";
 
 export const STORAGE_KEY = "veloquest:v1";
 
@@ -280,7 +281,8 @@ export function emptyState(): AppState {
     sessions: [],
     measurements: [],
     preferences: { ...defaultPreferences },
-    favoriteRouteIds: []
+    favoriteRouteIds: [],
+    guidance: initialGuidance()
   };
 }
 

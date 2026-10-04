@@ -8,6 +8,7 @@ VéloQuest est une PWA personnelle Next.js / React / TypeScript. Elle associe un
 
 ## Fonctions disponibles
 
+- Démarrage accompagné en quatre étapes, profil et mesures facultatives, première séance douce de 15 min, puis Quête simplifiée et découverte progressive du coach et des balades. Les comptes existants conservent leur interface.
 - Programme de douze semaines : objectifs de minutes, points, séances et variété, avec un plafond de séances difficiles.
 - Catalogue libre, micro-séances de 10/12/15/20 minutes, séance libre et saisie rétroactive. Nouveaux formats : Roulage contemplatif (25 min), Cadence fluide (30 min), Petites vagues (40 min), Parenthèse souple (12 min bonus).
 - Coach adaptatif local : temps disponible, énergie, historique, charge récente et RPE.
@@ -22,6 +23,16 @@ VéloQuest est une PWA personnelle Next.js / React / TypeScript. Elle associe un
 - Journal, dates/heures locales, mesures datées de poids/taille/abdomen et suppression des saisies erronées.
 - Export/import JSON (v3, compatible v2 et ancien état simple), exports CSV et estimation du stockage local.
 - Lecture FTMS : vitesse, cadence, distance, résistance, puissance, fréquence cardiaque, moyennes, énergie, MET et temps **si le vélo les transmet**. Contrôle de résistance facultatif avec acquittement.
+
+## Premiers pas accompagnés
+
+Au premier lancement, le guide demande un prénom facultatif, une envie (habitude, endurance ou paysages), le niveau de pratique, un créneau de 15/25/30 minutes et un cap souple de 2/3/4 séances par semaine. Il explique le mode manuel sur 32 niveaux et le RPE, puis propose **Premiers tours de roue** : 15 minutes faciles, trois segments, sans Bluetooth obligatoire. Les mesures corporelles pourront être ajoutées dans Plus ; une sauvegarde peut être restaurée dès l’accueil.
+
+La Quête affiche ensuite une prochaine action et trois repères : découvrir les consignes, trouver son rythme, choisir son chemin. Ils sont recalculés depuis les séances complètes enregistrées d’au moins 10 minutes ; bonus, secteurs, tentatives explicitement incomplètes et dates futures ne les valident pas. Une saisie manuelle ou un ancien historique sans marqueur d’incomplétude reste reconnu ; il ne constitue pas une preuve indépendante d’achèvement physique.
+
+Les trois premiers repères privilégient les formats faciles. Après trois séances, les choix du jour (temps et énergie) apparaissent et le coach exploite la charge et le ressenti. Un débutant accompagné évite les séances difficiles avant six réalisations ; un RPE récent de 8 ou plus ramène les suggestions aux formats faciles. Le cap personnel n’attribue pas de bonus et ne remplace pas les missions XP du programme de douze semaines, accessibles dans une section dépliable. Les balades et tous les autres onglets restent libres.
+
+Le guide et ses réglages sont sauvegardés avec les données locales et le JSON v3. Une interruption de configuration reprend à la même étape. **Explorer librement** permet de sortir du guide ; **Plus → Revoir le guide de démarrage** permet d’y revenir sans effacer les séances, mesures, favoris ou dates. Les anciennes sauvegardes sans guide n’en déclenchent pas un automatiquement. Les choix du jour restent temporaires ; le cap du guide est conservé.
 
 ## Campagnes et historique
 

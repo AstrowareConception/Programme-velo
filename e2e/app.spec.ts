@@ -25,12 +25,15 @@ test("first-run onboarding persists across reload", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByText("BIENVENUE DANS VELOQUEST")).toBeVisible();
   await page.getByLabel("Prénom ou pseudo").fill("QA Rider");
+  await page.getByText("Choisir ma date de départ", { exact: true }).click();
   await page.getByLabel("Date de départ").fill("2026-10-01");
-  await page.getByRole("button", { name: "Entrer dans VeloQuest" }).click();
+  for (let i = 0; i < 3; i++) await page.getByRole("button", { name: "Continuer", exact: true }).click();
+  await page.getByRole("button", { name: "Plus tard, ouvrir ma quête" }).click();
   await expect(page.getByRole("heading", { name: /QA Rider, ta quête continue/ })).toBeVisible();
   await page.reload();
   await expect(page.getByRole("heading", { name: /QA Rider, ta quête continue/ })).toBeVisible();
   await expect(page.getByText("BIENVENUE DANS VELOQUEST")).toHaveCount(0);
+  await expect(page.getByRole("region", { name: "Mon démarrage accompagné" })).toBeVisible();
 });
 
 test("session catalog opens a guided preflight", async ({ page }) => {

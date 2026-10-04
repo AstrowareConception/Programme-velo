@@ -1,6 +1,7 @@
 import { defaultPreferences, emptyState } from "./data";
 import type { AppState, Preferences } from "./types";
 import type { ClimbChallenge } from "./routes";
+import { normalizeGuidance } from "./onboarding";
 
 type Backup = {
   format: "veloquest-backup-v3";
@@ -51,6 +52,7 @@ export function normalizeState(value: unknown): AppState {
 
   return {
     profile,
+    guidance: normalizeGuidance(value.guidance),
     sessions: Array.isArray(value.sessions) ? value.sessions.filter(isObject) as AppState["sessions"] : [],
     measurements: Array.isArray(value.measurements) ? value.measurements.filter(isObject) as AppState["measurements"] : [],
     preferences: normalizePreferences(value.preferences),

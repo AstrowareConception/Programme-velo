@@ -2,6 +2,16 @@ import type { WorkoutTemplate } from "./types";
 
 export const discoveryWorkouts: WorkoutTemplate[] = [
   {
+    id: "first-pedals-15", name: "Premiers tours de roue", tagline: "Une première séance pour découvrir les consignes, à ton rythme.",
+    kind: "recovery", duration: 15, points: 1, xp: 25, intensity: "easy",
+    description: "Règle la résistance à la main. Le ressenti d’effort (RPE) va de 1, très facile, à 10, maximal. Ici, garde un effort confortable de 2 à 3 : les niveaux sont des repères que tu peux diminuer. À la fin, indique ton ressenti pour aider le coach à choisir la suite.",
+    segments: [
+      { label: "Découvrir le pédalage", minutes: 4, resistance: "4–5", rpe: "2", cadence: "libre" },
+      { label: "Trouver un rythme confortable", minutes: 7, resistance: "5–7", rpe: "2–3", cadence: "libre" },
+      { label: "Revenir doucement au calme", minutes: 4, resistance: "4–5", rpe: "2", cadence: "libre" }
+    ]
+  },
+  {
     id: "contemplative-25", name: "Roulage contemplatif", tagline: "Vingt-cinq minutes pour pédaler sans te presser.",
     kind: "endurance", duration: 25, points: 1, xp: 40, intensity: "easy",
     description: "Un format doux, facile à placer entre deux séances plus exigeantes. Garde une respiration confortable et ajuste le niveau pour rester à RPE 2–4.",

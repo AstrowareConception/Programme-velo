@@ -8,6 +8,9 @@ import { connectFtmsBike, hasWebBluetooth, type BikeConnection, type BikeTelemet
 import { ClimbProfile } from "@/components/ClimbProfile";
 import { RouteMap } from "@/components/RouteMap";
 import { RoutePlaces } from "@/components/RoutePlaces";
+import { OnboardingWizard } from "@/components/OnboardingWizard";
+import { GettingStartedCard } from "@/components/GettingStartedCard";
+import { firstGuidedWorkout, guidanceCandidates, guidanceSessions, initialGuidance } from "@/lib/onboarding";
 import { MetricChart } from "@/components/MetricChart";
 import { InstallCard } from "@/components/InstallCard";
 import { PerformanceRecords, SectorAnalysis } from "@/components/PerformancePanel";
@@ -35,6 +38,7 @@ import {
   totalXp,
   weekTargets,
   weeklyStats,
+  sessionsForProgramWeek,
   workouts,
   streak,
   isPerfectWeek,
@@ -149,14 +153,16 @@ export function VeloQuestApp() {
   useEffect(() => {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
-      try { setState(normalizeState(JSON.parse(raw))); }
+      try {
+        const loaded = normalizeState(JSON.parse(raw));
+        setState(loaded);
+        setAvailableMinutes(loaded.guidance?.sessionMinutes ?? 35);
+      }
       catch {
         setState(emptyState());
         setToast("Sauvegarde locale illisible : un état sain a été chargé.");
       }
-    } else {
-      setShowSetup(true);
-    }
+    } else setAvailableMinutes(15);
     const requestedTab = new URLSearchParams(window.location.search).get("tab");
     if (requestedTab && ["dashboard","sessions","climbs","progress","more"].includes(requestedTab)) setTab(requestedTab as Tab);
 
@@ -423,7 +429,7 @@ export function VeloQuestApp() {
 
   const adaptiveCoach = useMemo(() => recommendAdaptiveWorkout({
     state,
-    workouts,
+    workouts: guidanceCandidates(state, workouts, availableMinutes),
     target,
     weekly: {
       sessions: stats.sessions,
@@ -437,6 +443,10 @@ export function VeloQuestApp() {
   }), [state, target, stats.sessions, stats.minutes, stats.points, stats.hard, stats.variety, availableMinutes, energy]);
 
   const recommendation = adaptiveCoach.workout;
+  const guidedView = state.guidance?.status === "active";
+  const discoveryCount = guidanceSessions(state).length;
+  const guidedRecommendation = discoveryCount === 0 ? firstGuidedWorkout(workouts) : recommendation;
+  const guidedWeekCount = guidanceSessions({ ...state, sessions: sessionsForProgramWeek(state, week) }).length;
 
   const totalSessionSeconds = active ? active.segments.reduce((sum, segment) => sum + segment.minutes * 60, 0) : 0;
   const elapsedBeforeSegment = active ? active.segments.slice(0, segmentIndex).reduce((sum, segment) => sum + segment.minutes * 60, 0) : 0;
@@ -780,6 +790,7 @@ export function VeloQuestApp() {
           note: String(form.get("note") ?? "").trim() || undefined,
           metrics: {
             source: hasFtms && manualUsed ? "mixed" : hasFtms ? "ftms" : "manual",
+            completedWorkout: activeClimb ? undefined : sessionStarted ? sessionProgressPercent >= 98 : true,
             elapsedSeconds,
             timeAttack: isTimeAttack || undefined,
             segmentAttackIndex: isSegmentAttack && segmentAttackIndex !== null ? segmentAttackIndex : undefined,
@@ -909,6 +920,31 @@ export function VeloQuestApp() {
     setShowSetup(false);
   }
 
+  function reviewGuidance() {
+    setState((previous) => ({ ...previous, guidance: { ...(previous.guidance ?? initialGuidance()), status: "setup", step: 0 } }));
+  }
+
+  function finishGuidance(start: boolean) {
+    setState((previous) => ({ ...previous, guidance: { ...(previous.guidance ?? initialGuidance()), status: "active", step: 3 } }));
+    setAvailableMinutes(state.guidance?.sessionMinutes ?? 15);
+    setEnergy("normal");
+    setTab("dashboard");
+    if (start) launch(firstGuidedWorkout(workouts));
+  }
+
+  function leaveGuidance() {
+    setState((previous) => ({ ...previous, guidance: { ...(previous.guidance ?? initialGuidance()), status: "dismissed" } }));
+    setTab("dashboard");
+  }
+
+  function exploreGentleRides() {
+    setRouteSearch("");
+    setRouteCategoryFilter("scenic");
+    setRouteDifficultyFilter(1);
+    setRouteFavoritesOnly(false);
+    setTab("climbs");
+  }
+
   function exportData() {
     const backup = createBackup(state, customClimbs);
     const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
@@ -968,6 +1004,8 @@ export function VeloQuestApp() {
       const parsed = parseBackup(await file.text());
       setState(parsed.state);
       setCustomClimbs(parsed.customClimbs);
+      setAvailableMinutes(parsed.state.guidance?.sessionMinutes ?? 35);
+      setShowSetup(false);
       setToast("Sauvegarde importée.");
     } catch {
       alert("Sauvegarde invalide.");
@@ -996,7 +1034,9 @@ export function VeloQuestApp() {
     setCustomClimbs([]);
     setSelectedSessionId(null);
     setTab("dashboard");
-    setShowSetup(true);
+    setShowSetup(false);
+    setResumeSnapshot(null);
+    setAvailableMinutes(15);
     setToast("Données locales réinitialisées.");
   }
 
@@ -1043,11 +1083,11 @@ export function VeloQuestApp() {
         </div>
       </header>
 
-      <section className="hero">
+      <section className={guidedView ? "hero guidedHero" : "hero"}>
         <div>
-          <p className="eyebrow">SEMAINE {week} / 12</p>
+          <p className="eyebrow">{guidedView ? "TON PARCOURS DE DÉMARRAGE" : `SEMAINE ${week} / 12`}</p>
           <h1>{state.profile.name ? `${state.profile.name}, ta quête continue.` : "Ta quête continue."}</h1>
-          <p>Choisis selon ton temps et ton énergie. VeloQuest récompense la régularité, la variété et la progression.</p>
+          <p>{guidedView ? "Une prochaine action claire. Le programme se précise avec tes séances et ton ressenti." : "Choisis selon ton temps et ton énergie. VeloQuest récompense la régularité, la variété et la progression."}</p>
           <div className="heroLevelProgress"><span><strong>{currentLevelTitle}</strong><small>{levelXp}/500 XP vers le niveau {level + 1}</small></span><i><b style={{ width: `${Math.round((levelXp / 500) * 100)}%` }} /></i></div>
         </div>
         <div className="heroRune"><span>{level}</span><small>NIVEAU</small><em>{currentLevelTitle}</em></div>
@@ -1067,6 +1107,14 @@ export function VeloQuestApp() {
             </section>
           )}
 
+          {guidedView && <GettingStartedCard state={state} workout={guidedRecommendation} reasons={adaptiveCoach.reasons} weeklySessions={guidedWeekCount}
+            availableMinutes={availableMinutes} energy={energy} onMinutes={setAvailableMinutes} onEnergy={setEnergy}
+            onLaunch={() => launch(guidedRecommendation, null, "training", discoveryCount ? adaptiveCoach.suggestedResistanceDelta : 0)}
+            onExplore={exploreGentleRides} onReview={reviewGuidance} onFree={leaveGuidance} />}
+
+          <details className={guidedView ? "guidedAdvanced" : "legacyDashboard"} open={guidedView ? undefined : true}>
+            <summary hidden={!guidedView}>Voir le programme de douze semaines et les outils avancés</summary>
+            <div>
           <section className="grid statsGrid">
             <Stat label="Points" value={stats.points} target={target.points} suffix=" pts" />
             <Stat label="Minutes" value={stats.minutes} target={target.minutes} suffix=" min" />
@@ -1164,6 +1212,8 @@ export function VeloQuestApp() {
             <div className="sectionHead"><div><p className="eyebrow">GARDE-FOU</p><h2>Charge intense</h2></div><strong>{stats.hard}/{target.maxHard}</strong></div>
             <p>{stats.hard > target.maxHard ? "Tu as dépassé le plafond conseillé : privilégie l'endurance ou le décrassage." : "Une semaine parfaite respecte aussi le plafond de séances intenses."}</p>
           </section>
+            </div>
+          </details>
         </>
       )}
 
@@ -1476,6 +1526,7 @@ export function VeloQuestApp() {
           <section className="card actionStack">
             <div><p className="eyebrow">DONNÉES LOCALES</p><h2>Profil & sauvegardes</h2><p>Les données restent sur cet appareil tant que tu ne les exportes pas.</p></div>
             <button className="secondary" onClick={() => setShowSetup(true)}>Modifier le profil et les objectifs</button>
+            <button className="secondary" onClick={reviewGuidance}>Revoir le guide de démarrage</button>
             <div className="storageMeter"><span>Empreinte locale</span><strong>{localBytes < 1024 * 1024 ? `${Math.max(1, Math.round(localBytes / 1024))} Ko` : `${(localBytes / 1024 / 1024).toFixed(2)} Mo`}</strong></div>
             <button className="secondary" onClick={exportData}>Exporter une sauvegarde JSON v3</button>
             <button className="secondary" onClick={exportCsv}>Exporter séances + mesures en CSV</button>
@@ -1743,6 +1794,7 @@ export function VeloQuestApp() {
       {showSetup && (
         <div className="modalBackdrop">
           <form action={saveProfile} className="sessionModal setupModal">
+            <button type="button" className="close" aria-label="Fermer le profil" onClick={() => setShowSetup(false)}>×</button>
             <Image src="/logo.svg" alt="" width={64} height={64} className="setupLogo" />
             <p className="eyebrow">BIENVENUE DANS VELOQUEST</p>
             <h2>Configure ta quête</h2>
@@ -1762,6 +1814,12 @@ export function VeloQuestApp() {
           </form>
         </div>
       )}
+      {hydrated && state.guidance?.status === "setup" && !resumeSnapshot && !active && <OnboardingWizard
+        guide={state.guidance} profile={state.profile} preferences={preferences} firstWorkout={firstGuidedWorkout(workouts)}
+        onChange={(guide) => setState((previous) => ({ ...previous, guidance: guide }))}
+        onProfile={(profile) => setState((previous) => ({ ...previous, profile }))}
+        onPreferences={(prefs) => setState((previous) => ({ ...previous, preferences: prefs }))}
+        onFinish={finishGuidance} onSkip={leaveGuidance} onImport={importData} />}
     </main>
   );
 }
