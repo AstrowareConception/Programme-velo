@@ -677,3 +677,8 @@ button:focus-visible, input:focus-visible, .fileButton:focus-within { outline: 2
 .campaignFooter > span strong { color:var(--gold); }
 .campaignComplete { color:var(--lime); font-size:.75rem; }
 @media (max-width:760px) { .campaignGrid { grid-template-columns:1fr; } }
+
+.dangerButton { color:#ff8b8b; border-color:rgba(255,107,107,.25); }
+.iconDanger { border:1px solid rgba(255,107,107,.2); background:transparent; color:#ff9a9a; border-radius:10px; min-width:44px; min-height:44px; font-size:1.25rem; }
+.history > div:has(.iconDanger) { grid-template-columns:1fr 1fr 1fr auto; }
+@media (max-width:460px) { .history > div:has(.iconDanger) { grid-template-columns:1fr 1fr auto; } .history > div:has(.iconDanger) > span:nth-child(3) { grid-column:1 / 3; grid-row:2; } .history .iconDanger { grid-column:3; grid-row:1 / 3; } }

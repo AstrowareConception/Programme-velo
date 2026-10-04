@@ -1,3 +1,4 @@
+import { isRouteCompleted } from "./progression";
 import type { CompletedSession, TelemetrySample, TimeAttackSplit } from "./types";
 
 export function formatRaceTime(seconds: number) {
@@ -12,7 +13,7 @@ export function formatRaceTime(seconds: number) {
 
 export function routeAttempts(sessions: CompletedSession[], routeId: string) {
   return sessions
-    .filter((session) => session.routeId === routeId && session.metrics?.timeAttack && typeof session.metrics.elapsedSeconds === "number")
+    .filter((session) => session.routeId === routeId && isRouteCompleted(session) && session.metrics?.timeAttack && Number.isFinite(session.metrics.elapsedSeconds) && (session.metrics.elapsedSeconds ?? 0) > 0)
     .sort((a,b) => (a.metrics?.elapsedSeconds ?? Infinity) - (b.metrics?.elapsedSeconds ?? Infinity));
 }
 
@@ -102,7 +103,8 @@ export function segmentAttempts(sessions: CompletedSession[], routeId: string, s
     .filter((session) =>
       session.routeId === routeId &&
       session.metrics?.segmentAttackIndex === segmentIndex &&
-      typeof session.metrics.elapsedSeconds === "number"
+      session.metrics.completedSegment !== false &&
+      Number.isFinite(session.metrics.elapsedSeconds) && (session.metrics.elapsedSeconds ?? 0) > 0
     )
     .sort((a,b) => (a.metrics?.elapsedSeconds ?? Infinity) - (b.metrics?.elapsedSeconds ?? Infinity));
 }

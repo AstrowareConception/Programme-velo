@@ -1,3 +1,4 @@
+import { localInputDate, localCalendarDay } from "./dates";
 import type { Badge, AppState, Preferences, WeekTarget, WorkoutTemplate } from "./types";
 import { campaignBonusXp, campaigns, campaignProgress, completedRouteIds } from "./campaigns";
 
@@ -271,7 +272,7 @@ export function emptyState(): AppState {
   return {
     profile: {
       name: "",
-      startDate: new Date().toISOString().slice(0, 10)
+      startDate: localInputDate()
     },
     sessions: [],
     measurements: [],
@@ -283,14 +284,17 @@ export function emptyState(): AppState {
 export function currentProgramWeek(startDate: string) {
   const start = new Date(startDate + "T00:00:00");
   const now = new Date();
-  const days = Math.max(0, Math.floor((now.getTime() - start.getTime()) / 86400000));
+  const days = Math.max(0, localCalendarDay(now) - localCalendarDay(start));
   return Math.min(12, Math.max(1, Math.floor(days / 7) + 1));
 }
 
 export function sessionsForProgramWeek(state: AppState, week: number) {
-  const start = new Date(state.profile.startDate + "T00:00:00").getTime();
-  const from = start + (week - 1) * 7 * 86400000;
-  const to = from + 7 * 86400000;
+  const start = new Date(state.profile.startDate + "T00:00:00");
+  const end = new Date(start);
+  start.setDate(start.getDate() + (week - 1) * 7);
+  end.setDate(end.getDate() + week * 7);
+  const from = start.getTime();
+  const to = end.getTime();
   return state.sessions.filter((s) => {
     const time = new Date(s.date).getTime();
     return time >= from && time < to;

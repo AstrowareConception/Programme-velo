@@ -1,11 +1,19 @@
 export type BikeTelemetry = {
   speedKmh?: number;
+  avgSpeedKmh?: number;
   cadenceRpm?: number;
+  avgCadenceRpm?: number;
   resistance?: number;
   powerW?: number;
+  avgPowerW?: number;
   heartRate?: number;
+  totalEnergyKcal?: number;
+  energyPerHourKcal?: number;
+  energyPerMinuteKcal?: number;
+  metabolicEquivalent?: number;
   distanceM?: number;
   elapsedSeconds?: number;
+  remainingSeconds?: number;
 };
 
 export type ResistanceRange = {
@@ -71,41 +79,76 @@ function u24(view: DataView, offset: number) {
 }
 
 export function parseIndoorBikeData(view: DataView): BikeTelemetry {
+  if (view.byteLength < 2) return {};
   const flags = view.getUint16(0, true);
   let offset = 2;
   const out: BikeTelemetry = {};
 
-  if ((flags & (1 << 0)) === 0 && offset + 2 <= view.byteLength) {
+  if ((flags & (1 << 0)) === 0) {
+    if (offset + 2 > view.byteLength) return out;
     out.speedKmh = view.getUint16(offset, true) / 100;
     offset += 2;
   }
-  if (flags & (1 << 1)) offset += 2;
-  if ((flags & (1 << 2)) && offset + 2 <= view.byteLength) {
+  if (flags & (1 << 1)) {
+    if (offset + 2 > view.byteLength) return out;
+    out.avgSpeedKmh = view.getUint16(offset, true) / 100;
+    offset += 2;
+  }
+  if (flags & (1 << 2)) {
+    if (offset + 2 > view.byteLength) return out;
     out.cadenceRpm = view.getUint16(offset, true) / 2;
     offset += 2;
   }
-  if (flags & (1 << 3)) offset += 2;
-  if ((flags & (1 << 4)) && offset + 3 <= view.byteLength) {
+  if (flags & (1 << 3)) {
+    if (offset + 2 > view.byteLength) return out;
+    out.avgCadenceRpm = view.getUint16(offset, true) / 2;
+    offset += 2;
+  }
+  if (flags & (1 << 4)) {
+    if (offset + 3 > view.byteLength) return out;
     out.distanceM = u24(view, offset);
     offset += 3;
   }
-  if ((flags & (1 << 5)) && offset + 2 <= view.byteLength) {
+  if (flags & (1 << 5)) {
+    if (offset + 2 > view.byteLength) return out;
     out.resistance = view.getInt16(offset, true) / 10;
     offset += 2;
   }
-  if ((flags & (1 << 6)) && offset + 2 <= view.byteLength) {
+  if (flags & (1 << 6)) {
+    if (offset + 2 > view.byteLength) return out;
     out.powerW = view.getInt16(offset, true);
     offset += 2;
   }
-  if (flags & (1 << 7)) offset += 2;
-  if (flags & (1 << 8)) offset += 5;
-  if ((flags & (1 << 9)) && offset + 1 <= view.byteLength) {
+  if (flags & (1 << 7)) {
+    if (offset + 2 > view.byteLength) return out;
+    out.avgPowerW = view.getInt16(offset, true);
+    offset += 2;
+  }
+  if (flags & (1 << 8)) {
+    if (offset + 5 > view.byteLength) return out;
+    const totalEnergy = view.getUint16(offset, true); offset += 2;
+    if (totalEnergy !== 0xffff) out.totalEnergyKcal = totalEnergy;
+    out.energyPerHourKcal = view.getUint16(offset, true); offset += 2;
+    out.energyPerMinuteKcal = view.getUint8(offset); offset += 1;
+  }
+  if (flags & (1 << 9)) {
+    if (offset + 1 > view.byteLength) return out;
     out.heartRate = view.getUint8(offset);
     offset += 1;
   }
-  if (flags & (1 << 10)) offset += 1;
-  if ((flags & (1 << 11)) && offset + 2 <= view.byteLength) {
+  if (flags & (1 << 10)) {
+    if (offset + 1 > view.byteLength) return out;
+    out.metabolicEquivalent = view.getUint8(offset) / 10;
+    offset += 1;
+  }
+  if (flags & (1 << 11)) {
+    if (offset + 2 > view.byteLength) return out;
     out.elapsedSeconds = view.getUint16(offset, true);
+    offset += 2;
+  }
+  if (flags & (1 << 12)) {
+    if (offset + 2 > view.byteLength) return out;
+    out.remainingSeconds = view.getUint16(offset, true);
   }
   return out;
 }

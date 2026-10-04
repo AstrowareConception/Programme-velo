@@ -16,3 +16,11 @@ describe("session helpers", () => {
     expect(formatClock(3599)).toBe("59:59");
   });
 });
+
+
+it("counts session calories relative to the device counter and handles resets", async () => {
+  const { counterDelta } = await import("../lib/session");
+  expect(counterDelta([300, undefined, 320, 340])).toBe(40);
+  expect(counterDelta([300, 320, 0, 10])).toBe(30);
+  expect(counterDelta([300])).toBeUndefined();
+});
