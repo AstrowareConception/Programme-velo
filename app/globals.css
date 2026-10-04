@@ -302,6 +302,18 @@ button:focus-visible, input:focus-visible, .fileButton:focus-within { outline: 2
 .installIcon { width:50px; height:50px; display:grid; place-items:center; border-radius:15px; background:rgba(80,227,255,.08); color:var(--cyan); font-size:1.5rem; font-weight:900; }
 .installCopy h2, .installCard h2 { margin:0 0 5px; }
 .installCopy p, .installCard p { margin:0; }
+.installAction { width:100%; text-align:left; color:var(--text); transition:border-color .15s,background .15s; }
+.installAction:hover { border-color:var(--cyan); background:rgba(25,38,60,.95); }
+.installAction:focus-visible { outline:3px solid var(--cyan); outline-offset:4px; }
+.installAction:disabled { cursor:wait; opacity:.7; }
+.installCopy > span { display:block; }
+.installTitle { margin:4px 0 6px; font-size:1.4rem; font-weight:800; letter-spacing:-.02em; }
+.installDescription, .installNotice { color:var(--muted); line-height:1.6; }
+.installNotice { margin:-4px 8px 20px; }
+.installAction .primary { text-align:center; }
+.installationDialog ol { padding-left:24px; }
+.installationDialog li { margin:12px 0; line-height:1.65; }
+.installationDialog .fullWidth { margin-top:12px; }
 .sessionPreview .previewDescription { color:var(--muted); line-height:1.55; }
 .previewStats { display:grid; grid-template-columns:repeat(4,1fr); gap:7px; margin:16px 0; }
 .previewStats span { padding:11px; border:1px solid var(--line); border-radius:12px; background:rgba(255,255,255,.025); }

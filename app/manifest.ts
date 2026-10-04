@@ -19,6 +19,8 @@ export default function manifest(): MetadataRoute.Manifest {
       { name: "Voir ma progression", short_name: "Suivi", url: "/?tab=progress", icons: [{ src: "/icon.svg", sizes: "any", type: "image/svg+xml" }] }
     ],
     icons: [
+      { src: "/pwa-icon/192", sizes: "192x192", type: "image/png", purpose: "any" },
+      { src: "/pwa-icon/512", sizes: "512x512", type: "image/png", purpose: "any" },
       { src: "/icon.svg", sizes: "any", type: "image/svg+xml", purpose: "any" }
     ]
   };
