@@ -22,9 +22,13 @@ Première version : un parcours natif ou GPX en portions de 15/30/45/60 minutes,
 
 Le catalogue reste à 71 parcours, avec 70 badges. Les références exactes de contrôle et de livraison seront portées dans l’état de reprise externe après observation. Les carnets Napoléon et Estérel restent libres ; ce mode ne lance pas automatiquement la prochaine étape et n’invente aucune liaison à Gap.
 
-## Prochaine priorité : paysages et expérience PWA
+## Premier lot de photos documentées
 
-Ajouter des photos légères documentées avec attribution, texte alternatif et option de masquage. Puis accompagner les mises à jour de la PWA et rendre sa disponibilité hors connexion explicite. Ces lots restent à faire ; les cartes externes ne sont pas garanties hors connexion. L’enchaînement de plusieurs étapes et le carnet personnel viendront ensuite.
+Cinq photos azuréennes sur huit parcours existants : galeries fermées au départ, une image locale à la fois, légendes et droits, navigation libre ou suivi des repères, masquage sauvegardé et vue essentielle conservée. Intégration dans les fiches, la préparation et le lecteur, y compris Voyage à mi-parcours. [Sélection et limites](LANDSCAPE-PHOTOS.md). Les 71 parcours et 70 badges sont conservés. Les références de validation et publication de ce lot sont consignées dans l’état de reprise externe après observation.
+
+## Prochaine priorité : expérience PWA
+
+Accompagner les mises à jour de la PWA et rendre sa disponibilité hors connexion explicite. Les cartes externes et les photos non consultées ne sont pas garanties hors connexion. Puis étendre progressivement les photos documentées aux autres régions et aux grands cols ; l’enchaînement de plusieurs étapes et le carnet personnel viendront ensuite.
 
 ## Packs de parcours suivants
 
@@ -39,7 +43,7 @@ Chaque pack devra proposer les mêmes informations locales : paysages, lieux ré
 
 ## Immersion après le mode Voyage
 
-Ajouter des photos documentées des lieux, avec droits et attribution, chargement léger et texte de remplacement. Prévoir une option pour réduire ou masquer les médias. Sons d’ambiance facultatifs, sans masquer les consignes. Un lecteur vidéo intégré est à étudier après les essais pratiques : disponibilité réseau, consommation, mode flottant et contraintes de la plateforme. Les photos ne constituent ni une restitution continue du trajet ni un relevé géographique.
+Le premier lot de photos azuréennes est décrit ci-dessus. Étendre les sélections avec les mêmes droits, légendes et limites, sans créer une association trompeuse avec le tracé. Sons d’ambiance facultatifs, sans masquer les consignes. Un lecteur vidéo intégré est à étudier après les essais pratiques : disponibilité réseau, consommation, mode flottant et contraintes de la plateforme. Les photos ne constituent ni une restitution continue du trajet ni un relevé géographique.
 
 ## Puis : carnet personnel
 

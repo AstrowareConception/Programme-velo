@@ -68,6 +68,8 @@ La **Corniche d’Or et l’Estérel** ajoutent quatre étapes de Saint-Raphaël
 
 ## Confort du lecteur et médias
 
+Les parcours azuréens illustrés proposent **Voir les photos** dans la fiche, la préparation et la vue complète du lecteur : cinq photos documentées de Cagnes-sur-Mer, Antibes, Golfe-Juan, Cannes et Menton, avec dates, légendes et crédits. Une photo à la fois, chargée uniquement à l’ouverture. **Photos des paysages**, dans Son, voix et média, permet de les masquer ; la vue essentielle les masque pendant l’effort. Les kilomètres du Voyage restent absolus, les vues prises hors du tracé sont identifiées. Ce premier lot couvre huit parcours existants, sans vidéo continue ni photos attribuées automatiquement aux GPX personnels. [Sources, droits et limites](docs/LANDSCAPE-PHOTOS.md).
+
 Choisis **Vue essentielle** dans Plus, avant le départ ou pendant la séance : résistance, temps, prochaine consigne, lieux et commandes restent visibles. La vue complète retrouve carte et profil. Le choix est conservé dans les sauvegardes sans modifier les historiques, chronos ou défis.
 
 Dans **Son, voix et média**, règle les bips, la voix, le volume et la fréquence, puis teste avec ton casque ou ton podcast. Un préavis facultatif de dix secondes est disponible sur les segments minutés ; la voix tient compte de la calibration. Le maintien de l’écran indique son état réel, y compris refus ou interruption, avec possibilité de réessayer.

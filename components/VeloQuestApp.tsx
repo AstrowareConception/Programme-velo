@@ -11,6 +11,7 @@ import { connectFtmsBike, hasWebBluetooth, type BikeConnection, type BikeTelemet
 import { ClimbProfile } from "@/components/ClimbProfile";
 import { RouteMap } from "@/components/RouteMap";
 import { RoutePlaces } from "@/components/RoutePlaces";
+import { RoutePhotos } from "@/components/RoutePhotos";
 import { WorkoutProgramsPanel } from "@/components/WorkoutProgramsPanel";
 import { OnboardingWizard } from "@/components/OnboardingWizard";
 import { GettingStartedCard } from "@/components/GettingStartedCard";
@@ -1433,6 +1434,7 @@ export function VeloQuestApp() {
 
                     {climb.scenery && <details className="sceneryDetails"><summary>Découvrir le paysage</summary><p>{climb.scenery}</p><div className="routeTags">{climb.highlights?.map((highlight) => <span key={highlight}>{highlight}</span>)}</div></details>}
                     <RoutePlaces route={climb} />
+                    {preferences.showRoutePhotos && <RoutePhotos key={climb.id} route={climb} />}
 
                     <div className="timeAttackSummary">
                       <span><small>RECORD</small><strong>{pb?.metrics?.elapsedSeconds !== undefined ? formatRaceTime(pb.metrics.elapsedSeconds) : "—"}</strong></span>
@@ -1733,6 +1735,7 @@ export function VeloQuestApp() {
                 <p className="previewDescription">{activeVoyage ? `${active.tagline} · ≈ ${active.duration.toFixed(1)} min. Position simulée à 15 km/h, pauses libres. Les mesures FTMS sont enregistrées séparément et ne pilotent pas ce mode.` : scenicSession ? "RPE 2–4, résistance douce et pauses libres. Parcours entier, sans objectif de chrono : choisis selon la durée estimée et ton énergie." : activeClimb?.subtitle ?? active.description}</p>
                 {activeClimb?.scenery && <details className="sceneryDetails"><summary>Découvrir le paysage et son profil</summary><p>{activeClimb.scenery}</p><small>{activeClimb.note}</small></details>}
                 {activeClimb && <RoutePlaces route={activeClimb} />}
+                {activeClimb && preferences.showRoutePhotos && <RoutePhotos key={activeClimb.id} route={activeClimb} currentKm={activeVoyage?.startKm} />}
                 <div className="previewStats">
                   <span><small>{(routeMode === "timeAttack" || routeMode === "segmentAttack") && activeClimb ? "Record" : "Durée"}</small><strong>{(routeMode === "timeAttack" || routeMode === "segmentAttack") && activeClimb ? (activeRaceBest?.metrics?.elapsedSeconds !== undefined ? formatRaceTime(activeRaceBest.metrics.elapsedSeconds) : "à établir") : `${activeVoyage ? active.duration.toFixed(1) : active.duration} min`}</strong></span>
                   <span><small>Intensité</small><strong>{active.intensity === "hard" ? "dure" : active.intensity === "moderate" ? "soutenue" : "facile"}</strong></span>
@@ -1817,6 +1820,7 @@ export function VeloQuestApp() {
                   {autoResistanceControl && controlGranted && <small>AUTO LEVEL ACTIF</small>}
                 </div>
                 <div className="segmentMeta"><span>RPE {active.segments[segmentIndex].rpe}</span>{active.segments[segmentIndex].cadence && <span>Cible {active.segments[segmentIndex].cadence} tr/min</span>}</div>
+                {activeClimb && preferences.showRoutePhotos && preferences.readerView !== "essential" && <RoutePhotos key={activeClimb.id} route={activeClimb} currentKm={currentRouteKm} />}
                 {bike && (
                   <div className="liveStrip">
                     <span><small>RPM</small><strong>{telemetry.cadenceRpm?.toFixed(0) ?? "—"}</strong></span>
