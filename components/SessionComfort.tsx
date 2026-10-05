@@ -30,6 +30,8 @@ export function SessionComfort({ preferences, onChange }: Props) {
       <label>Volume des alertes · {preferences.cueVolume ?? 65}%<input aria-label="Volume des alertes" type="range" min="0" max="100" step="5" value={preferences.cueVolume ?? 65} onChange={event => onChange("cueVolume", Number(event.target.value))} /></label>
       <label>Fréquence des annonces<select value={preferences.cueFrequency ?? "all"} onChange={event => onChange("cueFrequency", event.target.value === "changes" ? "changes" : "all")}><option value="all">Tous les segments</option><option value="changes">Changements de consigne seulement</option></select></label>
       <label className="comfortCheck"><input type="checkbox" checked={preferences.announceUpcoming ?? false} onChange={event => onChange("announceUpcoming", event.target.checked)} />Prévenir 10 secondes avant le changement</label>
+      <label className="comfortCheck"><input type="checkbox" checked={preferences.showRoutePhotos ?? true} onChange={event => onChange("showRoutePhotos", event.target.checked)} />Photos des paysages</label>
+      <small>Galeries facultatives sur les parcours illustrés. Aucune photo chargée avant ouverture ; masquées dans la vue essentielle pendant l’effort.</small>
       <small>Préavis sur les segments minutés. En course pilotée par la distance du vélo, suis la prochaine consigne affichée.</small>
       <button type="button" className="secondary" disabled={testing} onClick={test}>Tester mes alertes</button>
       <p className="audioTestNotice" role="status">{notice}</p>

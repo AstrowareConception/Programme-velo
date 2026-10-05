@@ -1,0 +1,62 @@
+{
+  "cagnes": {
+    "src": "/landscapes/cagnes.webp", "width": 960, "height": 640,
+    "title": "Le littoral de Cagnes-sur-Mer",
+    "alt": "La baie de Cagnes-sur-Mer vue du ciel, avec le front de mer et les collines en arrière-plan.",
+    "caption": "La baie et le quartier du Cros-de-Cagnes, photographiés depuis les airs. La promenade de la balade reste sur le littoral.",
+    "author": "Olivier Cleynen", "date": "2020-09-28",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Aerial_photograph_of_Cros-de-Cagnes.jpg",
+    "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/b/b1/Aerial_photograph_of_Cros-de-Cagnes.jpg",
+    "license": "CC BY 4.0", "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "bytes": 58158, "sha256": "713209842d60d97582e3c20d86a2bef5a446ef5509ca5d234c94451f24315f38",
+    "originalSha256": "c79abd2bf534cafa3ece526e02280f8f4688bd1b4d721b7317c96655f8d5515c"
+  },
+  "antibes": {
+    "src": "/landscapes/antibes.webp", "width": 960, "height": 640,
+    "title": "Antibes, le port et la vieille ville",
+    "alt": "Les voiliers et les yachts du port Vauban devant les maisons et les remparts de la vieille ville d’Antibes.",
+    "caption": "Le port Vauban et la vieille ville vus depuis le Fort Carré. Cette vue en hauteur illustre Antibes ; la trace ne monte pas au fort.",
+    "author": "Plyd", "date": "2009-09-20",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Port_Vauban_et_citadelle_d%27Antibes_depuis_le_Fort_carr%C3%A9.jpg",
+    "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e9/Port_Vauban_et_citadelle_d%27Antibes_depuis_le_Fort_carr%C3%A9.jpg",
+    "license": "Domaine public", "licenseUrl": "https://commons.wikimedia.org/wiki/File:Port_Vauban_et_citadelle_d%27Antibes_depuis_le_Fort_carr%C3%A9.jpg#Licensing",
+    "bytes": 59396, "sha256": "ac5c9cdef906880aab755b5396020aeb020061044c598045a2ca1dabd663e670",
+    "originalSha256": "52f1fd7366b55ff16ed05db02956360393ffc038f92ec81a9e74e9c24329a1a9"
+  },
+  "golfe-juan": {
+    "src": "/landscapes/golfe-juan.webp", "width": 960, "height": 720,
+    "title": "Une escale au port de Golfe-Juan",
+    "alt": "Les mâts des voiliers du vieux port de Golfe-Juan devant les façades claires, sous un ciel nuageux.",
+    "caption": "Les bateaux et les façades du vieux port, près de la capitainerie. Un autre regard sur la ville de départ de la Route Napoléon.",
+    "author": "Robert Guarino", "date": "2021-02-01",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Port_de_Golfe-Juan.jpg",
+    "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/3/3c/Port_de_Golfe-Juan.jpg",
+    "license": "CC BY-SA 4.0", "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "bytes": 94184, "sha256": "7f9cab55c96fb220cad624dca0f33ccadf1fc5f30aff0adfee9f40358064697c",
+    "originalSha256": "3d9404d6b490288b833ab2930662940dd698b589c17f0b63be075eb705cecb98"
+  },
+  "cannes": {
+    "src": "/landscapes/cannes.webp", "width": 960, "height": 211,
+    "title": "Cannes, un horizon sur la Croisette",
+    "alt": "Une vue panoramique des plages de la Croisette à Cannes, avec les palmiers et la baie méditerranéenne.",
+    "caption": "La Croisette vue depuis le Palais des Festivals. La photo illustre Cannes ; elle ne décrit pas chaque rue des parcours qui traversent la ville.",
+    "author": "Copyleft", "date": "2015-07-11",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Panoramic_of_Cannes.JPG",
+    "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/3/37/Panoramic_of_Cannes.JPG",
+    "license": "CC BY-SA 4.0", "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "bytes": 20924, "sha256": "44843be043418f1d3bd1029da160cce9ea7e38aa227f2371ba1ce47380153b28",
+    "originalSha256": "dd1310e641a7f4abe09f180cbf4591ff5e6a800cb1991cb83c57bf16604f3901"
+  },
+  "menton": {
+    "src": "/landscapes/menton.webp", "width": 960, "height": 640,
+    "title": "Menton, les toits face à la mer",
+    "alt": "La vieille ville de Menton et le clocher de Saint-Michel au-dessus des toits orangés, avec la mer en arrière-plan.",
+    "caption": "La vieille ville vue depuis le cimetière du Trabuquet, sur les hauteurs. Les balades et étapes photographiées rejoignent le littoral, sans ce détour.",
+    "author": "Prekmarg", "date": "2018-08-25",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Panorama_de_Menton_(Fran%C3%A7a).jpg",
+    "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/2/23/Panorama_de_Menton_%28Fran%C3%A7a%29.jpg",
+    "license": "CC BY-SA 4.0", "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "bytes": 30084, "sha256": "bc08069d3881410ed4d0cca1795f6c579292b0230dad0ead0db8833ac524e54b",
+    "originalSha256": "771a3c2ccc2a9e2a028fa53871185e4d8b59566e67249024f4ce673bdde1a425"
+  }
+}

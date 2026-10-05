@@ -131,6 +131,7 @@ export type Preferences = {
   cueFrequency?: "all" | "changes";
   announceUpcoming?: boolean;
   readerView?: "full" | "essential";
+  showRoutePhotos?: boolean;
 };
 
 export type AppState = {

@@ -35,6 +35,8 @@ Verrouiller l’écran ou masquer VéloQuest peut suspendre minuteurs, annonces 
 
 ## Portée des vérifications
 
+Les **Photos des paysages** sont facultatives dans les fiches, la préparation et la vue complète ; elles sont masquées pendant l’effort en vue essentielle. Une galerie fermée ne charge aucune photo. La navigation libre n’avance ni le lecteur ni les kilomètres du Voyage. Les légendes distinguent le lieu illustré du point de vue photographique. [Guide des photos](LANDSCAPE-PHOTOS.md).
+
 Les tests unitaires couvrent préférences, sauvegardes, calibration, filtrage des annonces, volume et contexte audio. Les tests Chromium mobile/ordinateur couvrent changements de vue, pause/reprise, arrivée, course/secteur, conservation des historiques et simulation des accords/refus/libérations du maintien de l’écran. Voix et maintien sont simulés : ils ne prouvent ni l’audibilité, ni le fonctionnement réel du TEB5, ni une installation Safari/iPhone, ni la lecture simultanée d’un média sur un téléphone physique.
 
 À réception du vélo et sur les appareils utilisés : essayer casque/podcast, alerte de changement, volume nul, passage arrière-plan/retour, veille, reprise et reconnexion. Suivre aussi le [protocole matériel](TEB5-BLUETOOTH-VALIDATION.md). Exporter les données avant un transfert d’appareil ; elles restent locales.

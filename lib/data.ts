@@ -24,7 +24,8 @@ export const defaultPreferences: Preferences = {
   cueVolume: 65,
   cueFrequency: "all",
   announceUpcoming: false,
-  readerView: "full"
+  readerView: "full",
+  showRoutePhotos: true
 };
 
 export const workouts: WorkoutTemplate[] = [

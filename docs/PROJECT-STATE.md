@@ -1,4 +1,4 @@
-# État de reprise VéloQuest — 4 octobre 2026
+# État de reprise VéloQuest — actualisé le 5 octobre 2026
 
 ## Références
 
@@ -121,3 +121,11 @@ Lot fondé sur main `f1eea5a61505dea0063a178485adff847398a077` (PR 30, confort d
 Journal avec bornes et achèvement de portion ; union des passages, sans cumul des chevauchements ni validation individuelle de route. XP du parcours une seule fois en Voyage, à son achèvement, sans double bonus avec une réalisation classique antérieure. Recalcul après suppression ; campagnes et palmarès suivent la couverture entière. Trois trophées ajoutés, 70 badges au total, 71 parcours inchangés. Métadonnées Voyage facultatives, export/import JSON v3 et colonnes CSV ; reprise v1 compatible avec les anciennes séances. Cache PWA v14. [Guide Voyage](VOYAGE.md).
 
 Contrôles exacts, PR, fusion et version publique seront consignés dans l’état de reprise externe après observation. La PR 29 reste distincte pour les diagnostics du vélo ; la simulation temporelle et FTMS ne qualifie pas le TOPUTURE physique. Photos documentées et carnet composé de plusieurs étapes restent à développer.
+
+## 5 octobre 2026 — photos azuréennes documentées
+
+Lot préparé depuis main `50304a6` (Voyage livré via PR 31). Cinq photos locales de Cagnes-sur-Mer, Antibes, Golfe-Juan, Cannes et Menton sur huit parcours existants ; 262 746 octets au total, moins de 100 000 par image. Attribution, date, source, licence et limites géographiques visibles. WebP 960 px sans recadrage, métadonnées retirées ; originaux et dérivés identifiés par SHA-256. [Sources et parcours](LANDSCAPE-PHOTOS.md).
+
+Galerie fermée et sans image au départ, navigation d’un lieu à l’autre, suivi du dernier repère illustré en kilomètres absolus pendant l’effort et Voyage, première vue à venir signalée. La navigation libre n’avance aucune séance. Images indisponibles : texte et crédits conservés, relance possible. Préférence facultative `showRoutePhotos`, sauvegardes v2/v3 compatibles, aucun changement d’historique ou de progression. La vue essentielle masque les galeries pendant l’effort. Aucun rapprochement automatique avec un GPX inconnu. Cache v15 ; images non consultées et cartes externes sans garantie hors connexion.
+
+Le catalogue reste à 71 parcours, 29 balades, dix thèmes, 20 campagnes et 70 badges. La PR 29 matérielle demeure distincte. Les quatre contrôles sur le commit exact, les vues mobile/ordinateur et la production doivent être vérifiés avant d’inscrire la livraison dans l’état de reprise externe. Suite : disponibilité hors connexion et mise à jour PWA accompagnée, puis extension photographique documentée et carnets multi-étapes. Le TOPUTURE physique n’est toujours pas qualifié.

@@ -25,7 +25,7 @@ function stringOr(value: unknown, fallback: string) {
 
 function normalizePreferences(value: unknown): Preferences {
   const raw = isObject(value) ? value : {};
-  const bool = (key: "soundCues" | "voiceCues" | "haptics" | "keepScreenAwake" | "keepTelemetryTrace" | "announceUpcoming") =>
+  const bool = (key: "soundCues" | "voiceCues" | "haptics" | "keepScreenAwake" | "keepTelemetryTrace" | "announceUpcoming" | "showRoutePhotos") =>
     typeof raw[key] === "boolean" ? raw[key] as boolean : (defaultPreferences[key] ?? false);
   return {
     soundCues: bool("soundCues"),
@@ -37,7 +37,8 @@ function normalizePreferences(value: unknown): Preferences {
     cueVolume: Math.max(0, Math.min(100, numberOrUndefined(raw.cueVolume) ?? 65)),
     cueFrequency: raw.cueFrequency === "changes" ? "changes" : "all",
     announceUpcoming: bool("announceUpcoming"),
-    readerView: raw.readerView === "essential" ? "essential" : "full"
+    readerView: raw.readerView === "essential" ? "essential" : "full",
+    showRoutePhotos: bool("showRoutePhotos")
   };
 }
 

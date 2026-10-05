@@ -60,6 +60,8 @@ Tous les parcours proposent désormais paysage, points d’intérêt et lieux re
 
 ## 3. Pendant la séance
 
+Sur les parcours azuréens illustrés, ouvre **Voir les photos** pour découvrir une vue du lieu, avec sa date, son auteur et sa licence. Les flèches parcourent les images ; pendant l’effort, **Suivre les repères** revient au dernier lieu illustré atteint selon les kilomètres affichés. Une vue peut être prise depuis les hauteurs ou ailleurs que sur la route : lis sa légende. La première photo encore à venir porte **À découvrir**. Désactive **Photos des paysages** dans **Plus → Son, voix et média** ou dans les réglages du lecteur pour masquer les galeries. Le choix reste sauvegardé ; la vue essentielle les masque pendant l’effort. [Sélection, droits et limites](LANDSCAPE-PHOTOS.md).
+
 Avant de démarrer, la préparation présente les segments, les lieux et les niveaux. **Vue essentielle** met en avant résistance, temps restant, RPE, prochaine consigne et commandes. Tu peux revenir à **Vue complète** pendant la séance pour retrouver la carte et le profil, sans remettre le chrono à zéro. Le choix se conserve après rechargement et dans l’export JSON.
 
 Pendant l'effort :
