@@ -24,15 +24,19 @@ function stringOr(value: unknown, fallback: string) {
 
 function normalizePreferences(value: unknown): Preferences {
   const raw = isObject(value) ? value : {};
-  const bool = (key: keyof Omit<Preferences, "resistanceOffset">) =>
-    typeof raw[key] === "boolean" ? raw[key] as boolean : defaultPreferences[key];
+  const bool = (key: "soundCues" | "voiceCues" | "haptics" | "keepScreenAwake" | "keepTelemetryTrace" | "announceUpcoming") =>
+    typeof raw[key] === "boolean" ? raw[key] as boolean : (defaultPreferences[key] ?? false);
   return {
     soundCues: bool("soundCues"),
     voiceCues: bool("voiceCues"),
     haptics: bool("haptics"),
     keepScreenAwake: bool("keepScreenAwake"),
     keepTelemetryTrace: bool("keepTelemetryTrace"),
-    resistanceOffset: Math.max(-4, Math.min(4, numberOrUndefined(raw.resistanceOffset) ?? defaultPreferences.resistanceOffset))
+    resistanceOffset: Math.max(-4, Math.min(4, numberOrUndefined(raw.resistanceOffset) ?? defaultPreferences.resistanceOffset)),
+    cueVolume: Math.max(0, Math.min(100, numberOrUndefined(raw.cueVolume) ?? 65)),
+    cueFrequency: raw.cueFrequency === "changes" ? "changes" : "all",
+    announceUpcoming: bool("announceUpcoming"),
+    readerView: raw.readerView === "essential" ? "essential" : "full"
   };
 }
 

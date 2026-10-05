@@ -1,6 +1,6 @@
 # Roadmap VéloQuest
 
-Actualisée le 4 octobre 2026. Le document distingue le produit intégré aux lots précédents, le lot Estérel préparé ici et les prochaines fonctions. Les références exactes de contrôle, fusion et déploiement figurent dans le document externe d’état de reprise après vérification.
+Actualisée le 5 octobre 2026. Le catalogue Estérel est intégré ; le lot confort du lecteur est décrit ci-dessous avec les prochaines fonctions. Les références exactes de contrôle, fusion et déploiement figurent dans le document externe d’état de reprise après vérification.
 
 ## Socle disponible
 
@@ -8,7 +8,13 @@ Programme souple de douze semaines, trois programmes découverte, onboarding pro
 
 ## Lot Estérel et petites escales
 
-Dix nouvelles destinations, un thème Estérel, trois carnets, deux trophées de découverte. Catalogue prévu après intégration : 71 parcours, 29 balades 1/5, 10 thèmes, 20 carnets et 67 badges. [Contenu, sources et règles](ESTEREL-ESCALES.md). Pas de changement de stockage ni de raccourcissement artificiel des grandes étapes.
+Dix nouvelles destinations, un thème Estérel, trois carnets, deux trophées de découverte. Catalogue intégré par la PR 28 : 71 parcours, 29 balades 1/5, 10 thèmes, 20 carnets et 67 badges. [Contenu, sources et règles](ESTEREL-ESCALES.md). Pas de changement de stockage ni de raccourcissement artificiel des grandes étapes.
+
+## Confort du lecteur et usage avec un média
+
+Vue essentielle ou complète, commandes accessibles, volume et fréquence des alertes, test audio avant le départ, voix calibrée et préavis facultatif sur les segments minutés. État réel du maintien de l’écran, relance après refus/interruption et rappel au retour d’arrière-plan. Préférences sauvegardées ; chronos, défis et reprise conservés. [Guide pratique](READER-COMFORT.md). Le lot doit passer les quatre contrôles sur son SHA exact avant publication.
+
+L’installation active existe déjà. Restent à éprouver sur appareils réels : installation, veille/reprise, casque et coexistence avec podcast/vidéo. Une mise à jour PWA accompagnée et une vérification explicite de la disponibilité hors connexion restent à développer. Le cache actuel n’assure pas les cartes externes hors connexion.
 
 ## Prochaine priorité : mode Voyage
 
@@ -26,6 +32,10 @@ Conditions de livraison : distinction entre portion parcourue et route entière 
 | 4 | Ardèche | Balazuc, villages, gorges et reliefs variés | Parcours touristiques repérés ; sélection exacte à établir |
 
 Chaque pack devra proposer les mêmes informations locales : paysages, lieux réellement traversés ou proches clairement distingués, sources, distance, relief et limites. Difficultés fixées après analyse, pas avant. Les objectifs nouveaux doivent avoir une liste et un seuil stables ; les ajouts ne doivent pas déplacer un ancien trophée.
+
+## Immersion après le mode Voyage
+
+Ajouter des photos documentées des lieux, avec droits et attribution, chargement léger et texte de remplacement. Prévoir une option pour réduire ou masquer les médias. Sons d’ambiance facultatifs, sans masquer les consignes. Un lecteur vidéo intégré est à étudier après les essais pratiques : disponibilité réseau, consommation, mode flottant et contraintes de la plateforme. Les photos ne constituent ni une restitution continue du trajet ni un relevé géographique.
 
 ## Puis : carnet personnel
 
