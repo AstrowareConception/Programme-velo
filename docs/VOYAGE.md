@@ -22,7 +22,7 @@ Les portions achevées sont réunies par parcours. Les chevauchements et répét
 
 Les sessions Voyage ont **0 XP individuels**. À l’achèvement du parcours, ses XP sont attribués **une seule fois en Voyage**. Une séance classique complète déjà enregistrée à cette date sur ce parcours exclut ce second bonus ; les futures séances classiques conservent leur récompense habituelle. Les bonus uniques des campagnes restent distincts. Les points de semaine sont proportionnels à la distance de chaque portion achevée ; minutes, séances et charge restent dans le suivi d’activité. Une tentative Voyage inachevée n’attribue pas de points.
 
-Trois trophées sans XP supplémentaires : **Première escale**, **Au bout du voyage**, **Carnet de voyage** (trois parcours différents achevés en Voyage). Les anciens objectifs et leurs seuils restent inchangés.
+Trois trophées sans XP supplémentaires : **Première escale**, **Au bout du voyage**, **Voyages au long cours** (trois parcours différents achevés en Voyage). L’ancien **Carnet de voyage** reste un objectif distinct de dix parcours natifs ; les anciens objectifs et leurs seuils restent inchangés.
 
 Supprimer une portion recalcule la couverture, la prochaine position, les XP et les trophées. Les portions plus loin sont conservées ; un passage manquant doit être refait. La suppression d’une autre séance peut aussi modifier l’éligibilité au bonus. Le JSON v3 conserve la sélection et les portions ; les sauvegardes anciennes restent compatibles.
 

@@ -394,7 +394,7 @@ export function badges(state: AppState): Badge[] {
     ...[
       { id: "voyage-first", name: "Première escale", icon: "🧳", target: 1, count: voyages.length ? 1 : 0, description: "Achever et enregistrer une première portion en mode Voyage." },
       { id: "voyage-complete", name: "Au bout du voyage", icon: "🏁", target: 1, count: completedVoyages, description: "Couvrir un parcours entier en une ou plusieurs portions Voyage, sans kilomètre manquant." },
-      { id: "voyage-three", name: "Carnet de voyage", icon: "📖", target: 3, count: completedVoyages, description: "Achever trois parcours différents en mode Voyage." }
+      { id: "voyage-three", name: "Voyages au long cours", icon: "📖", target: 3, count: completedVoyages, description: "Achever trois parcours différents en mode Voyage." }
     ].map((trophy): Badge => ({ id: trophy.id, name: trophy.name, icon: trophy.icon, description: trophy.description, unlocked: trophy.count >= trophy.target, progress: `${Math.min(trophy.count, trophy.target)}/${trophy.target}` })),
     ...discoveryBadges(state.sessions),
     ...workoutProgramBadges(state.sessions),

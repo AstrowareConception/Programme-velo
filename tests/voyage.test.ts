@@ -22,6 +22,13 @@ const full = () => [session(0, route.distanceKm / 2), session(route.distanceKm /
 const withSessions = (sessions: CompletedSession[]) => ({ ...emptyState(), sessions });
 
 describe("Voyage coverage and rewards", () => {
+  it("adds distinct trophies without changing the 67 historic goals", () => {
+    const all = badges(emptyState());
+    const old = all.filter(b => !b.id.startsWith("voyage-"));
+    expect(old).toHaveLength(67); expect(all).toHaveLength(70);
+    for (const trophy of all.filter(b => b.id.startsWith("voyage-"))) expect(old.some(b => b.name === trophy.name)).toBe(false);
+    expect(new Set(all.map(b => b.id)).size).toBe(70);
+  });
   it("cuts a real distance at 15 km/h without shortening the parent route", () => {
     const before = JSON.stringify(route);
     const plan = voyagePlan(route, [], 30)!;
