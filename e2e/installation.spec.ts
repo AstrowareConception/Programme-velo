@@ -40,7 +40,7 @@ test("invitation received on Quête survives tabs, is consumed once and waits fo
   const before = await retained();
   await expect(card(page)).toContainText("Ouvre la confirmation");
   await card(page).click();
-  await expect(page.getByRole("status")).toContainText("Installation annulée");
+  await expect(page.locator(".installNotice")).toContainText("Installation annulée");
   expect(await calls(page)).toBe(1);
   await page.getByRole("button", { name: /Séances/ }).click(); await more(page);
   await card(page).click();
@@ -52,7 +52,7 @@ test("invitation received on Quête survives tabs, is consumed once and waits fo
   await expect(card(page)).toBeDisabled();
   expect(await calls(page)).toBe(1);
   await page.evaluate(() => (window as unknown as { installationQA: { resolve: (value: { outcome: string }) => void } }).installationQA.resolve({ outcome: "accepted" }));
-  await expect(page.getByRole("status")).toContainText("Installation acceptée");
+  await expect(page.locator(".installNotice")).toContainText("Installation acceptée");
   await expect(page.getByRole("region", { name: "VeloQuest installée" })).toHaveCount(0);
   await page.evaluate(() => window.dispatchEvent(new Event("appinstalled")));
   await expect(page.getByRole("region", { name: "VeloQuest installée" })).toBeVisible();
@@ -79,7 +79,7 @@ test("help accepts a later browser invitation without a reload", async ({ page }
   await invitation(page, "accepted");
   await page.getByRole("button", { name: "Installer maintenant" }).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
-  await expect(page.getByRole("status")).toContainText("Installation acceptée");
+  await expect(page.locator(".installNotice")).toContainText("Installation acceptée");
   expect(await calls(page)).toBe(1);
 });
 

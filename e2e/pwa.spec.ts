@@ -42,7 +42,13 @@ async function boot(page: Page, fixture: Fixture) {
   await page.addInitScript(value => { if (!localStorage.getItem('veloquest:v1')) localStorage.setItem('veloquest:v1', JSON.stringify(value)); }, state);
   await page.goto(fixture.url);
   await page.getByRole('button', { name: /••• Plus/ }).click();
-  await expect(panel(page)).toContainText('Séances et parcours prêts hors connexion');
+  try { await expect(panel(page)).toContainText('Séances et parcours prêts hors connexion'); }
+  catch (error) {
+    console.log('PWA bootstrap', await page.evaluate(async () => {
+      const reg = await navigator.serviceWorker.getRegistration(); const keys = await caches.keys();
+      return { active: reg?.active?.state, installing: reg?.installing?.state, waiting: reg?.waiting?.state, controller: navigator.serviceWorker.controller?.state, caches: await Promise.all(keys.map(async key => ({ key, files: (await (await caches.open(key)).keys()).map(r => new URL(r.url).pathname) }))) };
+    })); throw error;
+  }
 }
 async function replacement(page: Page, fixture: Fixture) {
   fixture.revision++;
