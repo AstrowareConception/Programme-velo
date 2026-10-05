@@ -67,6 +67,12 @@ test('real offline shell and explicitly prepared photos survive a cold reload wi
   await expect(panel(page)).toContainText('Photos : 5/5');
   await panel(page).screenshot({ path: info.outputPath('pwa-ready.png') });
   await context.setOffline(true); await page.reload();
+  expect(await page.evaluate(async () => {
+    const script = [...document.scripts].find(s => s.src.includes('/_next/static/'));
+    if (!script) return false;
+    const url = new URL(script.src); url.searchParams.set('dpl', 'deployment-query-test');
+    return (await fetch(url)).ok;
+  })).toBe(true);
   await page.getByRole('button', { name: /••• Plus/ }).click();
   await expect(panel(page)).toContainText('HORS CONNEXION'); await expect(panel(page)).toContainText('Séances et parcours prêts');
   const card = await route(page); await card.getByText(/Voir les photos ·/).click();
