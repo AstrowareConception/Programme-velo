@@ -4,7 +4,7 @@
 
 - Dépôt : https://github.com/AstrowareConception/Programme-velo ; référence `main`.
 - Production : https://programme-velo.vercel.app/ ; projet Vercel `programme-velo`.
-- Matériel : TOPUTURE TEB5, consignes sur 1–32 niveaux, mode manuel conservé.
+- Matériel : TOPUTURE commandé le 4 octobre 2026, référence exacte et FTMS à qualifier ; TEB5 est une hypothèse historique. Consignes sur 1–32 niveaux, mode manuel conservé. Voir `HARDWARE-COMPATIBILITY.md`.
 
 ## Campagnes intégrées
 
@@ -90,7 +90,7 @@ Une suppression recalcule les indicateurs depuis les séances restantes. Les XP 
 
 Avant fusion : `npm run typecheck`, `npm test`, `npm run test:e2e`, `npm run build` sur le commit exact de la PR, puis contrôle visuel mobile/ordinateur. Vérifier ensuite la CI de `main`, le déploiement Vercel, `/api/version` et l'URL publique.
 
-Aucun essai TEB5 physique ni validation Safari/iPhone physique n'est réalisé par les tests Chromium. Prochaine étape matérielle : suivre `docs/TEB5-BLUETOOTH-VALIDATION.md` et conserver un relevé de la télémétrie et du contrôle effectifs.
+Aucun essai TEB5 physique ni validation Safari/iPhone physique n'est réalisé par les tests Chromium. Prochaine étape matérielle : suivre `docs/HARDWARE-COMPATIBILITY.md` et conserver un relevé de la télémétrie et du contrôle effectifs.
 
 Le document d'état externe livré après déploiement complète ce point avec les commits finaux, PR et résultats réellement observés, sans anticiper la publication.
 

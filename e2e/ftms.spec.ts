@@ -125,7 +125,7 @@ async function mockFtms(page: Page) {
     };
 
     const device: any = {
-      name: "Fake TEB5",
+      name: "Simulateur FTMS 1–32",
       addEventListener() {},
       removeEventListener() {},
       gatt: {
@@ -144,33 +144,36 @@ async function mockFtms(page: Page) {
   });
 }
 
-test("FTMS connection exposes live TEB5 telemetry and capabilities", async ({ page }) => {
+test("FTMS connection exposes simulated telemetry and capabilities", async ({ page }) => {
   await seed(page);
   await mockFtms(page);
   await page.goto("/");
 
-  await page.getByRole("button", { name: /TEB5/ }).click();
-  await expect(page.getByText("Fake TEB5").first()).toBeVisible();
+  await page.getByRole("button", { name: "Vélo Bluetooth" }).click();
+  await expect(page.getByText("Simulateur FTMS 1–32").first()).toBeVisible();
   await expect(page.getByText("88").first()).toBeVisible();
   await expect(page.getByText("205").first()).toBeVisible();
   await expect(page.getByText("142").first()).toBeVisible();
 
   await page.getByRole("button", { name: /Plus/ }).click();
+  await expect(page.getByRole("button", { name: "Inspecter un appareil BLE" })).toBeDisabled();
   await expect(page.getByText("Control Point")).toBeVisible();
   await expect(page.getByText("Résistance cible")).toBeVisible();
   await expect(page.getByText("1–32", { exact: true })).toBeVisible();
 });
 
-test("FTMS control acknowledgement and auto resistance send real control-point commands", async ({ page }) => {
+test("FTMS control acknowledgement and auto resistance send simulated control-point commands", async ({ page }) => {
   await seed(page);
   await mockFtms(page);
   await page.goto("/");
 
-  await page.getByRole("button", { name: /TEB5/ }).click();
+  await page.getByRole("button", { name: "Vélo Bluetooth" }).click();
   await page.getByRole("button", { name: /Plus/ }).click();
 
   await page.getByRole("button", { name: "Demander le contrôle FTMS" }).click();
   await expect(page.getByText("Contrôle accordé")).toBeVisible();
+  await expect(page.getByLabel("Auto-résistance pour cette connexion")).toHaveCount(0);
+  await page.locator("label.toggleRow").filter({ hasText: "Correspondance physique 1–32 vérifiée pour cette connexion" }).click();
   await page.locator("label.toggleRow").filter({ hasText: "Auto-résistance pour cette connexion" }).click();
   await expect(page.getByLabel("Auto-résistance pour cette connexion")).toBeChecked();
 

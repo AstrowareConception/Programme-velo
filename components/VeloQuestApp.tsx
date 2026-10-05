@@ -1,5 +1,6 @@
 "use client";
 
+import { BleDiagnosticPanel } from "@/components/BleDiagnosticPanel";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -136,7 +137,9 @@ export function VeloQuestApp() {
   const [bluetoothError, setBluetoothError] = useState<string | null>(null);
   const [connectingBike, setConnectingBike] = useState(false);
   const [controlGranted, setControlGranted] = useState(false);
-  const [testResistanceLevel, setTestResistanceLevel] = useState(8);
+  const [testResistanceLevel, setTestResistanceLevel] = useState(1);
+  const [diagnosingBike, setDiagnosingBike] = useState(false);
+  const [resistanceMappingVerified, setResistanceMappingVerified] = useState(false);
   const [autoResistanceControl, setAutoResistanceControl] = useState(false);
   const [climbStartDistanceM, setClimbStartDistanceM] = useState<number | null>(null);
   const [customClimbs, setCustomClimbs] = useState<ClimbChallenge[]>([]);
@@ -566,6 +569,7 @@ export function VeloQuestApp() {
     const targetLevel = values.reduce((sum, value) => sum + value, 0) / values.length + preferences.resistanceOffset + sessionResistanceDelta;
     bike.setResistance(targetLevel).catch((error) => {
       setAutoResistanceControl(false);
+      setControlGranted(false);
       setBluetoothError(error instanceof Error ? error.message : "Pilotage automatique interrompu.");
     });
   }, [autoResistanceControl, controlGranted, running, sessionStarted, active, segmentIndex, bike]);
@@ -643,6 +647,8 @@ export function VeloQuestApp() {
   }
 
   async function connectBike() {
+    if (diagnosingBike || connectingBike) return;
+    setResistanceMappingVerified(false);
     if (!hasWebBluetooth()) {
       setBluetoothError(webBluetoothHint() === "ios"
         ? "Sur iPhone/iPad, les navigateurs actuels n’exposent pas Web Bluetooth à la PWA. Le mode guidé et la saisie manuelle restent disponibles."
@@ -665,6 +671,7 @@ export function VeloQuestApp() {
       setControlGranted(false);
       setAutoResistanceControl(false);
       const range = connection.capabilities.resistanceRange;
+      setTestResistanceLevel(range?.min ?? 1);
       setToast(range ? `${connection.deviceName} connecté · résistance ${range.min}–${range.max}` : `${connection.deviceName} connecté`);
     } catch (error) {
       setBluetoothError(error instanceof Error ? error.message : "Connexion Bluetooth impossible.");
@@ -689,8 +696,10 @@ export function VeloQuestApp() {
     if (!bike?.setResistance || !controlGranted) return;
     try {
       await bike.setResistance(testResistanceLevel);
-      setToast(`Résistance ${testResistanceLevel} confirmée par le vélo.`);
+      setToast(`Commande ${testResistanceLevel} acquittée ; effet physique à vérifier.`);
     } catch (error) {
+      setControlGranted(false);
+      setAutoResistanceControl(false);
       setBluetoothError(error instanceof Error ? error.message : "Commande de résistance refusée.");
     }
   }
@@ -1091,8 +1100,8 @@ export function VeloQuestApp() {
           <div><strong>VeloQuest</strong><span>Ride · Level up · Repeat</span></div>
         </div>
         <div className="topActions">
-          <button className={`bikePill ${bike ? "connected" : ""}`} onClick={bike ? () => { bike.disconnect(); setBike(null); setTelemetry({}); setControlGranted(false); setAutoResistanceControl(false); } : connectBike}>
-            <span>{bike ? "●" : "◌"}</span>{bike ? bike.deviceName : connectingBike ? "Connexion…" : "TEB5"}
+          <button disabled={diagnosingBike || connectingBike} className={`bikePill ${bike ? "connected" : ""}`} onClick={bike ? () => { bike.disconnect(); setBike(null); setTelemetry({}); setControlGranted(false); setAutoResistanceControl(false); } : connectBike}>
+            <span>{bike ? "●" : "◌"}</span>{bike ? bike.deviceName : connectingBike ? "Connexion…" : "Vélo Bluetooth"}
           </button>
           <div className="levelPill"><span>Niv. {level}</span><strong>{xp} XP</strong></div>
         </div>
@@ -1157,7 +1166,7 @@ export function VeloQuestApp() {
 
           <section className={`card bikeConsole ${bike ? "online" : ""}`}>
             <div className="sectionHead">
-              <div><p className="eyebrow">TEB5 · MODE CONNECTÉ BETA</p><h2>{bike ? bike.deviceName : "Console Bluetooth"}</h2></div>
+              <div><p className="eyebrow">VÉLO · MODE CONNECTÉ BETA</p><h2>{bike ? bike.deviceName : "Console Bluetooth"}</h2></div>
               <span className="connectionState">{bike ? "LIVE" : "OFFLINE"}</span>
             </div>
             {bike ? (
@@ -1182,7 +1191,7 @@ export function VeloQuestApp() {
                 {bike.capabilities.resistanceRange && <span className="ok">Plage {bike.capabilities.resistanceRange.min}–{bike.capabilities.resistanceRange.max}</span>}
               </div>
             )}
-            {!bike && <button className="secondary" onClick={connectBike} disabled={connectingBike}>{connectingBike ? "Recherche du vélo…" : "Connecter le vélo"}</button>}
+            {!bike && <button className="secondary" onClick={connectBike} disabled={connectingBike || diagnosingBike}>{connectingBike ? "Recherche du vélo…" : "Connecter le vélo"}</button>}
             {bluetoothError && <p className="errorText">{bluetoothError}</p>}
           </section>
 
@@ -1334,7 +1343,7 @@ export function VeloQuestApp() {
             <div>
               <p className="eyebrow">IMPORT GPX</p>
               <h2>Une route réelle devient une quête.</h2>
-              <p>VeloQuest calcule la distance, le D+, les pentes lissées, le profil altimétrique et les niveaux TEB5. Le fichier reste sur ton appareil.</p>
+              <p>VeloQuest calcule la distance, le D+, les pentes lissées, le profil altimétrique et les niveaux guidés 1–32. Le fichier reste sur ton appareil.</p>
             </div>
             <label className="primary gpxButton">Choisir un fichier GPX<input type="file" accept=".gpx,application/gpx+xml" onChange={(e) => importGpx(e.target.files?.[0])} /></label>
             {gpxError && <p className="errorText">{gpxError}</p>}
@@ -1485,7 +1494,7 @@ export function VeloQuestApp() {
             <div className="sectionHead"><div><p className="eyebrow">GUIDE RAPIDE</p><h2>Une routine simple</h2></div><span className="spark">4 étapes</span></div>
             <div className="guideSteps">
               <div><span>1</span><p><strong>Choisis selon ton temps.</strong><small>Le Coach Express adapte la séance au créneau et à ton énergie.</small></p></div>
-              <div><span>2</span><p><strong>Respecte surtout le RPE.</strong><small>Le niveau TEB5 est un repère ; utilise la calibration globale s’il est trop facile ou trop dur.</small></p></div>
+              <div><span>2</span><p><strong>Respecte surtout le RPE.</strong><small>Le niveau guidé 1–32 est un repère ; utilise la calibration globale s’il est trop facile ou trop dur.</small></p></div>
               <div><span>3</span><p><strong>Enregistre la séance.</strong><small>Bluetooth si disponible, sinon recopie simplement les chiffres utiles du vélo.</small></p></div>
               <div><span>4</span><p><strong>Suis les tendances.</strong><small>Poids, tour de taille, régularité et volume comptent davantage qu’une valeur isolée.</small></p></div>
             </div>
@@ -1500,13 +1509,15 @@ export function VeloQuestApp() {
               <Toggle label="Garder l’écran éveillé" description="Empêche la mise en veille pendant une séance quand l’API est disponible." checked={preferences.keepScreenAwake} onChange={(v) => updatePreference("keepScreenAwake", v)} />
               <Toggle label="Conserver la trace Bluetooth" description="Garde une trace compacte de la télémétrie pour l’historique." checked={preferences.keepTelemetryTrace} onChange={(v) => updatePreference("keepTelemetryTrace", v)} />
               <div className="resistanceCalibration">
-                <div><strong>Calibration résistance TEB5</strong><small>Ajuste tous les niveaux guidés et automatiques sans modifier les séances.</small></div>
+                <div><strong>Calibration résistance 1–32</strong><small>Ajuste tous les niveaux guidés et automatiques sans modifier les séances.</small></div>
                 <span>{preferences.resistanceOffset > 0 ? `+${preferences.resistanceOffset}` : preferences.resistanceOffset}</span>
                 <input type="range" min="-4" max="4" step="1" value={preferences.resistanceOffset} onChange={(event) => updateResistanceOffset(Number(event.target.value))} />
                 <div className="calibrationLabels"><small>plus facile</small><button className="secondary miniButton" onClick={() => updateResistanceOffset(0)}>neutre</button><small>plus dur</small></div>
               </div>
             </div>
           </section>
+
+          <BleDiagnosticPanel disabled={Boolean(bike) || connectingBike || Boolean(active)} onBusyChange={setDiagnosingBike} />
 
           <section className="card">
             <div className="sectionHead"><div><p className="eyebrow">BLUETOOTH LAB</p><h2>{bike ? bike.deviceName : "Diagnostic FTMS"}</h2></div><span className={bike ? "connectionState onlineText" : "connectionState"}>{bike ? "CONNECTÉ" : "OFFLINE"}</span></div>
@@ -1525,7 +1536,7 @@ export function VeloQuestApp() {
                   <span><small>Résistance cible</small><strong>{bike.capabilities.supportsResistanceTarget ? "oui" : "non détectée"}</strong></span>
                   <span><small>Plage</small><strong>{bike.capabilities.resistanceRange ? `${bike.capabilities.resistanceRange.min}–${bike.capabilities.resistanceRange.max}` : "inconnue"}</strong></span>
                 </div>
-                <p className="finePrint">Le pilotage automatique reste verrouillé jusqu’à validation sur le TEB5 réel. Le laboratoire ci-dessous permet seulement un test manuel et explicite.</p>
+                <p className="finePrint">Les capacités annoncées ne prouvent pas le changement physique de résistance. Les tests manuels utilisent les unités FTMS annoncées ; vérifie leur correspondance avec l’écran du vélo.</p>
                 {bike.capabilities.supportsResistanceTarget && bike.requestControl && bike.setResistance && (
                   <div className="controlLab">
                     <div className="sectionHead"><div><small>LABORATOIRE DE CONTRÔLE</small><strong>{controlGranted ? "Contrôle accordé" : "Contrôle non demandé"}</strong></div><span className={controlGranted ? "labState ok" : "labState"}>{controlGranted ? "ARMÉ" : "VERROUILLÉ"}</span></div>
@@ -1533,9 +1544,12 @@ export function VeloQuestApp() {
                       <button className="secondary" onClick={requestBikeControl}>Demander le contrôle FTMS</button>
                     ) : (
                       <>
-                        <label>Niveau de test <strong>{testResistanceLevel}</strong><input type="range" min={bike.capabilities.resistanceRange?.min ?? 1} max={bike.capabilities.resistanceRange?.max ?? 32} step={bike.capabilities.resistanceRange?.increment || 1} value={testResistanceLevel} onChange={(e) => setTestResistanceLevel(Number(e.target.value))} /></label>
+                        <label>Résistance FTMS de test <strong>{testResistanceLevel}</strong><input type="range" min={bike.capabilities.resistanceRange?.min} max={bike.capabilities.resistanceRange?.max} step={bike.capabilities.resistanceRange?.increment} value={testResistanceLevel} onChange={(e) => setTestResistanceLevel(Number(e.target.value))} /></label>
                         <button className="secondary" onClick={sendTestResistance}>Envoyer ce niveau au vélo</button>
-                        <Toggle label="Auto-résistance pour cette connexion" description="À chaque changement de segment, VeloQuest envoie le niveau cible au vélo. Désactivé automatiquement en cas d’erreur." checked={autoResistanceControl} onChange={setAutoResistanceControl} />
+                        {bike.capabilities.resistanceRange?.min === 1 && bike.capabilities.resistanceRange.max === 32 && bike.capabilities.resistanceRange.increment === 1 ? <>
+                          <Toggle label="Correspondance physique 1–32 vérifiée pour cette connexion" description="À cocher seulement après avoir comparé les commandes manuelles avec l’écran et la résistance effective du vélo." checked={resistanceMappingVerified} onChange={(verified) => { setResistanceMappingVerified(verified); setAutoResistanceControl(false); }} />
+                          {resistanceMappingVerified && <Toggle label="Auto-résistance pour cette connexion" description="À chaque changement de segment, VeloQuest envoie le niveau cible au vélo. Désactivé automatiquement en cas d’erreur." checked={autoResistanceControl} onChange={setAutoResistanceControl} />}
+                        </> : <p>Auto-résistance indisponible : la plage annoncée ne correspond pas aux consignes 1–32. Aucune conversion matérielle n’est supposée.</p>}
                       </>
                     )}
                   </div>
@@ -1544,7 +1558,7 @@ export function VeloQuestApp() {
             ) : (
               <>
                 <p>{webBluetoothHint() === "ios" ? "iOS n’expose pas Web Bluetooth aux PWA. VeloQuest reste utilisable en mode guidé et saisie manuelle." : "Connecte le vélo pour inspecter précisément les caractéristiques FTMS qu’il expose."}</p>
-                <button className="secondary" onClick={connectBike} disabled={connectingBike}>{connectingBike ? "Recherche…" : "Lancer le diagnostic Bluetooth"}</button>
+                <button className="secondary" onClick={connectBike} disabled={connectingBike || diagnosingBike}>{connectingBike ? "Recherche…" : "Connecter pour la télémétrie FTMS"}</button>
               </>
             )}
           </section>
@@ -1747,7 +1761,7 @@ export function VeloQuestApp() {
                 )}
 
                 <div className="resistance">
-                  <small>NIVEAU TEB5</small>
+                  <small>NIVEAU GUIDÉ</small>
                   <strong>{adjustedResistance(active.segments[segmentIndex].resistance, preferences.resistanceOffset + sessionResistanceDelta)}</strong>
                 </div>
                 <div className="timer" aria-live="off">{formatClock(secondsLeft)}</div>

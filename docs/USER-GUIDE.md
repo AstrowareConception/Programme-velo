@@ -64,14 +64,14 @@ Avant de démarrer, le pré-vol affiche tous les segments.
 
 Pendant l'effort :
 
-- le niveau TEB5 cible est affiché en grand ;
+- le niveau guidé 1–32 cible est affiché en grand ;
 - le RPE cible reste prioritaire ;
 - la cadence cible est indiquée lorsqu'elle est pertinente ;
 - le prochain segment est annoncé ;
 - l'écran peut être maintenu éveillé ;
 - bip, voix et retour haptique sont configurables.
 
-Si tous les niveaux paraissent trop faciles ou trop durs, régler **Plus > Calibration résistance TEB5**.
+Si tous les niveaux paraissent trop faciles ou trop durs, régler **Plus > Calibration résistance 1–32**.
 
 ## 4. Bluetooth
 
@@ -83,7 +83,7 @@ Sur navigateur compatible Web Bluetooth :
 
 Sur iPhone, utiliser le mode guidé et saisir les valeurs affichées sur le vélo en fin de séance.
 
-Le pilotage automatique ne doit être utilisé qu'après validation du protocole documenté dans `docs/TEB5-BLUETOOTH-VALIDATION.md`.
+Le pilotage automatique ne doit être utilisé qu'après validation du protocole documenté dans `docs/HARDWARE-COMPATIBILITY.md`.
 
 ## 5. Micro-séances bonus
 
@@ -204,3 +204,8 @@ Au retour, le panneau **Séance interrompue** propose de reprendre ou d'abandonn
 Après une mise à jour, recharge en ligne puis vérifie ton journal. **Plus** affiche le numéro court de version ; `/api/version` fournit le commit complet pour un diagnostic. Exporter une sauvegarde reste utile avant tout changement d'appareil.
 
 Les tests de vélo simulé ne valident pas ton TEB5 réel. Le compteur « KCAL VÉLO » est cumulatif ; les calories préremplies de séance utilisent sa variation échantillonnée. Corrige-les manuellement si nécessaire.
+
+
+### Identifier un nouveau vélo
+
+Dans **Plus → Explorer les services Bluetooth**, lancer l’inventaire sans commande de résistance et exporter le rapport technique local si nécessaire. Le TOPUTURE commandé reste à qualifier : ni son nom ni ses 32 niveaux ne prouvent FTMS. Le diagnostic ne contient aucune mesure personnelle. Voir [la recette matérielle](HARDWARE-COMPATIBILITY.md) avant tout test de contrôle.
