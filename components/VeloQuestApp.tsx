@@ -3,7 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { AppState, Measurement, Preferences, TelemetrySample, TimeAttackSplit, WorkoutTemplate } from "@/lib/types";
+import type { AppState, CompletedSession, Measurement, Preferences, TelemetrySample, TimeAttackSplit, VoyagePortion, WorkoutTemplate } from "@/lib/types";
+import { VoyagePanel } from "@/components/VoyagePanel";
+import { voyagePlan, voyageProgress, voyageWorkout } from "@/lib/voyage";
+import { validVoyagePortion } from "@/lib/voyage-progress";
 import { connectFtmsBike, hasWebBluetooth, type BikeConnection, type BikeTelemetry, webBluetoothHint } from "@/lib/ftms";
 import { ClimbProfile } from "@/components/ClimbProfile";
 import { RouteMap } from "@/components/RouteMap";
@@ -67,11 +70,15 @@ import {
 
 type Tab = "dashboard" | "sessions" | "climbs" | "progress" | "more";
 type Energy = "easy" | "normal" | "hard";
-type RouteMode = "training" | "timeAttack" | "segmentAttack";
+type RouteMode = "training" | "timeAttack" | "segmentAttack" | "voyage";
 const CUSTOM_ROUTES_KEY = "veloquest:custom-routes:v1";
 
 function pct(value: number, target: number) {
   return Math.min(100, Math.round((value / Math.max(1, target)) * 100));
+}
+
+function quantity(value: number) {
+  return value.toLocaleString("fr-FR", { maximumFractionDigits: 1 });
 }
 
 function uid() {
@@ -106,6 +113,8 @@ export function VeloQuestApp() {
   const [active, setActive] = useState<WorkoutTemplate | null>(null);
   const [activeClimb, setActiveClimb] = useState<ClimbChallenge | null>(null);
   const [routeMode, setRouteMode] = useState<RouteMode>("training");
+  const [activeVoyage, setActiveVoyage] = useState<VoyagePortion | null>(null);
+  const [voyagePickerOpen, setVoyagePickerOpen] = useState(false);
   const [challengeRoute, setChallengeRoute] = useState<ClimbChallenge | null>(null);
   const [segmentAttackRoute, setSegmentAttackRoute] = useState<ClimbChallenge | null>(null);
   const [segmentAttackIndex, setSegmentAttackIndex] = useState<number | null>(null);
@@ -219,6 +228,7 @@ export function VeloQuestApp() {
       workoutId: active.id,
       routeId: activeClimb?.id,
       routeMode,
+      voyage: activeVoyage ?? undefined,
       challengeId: activeChallenge?.id,
       segmentAttackIndex: segmentAttackIndex ?? undefined,
       segmentIndex,
@@ -234,7 +244,7 @@ export function VeloQuestApp() {
       telemetrySamples: compactTelemetry(telemetrySamples, 180),
       hadBikeConnection: Boolean(bike)
     };
-  }, [active, activeClimb, routeMode, activeChallenge, segmentAttackIndex, segmentIndex, secondsLeft, running, sessionStarted, showFinish, timeAttackElapsedSeconds, timeAttackSplits, pauseCount, sessionResistanceDelta, climbStartDistanceM, telemetrySamples, bike]);
+  }, [active, activeClimb, routeMode, activeVoyage, activeChallenge, segmentAttackIndex, segmentIndex, secondsLeft, running, sessionStarted, showFinish, timeAttackElapsedSeconds, timeAttackSplits, pauseCount, sessionResistanceDelta, climbStartDistanceM, telemetrySamples, bike]);
 
   useEffect(() => {
     if (!active || !sessionStarted) return;
@@ -468,6 +478,10 @@ export function VeloQuestApp() {
     if (!activeClimb || !active) return 0;
     const timedProgress = totalSessionSeconds ? sessionElapsedSeconds / totalSessionSeconds : 0;
 
+    if (routeMode === "voyage" && activeVoyage) {
+      return (activeVoyage.startKm + Math.min(1, timedProgress) * (activeVoyage.endKm - activeVoyage.startKm)) / activeClimb.distanceKm;
+    }
+
     if (bike && telemetry.distanceM !== undefined && climbStartDistanceM !== null) {
       const localKm = Math.max(0, (telemetry.distanceM - climbStartDistanceM) / 1000);
       if (routeMode === "segmentAttack" && activeSegmentBounds) {
@@ -483,7 +497,7 @@ export function VeloQuestApp() {
     }
 
     return Math.max(0, Math.min(1, timedProgress));
-  }, [activeClimb, active, bike, telemetry.distanceM, climbStartDistanceM, routeMode, activeSegmentBounds, totalSessionSeconds, sessionElapsedSeconds]);
+  }, [activeClimb, active, bike, telemetry.distanceM, climbStartDistanceM, routeMode, activeVoyage, activeSegmentBounds, totalSessionSeconds, sessionElapsedSeconds]);
 
   const currentRouteKm = activeClimb ? climbProgress * activeClimb.distanceKm : 0;
   const routeBest = activeClimb ? personalBest(state.sessions, activeClimb.id) : undefined;
@@ -562,6 +576,14 @@ export function VeloQuestApp() {
     });
   }, [autoResistanceControl, controlGranted, running, sessionStarted, active, segmentIndex, bike]);
 
+  const voyageCard = state.voyage ? <VoyagePanel
+    route={allClimbs.find(route => route.id === state.voyage?.routeId)} sessions={state.sessions}
+    minutes={state.voyage.minutes} interrupted={Boolean(resumeSnapshot)}
+    onMinutes={minutes => setState(prev => ({ ...prev, voyage: prev.voyage ? { ...prev.voyage, minutes } : undefined }))}
+    onStart={launchVoyage} onChoose={() => { setVoyagePickerOpen(false); setTab("climbs"); }}
+    onClear={() => { setState(prev => ({ ...prev, voyage: undefined })); setVoyagePickerOpen(false); setTab("climbs"); }}
+  /> : null;
+
   if (!hydrated) {
     return (
       <main className="splashScreen" aria-busy="true">
@@ -576,8 +598,12 @@ export function VeloQuestApp() {
   function resumeInterruptedSession() {
     if (!resumeSnapshot) return;
     const route = resumeSnapshot.routeId ? allClimbs.find((item) => item.id === resumeSnapshot.routeId) ?? null : null;
+    const savedVoyage = resumeSnapshot.routeMode === "voyage" && route && validVoyagePortion(resumeSnapshot.voyage) &&
+      resumeSnapshot.voyage.routeDistanceKm === route.distanceKm && resumeSnapshot.voyage.routeXp === route.xp
+      ? resumeSnapshot.voyage : null;
     const workout = route
-      ? (resumeSnapshot.routeMode === "segmentAttack" && resumeSnapshot.segmentAttackIndex !== undefined
+      ? (resumeSnapshot.routeMode === "voyage" ? (savedVoyage ? voyageWorkout(route, savedVoyage) : undefined)
+        : resumeSnapshot.routeMode === "segmentAttack" && resumeSnapshot.segmentAttackIndex !== undefined
           ? routeSegmentWorkout(route, resumeSnapshot.segmentAttackIndex)
           : climbToWorkout(route))
       : workouts.find((item) => item.id === resumeSnapshot.workoutId);
@@ -595,6 +621,7 @@ export function VeloQuestApp() {
     setActive(workout);
     setActiveClimb(route);
     setRouteMode(restored.routeMode);
+    setActiveVoyage(savedVoyage);
     setSegmentAttackIndex(restored.segmentAttackIndex ?? null);
     setActiveChallenge(restored.challengeId ? routeChallenges.find((challenge) => challenge.id === restored.challengeId) ?? null : null);
     setSegmentIndex(restored.segmentIndex);
@@ -699,6 +726,7 @@ export function VeloQuestApp() {
   }
 
   function launch(workout: WorkoutTemplate, climb: ClimbChallenge | null = null, mode: RouteMode = "training", resistanceDelta = 0) {
+    setActiveVoyage(null);
     setActive(workout);
     setActiveClimb(climb);
     setRouteMode(climb ? mode : "training");
@@ -725,6 +753,19 @@ export function VeloQuestApp() {
     launch(routeSegmentWorkout(route, index), route, "segmentAttack");
   }
 
+  function launchVoyage() {
+    if (!state.voyage || resumeSnapshot) return;
+    const route = allClimbs.find(item => item.id === state.voyage?.routeId);
+    if (!route) return;
+    const portion = voyagePlan(route, state.sessions, state.voyage.minutes);
+    if (!portion) return;
+    const workout = voyageWorkout(route, portion);
+    if (!workout.segments.length) { setToast("Le profil de ce parcours ne permet pas de préparer cette portion."); return; }
+    launch(workout, route, "voyage");
+    setActiveVoyage(portion);
+    setVoyagePickerOpen(false);
+  }
+
   function finishActive(form: FormData) {
     if (!active) return;
     const loggedAt = String(form.get("loggedAt") ?? "").trim();
@@ -736,10 +777,12 @@ export function VeloQuestApp() {
     const isTimeAttack = routeMode === "timeAttack" && Boolean(activeClimb);
     const isSegmentAttack = routeMode === "segmentAttack" && Boolean(activeClimb) && segmentAttackIndex !== null;
     const isRaceMode = isTimeAttack || isSegmentAttack;
+    const isVoyage = routeMode === "voyage" && Boolean(activeVoyage);
+    const completedPortion = isVoyage && sessionStarted && sessionElapsedSeconds >= totalSessionSeconds - .01;
     const elapsedSeconds = isRaceMode
       ? (n(form, "elapsedSeconds") ?? timeAttackElapsedSeconds)
       : undefined;
-    const duration = isRaceMode && elapsedSeconds !== undefined
+    const duration = isVoyage ? sessionElapsedSeconds / 60 : isRaceMode && elapsedSeconds !== undefined
       ? elapsedSeconds / 60
       : (n(form, "duration") ?? active.duration);
     const previousBest = isTimeAttack && activeClimb
@@ -753,7 +796,7 @@ export function VeloQuestApp() {
       (!previousBest?.metrics?.elapsedSeconds || elapsedSeconds < previousBest.metrics.elapsedSeconds)
     );
     const completedRoute = activeClimb
-      ? (isSegmentAttack
+      ? (isSegmentAttack || isVoyage
           ? false
           : bike && telemetry.distanceM !== undefined && climbStartDistanceM !== null
             ? currentRouteKm >= activeClimb.distanceKm * 0.98
@@ -779,17 +822,13 @@ export function VeloQuestApp() {
       : undefined;
     const awardedXp = active.xp + (isPersonalBest ? 50 : 0) + (challengeResult?.xpBonus ?? 0);
 
-    setState((prev) => ({
-      ...prev,
-      sessions: [
-        ...prev.sessions,
-        {
+    const session: CompletedSession = {
           id: uid(),
           templateId: active.id,
           routeId: activeClimb?.id,
           date,
           duration,
-          points: active.points,
+          points: isVoyage && !completedPortion ? 0 : active.points,
           xp: awardedXp,
           intensity: active.intensity,
           kind: active.kind,
@@ -797,6 +836,7 @@ export function VeloQuestApp() {
           rpe: n(form, "rpe"),
           note: String(form.get("note") ?? "").trim() || undefined,
           metrics: {
+            voyage: isVoyage && activeVoyage ? { ...activeVoyage, completedPortion } : undefined,
             source: hasFtms && manualUsed ? "mixed" : hasFtms ? "ftms" : "manual",
             completedWorkout: activeClimb ? undefined : sessionStarted ? sessionProgressPercent >= 98 : true,
             elapsedSeconds,
@@ -806,7 +846,7 @@ export function VeloQuestApp() {
             challenge: challengeResult,
             completedRoute: activeClimb ? completedRoute : undefined,
             completedSegment,
-            distanceKm: n(form, "distance") ?? autoMetrics.distanceKm ?? (activeClimb ? (isSegmentAttack ? raceCurrentKm : currentRouteKm) : undefined),
+            distanceKm: n(form, "distance") ?? autoMetrics.distanceKm ?? (isVoyage ? undefined : activeClimb ? (isSegmentAttack ? raceCurrentKm : currentRouteKm) : undefined),
             calories: n(form, "calories") ?? autoMetrics.calories,
             avgSpeedKmh: n(form, "avgSpeed") ?? autoMetrics.avgSpeedKmh,
             avgCadenceRpm: n(form, "avgCadence") ?? autoMetrics.avgCadenceRpm,
@@ -818,9 +858,11 @@ export function VeloQuestApp() {
             avgResistance: autoMetrics.avgResistance,
             samples: hasFtms && preferences.keepTelemetryTrace ? compactTelemetry(telemetrySamples) : undefined
           }
-        }
-      ]
-    }));
+        };
+    const nextSessions = [...state.sessions, session];
+    const voyageXpEarned = isVoyage ? totalXp({ ...state, sessions: nextSessions }) - totalXp(state) : 0;
+    const voyageComplete = isVoyage && activeClimb ? voyageProgress(activeClimb, nextSessions).complete : false;
+    setState(prev => ({ ...prev, sessions: [...prev.sessions, session] }));
     setActive(null);
     setActiveClimb(null);
     setRunning(false);
@@ -835,7 +877,8 @@ export function VeloQuestApp() {
     setPauseCount(0);
     setActiveChallenge(null);
     setSegmentAttackIndex(null);
-    setToast(challengeResult
+    setActiveVoyage(null);
+    setToast(isVoyage ? (completedPortion ? `${voyageComplete ? "Voyage achevé" : "Portion enregistrée · la suite t’attend dans Quête"}${voyageXpEarned ? ` · +${voyageXpEarned} XP` : ""}` : "Séance enregistrée. Portion inachevée : aucun kilomètre validé dans le Voyage.") : challengeResult
       ? (challengeResult.success ? `Défi réussi · +${awardedXp} XP` : `Défi manqué · ${challengeResult.summary}`)
       : isPersonalBest
         ? `${isSegmentAttack ? "Nouveau record de secteur" : "Nouveau record personnel"} · +${awardedXp} XP`
@@ -874,7 +917,7 @@ export function VeloQuestApp() {
   }
 
   function goToSegment(index: number) {
-    if (!active) return;
+    if (!active || routeMode === "voyage") return;
     const next = Math.max(0, Math.min(active.segments.length - 1, index));
     setSegmentIndex(next);
     const seconds = Math.round(active.segments[next].minutes * 60);
@@ -984,7 +1027,7 @@ export function VeloQuestApp() {
   function exportCsv() {
     const quote = (value: unknown) => `"${String(value ?? "").replaceAll('"', '""')}"`;
     const sessions = [
-      ["date","seance","duree_min","distance_km","calories","vitesse_moy","rpm_moy","watts_moy","fc_moy","rpe","source"],
+      ["date","seance","duree_min","distance_km","calories","vitesse_moy","rpm_moy","watts_moy","fc_moy","rpe","source","voyage_debut_km","voyage_fin_km","voyage_portion_achevee","voyage_position"],
       ...state.sessions.map((session) => {
         const template = workouts.find((w) => w.id === session.templateId);
         const route = allClimbs.find((c) => c.id === session.routeId);
@@ -999,7 +1042,11 @@ export function VeloQuestApp() {
           session.metrics?.avgPowerW,
           session.metrics?.avgHeartRate,
           session.rpe,
-          session.metrics?.source
+          session.metrics?.source,
+          session.metrics?.voyage?.startKm,
+          session.metrics?.voyage?.endKm,
+          session.metrics?.voyage?.completedPortion,
+          session.metrics?.voyage?.positionSource
         ];
       })
     ].map((row) => row.map(quote).join(";")).join("\n");
@@ -1127,6 +1174,8 @@ export function VeloQuestApp() {
             onLaunch={() => launch(guidedRecommendation, null, "training", discoveryCount ? adaptiveCoach.suggestedResistanceDelta : 0)}
             onExplore={exploreGentleRides} onReview={reviewGuidance} onFree={leaveGuidance} />}
 
+          {voyageCard}
+
           <details className={guidedView ? "guidedAdvanced" : "legacyDashboard"} open={guidedView ? undefined : true}>
             <summary hidden={!guidedView}>Voir le programme de douze semaines et les outils avancés</summary>
             <div>
@@ -1138,7 +1187,7 @@ export function VeloQuestApp() {
           </section>
 
           <section className="card weeklyMission">
-            <div className="sectionHead"><div><p className="eyebrow">MISSION SEMAINE {week}</p><h2>Ce qu’il reste à conquérir</h2></div><strong>{perfectWeek ? "✓ complète" : `${Math.max(0, target.points - stats.points)} pts restants`}</strong></div>
+            <div className="sectionHead"><div><p className="eyebrow">MISSION SEMAINE {week}</p><h2>Ce qu’il reste à conquérir</h2></div><strong>{perfectWeek ? "✓ complète" : `${quantity(Math.max(0, target.points - stats.points))} pts restants`}</strong></div>
             <div className="missionItems">
               <MissionItem label="Charge" value={stats.points} target={target.points} suffix=" pts" />
               <MissionItem label="Volume" value={stats.minutes} target={target.minutes} suffix=" min" />
@@ -1149,7 +1198,7 @@ export function VeloQuestApp() {
           </section>
 
           <section className="grid achievementGrid">
-            <article className={`card achievement ${perfectWeek ? "success" : ""}`}><span>👑</span><div><small>Semaine</small><strong>{perfectWeek ? "Parfaite" : "En cours"}</strong><em>{stats.points}/{target.points} pts · {stats.hard}/{target.maxHard} séances dures</em></div></article>
+            <article className={`card achievement ${perfectWeek ? "success" : ""}`}><span>👑</span><div><small>Semaine</small><strong>{perfectWeek ? "Parfaite" : "En cours"}</strong><em>{quantity(stats.points)}/{target.points} pts · {stats.hard}/{target.maxHard} séances dures</em></div></article>
             <article className="card achievement"><span>🔥</span><div><small>Série</small><strong>{currentStreak} semaine{currentStreak > 1 ? "s" : ""}</strong><em>parfaite{currentStreak > 1 ? "s" : ""} d’affilée</em></div></article>
             <article className="card achievement"><span>🛣️</span><div><small>Distance totale</small><strong>{totalDistance.toFixed(1)} km</strong><em>enregistrés</em></div></article>
             <article className="card achievement"><span>📉</span><div><small>Transformation</small><strong>{weightLost > 0 ? `-${weightLost.toFixed(1)} kg` : "—"}</strong><em>{waistLost > 0 ? `-${waistLost.toFixed(1)} cm de taille` : "mesures à compléter"}</em></div></article>
@@ -1399,6 +1448,7 @@ export function VeloQuestApp() {
                       <button className="secondary timeAttackButton" onClick={() => launch(climbToWorkout(climb), climb, "timeAttack")}>⏱ Time Attack</button>
                       <button className="secondary segmentAttackButton" onClick={() => setSegmentAttackRoute(climb)}>⚡ Segments</button>
                       <button className="secondary challengeButton" onClick={() => setChallengeRoute(climb)}>◆ Défis</button>
+                      <button className="secondary" onClick={() => { setState(prev => ({ ...prev, voyage: { routeId: climb.id, minutes: prev.voyage?.minutes ?? 30 } })); setVoyagePickerOpen(true); }}>🧳 Voyage en plusieurs séances</button>
                       {climb.id.startsWith("gpx-") && <button className="secondary dangerButton" onClick={() => deleteCustomClimb(climb.id)}>Supprimer</button>}
                     </div>
                   </article>
@@ -1448,7 +1498,7 @@ export function VeloQuestApp() {
                 return (
                   <button className="sessionHistoryRow" key={session.id} onClick={() => setSelectedSessionId(session.id)}>
                     <span>{dateLabel(session.date)}</span>
-                    <div><strong>{route?.name ?? template?.name ?? session.templateId}</strong><small>{session.duration} min · {session.metrics?.source ?? "manuel"}</small></div>
+                    <div><strong>{route?.name ?? template?.name ?? session.templateId}</strong><small>{session.duration.toFixed(1)} min · {session.metrics?.voyage ? `Voyage · ${session.metrics.voyage.completedPortion ? "portion achevée" : "portion inachevée"}` : session.metrics?.source ?? "manuel"}</small></div>
                     <div className="historyMetrics">
                       {session.metrics?.distanceKm !== undefined && <span>{session.metrics.distanceKm.toFixed(1)} km</span>}
                       {session.metrics?.avgPowerW !== undefined && <span>{session.metrics.avgPowerW.toFixed(0)} W</span>}
@@ -1632,15 +1682,19 @@ export function VeloQuestApp() {
         </div>
       )}
 
+      {voyagePickerOpen && !active && <div className="modalBackdrop"><section className="sessionModal voyagePicker" role="dialog" aria-label="Préparer mon voyage"><button className="close" aria-label="Fermer le voyage" onClick={() => setVoyagePickerOpen(false)}>×</button>{voyageCard}</section></div>}
+
       {active && (
         <div className="modalBackdrop">
-          <div ref={readerRef} className={`sessionModal ${activeClimb ? "climbSession" : ""} ${sessionStarted && !showFinish && preferences.readerView === "essential" ? "essentialSession" : ""}`}>
+          <div ref={readerRef} className={`sessionModal ${activeClimb ? "climbSession" : ""} ${activeVoyage ? "voyageSession" : ""} ${sessionStarted && !showFinish && preferences.readerView === "essential" ? "essentialSession" : ""}`}>
             <button className="close" aria-label="Mettre la séance de côté" onClick={parkActiveSession}>×</button>
 
             {showFinish ? (
               <form action={finishActive} className="finishForm">
                 <p className="eyebrow">JOURNAL DE SÉANCE</p>
                 <h2>Enregistre ta performance</h2>
+                {activeVoyage && <p className="voyageNext">{sessionElapsedSeconds >= totalSessionSeconds - .01 ? `Portion achevée : ${activeVoyage.startKm.toFixed(2)} → ${activeVoyage.endKm.toFixed(2)} km. Enregistre-la pour avancer dans ton voyage.` : "Portion inachevée : la séance reste dans ton journal, mais ce passage sera à refaire. Tu peux aussi fermer pour conserver la séance et la reprendre."} La distance du Voyage est simulée ; les champs ci-dessous décrivent les mesures du vélo.</p>}
+                {activeVoyage && sessionElapsedSeconds < totalSessionSeconds - .01 && <button type="button" className="secondary" onClick={() => setShowFinish(false)}>Continuer cette portion</button>}
                 {(routeMode === "timeAttack" || routeMode === "segmentAttack") && activeClimb && (
                   <div className="raceFinishBanner">
                     <span><small>CHRONO</small><strong>{formatRaceTime(timeAttackElapsedSeconds)}</strong></span>
@@ -1653,7 +1707,7 @@ export function VeloQuestApp() {
                   <div className="formRow">
                     {(routeMode === "timeAttack" || routeMode === "segmentAttack") && activeClimb
                       ? <label>Chrono final (secondes)<input name="elapsedSeconds" type="number" step="1" defaultValue={timeAttackElapsedSeconds || undefined} /></label>
-                      : <label>Durée (min)<input name="duration" type="number" step="1" defaultValue={active.duration} /></label>}
+                      : <label>Durée (min)<input name="duration" type="number" step="0.01" readOnly={Boolean(activeVoyage)} defaultValue={activeVoyage ? Number((sessionElapsedSeconds / 60).toFixed(2)) : active.duration} /></label>}
                     <label>RPE ressenti /10<input name="rpe" type="number" min="1" max="10" step="0.5" /></label>
                   </div>
                   <div className="formRow">
@@ -1669,20 +1723,20 @@ export function VeloQuestApp() {
                     <label>FC moyenne (bpm)<input name="avgHeartRate" type="number" step="1" defaultValue={autoMetrics.avgHeartRate?.toFixed(0)} /></label>
                   </div>
                   <label>Note<input name="note" placeholder="Jambes, sommeil, difficulté, réglage…" /></label>
-                  <button className="primary" type="submit">Valider la quête · +{active.xp} XP</button>
+                  <button className="primary" type="submit">{activeVoyage ? "Enregistrer ma portion" : `Valider la quête · +${active.xp} XP`}</button>
                 </div>
               </form>
             ) : !sessionStarted ? (
               <div className="sessionPreview">
-                <p className="eyebrow">{activeClimb ? (routeMode === "timeAttack" ? "TIME ATTACK" : routeMode === "segmentAttack" ? "SEGMENT ATTACK" : routeCategory(activeClimb) === "scenic" ? "BALADE · 1/5" : "PARCOURS") : "PRÉPARATION"}</p>
+                <p className="eyebrow">{activeVoyage ? "VOYAGE · PORTION" : activeClimb ? (routeMode === "timeAttack" ? "TIME ATTACK" : routeMode === "segmentAttack" ? "SEGMENT ATTACK" : routeCategory(activeClimb) === "scenic" ? "BALADE · 1/5" : "PARCOURS") : "PRÉPARATION"}</p>
                 <h2>{active.name}</h2>
-                <p className="previewDescription">{scenicSession ? "RPE 2–4, résistance douce et pauses libres. Parcours entier, sans objectif de chrono : choisis selon la durée estimée et ton énergie." : activeClimb?.subtitle ?? active.description}</p>
+                <p className="previewDescription">{activeVoyage ? `${active.tagline} · ≈ ${active.duration.toFixed(1)} min. Position simulée à 15 km/h, pauses libres. Les mesures FTMS sont enregistrées séparément et ne pilotent pas ce mode.` : scenicSession ? "RPE 2–4, résistance douce et pauses libres. Parcours entier, sans objectif de chrono : choisis selon la durée estimée et ton énergie." : activeClimb?.subtitle ?? active.description}</p>
                 {activeClimb?.scenery && <details className="sceneryDetails"><summary>Découvrir le paysage et son profil</summary><p>{activeClimb.scenery}</p><small>{activeClimb.note}</small></details>}
                 {activeClimb && <RoutePlaces route={activeClimb} />}
                 <div className="previewStats">
-                  <span><small>{(routeMode === "timeAttack" || routeMode === "segmentAttack") && activeClimb ? "Record" : "Durée"}</small><strong>{(routeMode === "timeAttack" || routeMode === "segmentAttack") && activeClimb ? (activeRaceBest?.metrics?.elapsedSeconds !== undefined ? formatRaceTime(activeRaceBest.metrics.elapsedSeconds) : "à établir") : `${active.duration} min`}</strong></span>
+                  <span><small>{(routeMode === "timeAttack" || routeMode === "segmentAttack") && activeClimb ? "Record" : "Durée"}</small><strong>{(routeMode === "timeAttack" || routeMode === "segmentAttack") && activeClimb ? (activeRaceBest?.metrics?.elapsedSeconds !== undefined ? formatRaceTime(activeRaceBest.metrics.elapsedSeconds) : "à établir") : `${activeVoyage ? active.duration.toFixed(1) : active.duration} min`}</strong></span>
                   <span><small>Intensité</small><strong>{active.intensity === "hard" ? "dure" : active.intensity === "moderate" ? "soutenue" : "facile"}</strong></span>
-                  <span><small>Récompense</small><strong>+{active.xp} XP</strong></span>
+                  <span><small>Récompense</small><strong>{activeVoyage ? `${activeClimb?.xp} XP au bout du voyage` : `+${active.xp} XP`}</strong></span>
                   <span><small>Segments</small><strong>{active.segments.length}</strong></span>
                 </div>
                 {bike && <div className="connectedNotice">✓ {bike.deviceName} connecté · télémétrie automatique activée</div>}
@@ -1706,9 +1760,9 @@ export function VeloQuestApp() {
                   <summary>Voir les {active.segments.length} segments et les niveaux</summary>
                   <div className="segmentPlan">
                   {active.segments.map((segment, index) => (
-                    <button key={index} type="button" onClick={() => goToSegment(index)}>
+                    <button key={index} type="button" disabled={Boolean(activeVoyage)} onClick={() => goToSegment(index)}>
                       <span>{String(index + 1).padStart(2, "0")}</span>
-                      <div><strong>{segment.label}</strong><small>{segment.minutes} min · niveau {adjustedResistance(segment.resistance, preferences.resistanceOffset + sessionResistanceDelta)} · RPE {segment.rpe}</small></div>
+                      <div><strong>{segment.label}</strong><small>{activeVoyage ? segment.minutes.toFixed(1) : segment.minutes} min · niveau {adjustedResistance(segment.resistance, preferences.resistanceOffset + sessionResistanceDelta)} · RPE {segment.rpe}</small></div>
                     </button>
                   ))}
                   </div>
@@ -1720,7 +1774,7 @@ export function VeloQuestApp() {
               </div>
             ) : (
               <>
-                <p className="eyebrow">{activeClimb ? routeCategory(activeClimb) === "scenic" ? "BALADE · RYTHME DOUX" : routeCategory(activeClimb) === "stage" ? "ÉTAPE" : "COL DE LÉGENDE" : active.name.toUpperCase()}</p>
+                <p className="eyebrow">{activeVoyage ? "VOYAGE · PORTION" : activeClimb ? routeCategory(activeClimb) === "scenic" ? "BALADE · RYTHME DOUX" : routeCategory(activeClimb) === "stage" ? "ÉTAPE" : "COL DE LÉGENDE" : active.name.toUpperCase()}</p>
                 <ReaderViewChoice preferences={preferences} onChange={updatePreference} />
                 <div className="sessionScreenStatus"><span role="status">{sessionStarted && !running && preferences.keepScreenAwake ? "Maintien de l’écran en pause" : screenWakeLabel(screenWake.status, preferences.keepScreenAwake)}</span>{preferences.keepScreenAwake && ["refused", "released"].includes(screenWake.status) && <button type="button" className="secondary miniButton" onClick={screenWake.retry}>Réessayer le maintien</button>}</div>
                 {foregroundNotice && <div className="foregroundNotice" role="status"><p>De retour dans VéloQuest. Vérifie la consigne actuelle et la connexion du vélo : les alertes peuvent avoir été interrompues en arrière-plan.</p><button type="button" className="secondary miniButton" onClick={() => setForegroundNotice(false)}>Compris</button></div>}
@@ -1729,6 +1783,7 @@ export function VeloQuestApp() {
                 {activeClimb && (
                   <>
                     <div className="climbLiveTitle"><strong>{activeClimb.name}</strong><span>{routeMode === "segmentAttack" ? `${raceCurrentKm.toFixed(1)} / ${raceDistanceKm.toFixed(1)} km` : `${currentRouteKm.toFixed(1)} / ${activeClimb.distanceKm.toFixed(1)} km`}</span></div>
+                    {activeVoyage && <p className="voyageNext">Voyage · position simulée · portion {activeVoyage.startKm.toFixed(2)} → {activeVoyage.endKm.toFixed(2)} km</p>}
                     {(routeMode === "timeAttack" || routeMode === "segmentAttack") && (
                       <div className="timeAttackHud">
                         <span><small>CHRONO</small><strong>{formatRaceTime(timeAttackElapsedSeconds)}</strong></span>
@@ -1776,11 +1831,11 @@ export function VeloQuestApp() {
                 {active.segments.length <= 30 && <div className="segmentProgress">{active.segments.map((_, i) => <i key={i} className={i <= segmentIndex ? "done" : ""} />)}</div>}
                 <SessionComfort preferences={preferences} onChange={updatePreference} />
                 <div className="readerControls"><div className="modalActions three">
-                  <button className="secondary" disabled={segmentIndex === 0} onClick={() => goToSegment(segmentIndex - 1)}>← Précédent</button>
+                  <button className="secondary" disabled={Boolean(activeVoyage) || segmentIndex === 0} onClick={() => goToSegment(segmentIndex - 1)}>← Précédent</button>
                   {(routeMode === "timeAttack" || routeMode === "segmentAttack") && activeClimb
                     ? <button className="primary" disabled>Chrono actif</button>
                     : <button className="primary" onClick={togglePause}>{running ? "Pause" : "Reprendre"}</button>}
-                  <button className="secondary" disabled={segmentIndex >= active.segments.length - 1} onClick={() => goToSegment(segmentIndex + 1)}>Suivant →</button>
+                  <button className="secondary" disabled={Boolean(activeVoyage) || segmentIndex >= active.segments.length - 1} onClick={() => goToSegment(segmentIndex + 1)}>Suivant →</button>
                 </div>
                 <button className="finish" onClick={() => { setRunning(false); setShowFinish(true); }}>Terminer et enregistrer</button>
                 </div>
@@ -1796,6 +1851,7 @@ export function VeloQuestApp() {
             <button className="close" aria-label="Fermer le détail" onClick={() => setSelectedSessionId(null)}>×</button>
             <p className="eyebrow">JOURNAL</p>
             <h2>{selectedRoute?.name ?? selectedTemplate?.name ?? selectedSession.templateId}</h2>
+            {selectedSession.metrics?.voyage && <p className="voyageNext">Voyage · {selectedSession.metrics.voyage.startKm.toFixed(2)} → {selectedSession.metrics.voyage.endKm.toFixed(2)} km · {selectedSession.metrics.voyage.completedPortion ? "portion achevée" : "portion inachevée"} · position simulée. Cette séance seule ne valide pas un parcours entier.</p>}
             <p className="detailDate">{new Intl.DateTimeFormat("fr-FR", { dateStyle: "full", timeStyle: "short" }).format(new Date(selectedSession.date))}</p>
             <div className="detailMetrics">
               <DetailMetric label={selectedSession.metrics?.segmentAttackIndex !== undefined ? `Segment Attack S${selectedSession.metrics.segmentAttackIndex + 1}` : selectedSession.metrics?.timeAttack ? "Time Attack" : "Durée"} value={selectedSession.metrics?.elapsedSeconds !== undefined ? formatRaceTime(selectedSession.metrics.elapsedSeconds) : `${selectedSession.duration.toFixed(1)} min`} />
@@ -1873,7 +1929,7 @@ export function VeloQuestApp() {
 
 function MissionItem({ label, value, target, suffix = "" }: { label: string; value: number; target: number; suffix?: string }) {
   const done = value >= target;
-  return <div className={done ? "missionItem done" : "missionItem"}><span>{done ? "✓" : "•"}</span><div><strong>{label}</strong><small>{value}{suffix} / {target}{suffix}</small></div></div>;
+  return <div className={done ? "missionItem done" : "missionItem"}><span>{done ? "✓" : "•"}</span><div><strong>{label}</strong><small>{quantity(value)}{suffix} / {target}{suffix}</small></div></div>;
 }
 
 function DetailMetric({ label, value }: { label: string; value: string }) {
@@ -1885,7 +1941,7 @@ function ConsoleMetric({ label, value }: { label: string; value: string }) {
 }
 
 function Stat({ label, value, target, suffix = "" }: { label: string; value: number; target: number; suffix?: string }) {
-  return <article className="card stat"><span>{label}</span><strong>{value}{suffix}</strong><small>objectif {target}{suffix}</small><div className="bar"><i style={{ width: `${pct(value, target)}%` }} /></div></article>;
+  return <article className="card stat"><span>{label}</span><strong>{quantity(value)}{suffix}</strong><small>objectif {target}{suffix}</small><div className="bar"><i style={{ width: `${pct(value, target)}%` }} /></div></article>;
 }
 
 function Toggle({ label, description, checked, onChange }: { label: string; description: string; checked: boolean; onChange: (value: boolean) => void }) {

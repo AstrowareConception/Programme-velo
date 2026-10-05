@@ -102,6 +102,7 @@ export function segmentAttempts(sessions: CompletedSession[], routeId: string, s
   return sessions
     .filter((session) =>
       session.routeId === routeId &&
+      session.metrics?.voyage === undefined &&
       session.metrics?.segmentAttackIndex === segmentIndex &&
       session.metrics.completedSegment !== false &&
       Number.isFinite(session.metrics.elapsedSeconds) && (session.metrics.elapsedSeconds ?? 0) > 0

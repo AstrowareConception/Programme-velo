@@ -1,4 +1,4 @@
-import type { TelemetrySample, TimeAttackSplit, WorkoutTemplate } from "./types";
+import type { TelemetrySample, TimeAttackSplit, VoyagePortion, WorkoutTemplate } from "./types";
 
 export const ACTIVE_SESSION_KEY = "veloquest:active-session:v1";
 
@@ -7,7 +7,8 @@ export type ActiveSessionSnapshot = {
   savedAt: number;
   workoutId: string;
   routeId?: string;
-  routeMode: "training" | "timeAttack" | "segmentAttack";
+  routeMode: "training" | "timeAttack" | "segmentAttack" | "voyage";
+  voyage?: VoyagePortion;
   challengeId?: string;
   segmentAttackIndex?: number;
   segmentIndex: number;

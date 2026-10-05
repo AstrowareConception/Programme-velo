@@ -208,3 +208,11 @@ Au retour, le panneau **Séance interrompue** propose de reprendre ou d'abandonn
 Après une mise à jour, recharge en ligne puis vérifie ton journal. **Plus** affiche le numéro court de version ; `/api/version` fournit le commit complet pour un diagnostic. Exporter une sauvegarde reste utile avant tout changement d'appareil.
 
 Les tests de vélo simulé ne valident pas ton TEB5 réel. Le compteur « KCAL VÉLO » est cumulatif ; les calories préremplies de séance utilisent sa variation échantillonnée. Corrige-les manuellement si nécessaire.
+
+## Voyage en plusieurs séances
+
+Dans **Parcours**, utilise **Voyage en plusieurs séances** sur le parcours de ton choix, puis sélectionne 15, 30, 45 ou 60 minutes. La carte conserve le parcours entier ; le prochain passage commence au premier kilomètre manquant. Après une portion achevée et enregistrée, **Quête → Continuer mon voyage** retrouve ta position. Tu peux changer de parcours puis revenir sans effacer les portions.
+
+La position est **simulée à 15 km/h**, même avec Bluetooth ; les mesures du vélo restent distinctes. Tu peux mettre en pause et reprendre une portion interrompue. Les commandes de saut de segment sont désactivées. Un arrêt précoce peut être enregistré dans le journal, sans valider ce passage ; **Continuer cette portion** permet de revenir au lecteur avant l’enregistrement.
+
+La route entière se valide quand toutes ses portions sont couvertes, sans trou. Ses XP sont attribués une seule fois en Voyage, sauf s’il existe déjà une séance classique complète à cette date. Les campagnes ajoutent leurs bonus uniques habituels. Trois trophées accompagnent les portions et les parcours achevés. La suppression recalcule position, XP, campagnes et trophées ; le JSON v3 conserve le voyage. Les kilomètres simulés figurent séparément dans le CSV. Ce mode concerne un parcours à la fois, sans raccord automatique entre étapes. [Règles et limites détaillées](VOYAGE.md).
