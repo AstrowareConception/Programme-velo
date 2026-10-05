@@ -871,3 +871,8 @@ button:focus-visible, input:focus-visible, .fileButton:focus-within { outline: 2
 .voyageSession.essentialSession > h2, .voyageSession.essentialSession .sessionEssentials { order: 2; }
 .voyageSession.essentialSession .readerControls { order: 9; }
 .stat { min-width: 0; }
+.pwaStatus p { overflow-wrap: anywhere; }
+.pwaActions { display: flex; flex-wrap: wrap; gap: 10px; }
+.pwaActions .btn, .pwaUpdate .btn { min-height: 44px; white-space: normal; }
+.pwaUpdate { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
+.pwaUpdateLock { position: fixed; inset: 0; z-index: 9999; display: grid; place-content: center; padding: 28px; background: rgba(7,10,19,.97); text-align: center; }

@@ -18,6 +18,7 @@ import { GettingStartedCard } from "@/components/GettingStartedCard";
 import { firstGuidedWorkout, guidanceCandidates, guidanceSessions, initialGuidance } from "@/lib/onboarding";
 import { MetricChart } from "@/components/MetricChart";
 import { InstallCard } from "@/components/InstallCard";
+import { PwaStatusCard, usePwa } from "@/components/PwaProvider";
 import { ReaderViewChoice, SessionComfort } from "@/components/SessionComfort";
 import { screenWakeLabel, useScreenWakeLock } from "@/components/useScreenWakeLock";
 import { PerformanceRecords, SectorAnalysis } from "@/components/PerformancePanel";
@@ -108,8 +109,11 @@ function n(form: FormData, key: string) {
 }
 
 export function VeloQuestApp() {
+  const pwa = usePwa();
   const [state, setState] = useState<AppState>(emptyState());
   const [hydrated, setHydrated] = useState(false);
+  const [stateSaveFailed, setStateSaveFailed] = useState(false);
+  const [routesSaveFailed, setRoutesSaveFailed] = useState(false);
   const [tab, setTab] = useState<Tab>("dashboard");
   const [active, setActive] = useState<WorkoutTemplate | null>(null);
   const [activeClimb, setActiveClimb] = useState<ClimbChallenge | null>(null);
@@ -163,6 +167,7 @@ export function VeloQuestApp() {
   const readerRef = useRef<HTMLDivElement>(null);
   const [foregroundNotice, setForegroundNotice] = useState(false);
   const preferences: Preferences = { ...defaultPreferences, ...(state.preferences ?? {}) };
+  useEffect(() => { pwa.setBusy(!hydrated || Boolean(active) || showSetup || stateSaveFailed || routesSaveFailed); }, [hydrated, active, showSetup, stateSaveFailed, routesSaveFailed, pwa.setBusy]);
   const screenWake = useScreenWakeLock(running && sessionStarted && preferences.keepScreenAwake);
 
   useEffect(() => {
@@ -211,11 +216,17 @@ export function VeloQuestApp() {
   }, []);
 
   useEffect(() => {
-    if (hydrated && !safeLocalStorageWrite(STORAGE_KEY, state)) setToast("Stockage local plein : exporte une sauvegarde puis allège l’historique.");
+    if (hydrated) {
+      const saved = safeLocalStorageWrite(STORAGE_KEY, state); setStateSaveFailed(!saved);
+      if (!saved) setToast("Stockage local plein : exporte une sauvegarde puis allège l’historique.");
+    }
   }, [state, hydrated]);
 
   useEffect(() => {
-    if (hydrated && !safeLocalStorageWrite(CUSTOM_ROUTES_KEY, customClimbs)) setToast("Impossible d’enregistrer les parcours : stockage local insuffisant.");
+    if (hydrated) {
+      const saved = safeLocalStorageWrite(CUSTOM_ROUTES_KEY, customClimbs); setRoutesSaveFailed(!saved);
+      if (!saved) setToast("Impossible d’enregistrer les parcours : stockage local insuffisant.");
+    }
   }, [customClimbs, hydrated]);
 
   useEffect(() => {
@@ -597,6 +608,7 @@ export function VeloQuestApp() {
   }
 
   function resumeInterruptedSession() {
+    if (pwa.locked()) return;
     if (!resumeSnapshot) return;
     const route = resumeSnapshot.routeId ? allClimbs.find((item) => item.id === resumeSnapshot.routeId) ?? null : null;
     const savedVoyage = resumeSnapshot.routeMode === "voyage" && route && validVoyagePortion(resumeSnapshot.voyage) &&
@@ -616,6 +628,7 @@ export function VeloQuestApp() {
     }
 
     const restored = restoreSessionSnapshot(resumeSnapshot, workout);
+    pwa.setBusy(true);
     setForegroundNotice(false);
     void prepareCueAudio(preferences);
     if (!restored.showFinish) cueSegment(workout.segments[restored.segmentIndex], { ...preferences, resistanceOffset: preferences.resistanceOffset + restored.sessionResistanceDelta });
@@ -654,7 +667,7 @@ export function VeloQuestApp() {
   function parkActiveSession() {
     if (activeSnapshotRef.current) {
       const snapshot = { ...activeSnapshotRef.current, savedAt: Date.now() };
-      writeActiveSessionSnapshot(snapshot);
+      if (!writeActiveSessionSnapshot(snapshot)) { setToast("La reprise n’a pas pu être enregistrée. Garde le lecteur ouvert et libère du stockage avant une mise à jour."); return; }
       setResumeSnapshot(snapshot);
     }
     setActive(null);
@@ -727,6 +740,8 @@ export function VeloQuestApp() {
   }
 
   function launch(workout: WorkoutTemplate, climb: ClimbChallenge | null = null, mode: RouteMode = "training", resistanceDelta = 0) {
+    if (pwa.locked()) { setToast("Mise à jour en cours : attends le rechargement."); return; }
+    pwa.setBusy(true);
     setActiveVoyage(null);
     setActive(workout);
     setActiveClimb(climb);
@@ -1532,6 +1547,7 @@ export function VeloQuestApp() {
           <div className="pageHead"><p className="eyebrow">PLUS · VERSION {process.env.NEXT_PUBLIC_BUILD_COMMIT?.slice(0, 7)}</p><h1>Réglages, badges & données</h1><p>Tout ce qui personnalise VeloQuest sans encombrer la navigation principale.</p></div>
 
           <InstallCard />
+          <PwaStatusCard />
 
           <section className="card quickGuide">
             <div className="sectionHead"><div><p className="eyebrow">GUIDE RAPIDE</p><h2>Une routine simple</h2></div><span className="spark">4 étapes</span></div>

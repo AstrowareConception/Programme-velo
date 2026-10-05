@@ -99,7 +99,7 @@ Les semaines suivent le calendrier local, y compris lors d'un changement d'heure
 
 Dans **Plus**, le cadre **Installer VeloQuest** est entièrement cliquable. Il ouvre la confirmation native dès que le navigateur fournit une invitation d’installation ; sinon il ouvre les étapes adaptées à l’appareil. L’invitation est conservée dès l’accueil, même avant d’ouvrir Plus. Sur iPhone/iPad, le guide explique l’ajout à l’écran d’accueil ; sur Safari Mac, l’ajout au Dock. Le navigateur conserve la décision et la confirmation finales. Une annulation reste possible et ne modifie aucune séance.
 
-La PWA met en cache l'interface après chargement. Les cartes distantes demandent du réseau ; les capacités hors connexion dépendent de ce qui a déjà été chargé. Faire un export avant de changer de téléphone ou d'effacer les données du navigateur. Les cartes OpenStreetMap et l'hébergement Vercel impliquent des requêtes réseau ordinaires. [Confidentialité](https://programme-velo.vercel.app/confidentialite).
+La PWA prépare le paquet du build et vérifie ses fichiers dans **Plus → Emporte ta séance**. Les photos ont un compteur et une préparation facultative ; les cartes distantes et les médias restent dépendants de leur réseau. Une mise à jour attend ton action et le repos des lecteurs ouverts. Le navigateur peut retirer le cache : fais un export avant de changer de téléphone ou d’effacer les données. [Guide PWA](docs/PWA-OFFLINE.md) · [Confidentialité](https://programme-velo.vercel.app/confidentialite).
 
 ## Développement et validation
 
@@ -140,3 +140,5 @@ La version est visible dans **Plus** et dans [l'endpoint de version](https://pro
 Les niveaux proposés sont des repères : le ressenti, la récupération et les limites d'intensité du programme restent prioritaires. Projet personnel / expérimental.
 
 Les quinze nouvelles traces, leurs sections, les lieux traversés et les récompenses sont documentés dans [docs/EXPLORATION-ROUTES.md](docs/EXPLORATION-ROUTES.md). Les profils officiels lissés restent une représentation pour vélo d’appartement, sans guidage routier ni preuve de fonctionnement du TEB5 réel.
+
+Hors connexion et mises à jour : dans **Plus → Emporte ta séance**, vérifie le paquet local et prépare les photos facultatives. Une nouvelle version attend ton action et le repos des lecteurs ouverts ; la reprise sauvegardée reste conservée. [Usage, construction et limites PWA](docs/PWA-OFFLINE.md).

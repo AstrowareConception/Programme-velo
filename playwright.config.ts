@@ -7,6 +7,7 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? "line" : "list",
   use: {
+    serviceWorkers: "block",
     baseURL: process.env.E2E_BASE_URL || "http://127.0.0.1:3000",
     launchOptions: process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH, args: ["--no-sandbox", "--disable-dev-shm-usage"] } : undefined,
     trace: "retain-on-failure",
@@ -31,9 +32,9 @@ export default defineConfig({
     }
   ],
   webServer: process.env.E2E_BASE_URL ? undefined : {
-    command: "npm run dev -- --hostname 127.0.0.1",
+    command: "npm run build && npm run start -- --hostname 127.0.0.1",
     url: "http://127.0.0.1:3000",
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: false,
     timeout: 120_000
   }
 });

@@ -14,7 +14,7 @@ Dix nouvelles destinations, un thème Estérel, trois carnets, deux trophées de
 
 Vue essentielle ou complète, commandes accessibles, volume et fréquence des alertes, test audio avant le départ, voix calibrée et préavis facultatif sur les segments minutés. État réel du maintien de l’écran, relance après refus/interruption et rappel au retour d’arrière-plan. Préférences sauvegardées ; chronos, défis et reprise conservés. [Guide pratique](READER-COMFORT.md). Lot livré par la PR 30, contrôlé et déployé sur main `f1eea5a`.
 
-L’installation active existe déjà. Restent à éprouver sur appareils réels : installation, veille/reprise, casque et coexistence avec podcast/vidéo. Une mise à jour PWA accompagnée et une vérification explicite de la disponibilité hors connexion restent à développer. Le cache actuel n’assure pas les cartes externes hors connexion.
+L’installation active existe déjà. Restent à éprouver sur appareils réels : installation, veille/reprise, casque et coexistence avec podcast/vidéo. Le lot PWA décrit ci-dessous accompagne les mises à jour et vérifie la disponibilité des fichiers essentiels. Le cache actuel n’assure pas les cartes externes hors connexion.
 
 ## Voyage par portions
 
@@ -26,9 +26,13 @@ Le catalogue reste à 71 parcours, avec 70 badges. Les références exactes de c
 
 Cinq photos azuréennes sur huit parcours existants : galeries fermées au départ, une image locale à la fois, légendes et droits, navigation libre ou suivi des repères, masquage sauvegardé et vue essentielle conservée. Intégration dans les fiches, la préparation et le lecteur, y compris Voyage à mi-parcours. [Sélection et limites](LANDSCAPE-PHOTOS.md). Les 71 parcours et 70 badges sont conservés. Les références de validation et publication de ce lot sont consignées dans l’état de reprise externe après observation.
 
-## Prochaine priorité : expérience PWA
+## Expérience PWA
 
-Accompagner les mises à jour de la PWA et rendre sa disponibilité hors connexion explicite. Les cartes externes et les photos non consultées ne sont pas garanties hors connexion. Puis étendre progressivement les photos documentées aux autres régions et aux grands cols ; l’enchaînement de plusieurs étapes et le carnet personnel viendront ensuite.
+Paquet du build vérifié, compteur de photos et préparation facultative dans Plus ; nouvelle version en attente, consentement des onglets au repos et rechargement accompagné, reprise sauvegardée conservée. [Guide et limites](PWA-OFFLINE.md). Cartes externes et médias exclus ; stockage du navigateur révocable. Références de livraison consignées dans l’état externe après contrôle du commit exact et de la production.
+
+## Prochaine priorité : autres paysages
+
+Étendre les photos documentées aux autres régions et aux grands cols, avec les mêmes repères, droits et budgets ; préparer ensuite le Vignoble d’Alsace et ses formats variés. L’enchaînement de plusieurs étapes et le carnet personnel viendront ensuite.
 
 ## Packs de parcours suivants
 

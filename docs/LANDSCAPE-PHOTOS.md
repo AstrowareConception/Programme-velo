@@ -51,7 +51,7 @@ Modifications : orientation normalisée selon l’original, réduction à 960 px
 
 Les cinq images représentent **262 746 octets** au total, chacune sous 100 000 octets. Elles sont servies depuis l’application, sans requête à Wikimedia lors de la lecture. `next/image` conserve les dimensions, le texte alternatif et le chargement différé ; les WebP déjà allégés sont servis directement afin de rester identiques aux fichiers documentés et cacheables sous une URL locale. Une seule photo est montée à la fois. Pas de préchargement des cinq images, ni de téléchargement de tout le catalogue.
 
-Cache PWA v15 : le service worker existant peut conserver une image après sa consultation. Les photos non consultées et les cartes externes ne sont pas garanties hors connexion. L’indicateur de disponibilité et la mise à jour PWA accompagnée constituent le lot suivant ; ce lot ne prétend pas les livrer. Installation, veille, casque et TOPUTURE physique restent à valider sur appareils réels.
+Cache PWA v15 : le service worker existant peut conserver une image après sa consultation. Les photos non consultées et les cartes externes ne sont pas garanties hors connexion. Le lot PWA suivant ajoute un compteur vérifié et **Préparer les photos · 263 Ko** dans Plus pour télécharger les cinq images. [Fonctionnement et limites](PWA-OFFLINE.md). Installation, veille, casque et TOPUTURE physique restent à valider sur appareils réels.
 
 ## Contrôles du lot
 
