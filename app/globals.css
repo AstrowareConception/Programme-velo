@@ -835,3 +835,21 @@ button:focus-visible, input:focus-visible, .fileButton:focus-within { outline: 2
 @media (max-width:520px) { .onboardingDialog { padding:20px 18px; } .onboardingDialog h2 { font-size:1.4rem; } .guideFooter { flex-direction:column; } .guideMilestones { gap:8px; } .guidedHero { padding:18px; } .guidedHero h1 { font-size:1.55rem; } }
 .history > div:has(.iconDanger) { grid-template-columns:1fr 1fr 1fr auto; }
 @media (max-width:460px) { .history > div:has(.iconDanger) { grid-template-columns:1fr 1fr auto; } .history > div:has(.iconDanger) > span:nth-child(3) { grid-column:1 / 3; grid-row:2; } .history .iconDanger { grid-column:3; grid-row:1 / 3; } }
+
+/* Voyage keeps the whole route visible and introduces one next action. */
+.voyagePanel { margin: 20px 0; }
+.voyagePanel label { display: grid; gap: 8px; margin-top: 16px; }
+.voyagePanel select { width: 100%; min-height: 44px; }
+.voyageDistance { display: flex; justify-content: space-between; gap: 12px; }
+.voyagePanel progress { width: 100%; height: 12px; accent-color: var(--cyan); }
+.voyageNext { padding: 12px; border: 1px solid var(--line); border-radius: 12px; font-size: .9rem; overflow-wrap: anywhere; }
+.voyageChoices { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+.voyagePicker .voyagePanel { margin: 24px 0 0; }
+.voyagePanel button { min-height: 44px; }
+.voyageSession.essentialSession { display: flex; flex-direction: column; }
+.voyageSession.essentialSession > * { order: 3; }
+.voyageSession.essentialSession .readerViewChoice { order: 0; }
+.voyageSession.essentialSession .sessionScreenStatus { order: 1; }
+.voyageSession.essentialSession > h2, .voyageSession.essentialSession .sessionEssentials { order: 2; }
+.voyageSession.essentialSession .readerControls { order: 9; }
+.stat { min-width: 0; }

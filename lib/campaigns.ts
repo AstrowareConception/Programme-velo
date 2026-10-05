@@ -1,5 +1,5 @@
 import type { CompletedSession } from "./types";
-import { isRouteCompleted } from "./progression";
+import { allCompletedRouteIds } from "./voyage-progress";
 
 export type Campaign = {
   id: string;
@@ -133,11 +133,7 @@ export const campaigns: Campaign[] = [
 ];
 
 export function completedRouteIds(sessions: CompletedSession[]) {
-  return new Set(
-    sessions
-      .filter(isRouteCompleted)
-      .map((session) => session.routeId!)
-  );
+  return allCompletedRouteIds(sessions);
 }
 
 export function campaignProgress(campaign: Campaign, sessions: CompletedSession[]) {

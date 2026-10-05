@@ -1,6 +1,6 @@
 # Roadmap VéloQuest
 
-Actualisée le 5 octobre 2026. Le catalogue Estérel est intégré ; le lot confort du lecteur est décrit ci-dessous avec les prochaines fonctions. Les références exactes de contrôle, fusion et déploiement figurent dans le document externe d’état de reprise après vérification.
+Actualisée le 5 octobre 2026. Le catalogue Estérel est intégré ; le confort du lecteur et le Voyage par portions sont décrits ci-dessous avec les prochaines fonctions. Les références exactes de contrôle, fusion et déploiement figurent dans le document externe d’état de reprise après vérification.
 
 ## Socle disponible
 
@@ -12,15 +12,19 @@ Dix nouvelles destinations, un thème Estérel, trois carnets, deux trophées de
 
 ## Confort du lecteur et usage avec un média
 
-Vue essentielle ou complète, commandes accessibles, volume et fréquence des alertes, test audio avant le départ, voix calibrée et préavis facultatif sur les segments minutés. État réel du maintien de l’écran, relance après refus/interruption et rappel au retour d’arrière-plan. Préférences sauvegardées ; chronos, défis et reprise conservés. [Guide pratique](READER-COMFORT.md). Le lot doit passer les quatre contrôles sur son SHA exact avant publication.
+Vue essentielle ou complète, commandes accessibles, volume et fréquence des alertes, test audio avant le départ, voix calibrée et préavis facultatif sur les segments minutés. État réel du maintien de l’écran, relance après refus/interruption et rappel au retour d’arrière-plan. Préférences sauvegardées ; chronos, défis et reprise conservés. [Guide pratique](READER-COMFORT.md). Lot livré par la PR 30, contrôlé et déployé sur main `f1eea5a`.
 
 L’installation active existe déjà. Restent à éprouver sur appareils réels : installation, veille/reprise, casque et coexistence avec podcast/vidéo. Une mise à jour PWA accompagnée et une vérification explicite de la disponibilité hors connexion restent à développer. Le cache actuel n’assure pas les cartes externes hors connexion.
 
-## Prochaine priorité : mode Voyage
+## Voyage par portions
 
-Avancer sur un itinéraire long en plusieurs séances choisies selon le temps disponible, retrouver sa position et proposer « Continuer mon voyage ». Afficher une progression lisible, les lieux atteints et la prochaine portion, en complément des carnets libres existants. La carte doit signaler les discontinuités des sources et les étapes séparées ; elle ne doit pas inventer de liaison à Gap ou entre deux GPX.
+Première version : un parcours natif ou GPX en portions de 15/30/45/60 minutes, progression retrouvée dans Quête et reprise de la portion en cours. Position simulée à 15 km/h, géométrie entière conservée et mesures du vélo distinctes. Une portion inachevée ne valide pas de kilomètres ; l’union des portions achevées valide la route, ses campagnes et une récompense unique. Recalcul après suppression, sauvegardes compatibles et trois trophées ajoutés. [Guide et limites](VOYAGE.md).
 
-Conditions de livraison : distinction entre portion parcourue et route entière terminée ; une seule validation et récompense de route complète ; conservation des sessions, courses, défis et reprise en cours ; recalcul documenté après suppression ; export/import et ancien historique compatibles ; sortie du mode librement possible. Une durée disponible doit produire une portion de la vraie géométrie, jamais des kilomètres compressés. Les choix pour une première utilisation doivent rester simples, et la difficulté du relief distincte de l’effort conseillé.
+Le catalogue reste à 71 parcours, avec 70 badges. Les références exactes de contrôle et de livraison seront portées dans l’état de reprise externe après observation. Les carnets Napoléon et Estérel restent libres ; ce mode ne lance pas automatiquement la prochaine étape et n’invente aucune liaison à Gap.
+
+## Prochaine priorité : paysages et expérience PWA
+
+Ajouter des photos légères documentées avec attribution, texte alternatif et option de masquage. Puis accompagner les mises à jour de la PWA et rendre sa disponibilité hors connexion explicite. Ces lots restent à faire ; les cartes externes ne sont pas garanties hors connexion. L’enchaînement de plusieurs étapes et le carnet personnel viendront ensuite.
 
 ## Packs de parcours suivants
 
