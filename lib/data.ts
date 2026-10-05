@@ -19,7 +19,11 @@ export const defaultPreferences: Preferences = {
   haptics: true,
   keepScreenAwake: true,
   keepTelemetryTrace: true,
-  resistanceOffset: 0
+  resistanceOffset: 0,
+  cueVolume: 65,
+  cueFrequency: "all",
+  announceUpcoming: false,
+  readerView: "full"
 };
 
 export const workouts: WorkoutTemplate[] = [

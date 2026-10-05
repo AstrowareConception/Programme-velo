@@ -14,6 +14,8 @@ import { GettingStartedCard } from "@/components/GettingStartedCard";
 import { firstGuidedWorkout, guidanceCandidates, guidanceSessions, initialGuidance } from "@/lib/onboarding";
 import { MetricChart } from "@/components/MetricChart";
 import { InstallCard } from "@/components/InstallCard";
+import { ReaderViewChoice, SessionComfort } from "@/components/SessionComfort";
+import { screenWakeLabel, useScreenWakeLock } from "@/components/useScreenWakeLock";
 import { PerformanceRecords, SectorAnalysis } from "@/components/PerformancePanel";
 import { ProgressionPalmares } from "@/components/ProgressionPalmares";
 import { CampaignsPanel } from "@/components/CampaignsPanel";
@@ -50,7 +52,8 @@ import {
 } from "@/lib/data";
 import { localInputDate, localInputDateTime, localDateToIso } from "@/lib/dates";
 import { counterDelta } from "@/lib/session";
-import { compactTelemetry, cueSegment, formatClock, requestScreenWakeLock } from "@/lib/session";
+import { compactTelemetry, formatClock } from "@/lib/session";
+import { adjustedResistance, cueSegment, prepareCueAudio, releaseCueAudio } from "@/lib/session-cues";
 import { createBackup, estimateLocalBytes, normalizeState, parseBackup, safeLocalStorageWrite } from "@/lib/storage";
 import { captureSplits, checkpointKilometers, formatRaceTime, ghostDeltaSeconds, ghostDistanceAtElapsed, personalBest, routeAttempts, segmentAttempts, segmentBounds, segmentPersonalBest } from "@/lib/time-attack";
 import { challengesForRoute, evaluateRouteChallenge, routeChallenges, type RouteChallenge } from "@/lib/challenges";
@@ -87,14 +90,6 @@ function average(values: Array<number | undefined>) {
 function maximum(values: Array<number | undefined>) {
   const nums = values.filter((v): v is number => typeof v === "number" && Number.isFinite(v));
   return nums.length ? Math.max(...nums) : undefined;
-}
-
-function adjustedResistance(label: string, offset: number) {
-  if (!offset || label === "libre") return label;
-  const values = label.match(/\d+(?:[.,]\d+)?/g)?.map((value) => Number(value.replace(",", ".")));
-  if (!values?.length) return label;
-  const adjusted = values.map((value) => Math.max(1, Math.min(32, Math.round(value + offset))));
-  return adjusted.length === 1 ? String(adjusted[0]) : adjusted.join("–");
 }
 
 function n(form: FormData, key: string) {
@@ -153,7 +148,24 @@ export function VeloQuestApp() {
   const activeSnapshotRef = useRef<ActiveSessionSnapshot | null>(null);
   const segmentDeadlineRef = useRef(0);
   const timeAttackStartedAtRef = useRef(0);
-  const wakeLockRef = useRef<any>(null);
+  const cuePreferencesRef = useRef<Preferences>(defaultPreferences);
+  const upcomingCueRef = useRef("");
+  const readerRef = useRef<HTMLDivElement>(null);
+  const [foregroundNotice, setForegroundNotice] = useState(false);
+  const preferences: Preferences = { ...defaultPreferences, ...(state.preferences ?? {}) };
+  const screenWake = useScreenWakeLock(running && sessionStarted && preferences.keepScreenAwake);
+
+  useEffect(() => {
+    cuePreferencesRef.current = { ...defaultPreferences, ...(state.preferences ?? {}), resistanceOffset: preferences.resistanceOffset + sessionResistanceDelta };
+  }, [state.preferences, preferences.resistanceOffset, sessionResistanceDelta]);
+
+  useEffect(() => {
+    if (!active || showFinish) releaseCueAudio();
+  }, [active, showFinish]);
+  useEffect(() => () => releaseCueAudio(), []);
+  useEffect(() => {
+    if (sessionStarted) readerRef.current?.scrollTo({ top: 0 });
+  }, [sessionStarted, preferences.readerView]);
 
   useEffect(() => {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -236,7 +248,11 @@ export function VeloQuestApp() {
     save();
     const timer = window.setInterval(save, 5000);
     const onPageHide = () => save();
-    const onVisibility = () => { if (document.visibilityState === "hidden") save(); };
+    let wasHidden = false;
+    const onVisibility = () => {
+      if (document.visibilityState === "hidden") { wasHidden = true; save(); }
+      else if (wasHidden) { setForegroundNotice(true); wasHidden = false; }
+    };
     window.addEventListener("pagehide", onPageHide);
     document.addEventListener("visibilitychange", onVisibility);
 
@@ -255,6 +271,12 @@ export function VeloQuestApp() {
       const now = Date.now();
       const remaining = Math.ceil((segmentDeadlineRef.current - now) / 1000);
       if (remaining > 0) {
+        const nextSegment = active.segments[segmentIndex + 1];
+        const key = `${active.id}:${segmentIndex}`;
+        if (remaining >= 9 && remaining <= 10 && nextSegment && cuePreferencesRef.current.announceUpcoming && upcomingCueRef.current !== key) {
+          upcomingCueRef.current = key;
+          cueSegment(nextSegment, cuePreferencesRef.current, { previous: active.segments[segmentIndex], upcoming: true });
+        }
         setSecondsLeft(remaining);
         return;
       }
@@ -283,7 +305,7 @@ export function VeloQuestApp() {
       setSegmentIndex(next);
       setSecondsLeft(nextRemainingSeconds);
       segmentDeadlineRef.current = now + nextRemainingSeconds * 1000;
-      cueSegment(active.segments[next], { ...defaultPreferences, ...(state.preferences ?? {}) });
+      cueSegment(active.segments[next], cuePreferencesRef.current, { previous: active.segments[next - 1] });
     }, 250);
 
     return () => window.clearInterval(timer);
@@ -319,41 +341,11 @@ export function VeloQuestApp() {
     ]);
   }, [telemetry, running, active, bike]);
 
-  const preferences: Preferences = { ...defaultPreferences, ...(state.preferences ?? {}) };
-
   useEffect(() => {
     if (!toast) return;
     const timer = window.setTimeout(() => setToast(null), 3200);
     return () => window.clearTimeout(timer);
   }, [toast]);
-
-  useEffect(() => {
-    if (!running || !sessionStarted || !preferences.keepScreenAwake) {
-      try { wakeLockRef.current?.release?.(); } catch {}
-      wakeLockRef.current = null;
-      return;
-    }
-
-    let cancelled = false;
-    const acquire = async () => {
-      const lock = await requestScreenWakeLock();
-      if (!cancelled) wakeLockRef.current = lock;
-      else try { await lock?.release?.(); } catch {}
-    };
-    acquire();
-
-    const onVisibility = () => {
-      if (document.visibilityState === "visible" && running) acquire();
-    };
-    document.addEventListener("visibilitychange", onVisibility);
-
-    return () => {
-      cancelled = true;
-      document.removeEventListener("visibilitychange", onVisibility);
-      try { wakeLockRef.current?.release?.(); } catch {}
-      wakeLockRef.current = null;
-    };
-  }, [running, sessionStarted, preferences.keepScreenAwake]);
 
   const week = currentProgramWeek(state.profile.startDate);
   const target = weekTargets[week - 1];
@@ -544,7 +536,7 @@ export function VeloQuestApp() {
       setSegmentIndex(nextIndex);
       const seconds = Math.round(active.segments[nextIndex].minutes * 60);
       setSecondsLeft(seconds);
-      cueSegment(active.segments[nextIndex], preferences);
+      cueSegment(active.segments[nextIndex], cuePreferencesRef.current, { previous: active.segments[segmentIndex] });
     }
 
     const finished = routeMode === "segmentAttack" && activeSegmentBounds
@@ -597,6 +589,9 @@ export function VeloQuestApp() {
     }
 
     const restored = restoreSessionSnapshot(resumeSnapshot, workout);
+    setForegroundNotice(false);
+    void prepareCueAudio(preferences);
+    if (!restored.showFinish) cueSegment(workout.segments[restored.segmentIndex], { ...preferences, resistanceOffset: preferences.resistanceOffset + restored.sessionResistanceDelta });
     setActive(workout);
     setActiveClimb(route);
     setRouteMode(restored.routeMode);
@@ -849,6 +844,9 @@ export function VeloQuestApp() {
 
   function beginSession() {
     if (!active) return;
+    void prepareCueAudio(preferences);
+    upcomingCueRef.current = "";
+    setForegroundNotice(false);
     setSessionStarted(true);
     if (activeClimb) setClimbStartDistanceM(telemetry.distanceM ?? null);
     if (routeMode === "timeAttack" || routeMode === "segmentAttack") {
@@ -860,7 +858,7 @@ export function VeloQuestApp() {
     const seconds = Math.round(active.segments[segmentIndex].minutes * 60);
     setSecondsLeft(seconds);
     segmentDeadlineRef.current = Date.now() + seconds * 1000;
-    cueSegment(active.segments[segmentIndex], preferences);
+    cueSegment(active.segments[segmentIndex], cuePreferencesRef.current);
   }
 
   function togglePause() {
@@ -871,6 +869,7 @@ export function VeloQuestApp() {
       return;
     }
     segmentDeadlineRef.current = Date.now() + secondsLeft * 1000;
+    void prepareCueAudio(preferences);
     setRunning(true);
   }
 
@@ -881,7 +880,8 @@ export function VeloQuestApp() {
     const seconds = Math.round(active.segments[next].minutes * 60);
     setSecondsLeft(seconds);
     segmentDeadlineRef.current = Date.now() + seconds * 1000;
-    if (sessionStarted) cueSegment(active.segments[next], preferences);
+    upcomingCueRef.current = "";
+    if (sessionStarted) { void prepareCueAudio(preferences); cueSegment(active.segments[next], cuePreferencesRef.current); }
   }
 
   function launchChallenge(route: ClimbChallenge, challenge: RouteChallenge) {
@@ -890,7 +890,7 @@ export function VeloQuestApp() {
     setActiveChallenge(challenge);
   }
 
-  function updatePreference(key: keyof Omit<Preferences, "resistanceOffset">, value: boolean) {
+  function updatePreference<K extends keyof Preferences>(key: K, value: Preferences[K]) {
     setState((prev) => ({
       ...prev,
       preferences: { ...defaultPreferences, ...(prev.preferences ?? {}), [key]: value }
@@ -1493,11 +1493,11 @@ export function VeloQuestApp() {
 
           <section className="card">
             <div className="sectionHead"><div><p className="eyebrow">CONFORT DE SÉANCE</p><h2>Ton cockpit</h2></div><span className="spark">personnalisable</span></div>
+            <ReaderViewChoice preferences={preferences} onChange={updatePreference} />
+            <SessionComfort preferences={preferences} onChange={updatePreference} />
             <div className="toggleList">
-              <Toggle label="Signaux sonores" description="Un bip à chaque changement de segment." checked={preferences.soundCues} onChange={(v) => updatePreference("soundCues", v)} />
-              <Toggle label="Annonces vocales" description="Annonce le segment et le niveau de résistance." checked={preferences.voiceCues} onChange={(v) => updatePreference("voiceCues", v)} />
               <Toggle label="Retour haptique" description="Vibration si le navigateur et l’appareil le permettent." checked={preferences.haptics} onChange={(v) => updatePreference("haptics", v)} />
-              <Toggle label="Garder l’écran éveillé" description="Empêche la mise en veille pendant une séance quand l’API est disponible." checked={preferences.keepScreenAwake} onChange={(v) => updatePreference("keepScreenAwake", v)} />
+              <Toggle label="Garder l’écran éveillé" description="Demande le maintien pendant l’effort ; le lecteur affiche l’état accordé ou refusé." checked={preferences.keepScreenAwake} onChange={(v) => updatePreference("keepScreenAwake", v)} />
               <Toggle label="Conserver la trace Bluetooth" description="Garde une trace compacte de la télémétrie pour l’historique." checked={preferences.keepTelemetryTrace} onChange={(v) => updatePreference("keepTelemetryTrace", v)} />
               <div className="resistanceCalibration">
                 <div><strong>Calibration résistance TEB5</strong><small>Ajuste tous les niveaux guidés et automatiques sans modifier les séances.</small></div>
@@ -1634,7 +1634,7 @@ export function VeloQuestApp() {
 
       {active && (
         <div className="modalBackdrop">
-          <div className={`sessionModal ${activeClimb ? "climbSession" : ""}`}>
+          <div ref={readerRef} className={`sessionModal ${activeClimb ? "climbSession" : ""} ${sessionStarted && !showFinish && preferences.readerView === "essential" ? "essentialSession" : ""}`}>
             <button className="close" aria-label="Mettre la séance de côté" onClick={parkActiveSession}>×</button>
 
             {showFinish ? (
@@ -1700,6 +1700,8 @@ export function VeloQuestApp() {
                       : "Sans distance Bluetooth, le profil avance sur le scénario temporel. Tu pourras saisir le chrono réel du vélo à l’arrivée."}</p>
                   </div>
                 )}
+                <ReaderViewChoice preferences={preferences} onChange={updatePreference} />
+                <SessionComfort preferences={preferences} onChange={updatePreference} />
                 <details className="segmentPlanDisclosure" open={!scenicSession}>
                   <summary>Voir les {active.segments.length} segments et les niveaux</summary>
                   <div className="segmentPlan">
@@ -1712,13 +1714,16 @@ export function VeloQuestApp() {
                   </div>
                 </details>
                 <div className="previewFooter">
-                  <span>{preferences.keepScreenAwake ? "☀ écran actif" : "écran standard"} · {preferences.voiceCues ? "voix active" : preferences.soundCues ? "bips actifs" : "silencieux"}{sessionResistanceDelta ? ` · coach ${sessionResistanceDelta > 0 ? "+" : ""}${sessionResistanceDelta}` : ""}</span>
+                  <span>{screenWakeLabel(screenWake.status, preferences.keepScreenAwake)} · {preferences.voiceCues ? "voix activée" : preferences.soundCues ? "bips activés" : "silencieux"}{sessionResistanceDelta ? ` · coach ${sessionResistanceDelta > 0 ? "+" : ""}${sessionResistanceDelta}` : ""}</span>
                   <button className="primary bigStart" onClick={beginSession}>{(routeMode === "timeAttack" || routeMode === "segmentAttack") && activeClimb ? "Lancer le chrono" : "Démarrer la séance"}</button>
                 </div>
               </div>
             ) : (
               <>
                 <p className="eyebrow">{activeClimb ? routeCategory(activeClimb) === "scenic" ? "BALADE · RYTHME DOUX" : routeCategory(activeClimb) === "stage" ? "ÉTAPE" : "COL DE LÉGENDE" : active.name.toUpperCase()}</p>
+                <ReaderViewChoice preferences={preferences} onChange={updatePreference} />
+                <div className="sessionScreenStatus"><span role="status">{sessionStarted && !running && preferences.keepScreenAwake ? "Maintien de l’écran en pause" : screenWakeLabel(screenWake.status, preferences.keepScreenAwake)}</span>{preferences.keepScreenAwake && ["refused", "released"].includes(screenWake.status) && <button type="button" className="secondary miniButton" onClick={screenWake.retry}>Réessayer le maintien</button>}</div>
+                {foregroundNotice && <div className="foregroundNotice" role="status"><p>De retour dans VéloQuest. Vérifie la consigne actuelle et la connexion du vélo : les alertes peuvent avoir été interrompues en arrière-plan.</p><button type="button" className="secondary miniButton" onClick={() => setForegroundNotice(false)}>Compris</button></div>}
                 <h2>{active.segments[segmentIndex].label}</h2>
 
                 {activeClimb && (
@@ -1731,11 +1736,11 @@ export function VeloQuestApp() {
                         <span><small>PB</small><strong>{activeRaceBest?.metrics?.elapsedSeconds !== undefined ? formatRaceTime(activeRaceBest.metrics.elapsedSeconds) : "—"}</strong></span>
                       </div>
                     )}
-                    <ClimbProfile climb={activeClimb} progress={climbProgress} ghostProgress={ghostProgress} />
-                    <RouteMap climb={activeClimb} progress={climbProgress} ghostProgress={ghostProgress} />
+                    {preferences.readerView !== "essential" && <ClimbProfile climb={activeClimb} progress={climbProgress} ghostProgress={ghostProgress} />}
+                    {preferences.readerView !== "essential" && <RouteMap climb={activeClimb} progress={climbProgress} ghostProgress={ghostProgress} />}
                     <RoutePlaces route={activeClimb} currentKm={currentRouteKm} />
-                    {activeClimb.scenery && routeMode === "training" && <details className="sceneryDetails"><summary>Ton carnet de paysage</summary><p>{activeClimb.scenery}</p><div className="routeTags">{activeClimb.highlights?.map((highlight) => <span key={highlight}>{highlight}</span>)}</div><small>Pauses libres. La progression affichée reste virtuelle sans distance FTMS.</small></details>}
-                    {routeMode === "timeAttack" && (
+                    {preferences.readerView !== "essential" && activeClimb.scenery && routeMode === "training" && <details className="sceneryDetails"><summary>Ton carnet de paysage</summary><p>{activeClimb.scenery}</p><div className="routeTags">{activeClimb.highlights?.map((highlight) => <span key={highlight}>{highlight}</span>)}</div><small>Pauses libres. La progression affichée reste virtuelle sans distance FTMS.</small></details>}
+                    {preferences.readerView !== "essential" && routeMode === "timeAttack" && (
                       <div className="checkpointStrip">
                         {routeCheckpoints.map((km, index) => {
                           const split = timeAttackSplits.find((item) => item.km === km);
@@ -1746,11 +1751,11 @@ export function VeloQuestApp() {
                   </>
                 )}
 
-                <div className="resistance">
+                <div className="sessionEssentials"><div className="resistance">
                   <small>NIVEAU TEB5</small>
                   <strong>{adjustedResistance(active.segments[segmentIndex].resistance, preferences.resistanceOffset + sessionResistanceDelta)}</strong>
                 </div>
-                <div className="timer" aria-live="off">{formatClock(secondsLeft)}</div>
+                <div className="timer" aria-live="off">{formatClock(secondsLeft)}</div></div>
                 <div className="sessionOverall">
                   <div><span>Segment {segmentIndex + 1}/{active.segments.length}</span><strong>{sessionProgressPercent}%</strong></div>
                   <i><b style={{ width: `${sessionProgressPercent}%` }} /></i>
@@ -1769,7 +1774,8 @@ export function VeloQuestApp() {
                   <div className="nextSegment"><small>ENSUITE</small><strong>{active.segments[segmentIndex + 1].label}</strong><span>niveau {adjustedResistance(active.segments[segmentIndex + 1].resistance, preferences.resistanceOffset + sessionResistanceDelta)}</span></div>
                 )}
                 {active.segments.length <= 30 && <div className="segmentProgress">{active.segments.map((_, i) => <i key={i} className={i <= segmentIndex ? "done" : ""} />)}</div>}
-                <div className="modalActions three">
+                <SessionComfort preferences={preferences} onChange={updatePreference} />
+                <div className="readerControls"><div className="modalActions three">
                   <button className="secondary" disabled={segmentIndex === 0} onClick={() => goToSegment(segmentIndex - 1)}>← Précédent</button>
                   {(routeMode === "timeAttack" || routeMode === "segmentAttack") && activeClimb
                     ? <button className="primary" disabled>Chrono actif</button>
@@ -1777,6 +1783,7 @@ export function VeloQuestApp() {
                   <button className="secondary" disabled={segmentIndex >= active.segments.length - 1} onClick={() => goToSegment(segmentIndex + 1)}>Suivant →</button>
                 </div>
                 <button className="finish" onClick={() => { setRunning(false); setShowFinish(true); }}>Terminer et enregistrer</button>
+                </div>
               </>
             )}
           </div>

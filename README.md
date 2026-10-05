@@ -15,7 +15,7 @@ VéloQuest est une PWA personnelle Next.js / React / TypeScript. Elle associe un
 - Quinze **formats courts** extraits des GPX existants, avec filtre de durée simulée et des carnets indépendants. Un tronçon court ne valide pas son parcours parent.
 - Fiches harmonisées sur tous les parcours : paysages, lieux, sources et limites. Les repères des quatorze profils historiques restent indicatifs.
 - Coach adaptatif local : temps disponible, énergie, historique, charge récente et RPE.
-- Préparation, lecteur guidé, pause, alertes sonores/vocales/haptiques, calibration et maintien de l'écran lorsque disponible.
+- Préparation et lecteur guidé, **vue essentielle** ou complète, pause et commandes accessibles ; alertes sonores/vocales/haptiques réglables, test avant le départ, volume, fréquence et préavis facultatif. Calibration et état réel du maintien de l’écran. [Utilisation avec podcast ou vidéo](docs/READER-COMFORT.md).
 - Reprise locale d'une séance interrompue, y compris Time Attack, Segment Attack et défi actif.
 - **71 parcours natifs**, dont **29 balades à 1/5** et les cinq étapes Velleron, Vaison, Uchaux, Enclave des Papes et Corniches à **2/5–3/5** : bosses, descentes, faux-plats et récupérations, en complément des grands cols à 4/5–5/5.
 - Dix thèmes de découverte, dont **Estérel et Corniche d’Or** et **Route Napoléon** (quatorze grandes étapes et quatre escales courtes), recherche par ville ou repère (avec ou sans accents), filtres, tri, favoris et import GPX avec persistance des parcours personnels.
@@ -63,6 +63,14 @@ Voir [les sources et la méthode des profils](docs/SCENIC-ROUTES.md). Ces traces
 La **Route Napoléon** réunit huit étapes routières de **Golfe-Juan à Gap**, à 2/5–3/5 : Grasse, Saint-Vallier-de-Thiey, Séranon, Castellane, Barrême, Digne et Sisteron jalonnent le voyage. Le thème regroupe ces parcours ; le carnet accepte toutes les étapes dans le désordre, avec un trophée et **900 XP uniques**. Le tracé officiel CRT PACA est découpé sans liaisons inventées, avec altitudes IGN lissées. La suite **Gap–Grenoble** ajoute six étapes par le col Bayard, Corps, La Mure, Laffrey, Vizille, Brié et Eybens, issues d’une seule trace Michelin publiée, avec altitudes IGN. Un carnet distinct offre **700 XP uniques** ; « Dauphiné en poche » (3/6) et « Traversée impériale » (14/14) ajoutent deux trophées sans XP supplémentaire. Le départ à Gap est distant d’environ 260 m de l’arrivée précédente, sans liaison ajoutée. Les étapes restent indépendantes ; le lecteur permet d’en retrouver une puis de reprendre sa séance. Voir [les nouvelles destinations et programmes](docs/DISCOVERY-PROGRAMMES.md).
 
 La **Corniche d’Or et l’Estérel** ajoutent quatre étapes de Saint-Raphaël à Théoule et retour par la RN7 (1/5–3/5), ainsi que deux petits formats côtiers. Quatre **petites escales Napoléon** de 15–27 minutes complètent le thème, avec leurs propres validations. Trois carnets offrent 600/100/180 XP uniques ; **Roches rouges** et **Aigle de poche** ajoutent deux trophées sans XP. Les anciens parcours et objectifs sont conservés. Voir [les dix destinations et leurs sources](docs/ESTEREL-ESCALES.md) et [la roadmap](docs/ROADMAP.md). Le mode Voyage continu reste à développer.
+
+## Confort du lecteur et médias
+
+Choisis **Vue essentielle** dans Plus, avant le départ ou pendant la séance : résistance, temps, prochaine consigne, lieux et commandes restent visibles. La vue complète retrouve carte et profil. Le choix est conservé dans les sauvegardes sans modifier les historiques, chronos ou défis.
+
+Dans **Son, voix et média**, règle les bips, la voix, le volume et la fréquence, puis teste avec ton casque ou ton podcast. Un préavis facultatif de dix secondes est disponible sur les segments minutés ; la voix tient compte de la calibration. Le maintien de l’écran indique son état réel, y compris refus ou interruption, avec possibilité de réessayer.
+
+Lance ton média séparément et garde VéloQuest visible : podcast en arrière-plan, vidéo flottante si YouTube et l’appareil le permettent, fenêtres côte à côte sur ordinateur/tablette. Le comportement audio dépend de l’appareil. Un écran verrouillé ou VéloQuest masqué peut interrompre les alertes et le Bluetooth. Les tests Chromium simulés ne qualifient ni ce comportement sur iPhone/Android réels ni le TEB5. [Guide pratique et limites](docs/READER-COMFORT.md).
 
 ## Géographie, simulation et mesures
 

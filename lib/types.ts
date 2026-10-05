@@ -126,6 +126,10 @@ export type Preferences = {
   keepScreenAwake: boolean;
   keepTelemetryTrace: boolean;
   resistanceOffset: number;
+  cueVolume?: number;
+  cueFrequency?: "all" | "changes";
+  announceUpcoming?: boolean;
+  readerView?: "full" | "essential";
 };
 
 export type AppState = {

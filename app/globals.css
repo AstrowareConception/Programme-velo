@@ -339,6 +339,52 @@ button:focus-visible, input:focus-visible, .fileButton:focus-within { outline: 2
 .nextSegment strong { font-size:.78rem; }
 .nextSegment span { color:var(--cyan); font-size:.7rem; }
 .modalActions.three { grid-template-columns:1fr 1.2fr 1fr; }
+.readerViewChoice { display:flex; gap:8px; flex-wrap:wrap; margin:12px 0; padding-right:32px; }
+.readerViewChoice button { min-height:44px; flex:1; font-size:.76rem; }
+.readerViewChoice button[aria-pressed="true"] { color:var(--cyan); border-color:var(--cyan); background:rgba(80,227,255,.08); }
+.sessionComfort { margin:12px 0; border:1px solid var(--line); border-radius:14px; background:rgba(255,255,255,.025); }
+.sessionComfort summary { padding:13px; cursor:pointer; color:var(--cyan); font-size:.82rem; min-height:44px; }
+.comfortFields { display:grid; gap:12px; padding:0 13px 13px; }
+.comfortFields label { display:grid; gap:7px; font-size:.78rem; color:var(--text); }
+.comfortFields .comfortCheck { display:flex; align-items:center; gap:10px; min-height:44px; }
+.comfortFields input[type="checkbox"] { width:20px; height:20px; accent-color:var(--cyan); flex:none; }
+.comfortFields input[type="range"] { width:100%; min-height:36px; accent-color:var(--cyan); }
+.comfortFields select { width:100%; min-height:44px; }
+.comfortFields small, .mediaGuide p, .audioTestNotice { color:var(--muted); font-size:.74rem; line-height:1.6; }
+.audioTestNotice:empty { display:none; }
+.mediaGuide { border-top:1px solid var(--line); padding-top:12px; }
+.mediaGuide strong { font-size:.82rem; }
+.mediaGuide p { margin:7px 0 0; }
+.sessionScreenStatus { display:flex; gap:8px; align-items:center; flex-wrap:wrap; color:var(--muted); font-size:.72rem; margin-bottom:12px; }
+.foregroundNotice { display:flex; align-items:center; gap:10px; padding:10px; margin:10px 0; border:1px solid var(--line); border-radius:12px; }
+.foregroundNotice p { color:var(--muted); font-size:.72rem; line-height:1.5; margin:0; }
+.readerControls { position:sticky; bottom:-1px; padding-top:10px; background:#0c1222; z-index:2; }
+.readerControls button { min-height:44px; }
+.essentialSession { width:min(720px,100%); }
+.essentialSession h2 { font-size:clamp(1.25rem,4vw,1.75rem); margin-bottom:12px; }
+.essentialSession .sessionEssentials { display:grid; grid-template-columns:1fr 1fr; align-items:center; gap:10px; }
+.essentialSession .resistance { margin:10px auto; width:min(100%,190px); height:auto; aspect-ratio:1; }
+.essentialSession .sessionEssentials > * { min-width:0; }
+.essentialSession .resistance strong { font-size:clamp(2.8rem,8vw,4.4rem); }
+.essentialSession .timer { font-size:clamp(2.7rem,8vw,4rem); }
+.essentialSession .routePlaces { margin:8px 0; }
+.essentialSession .routePlaceNow p, .essentialSession .routePlaces > details { display:none; }
+.essentialSession .routePlaceNow { padding:10px; }
+.essentialSession .routePlaceNow strong { font-size:1rem; }
+.essentialSession .nextSegment { grid-template-columns:auto 1fr; }
+.essentialSession .nextSegment span { grid-column:2; }
+@media (orientation:landscape) and (max-height:600px) {
+  .essentialSession { max-height:96dvh; padding:18px; }
+  .essentialSession > .eyebrow { display:none; }
+  .essentialSession .readerViewChoice { margin:0 0 6px; }
+  .essentialSession .sessionScreenStatus { margin-bottom:4px; }
+  .essentialSession h2 { font-size:1.1rem; margin:0 0 4px; }
+  .essentialSession .sessionEssentials { gap:16px; }
+  .essentialSession .resistance { width:96px; margin:4px auto; }
+  .essentialSession .resistance strong { font-size:2.3rem; }
+  .essentialSession .timer { font-size:2.5rem; }
+  .essentialSession .readerControls { position:sticky; }
+}
 .toast { position:fixed; z-index:90; left:50%; bottom:calc(96px + env(safe-area-inset-bottom)); transform:translateX(-50%); width:max-content; max-width:calc(100% - 28px); color:#071018; background:var(--lime); border-radius:999px; padding:10px 16px; font-weight:900; font-size:.76rem; box-shadow:0 14px 45px rgba(0,0,0,.45); animation:toastIn .22s ease-out; }
 @keyframes toastIn { from { opacity:0; transform:translate(-50%,8px); } to { opacity:1; transform:translate(-50%,0); } }
 
