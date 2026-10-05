@@ -218,3 +218,7 @@ Dans **Parcours**, utilise **Voyage en plusieurs séances** sur le parcours de t
 La position est **simulée à 15 km/h**, même avec Bluetooth ; les mesures du vélo restent distinctes. Tu peux mettre en pause et reprendre une portion interrompue. Les commandes de saut de segment sont désactivées. Un arrêt précoce peut être enregistré dans le journal, sans valider ce passage ; **Continuer cette portion** permet de revenir au lecteur avant l’enregistrement.
 
 La route entière se valide quand toutes ses portions sont couvertes, sans trou. Ses XP sont attribués une seule fois en Voyage, sauf s’il existe déjà une séance classique complète à cette date. Les campagnes ajoutent leurs bonus uniques habituels. Trois trophées accompagnent les portions et les parcours achevés. La suppression recalcule position, XP, campagnes et trophées ; le JSON v3 conserve le voyage. Les kilomètres simulés figurent séparément dans le CSV. Ce mode concerne un parcours à la fois, sans raccord automatique entre étapes. [Règles et limites détaillées](VOYAGE.md).
+
+## Emporter une séance et mettre à jour
+
+Dans **Plus → Emporte ta séance**, attends la disponibilité des séances et parcours hors connexion. **Préparer les photos · 263 Ko** conserve les cinq images actuelles. Le compteur décrit le cache de cet appareil, sans garantir les cartes externes ni les médias. Une mise à jour attend une action explicite et le repos des lecteurs dans les autres onglets. Une reprise déjà sauvegardée est conservée ; aucun abandon requis. [Guide complet et limites](PWA-OFFLINE.md).
