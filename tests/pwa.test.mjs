@@ -82,4 +82,9 @@ describe('production PWA worker', () => {
       let intercepted = false; await h.run('fetch', { request: { url, method: 'GET', mode: 'navigate' }, respondWith: () => { intercepted = true; } }); expect(intercepted).toBe(false);
     }
   });
+  it('serves a prepared static chunk with a deployment query without any network request', async () => {
+    const h = harness(); await h.run('install'); h.fail('app.js'); const count = h.requested.length; let response;
+    await h.run('fetch', { request: { url: base + '/_next/static/app.js?dpl=deployment-id', method: 'GET', mode: 'cors' }, respondWith: value => { response = value; } });
+    expect(await (await response).text()).toBe('js'); expect(h.requested).toHaveLength(count);
+  });
 });

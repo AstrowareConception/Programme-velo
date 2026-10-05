@@ -1,5 +1,11 @@
 # État de reprise VéloQuest — actualisé le 5 octobre 2026
 
+## Construction PWA sur Vercel
+
+La PR 33 a passé les quatre contrôles sur `b390adad97b544c6c172bc7822b87e3d2f7fcfdf` (140 unités, 182 scénarios navigateur), puis a été fusionnée dans main `906c30081ba127726c3ef8a09be2dcf4d3329a6d`, dont la CI a également réussi. Le build Vercel a toutefois échoué avec ENOENT ; la production précédente `703d769` est restée active. L’erreur exacte a été reproduite avec l’adaptateur officiel : Next.js 16.3 y conserve le HTML dans le cache de routes et le paquet `.next/output`, au lieu de `.next/server/app/index.html`.
+
+La correction utilise les fichiers du paquet Vercel, écrit le worker dans les deux destinations et retrouve les chunks préparés malgré le paramètre `?dpl` ajouté par Next.js. Tests de construction des deux formats, refus d’un paquet incomplet et vérification hors réseau avec ce paramètre ajoutés. Les références finales de la correction, les quatre contrôles sur son SHA exact, la CI et la version publique observée seront consignés dans l’état de reprise externe ; cet échec de déploiement ne constitue pas une livraison du lot PWA.
+
 ## Références
 
 - Dépôt : https://github.com/AstrowareConception/Programme-velo ; référence `main`.

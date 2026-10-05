@@ -94,12 +94,13 @@ self.addEventListener('fetch', event => {
   if (!url.pathname.startsWith('/_next/static/') && !PHOTOS.some(asset => asset.url === url.pathname) && !CORE.some(asset => asset.url === url.pathname)) return;
   event.respondWith((async () => {
     const cache = await caches.open(CACHE);
-    const cached = await cache.match(request);
+    const key = absolute(url.pathname);
+    const cached = await cache.match(key);
     if (cached) return cached;
     try {
       const response = await fetch(request);
       const asset = PHOTOS.find(asset => asset.url === url.pathname) || CORE.find(asset => asset.url === url.pathname);
-      if (asset && await verified(response, asset)) await cache.put(request, response.clone());
+      if (asset && await verified(response, asset)) await cache.put(key, response.clone());
       return response;
     } catch { return new Response('', { status: 503 }); }
   })());
