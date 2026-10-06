@@ -18,7 +18,7 @@ function fixture() {
     characteristic(0x2acc, featureRead), characteristic(0x2ad6, rangeRead),
     characteristic(0x2ad2), characteristic(0x2ad9), characteristic(0x2a37)
   ]) };
-  const getPrimaryService = vi.fn(async (id: number) => { if (id !== 0x1826) throw missing(); return service; });
+  const getPrimaryService = vi.fn(async (id: string) => { if (id !== uuid(0x1826)) throw missing(); return service; });
   const disconnect = vi.fn();
   const connect = vi.fn(async () => ({ getPrimaryService }));
   const device = { id: "SECRET_ID", name: "SECRET_NAME", gatt: { connect, disconnect } };
@@ -31,7 +31,7 @@ describe("read-only BLE inventory", () => {
   it("uses a brand-independent chooser and only exports technical metadata", async () => {
     const f = fixture();
     const report = await diagnoseBle(f.bluetooth);
-    expect(f.bluetooth.requestDevice).toHaveBeenCalledWith({ acceptAllDevices: true, optionalServices: [...DIAGNOSTIC_SERVICES] });
+    expect(f.bluetooth.requestDevice).toHaveBeenCalledWith({ acceptAllDevices: true, optionalServices: DIAGNOSTIC_SERVICES.map(uuid) });
     expect(report).toMatchObject({ outcome: "inspected", qualification: "not-qualified", ftms: { targetSettingsBits: 4, resistanceRange: { min: 1, max: 32, increment: 1 } } });
     expect(report.services[1].status).toBe("not-found");
     expect(f.personalRead).not.toHaveBeenCalled();
@@ -42,7 +42,7 @@ describe("read-only BLE inventory", () => {
   });
   it("does not invent FTMS when only a heart-rate service exists", async () => {
     const f = fixture();
-    f.getPrimaryService.mockImplementation(async id => { if (id !== 0x180d) throw missing(); return f.service; });
+    f.getPrimaryService.mockImplementation(async id => { if (id !== uuid(0x180d)) throw missing(); return f.service; });
     const report = await diagnoseBle(f.bluetooth);
     expect(report.services[0].status).toBe("not-found");
     expect(report.services[1].status).toBe("present");

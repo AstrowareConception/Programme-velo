@@ -1,5 +1,11 @@
 # État de reprise VéloQuest — actualisé le 5 octobre 2026
 
+## 6 octobre 2026 — Bluefy et UUID canoniques
+
+Correctif préparé depuis main `d1fa26957b24b4e6c1d3f714d8235749d094dd0b` (PR 37). Sur iPhone, le test Google indépendant échoue avant sélection avec `0x1826` (nombre JavaScript, rejet brut `2`), mais découvre les services et caractéristiques avec le champ vide ou l’UUID complet sous forme de texte. Captures utilisateur : service 1826, 2ACC et 2AD6 READ, 2AD2 NOTIFY, 2AD9 WRITE/INDICATE. Ce résultat valide la découverte dans Bluefy, pas encore le contrôle depuis VéloQuest. Le test natif antérieur avait permis un changement physique de résistance sur Toputure ; le test FTMS sur Sport02 n’en avait pas produit.
+
+La connexion et l’inventaire transmettent désormais des UUID complets textuels à requestDevice, getPrimaryService et getCharacteristic. Les autorisations de services restent explicites ; aucune commande ni plage de résistance n’est modifiée. Simulateurs navigateur et unités exigent ce format pour éviter une régression. TypeScript et 183 tests unitaires passent localement ; build réussi. Validation navigateur locale empêchée par le téléchargement Chromium tronqué ; validation mobile/ordinateur à obtenir en CI avant fusion. Le timeout Windows reste un problème distinct non résolu par ces observations.
+
 ## 6 octobre 2026 — vignoble d’Alsace et extension des photos
 
 Lot préparé depuis main `58a8769bab262903918757bdbe9c29306476d389` (correctif PWA de la PR 34 livré et vérifié en production). Neuf parcours alsaciens : six étapes continues et trois courts formats distincts, deux carnets (770 XP uniques au total) et deux trophées. Catalogue : 80 parcours, 35 balades, 11 thèmes, 22 carnets et 74 badges. Les anciens parcours et objectifs restent identiques. [Trace, relief et règles](ALSACE-VIGNOBLE.md).

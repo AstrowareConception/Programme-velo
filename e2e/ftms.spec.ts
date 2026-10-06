@@ -112,16 +112,17 @@ async function mockFtms(page: Page, mode: "standard" | "sport02" = "standard") {
     characteristic(CONTROL);
 
     const service = {
-      async getCharacteristic(uuid: number) {
-        const value = characteristics.get(uuid);
+      async getCharacteristic(uuid: string) {
+        if (typeof uuid !== "string" || !uuid.endsWith("-0000-1000-8000-00805f9b34fb")) throw new Error("Canonical UUID required");
+        const value = characteristics.get(parseInt(uuid.slice(0, 8), 16));
         if (!value) throw new DOMException("characteristic unavailable", "NotFoundError");
         return value;
       }
     };
 
     const server = {
-      async getPrimaryService(uuid: number) {
-        if (uuid !== FTMS_SERVICE) throw new Error("service unavailable");
+      async getPrimaryService(uuid: string) {
+        if (uuid !== "00001826-0000-1000-8000-00805f9b34fb") throw new Error("service unavailable");
         return service;
       }
     };
@@ -140,7 +141,10 @@ async function mockFtms(page: Page, mode: "standard" | "sport02" = "standard") {
       configurable: true,
       value: {
         async getAvailability() { return true; },
-        async requestDevice() { return device; }
+        async requestDevice(options: { optionalServices: string[] }) {
+          if (options.optionalServices[0] !== "00001826-0000-1000-8000-00805f9b34fb") throw 2;
+          return device;
+        }
       }
     });
   }, mode);

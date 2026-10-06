@@ -1,6 +1,8 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { connectFtmsBike, normalizeResistance, parseResistanceRange } from "../lib/ftms";
 
+const uuid = (id: number) => `0000${id.toString(16)}-0000-1000-8000-00805f9b34fb`;
+
 function fixture({ range = true, feature = true, data = true, controlNotify = true, bits = 4, result = 1 } = {}) {
   const listeners = new Set<(event: unknown) => void>();
   const write = vi.fn(async (bytes: Uint8Array) => {
@@ -15,20 +17,23 @@ function fixture({ range = true, feature = true, data = true, controlNotify = tr
     addEventListener: (_: string, handler: (event: unknown) => void) => listeners.add(handler),
     removeEventListener: (_: string, handler: (event: unknown) => void) => listeners.delete(handler)
   };
-  const service = { getCharacteristic: vi.fn(async (id: number) => {
-    if (id === 0x2ad2 && data) return dataCharacteristic;
-    if (id === 0x2ad9) return control;
-    if (id === 0x2acc && feature) return { readValue: async () => {
+  const service = { getCharacteristic: vi.fn(async (id: string) => {
+    if (id === uuid(0x2ad2) && data) return dataCharacteristic;
+    if (id === uuid(0x2ad9)) return control;
+    if (id === uuid(0x2acc) && feature) return { readValue: async () => {
       const view = new DataView(new ArrayBuffer(8)); view.setUint32(4, bits, true); return view;
     } };
-    if (id === 0x2ad6 && range) return { readValue: async () => {
+    if (id === uuid(0x2ad6) && range) return { readValue: async () => {
       const view = new DataView(new ArrayBuffer(6));
       view.setInt16(0, -20, true); view.setInt16(2, 100, true); view.setUint16(4, 5, true); return view;
     } };
     throw new DOMException("Missing", "NotFoundError");
   }) };
   const disconnect = vi.fn();
-  const getPrimaryService = vi.fn(async () => service);
+  const getPrimaryService = vi.fn(async (id: string) => {
+    if (id !== uuid(0x1826)) throw new Error("Canonical service UUID required");
+    return service;
+  });
   const connect = vi.fn(async () => ({ getPrimaryService }));
   const device = { name: "Unknown brand", addEventListener: vi.fn(), removeEventListener: vi.fn(), gatt: { connect, disconnect } };
   const requestDevice = vi.fn(async () => device);
@@ -52,7 +57,7 @@ describe("generic FTMS adapter", () => {
   it("does not assume a brand or write before explicit control; encodes reported increments", async () => {
     const f = fixture();
     const bike = await connectFtmsBike(() => {});
-    expect(f.requestDevice).toHaveBeenCalledWith({ acceptAllDevices: true, optionalServices: [0x1826] });
+    expect(f.requestDevice).toHaveBeenCalledWith({ acceptAllDevices: true, optionalServices: [uuid(0x1826)] });
     expect(f.write).not.toHaveBeenCalled();
     await expect(bike.setResistance!(1.3)).rejects.toThrow("contrôle");
     await bike.requestControl!();

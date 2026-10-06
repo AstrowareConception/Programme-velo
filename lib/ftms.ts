@@ -57,6 +57,8 @@ export type BikeConnection = {
   setResistance?: (level: number) => Promise<void>;
 };
 
+// Use canonical strings at the browser boundary: Bluefy rejects numeric UUIDs.
+const uuid = (id: number) => `0000${id.toString(16)}-0000-1000-8000-00805f9b34fb`;
 const FTMS_SERVICE = 0x1826;
 const FITNESS_MACHINE_FEATURE = 0x2acc;
 const INDOOR_BIKE_DATA = 0x2ad2;
@@ -170,9 +172,9 @@ export function parseIndoorBikeData(view: DataView): BikeTelemetry {
   return out;
 }
 
-async function optionalCharacteristic(service: any, uuid: number) {
+async function optionalCharacteristic(service: any, id: number) {
   try {
-    return { characteristic: await service.getCharacteristic(uuid), status: "present" as const };
+    return { characteristic: await service.getCharacteristic(uuid(id)), status: "present" as const };
   } catch (error) {
     return { characteristic: null, status: bleErrorName(error) === "NotFoundError" ? "not-found" as const : "unavailable" as const };
   }
@@ -273,7 +275,6 @@ export async function connectFtmsBike(
   let device: any;
   let stopped = false;
   let operation: BleOperation = { stage: "device-selection" };
-  const uuid = (id: number) => `0000${id.toString(16)}-0000-1000-8000-00805f9b34fb`;
   const characteristicOperation = (stage: BleOperation["stage"], id: number) => {
     operation = { stage, serviceUuid: uuid(FTMS_SERVICE), characteristicUuid: uuid(id) };
   };
@@ -302,7 +303,7 @@ export async function connectFtmsBike(
   try {
     device = await bounded(bluetooth.requestDevice({
       acceptAllDevices: true, // Names and advertised services do not establish compatibility.
-      optionalServices: [FTMS_SERVICE]
+      optionalServices: [uuid(FTMS_SERVICE)]
     }), (late: any) => { try { late.gatt?.disconnect(); } catch {} });
 
     operation = { stage: "gatt-connection" };
@@ -310,10 +311,10 @@ export async function connectFtmsBike(
     if (!server) throw new Error("Connexion GATT impossible.");
 
     operation = { stage: "service-discovery", serviceUuid: uuid(FTMS_SERVICE) };
-    const service: any = await bounded(server.getPrimaryService(FTMS_SERVICE));
+    const service: any = await bounded(server.getPrimaryService(uuid(FTMS_SERVICE)));
 
     characteristicOperation("characteristic-discovery", INDOOR_BIKE_DATA);
-    const dataChar: any = await bounded(service.getCharacteristic(INDOOR_BIKE_DATA));
+    const dataChar: any = await bounded(service.getCharacteristic(uuid(INDOOR_BIKE_DATA)));
     characteristicOperation("characteristic-discovery", FITNESS_MACHINE_FEATURE);
     const featureDiscovery = await bounded(optionalCharacteristic(service, FITNESS_MACHINE_FEATURE));
     const featureChar = featureDiscovery.characteristic;
