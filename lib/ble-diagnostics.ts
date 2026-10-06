@@ -1,4 +1,4 @@
-import { parseResistanceRange, type ResistanceRange } from "./ftms";
+import { hasFtmsControlProperties, inspectResistanceRange, parseResistanceRange, type FtmsReadStatus, type ResistanceRange, type ResistanceRangeDetails } from "./ftms";
 import { bleErrorName, type BleFailure, type BleOperation } from "./ble-failure";
 
 // Only these standard services are requested. No Device Information / serial numbers.
@@ -28,11 +28,13 @@ export type BleDiagnosticReport = {
     errorName?: string;
   }[];
   ftms: {
-    featureStatus?: "read" | "invalid" | "unavailable";
+    featureStatus?: FtmsReadStatus;
     machineFeaturesBits?: number;
     targetSettingsBits?: number;
-    rangeStatus?: "read" | "invalid" | "unavailable";
+    rangeStatus?: FtmsReadStatus;
     resistanceRange?: ResistanceRange;
+    rangeDetails?: ResistanceRangeDetails;
+    controlPointStatus?: "not-found" | "compatible-properties" | "unsupported-properties";
   };
 };
 
@@ -104,6 +106,14 @@ export async function diagnoseBle(bluetooth: DiagnosticBluetooth, signal?: Abort
       entry.characteristicStatus = "unavailable";
       try { characteristics = await bounded(service.getCharacteristics()); entry.characteristicStatus = "present"; }
       catch (error) { entry.characteristicStatus = status(error); entry.errorName = bleErrorName(error); rethrowStop(error); continue; }
+      if (id === 0x1826) {
+        const has = (id: number) => characteristics.some(characteristic => characteristic.uuid.toLowerCase() === uuid(id));
+        if (!has(0x2acc)) report.ftms.featureStatus = "not-found";
+        if (!has(0x2ad6)) report.ftms.rangeStatus = "not-found";
+        const control = characteristics.find(characteristic => characteristic.uuid.toLowerCase() === uuid(0x2ad9));
+        report.ftms.controlPointStatus = !control ? "not-found"
+          : hasFtmsControlProperties(control.properties) ? "compatible-properties" : "unsupported-properties";
+      }
       for (const characteristic of characteristics) {
         ensureActive();
         const characteristicUuid = characteristic.uuid.toLowerCase();
@@ -125,7 +135,9 @@ export async function diagnoseBle(bluetooth: DiagnosticBluetooth, signal?: Abort
         if (characteristicUuid === uuid(0x2ad6)) {
           operation = { stage: "characteristic-read", serviceUuid: uuid(id), characteristicUuid };
           try {
-            report.ftms.resistanceRange = parseResistanceRange(await bounded(characteristic.readValue()));
+            const value = await bounded(characteristic.readValue());
+            report.ftms.rangeDetails = inspectResistanceRange(value);
+            report.ftms.resistanceRange = parseResistanceRange(value);
             report.ftms.rangeStatus = report.ftms.resistanceRange ? "read" : "invalid";
           } catch (error) { rethrowStop(error); report.ftms.rangeStatus = "unavailable"; }
         }

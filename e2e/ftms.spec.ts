@@ -21,8 +21,8 @@ async function seed(page: Page) {
   }, state);
 }
 
-async function mockFtms(page: Page) {
-  await page.addInitScript(() => {
+async function mockFtms(page: Page, mode: "standard" | "sport02" = "standard") {
+  await page.addInitScript((mode) => {
     const FTMS_SERVICE = 0x1826;
     const FEATURE = 0x2acc;
     const BIKE_DATA = 0x2ad2;
@@ -45,6 +45,7 @@ async function mockFtms(page: Page) {
     function characteristic(uuid: number, read?: () => DataView) {
       const item: any = {
         uuid,
+        properties: uuid === CONTROL ? { write: mode === "standard", indicate: mode === "standard", writeWithoutResponse: mode === "sport02" } : { read: Boolean(read), notify: uuid === BIKE_DATA },
         value: undefined,
         async startNotifications() { return item; },
         addEventListener(name: string, callback: (event: any) => void) {
@@ -95,13 +96,14 @@ async function mockFtms(page: Page) {
     }
 
     characteristic(BIKE_DATA);
-    characteristic(FEATURE, () => {
+    if (mode === "standard") characteristic(FEATURE, () => {
       const view = new DataView(new ArrayBuffer(8));
       view.setUint32(4, 1 << 2, true);
       return view;
     });
     characteristic(RANGE, () => {
       const view = new DataView(new ArrayBuffer(6));
+      if (mode === "sport02") return view;
       view.setInt16(0, 10, true);
       view.setInt16(2, 320, true);
       view.setUint16(4, 10, true);
@@ -112,7 +114,7 @@ async function mockFtms(page: Page) {
     const service = {
       async getCharacteristic(uuid: number) {
         const value = characteristics.get(uuid);
-        if (!value) throw new Error("characteristic unavailable");
+        if (!value) throw new DOMException("characteristic unavailable", "NotFoundError");
         return value;
       }
     };
@@ -125,7 +127,7 @@ async function mockFtms(page: Page) {
     };
 
     const device: any = {
-      name: "Simulateur FTMS 1–32",
+      name: mode === "sport02" ? "Simulateur FTMS incomplet" : "Simulateur FTMS 1–32",
       addEventListener() {},
       removeEventListener() {},
       gatt: {
@@ -141,8 +143,28 @@ async function mockFtms(page: Page) {
         async requestDevice() { return device; }
       }
     });
-  });
+  }, mode);
 }
+
+test("Sport02-like telemetry remains usable while incomplete control is explained and disabled", async ({ page }) => {
+  await seed(page);
+  await mockFtms(page, "sport02");
+  await page.goto("/");
+  await page.getByRole("button", { name: /Plus/ }).click();
+  await page.getByRole("button", { name: "Connecter pour la télémétrie FTMS" }).click();
+  const lab = page.getByRole("region", { name: "Laboratoire FTMS" });
+  await expect(lab.getByText(/Dernier paquet reçu à/)).toBeVisible();
+  await expect(lab.getByText("présent, inutilisable", { exact: true })).toBeVisible();
+  await expect(lab.getByText("invalide", { exact: true })).toBeVisible();
+  await expect(lab.getByText(/FTMS Feature \(2ACC\) non trouvée/)).toBeVisible();
+  await expect(lab.getByRole("button", { name: "Demander le contrôle FTMS" })).toHaveCount(0);
+  await expect(lab.getByRole("button", { name: "Envoyer ce niveau au vélo" })).toHaveCount(0);
+  expect(await page.evaluate(() => (window as any).__ftmsWrites)).toEqual([]);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await lab.screenshot({ path: `test-results/ftms-incomplete-control-${test.info().project.name}.png` });
+  await lab.getByRole("button", { name: "Déconnecter le vélo après le test" }).click();
+  await expect(lab.getByRole("button", { name: "Connecter pour la télémétrie FTMS" })).toBeEnabled();
+});
 
 test("FTMS connection exposes simulated telemetry and capabilities", async ({ page }) => {
   await seed(page);

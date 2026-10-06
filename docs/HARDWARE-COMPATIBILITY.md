@@ -6,14 +6,14 @@ Le 4 octobre 2026, la commande Amazon rapportée par Térence décrit un vélo T
 
 - [PR #16](https://github.com/AstrowareConception/Programme-velo/pull/16) : simulateur logiciel FTMS 1–32, anciennement nommé « Fake TEB5 ». Ce nom n’était pas une qualification constructeur.
 - [PR #28](https://github.com/AstrowareConception/Programme-velo/pull/28) : aucun vélo physique qualifié.
-- Premier essai réel transmis par Térence le 6 octobre : inventaire interrompu par un délai et laboratoire FTMS inaccessible. La version `9208763` pouvait afficher « service présent » prématurément ; aucune caractéristique FTMS ni télémétrie n’est confirmée. **Qualification physique non établie.**
+- Premier essai réel transmis par Térence le 6 octobre : inventaire interrompu par un délai et laboratoire FTMS inaccessible. La version `9208763` pouvait afficher « service présent » prématurément ; ce premier essai ne confirmait ni caractéristique FTMS ni télémétrie. Un essai ultérieur sur l’appareil sélectionné sous Sport02 a permis la réception de télémétrie et l’inventaire ci-dessous. **Qualification physique non établie.**
 
 ## Audit des hypothèses
 
 | Emplacement | Hypothèse antérieure | Traitement |
 | --- | --- | --- |
 | `lib/ftms.ts`, sélection | Noms TOPUTURE / Sport privilégiés | Sélection BLE sans filtre de marque ; service FTMS vérifié après sélection |
-| Adaptateur, résistance | Repli implicite 1–32, support déduit de caractéristiques | Exiger feature bit 2, plage valide et notifications du Control Point ; aucune plage inventée |
+| Adaptateur, résistance | Repli implicite 1–32, support déduit de caractéristiques | Exiger feature bit 2, plage valide, propriétés Write + Indicate et abonnement au Control Point ; aucune plage inventée |
 | Encodage des commandes | Arrondi au dixième uniquement | Quantification sur le pas annoncé, bornée et signée ; rejet de NaN / plage invalide |
 | Auto-résistance | Consigne 1–32 assimilée à l’unité matérielle | Disponible seulement pour plage 1–32/pas 1 et confirmation physique explicite pour la connexion ; aucune conversion vers une autre plage |
 | Interface | TEB5 présenté comme identité du vélo | Libellés génériques ; les consignes de séance restent sur l’échelle 1–32 |
@@ -73,6 +73,42 @@ Commandes : `npm run typecheck`, `npm test`, `npm run test:e2e`, `npm run build`
 Retour arrière : révoquer la connexion et supprimer le JSON local si exporté ; pour retirer le lot logiciel après fusion, revert du commit de fusion. Aucun schéma ni historique à restaurer ; aucune dépendance ou variable d’environnement ajoutée. Aucun changement des règles Voyage dans ce lot.
 
 Références techniques : [Web Bluetooth, permissions et services optionnels (Chrome)](https://developer.chrome.com/docs/capabilities/bluetooth), [Fitness Machine Service (Bluetooth SIG)](https://www.bluetooth.com/specifications/specs/fitness-machine-service-1-0/). Ces références définissent les interfaces ; elles ne certifient aucun modèle TOPUTURE.
+
+## Inventaire ultérieur et télémétrie Sport02 — 6 octobre 2026
+
+Environnement confirmé par Térence : Windows et Chrome. La capture du laboratoire
+montre une connexion et des mesures FTMS reçues. Leur évolution au pédalage et à
+l’arrêt, leur concordance avec la console et l’association physique de l’appareil
+sélectionné au vélo restent à confirmer. Aucune valeur personnelle n’est recopiée ici.
+
+Le rapport transmis ensuite est `outcome: "inspected"` : services `1826`, `180D`
+et `1816` présents, `1818` non trouvé lors de l’essai. `2AD2` expose Read + Notify.
+L’absence de `1818` ne prouve pas l’absence de puissance dans les données FTMS.
+
+Trois limitations empêchent le contrôle standard dans VéloQuest :
+
+- `2ACC` n’est pas dans l’inventaire complet de `1826` ; aucun bit de cible de résistance ne peut être établi. `2ACE`, présent, est Cross Trainer Data, pas Fitness Machine Feature.
+- `2AD6` est présent mais sa lecture est rejetée par le parseur (`rangeStatus: "invalid"`). Ce rapport ancien ne contient ni longueur ni valeurs de capacité : impossible de distinguer lecture tronquée, bornes inversées ou pas nul.
+- `2AD9` expose uniquement Write Without Response, sans Write ni Indicate. Le contrôle FTMS standard attend Write + Indicate pour les commandes et leur acquittement. La présence de l’UUID seule ne rend donc pas le contrôle utilisable.
+
+L’application conserve la télémétrie, explique ces limitations et n’essaie pas de
+s’abonner à un point de contrôle dont les propriétés sont incompatibles. Elle ne
+propose aucune écriture ni plage de repli pour contourner cet inventaire. L’interface
+ne présente plus un point de contrôle simplement présent comme « OK ».
+
+Le nouvel export ajoute `featureStatus: "not-found"`, `controlPointStatus`, et
+`rangeDetails` (longueur lue, bornes/pas décodés si disponibles, raison du rejet).
+Ces champs sont des capacités techniques, sans trame de télémétrie ni identifiant.
+La version du schéma reste 1, avec champs optionnels additionnels. Un inventaire
+dont l’énumération est interrompue ne déclare pas les caractéristiques absentes.
+
+Prochaine recette : confirmer pédalage/arrêt et comparaison à la console avec les
+réglages manuels du vélo, puis exporter un nouveau diagnostic pour préciser la
+lecture de `2AD6`. Toute investigation d’un protocole propriétaire est un lot distinct,
+nécessitant identification et documentation ; aucun essai de commande inconnue.
+
+Référence : [suite de tests FTMS Bluetooth SIG, propriétés Write + Indicate du Control Point](https://files.bluetooth.com/wp-content/uploads/dlm_uploads/2024/10/FTMS.TS_.p6.pdf), tableau 4.2.
+
 ## Diagnostic interrompu lors du premier essai
 
 Si le rapport contient `outcome: "timeout"`, aucune compatibilité n'est établie.

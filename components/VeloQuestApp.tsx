@@ -1270,8 +1270,8 @@ export function VeloQuestApp() {
             {bike && (
               <div className="capabilityStrip">
                 <span className={bike.capabilities.indoorBikeData ? "ok" : ""}>Télémétrie</span>
-                <span className={bike.capabilities.controlPoint ? "ok" : ""}>Control Point</span>
-                <span className={bike.capabilities.supportsResistanceTarget ? "ok" : ""}>Résistance pilotable</span>
+                <span className={bike.requestControl ? "ok" : ""}>Control Point {bike.requestControl ? "disponible" : "indisponible"}</span>
+                <span className={bike.setResistance ? "ok" : ""}>Résistance {bike.setResistance ? "pilotable" : "manuelle"}</span>
                 {bike.capabilities.resistanceRange && <span className="ok">Plage {bike.capabilities.resistanceRange.min}–{bike.capabilities.resistanceRange.max}</span>}
               </div>
             )}
@@ -1622,10 +1622,13 @@ export function VeloQuestApp() {
                 <p className="finePrint">{lastTelemetryAt === null ? "En attente du premier paquet du vélo. Pédale doucement pour réveiller les mesures." : `Dernier paquet reçu à ${new Date(lastTelemetryAt).toLocaleTimeString("fr-FR")}. Vérifie que les chiffres évoluent en pédalant puis à l’arrêt.`}</p>
                 <div className="diagnosticGrid">
                   <span><small>FTMS</small><strong>{bike.capabilities.ftms ? "OK" : "—"}</strong></span>
-                  <span><small>Control Point</small><strong>{bike.capabilities.controlPoint ? "OK" : "non"}</strong></span>
-                  <span><small>Résistance cible</small><strong>{bike.capabilities.supportsResistanceTarget ? "oui" : "non détectée"}</strong></span>
-                  <span><small>Plage</small><strong>{bike.capabilities.resistanceRange ? `${bike.capabilities.resistanceRange.min}–${bike.capabilities.resistanceRange.max}` : "inconnue"}</strong></span>
+                  <span><small>Control Point</small><strong>{bike.requestControl ? "prêt à demander" : bike.capabilities.controlPoint ? "présent, inutilisable" : bike.capabilities.controlPointStatus === "unavailable" ? "inaccessible" : "non trouvé"}</strong></span>
+                  <span><small>Résistance cible</small><strong>{bike.capabilities.supportsResistanceTarget ? "annoncée" : bike.capabilities.featureStatus === "read" ? "non annoncée" : "inconnue"}</strong></span>
+                  <span><small>Plage</small><strong>{bike.capabilities.resistanceRange ? `${bike.capabilities.resistanceRange.min}–${bike.capabilities.resistanceRange.max}` : bike.capabilities.rangeStatus === "invalid" ? "invalide" : "inconnue"}</strong></span>
                 </div>
+                {bike.capabilities.featureStatus === "not-found" && <p className="finePrint">FTMS Feature (2ACC) non trouvée : les commandes de résistance prises en charge restent inconnues.</p>}
+                {bike.capabilities.controlPointStatus === "unsupported-properties" && <p className="finePrint">Le point de contrôle n’expose pas les propriétés d’écriture avec réponse et d’indication nécessaires au contrôle FTMS standard. Utilise les réglages de résistance de la console pendant la réception des mesures.</p>}
+                {bike.capabilities.controlPointStatus === "unavailable" && <p className="finePrint">Le canal d’acquittement du point de contrôle est inaccessible. Le contrôle de résistance reste indisponible pour cette connexion.</p>}
                 <p className="finePrint">Les capacités annoncées ne prouvent pas le changement physique de résistance. Les tests manuels utilisent les unités FTMS annoncées ; vérifie leur correspondance avec l’écran du vélo.</p>
                 {bike.capabilities.supportsResistanceTarget && bike.requestControl && bike.setResistance && (
                   <div className="controlLab">
