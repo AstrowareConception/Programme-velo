@@ -22,7 +22,7 @@ const overflow = (page: Page) => page.evaluate(() => document.documentElement.sc
 test("Route Napoléon groups fourteen road sections and four independent short escapes and prepares local landmarks", async ({ page }, testInfo) => {
   const errors: string[] = []; page.on("pageerror", (error) => errors.push(error.message));
   await seed(page); await browse(page); await page.getByRole("button", { name: /Route Napoléon Quatorze grandes étapes/ }).click();
-  await expect(page.locator(".routeLibraryCard")).toHaveCount(21);
+  await expect(page.locator(".routeLibraryCard")).toHaveCount(18);
   await expect(page.getByLabel("Thème", { exact: true })).toHaveValue("napoleon");
   const route = card(page, "Route Napoléon · Golfe-Juan → Grasse");
   await route.getByText("Découvrir le paysage", { exact: true }).click();
