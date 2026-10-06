@@ -67,7 +67,35 @@ describe("read-only BLE inventory", () => {
     const f = fixture();
     f.featureRead.mockResolvedValue(view([4]));
     f.rangeRead.mockResolvedValue(view([10, 0, 64, 1, 0, 0]));
-    expect((await diagnoseBle(f.bluetooth)).ftms).toEqual({ featureStatus: "invalid", rangeStatus: "invalid", resistanceRange: undefined });
+    expect((await diagnoseBle(f.bluetooth)).ftms).toMatchObject({ featureStatus: "invalid", rangeStatus: "invalid", rangeDetails: { invalidReason: "zero-increment", byteLength: 6 } });
+  });
+  it("explains the Sport02 inventory without reading telemetry or attempting control", async () => {
+    const f = fixture();
+    f.service.getCharacteristics.mockImplementation(async () => [
+      { uuid: uuid(0x2ad2), properties: { read: true, notify: true, write: false }, readValue: f.personalRead, writeValue: f.write, startNotifications: f.subscribe },
+      { uuid: uuid(0x2ad6), properties: { read: true, notify: true, write: false }, readValue: f.rangeRead, writeValue: f.write, startNotifications: f.subscribe },
+      { uuid: uuid(0x2ad9), properties: { read: false, notify: false, write: false, writeWithoutResponse: true }, readValue: f.personalRead, writeValue: f.write, startNotifications: f.subscribe }
+    ]);
+    // The real export did not include the read bytes; this deliberately invalid
+    // sample verifies reporting, without claiming the device returned these bytes.
+    f.rangeRead.mockResolvedValue(view([0, 0, 0, 0, 0, 0]));
+    const report = await diagnoseBle(f.bluetooth);
+    expect(report.ftms).toMatchObject({ featureStatus: "not-found", controlPointStatus: "unsupported-properties", rangeStatus: "invalid", rangeDetails: { byteLength: 6, invalidReason: "zero-increment", decodedRange: { min: 0, max: 0, increment: 0 } } });
+    expect(f.featureRead).not.toHaveBeenCalled();
+    expect(f.personalRead).not.toHaveBeenCalled();
+    expect(f.write).not.toHaveBeenCalled();
+    expect(f.subscribe).not.toHaveBeenCalled();
+    expect(f.disconnect).toHaveBeenCalled();
+    expect(JSON.stringify(report)).not.toContain("SECRET");
+  });
+  it.each([
+    { bytes: [1], invalidReason: "truncated" },
+    { bytes: [20, 0, 10, 0, 10, 0], invalidReason: "reversed-bounds" },
+    { bytes: [10, 0, 20, 0, 0, 0], invalidReason: "zero-increment" }
+  ])("distinguishes invalid range causes: $invalidReason", async ({ bytes, invalidReason }) => {
+    const f = fixture();
+    f.rangeRead.mockResolvedValue(view(bytes));
+    expect((await diagnoseBle(f.bluetooth)).ftms).toMatchObject({ rangeStatus: "invalid", rangeDetails: { byteLength: bytes.length, invalidReason } });
   });
   it("survives an unreadable feature and still inspects range", async () => {
     const f = fixture();

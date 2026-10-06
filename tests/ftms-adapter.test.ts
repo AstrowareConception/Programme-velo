@@ -9,6 +9,7 @@ function fixture({ range = true, feature = true, data = true, controlNotify = tr
   });
   const dataCharacteristic = { startNotifications: vi.fn(async () => {}), addEventListener: vi.fn(), removeEventListener: vi.fn() };
   const control = {
+    properties: { write: true, indicate: true, writeWithoutResponse: false },
     startNotifications: vi.fn(async () => { if (!controlNotify) throw new Error("unavailable"); }),
     writeValueWithResponse: write,
     addEventListener: (_: string, handler: (event: unknown) => void) => listeners.add(handler),
@@ -33,7 +34,7 @@ function fixture({ range = true, feature = true, data = true, controlNotify = tr
   const requestDevice = vi.fn(async () => device);
   vi.stubGlobal("navigator", { bluetooth: { requestDevice } });
   vi.stubGlobal("window", globalThis);
-  return { write, disconnect, requestDevice, dataCharacteristic, listeners, connect, device, getPrimaryService };
+  return { write, disconnect, requestDevice, dataCharacteristic, control, service, listeners, connect, device, getPrimaryService };
 }
 afterEach(() => { vi.unstubAllGlobals(); vi.useRealTimers(); });
 
@@ -67,6 +68,27 @@ describe("generic FTMS adapter", () => {
     expect(bike.setResistance).toBeUndefined();
     expect(f.write).not.toHaveBeenCalled();
     bike.disconnect();
+  });
+  it("keeps Sport02-like telemetry without subscribing or writing to its write-only control point", async () => {
+    const f = fixture({ feature: false });
+    f.control.properties = { write: false, indicate: false, writeWithoutResponse: true };
+    const bike = await connectFtmsBike(() => {});
+    expect(bike.capabilities).toMatchObject({ indoorBikeData: true, controlPoint: true, controlPointStatus: "unsupported-properties", featureStatus: "not-found" });
+    expect(bike.requestControl).toBeUndefined();
+    expect(bike.setResistance).toBeUndefined();
+    expect(f.control.startNotifications).not.toHaveBeenCalled();
+    expect(f.dataCharacteristic.startNotifications).toHaveBeenCalled();
+    expect(f.write).not.toHaveBeenCalled();
+    bike.disconnect();
+  });
+  it.each([{ write: true, indicate: false }, { write: false, indicate: true }])("requires both standard control properties: %j", async properties => {
+    const f = fixture();
+    Object.assign(f.control.properties, properties);
+    const bike = await connectFtmsBike(() => {});
+    expect(bike.requestControl).toBeUndefined();
+    expect(bike.setResistance).toBeUndefined();
+    expect(f.control.startNotifications).not.toHaveBeenCalled();
+    expect(f.write).not.toHaveBeenCalled();
   });
   it("disconnects when the required data characteristic is missing", async () => {
     const f = fixture({ data: false });

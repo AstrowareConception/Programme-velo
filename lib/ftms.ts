@@ -24,6 +24,17 @@ export type ResistanceRange = {
   increment: number;
 };
 
+export type FtmsReadStatus = "read" | "not-found" | "invalid" | "unavailable";
+export type ResistanceRangeDetails = {
+  byteLength: number;
+  decodedRange?: ResistanceRange;
+  invalidReason?: "truncated" | "reversed-bounds" | "zero-increment";
+};
+
+export function hasFtmsControlProperties(properties?: { write?: boolean; indicate?: boolean }) {
+  return properties?.write === true && properties.indicate === true;
+}
+
 export type BikeCapabilities = {
   ftms: boolean;
   indoorBikeData: boolean;
@@ -32,6 +43,10 @@ export type BikeCapabilities = {
   supportsPowerTarget: boolean;
   controlPoint: boolean;
   targetSettingsBits?: number;
+  featureStatus?: FtmsReadStatus;
+  rangeStatus?: FtmsReadStatus;
+  rangeDetails?: ResistanceRangeDetails;
+  controlPointStatus?: "ready" | "not-found" | "unsupported-properties" | "unavailable";
 };
 
 export type BikeConnection = {
@@ -157,20 +172,31 @@ export function parseIndoorBikeData(view: DataView): BikeTelemetry {
 
 async function optionalCharacteristic(service: any, uuid: number) {
   try {
-    return await service.getCharacteristic(uuid);
-  } catch {
-    return null;
+    return { characteristic: await service.getCharacteristic(uuid), status: "present" as const };
+  } catch (error) {
+    return { characteristic: null, status: bleErrorName(error) === "NotFoundError" ? "not-found" as const : "unavailable" as const };
   }
 }
 
-export function parseResistanceRange(view?: DataView): ResistanceRange | undefined {
-  if (!view || view.byteLength < 6) return undefined;
+export function inspectResistanceRange(view: DataView): ResistanceRangeDetails {
+  if (view.byteLength < 6) return { byteLength: view.byteLength, invalidReason: "truncated" };
   const range = {
     min: view.getInt16(0, true) / 10,
     max: view.getInt16(2, true) / 10,
     increment: view.getUint16(4, true) / 10
   };
-  return range.min <= range.max && range.increment > 0 ? range : undefined;
+  return {
+    byteLength: view.byteLength,
+    decodedRange: range,
+    ...(range.min > range.max ? { invalidReason: "reversed-bounds" as const }
+      : range.increment === 0 ? { invalidReason: "zero-increment" as const } : {})
+  };
+}
+
+export function parseResistanceRange(view?: DataView): ResistanceRange | undefined {
+  if (!view) return undefined;
+  const details = inspectResistanceRange(view);
+  return details.invalidReason ? undefined : details.decodedRange;
 }
 
 export function normalizeResistance(level: number, range: ResistanceRange): number {
@@ -289,35 +315,47 @@ export async function connectFtmsBike(
     characteristicOperation("characteristic-discovery", INDOOR_BIKE_DATA);
     const dataChar: any = await bounded(service.getCharacteristic(INDOOR_BIKE_DATA));
     characteristicOperation("characteristic-discovery", FITNESS_MACHINE_FEATURE);
-    const featureChar = await bounded(optionalCharacteristic(service, FITNESS_MACHINE_FEATURE));
+    const featureDiscovery = await bounded(optionalCharacteristic(service, FITNESS_MACHINE_FEATURE));
+    const featureChar = featureDiscovery.characteristic;
     characteristicOperation("characteristic-discovery", SUPPORTED_RESISTANCE_RANGE);
-    const rangeChar = await bounded(optionalCharacteristic(service, SUPPORTED_RESISTANCE_RANGE));
+    const rangeDiscovery = await bounded(optionalCharacteristic(service, SUPPORTED_RESISTANCE_RANGE));
+    const rangeChar = rangeDiscovery.characteristic;
     characteristicOperation("characteristic-discovery", CONTROL_POINT);
-    const controlPoint = await bounded(optionalCharacteristic(service, CONTROL_POINT));
+    const controlDiscovery = await bounded(optionalCharacteristic(service, CONTROL_POINT));
+    const controlPoint = controlDiscovery.characteristic;
 
     let targetSettingsBits: number | undefined;
+    let featureStatus: FtmsReadStatus = featureDiscovery.status === "present" ? "unavailable" : featureDiscovery.status;
     if (featureChar) {
       characteristicOperation("characteristic-read", FITNESS_MACHINE_FEATURE);
       try {
         const featureValue: DataView = await bounded<DataView>(featureChar.readValue());
+        featureStatus = featureValue.byteLength >= 8 ? "read" : "invalid";
         if (featureValue.byteLength >= 8) targetSettingsBits = featureValue.getUint32(4, true);
       } catch {}
     }
     ensureActive();
 
     let resistanceRange: ResistanceRange | undefined;
+    let rangeStatus: FtmsReadStatus = rangeDiscovery.status === "present" ? "unavailable" : rangeDiscovery.status;
+    let rangeDetails: ResistanceRangeDetails | undefined;
     if (rangeChar) {
       characteristicOperation("characteristic-read", SUPPORTED_RESISTANCE_RANGE);
       try {
-        resistanceRange = parseResistanceRange(await bounded<DataView>(rangeChar.readValue()));
+        const rangeValue = await bounded<DataView>(rangeChar.readValue());
+        rangeDetails = inspectResistanceRange(rangeValue);
+        resistanceRange = parseResistanceRange(rangeValue);
+        rangeStatus = resistanceRange ? "read" : "invalid";
       } catch {}
     }
 
     ensureActive();
     let controlReady = false;
-    if (controlPoint) {
+    let controlPointStatus: BikeCapabilities["controlPointStatus"] = controlDiscovery.status === "present" ? "unsupported-properties" : controlDiscovery.status;
+    if (controlPoint && hasFtmsControlProperties(controlPoint.properties)) {
+      controlPointStatus = "unavailable";
       characteristicOperation("notification-subscription", CONTROL_POINT);
-      try { await bounded(controlPoint.startNotifications()); controlReady = true; } catch {}
+      try { await bounded(controlPoint.startNotifications()); controlReady = true; controlPointStatus = "ready"; } catch {}
     }
 
     ensureActive();
@@ -328,7 +366,11 @@ export async function connectFtmsBike(
       supportsResistanceTarget: targetSettingsBits !== undefined && Boolean(targetSettingsBits & (1 << 2)),
       supportsPowerTarget: targetSettingsBits !== undefined ? Boolean(targetSettingsBits & (1 << 3)) : false,
       controlPoint: Boolean(controlPoint),
-      targetSettingsBits
+      targetSettingsBits,
+      featureStatus,
+      rangeStatus,
+      rangeDetails,
+      controlPointStatus
     };
 
     const handler = (event: Event) => {

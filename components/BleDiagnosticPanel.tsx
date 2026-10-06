@@ -67,6 +67,11 @@ export function BleDiagnosticPanel({ disabled, onBusyChange }: { disabled: boole
       </li>)}</ul>
       {report.outcome !== "inspected" && <p>Pour réessayer : ferme les autres applications et onglets Bluetooth, réveille la console, puis relance l’inventaire. Si l’échec se répète, exporte ce rapport et précise ton appareil, ton système et ton navigateur ; aucun contrôle de résistance n’a été envoyé.</p>}
       {report.ftms.featureStatus === "read" && <p>Commande de résistance annoncée : {(report.ftms.targetSettingsBits ?? 0) & 4 ? "oui, à tester séparément" : "non"}.</p>}
+      {report.ftms.featureStatus === "not-found" && <p>Capacités de commande inconnues : la caractéristique FTMS Feature (2ACC) n’a pas été trouvée lors de cet essai.</p>}
+      {report.ftms.featureStatus === "invalid" && <p>Capacités de commande inconnues : la lecture FTMS Feature est trop courte.</p>}
+      {report.ftms.featureStatus === "unavailable" && <p>Capacités de commande inconnues : FTMS Feature n’a pas pu être lue.</p>}
+      {report.ftms.controlPointStatus === "unsupported-properties" && <p>Point de contrôle présent, mais inutilisable pour le contrôle FTMS standard : les propriétés d’écriture avec réponse et d’indication ne sont pas toutes exposées. La télémétrie peut rester disponible.</p>}
+      {report.ftms.rangeStatus === "invalid" && <p>Plage de résistance invalide : {report.ftms.rangeDetails?.invalidReason === "truncated" ? "lecture trop courte (6 octets requis)" : report.ftms.rangeDetails?.invalidReason === "reversed-bounds" ? "minimum supérieur au maximum" : "pas de résistance nul"}. Aucune plage 1–32 n’est déduite.</p>}
       {report.ftms.resistanceRange && <p>Plage FTMS annoncée : <strong>{report.ftms.resistanceRange.min}–{report.ftms.resistanceRange.max}</strong>, pas {report.ftms.resistanceRange.increment}. Ces unités restent à comparer aux niveaux de la console.</p>}
       <details><summary>Voir le rapport technique</summary><pre style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>{JSON.stringify(report, null, 2)}</pre></details>
       <button className="secondary" onClick={download}>Exporter le rapport sans données personnelles</button>
