@@ -206,3 +206,10 @@ Commandes vocales facultatives dans le lecteur : « Vélo allège », « Vélo r
 Tests et publication consignés dans la PR du lot. Un navigateur exposant la synthèse vocale ne garantit pas la reconnaissance ; essai réel requis dans Bluefy.
 
 Extension du même lot demandée pendant la validation : Défi calories5/10min, rythme et résistance libres, chrono continu, record kcal distinct du score coach. Aucun niveau envoyé au départ ; Alléger/Renforcer choisit ensuite un niveau1–32 libre, par boutons ou voix. Calories du vélo : baseline fraîche au départ, différence du compteur dans l’intervalle exact, rejet des retours à zéro, trous>10s et fin sans mesure récente≤5s. Une reconnexion invalide la mesure ; une reprise après rechargement conserve le journal possible mais ne qualifie pas un record. Un arrêt anticipé ne qualifie pas non plus. Compteurs postérieurs au délai exclus. Résultats FTMS groupés par durée et nom du vélo ; saisies déclarées séparées, durée verrouillée et aucune assimilation aux données FTMS. Bilan/historique/cartes affichent kcal, record précédent et célébration d’un dépassement. Estimations de console explicitement distinguées d’une mesure physiologique ; les deux défis comptent dans les séances intenses existantes.
+
+
+## 6 octobre 2026 — lot programme personnel, PR 46
+
+Base main `0e3253bbeb02078587022d646e6cc48b7ea2b50c` (PR45). L’utilisateur a confirmé le transfert Bluefy JSON. Nouvelle demande : grande mise à jour issue de la roadmap approuvée. Programme, bilans, habitudes, cadence personnelle, maîtrise, carnets et premier pack canal implémentés ; voir PROGRAMME-PERSONNEL et CANAL-NANTES-BREST. 218 tests unitaires passent localement, TypeScript passe ; build local réussi avant ajout des routes, build final et tests navigateur requis en CI avant fusion. Aucun service de synchronisation distant configuré. Ne pas annoncer les packs Alpes/Ardèche comme livrés.
+
+PR de livraison : https://github.com/AstrowareConception/Programme-velo/pull/46 ; premier commit de travail `29578dc91bef8f53c07f06c195a47d1d23ec5fce`. Les résultats sur la tête finale, la fusion et le déploiement sont consignés dans cette PR après vérification.

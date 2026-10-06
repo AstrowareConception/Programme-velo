@@ -14,14 +14,14 @@ async function stored(page: Page) { return page.evaluate(() => JSON.parse(localS
 function chambordCard(page: Page) { return page.getByRole("heading", { name: "Chambord · petit tour", exact: true }).locator("xpath=ancestor::article"); }
 async function browse(page: Page) {
   await page.getByRole("button", { name: /Parcours/ }).click();
-  await page.getByRole("button", { name: "Explorer les 35 balades" }).click();
+  await page.getByRole("button", { name: "Explorer les 38 balades" }).click();
 }
 
 test("scenic catalogue, landscape, map profile and favorites work without overflow", async ({ page }, testInfo) => {
   const errors: string[] = []; page.on("pageerror", (error) => errors.push(error.message));
   await seed(page); await page.goto("/"); await browse(page);
-  await expect(page.locator(".routeLibraryCard")).toHaveCount(35);
-  await expect(page.locator(".routeLibraryCard").filter({ hasText: "Difficulté 1/5" })).toHaveCount(35);
+  await expect(page.locator(".routeLibraryCard")).toHaveCount(38);
+  await expect(page.locator(".routeLibraryCard").filter({ hasText: "Difficulté 1/5" })).toHaveCount(38);
   await page.getByLabel("Rechercher").fill("Chambord");
   const card = chambordCard(page);
   await card.getByText("Découvrir le paysage", { exact: true }).click();

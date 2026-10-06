@@ -4,21 +4,29 @@
 
 Application : [programme-velo.vercel.app](https://programme-velo.vercel.app/) · Dépôt : [AstrowareConception/Programme-velo](https://github.com/AstrowareConception/Programme-velo)
 
-VéloQuest est une PWA personnelle Next.js / React / TypeScript. Elle associe un programme souple de douze semaines, des séances guidées, des parcours variés et un suivi local. Les consignes utilisent une échelle **1–32**. Le TOPUTURE reçu le 6 octobre 2026 reste à identifier précisément et à qualifier ; la commande ne prouve pas FTMS. Le mode manuel permet de suivre les consignes et de saisir les valeurs du vélo sans connexion Bluetooth.
+VéloQuest est une PWA personnelle Next.js / React / TypeScript. Elle associe un programme souple de douze semaines, des séances guidées, des parcours variés et un suivi local. Les consignes utilisent une échelle **1–32**. Le Toputure TBE5 a été testé physiquement par l’utilisateur le 6 octobre 2026 avec Bluefy sur iPhone : télémétrie, résistance effective et transfert JSON confirmés. Cette qualification ne s’étend pas automatiquement aux autres appareils ou navigateurs. Le mode manuel permet de suivre les consignes et de saisir les valeurs du vélo sans connexion Bluetooth.
+
+## Mise à jour programme personnel — PR 46
+
+Quête accueille **Ma semaine adaptée** : disponibilités, créneaux, semaines allégées, remplacement et déplacement de séances, objectifs cohérents avec le planning confirmé. Suivi regroupe le bilan hebdomadaire, les tendances de poids et les habitudes facultatives. Les points du jeu ne poussent plus le coach vers une charge supérieure.
+
+Dix nouvelles séances, trois nouveaux programmes et défis de maîtrise ; repère de cadence personnel ; carnets ordonnés de parcours/GPX et reprise de leur prochaine étape. Le premier pack du canal de Nantes à Brest ajoute quatre parcours sourcés. Les champs nouveaux sont inclus dans la sauvegarde v3, sans recalcul de l’historique.
+
+[Mode d’emploi et limites](docs/PROGRAMME-PERSONNEL.md) · [Sources du canal](docs/CANAL-NANTES-BREST.md). La synchronisation distante reste à configurer ; les nouveaux packs Alpes/Ardèche et l’extension des photos restent dans la roadmap. Les résultats des contrôles du commit de livraison figurent dans la PR 46.
 
 ## Fonctions disponibles
 
 - Démarrage accompagné en quatre étapes, profil et mesures facultatives, première séance douce de 15 min, puis Quête simplifiée et découverte progressive du coach et des balades. Les comptes existants conservent leur interface.
 - Programme de douze semaines : objectifs de minutes, points, séances et variété, avec un plafond de séances difficiles.
 - Catalogue libre, micro-séances de 10/12/15/20 minutes, séance libre et saisie rétroactive. Nouveaux formats : Roulage contemplatif (25 min), Cadence fluide (30 min), Petites vagues (40 min), Parenthèse souple (12 min bonus).
-- Trois **programmes découverte** souples, onze séances de découverte dont six nouveaux formats de 8 à 30 minutes ; trophée et bonus unique de 120/140/160 XP selon le programme.
+- Six **programmes découverte** souples, dont Retour en selle, L’art de la régularité et Gérer sa réserve ; trophée et bonus unique selon le programme.
 - Des **formats courts** extraits des GPX existants, avec filtre de durée simulée et des carnets indépendants. Un tronçon court ne valide pas son parcours parent.
 - Fiches harmonisées sur tous les parcours : paysages, lieux, sources et limites. Les repères des quatorze profils historiques restent indicatifs.
 - Coach adaptatif local : temps disponible, énergie, historique, charge récente et RPE.
 - Préparation et lecteur guidé, **vue essentielle** ou complète, pause et commandes accessibles ; alertes sonores/vocales/haptiques réglables, test avant le départ, volume, fréquence et préavis facultatif. Calibration et état réel du maintien de l’écran. [Utilisation avec podcast ou vidéo](docs/READER-COMFORT.md).
 - Reprise locale d'une séance interrompue, y compris Time Attack, Segment Attack et défi actif.
-- **80 parcours natifs**, dont **35 balades à 1/5** et les cinq étapes Velleron, Vaison, Uchaux, Enclave des Papes et Corniches à **2/5–3/5** : bosses, descentes, faux-plats et récupérations, en complément des grands cols à 4/5–5/5.
-- Onze thèmes de découverte, dont **Estérel et Corniche d’Or** et **Route Napoléon** (quatorze grandes étapes et quatre escales courtes), recherche par ville ou repère (avec ou sans accents), filtres, tri, favoris et import GPX avec persistance des parcours personnels.
+- **84 parcours natifs**, dont **38 balades à 1/5** et les cinq étapes Velleron, Vaison, Uchaux, Enclave des Papes et Corniches à **2/5–3/5** : bosses, descentes, faux-plats et récupérations, en complément des grands cols à 4/5–5/5.
+- Douze thèmes de découverte, dont **Estérel et Corniche d’Or** et **Route Napoléon** (quatorze grandes étapes et quatre escales courtes), recherche par ville ou repère (avec ou sans accents), filtres, tri, favoris et import GPX avec persistance des parcours personnels.
 - Time Attack, records de parcours, fantôme et temps intermédiaires ; Segment Attack sur quatre secteurs, avec records séparés.
 - Huit défis de parcours ; **22 campagnes/carnets**, dont Passeport azuréen, Carnet du Verdon, Cartes postales de Provence, Les deux Corniches et Des forêts aux cimes. Les objectifs précédents restent inchangés ; Escales du Sud, Un paysage en 30 minutes et Route Napoléon ajoutent des bonus uniques de 220, 180 et 900 XP.
 - Trophées de découverte : Premier paysage, Flâneur de France (3 balades différentes), Atlas des balades (7), plus six trophées de variété : 10/20 parcours natifs, 6 destinations PACA, 3 parcours azuréens, 4 territoires et les 5 difficultés. Collection La France en douceur inchangée.

@@ -1007,3 +1007,50 @@ button:focus-visible, input:focus-visible, .fileButton:focus-within { outline: 2
 .backupButtons > button { flex:1 1 180px; }
 .backupPaste summary { cursor:pointer; min-height:32px; }
 .backupPaste > button { margin-top:12px; width:100%; }
+
+/* Personal programme: compact, readable controls from 320 px upwards. */
+.adaptiveProgram,.weeklyReview,.personalJourneys { margin-block:20px; }
+.adaptiveProgram h2,.weeklyReview h2,.personalJourneys h2 { margin:8px 0 14px; }
+.adaptiveProgram details,.weeklyReview details,.personalJourneys details { margin-block:16px; }
+.adaptiveProgram summary,.weeklyReview summary,.personalJourneys summary { cursor:pointer; color:var(--cyan,#42def5); padding-block:10px; }
+.adaptiveProgram label,.weeklyReview label,.personalJourneys label { display:grid; gap:8px; min-width:0; }
+.adaptiveProgram select,.weeklyReview select,.personalJourneys select,.personalJourneys input { width:100%; min-width:0; }
+.dayChoices { border:1px solid #ffffff24; border-radius:16px; padding:16px; display:flex; flex-wrap:wrap; gap:12px 20px; margin:16px 0; }
+.dayChoices label,.habitCheck { display:flex!important; align-items:center; min-height:44px; }
+.dayChoices input,.habitCheck input { width:20px!important; height:20px; flex-shrink:0; }
+.programToolbar { display:flex; flex-wrap:wrap; align-items:end; gap:14px; margin-block:20px; }
+.programToolbar > * { flex:1 1 200px; }
+.planSummary { border-left:3px solid #48dff3; padding:12px 18px; background:#42def508; }
+.planSummary strong,.planSummary span { display:block; margin-block:6px; }
+.plannedRides { list-style:none; padding:0; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin:20px 0; }
+.plannedRides > li,.journeyCard { border:1px solid #ffffff20; border-radius:18px; padding:18px; min-width:0; background:#ffffff03; }
+.plannedHeading { display:flex; flex-wrap:wrap; gap:6px 12px; font-size:.84rem; }
+.plannedHeading span { color:#aabbca; }
+.plannedRides h3,.journeyCard h3 { margin:12px 0 8px; }
+.plannedRides p { margin:8px 0; }
+.planActions button { width:100%; }
+.planActions label+label { margin-top:12px; }
+.reviewMetrics { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:20px 0; }
+.reviewMetrics > div { padding:16px; border:1px solid #ffffff20; border-radius:16px; background:#ffffff04; }
+.reviewMetrics small,.reviewMetrics strong { display:block; }
+.reviewMetrics strong { font-size:1.35rem; margin-top:8px; }
+.reviewAdvice,.sessionDebrief { background:#42def509; border:1px solid #42def527; padding:18px; border-radius:16px; margin:16px 0; }
+.journeyCards { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
+.journeySteps { padding:0; list-style:none; display:grid; gap:10px; }
+.journeySteps li { display:flex; justify-content:space-between; align-items:center; gap:10px; border-bottom:1px solid #ffffff20; padding:10px 0; }
+.journeySteps li > span { min-width:0; overflow-wrap:anywhere; }
+.journeySteps li > div { display:flex; gap:6px; flex-shrink:0; }
+.journeySteps button { min-width:44px; min-height:44px; }
+.journeyCard li { margin-block:8px; }
+.journeyCard progress { width:100%; accent-color:#adff62; }
+.journeyComplete { color:#adff62; }
+@media(max-width:600px) {
+  .plannedRides,.journeyCards { grid-template-columns:1fr; }
+  .adaptiveProgram,.weeklyReview,.personalJourneys { padding:20px; }
+  .adaptiveProgram .formRow,.weeklyReview .formRow { grid-template-columns:1fr; }
+  .programToolbar > * { flex-basis:100%; }
+  .reviewMetrics { gap:8px; }
+  .reviewMetrics > div { padding:12px; }
+  .reviewMetrics strong { font-size:1.12rem; }
+  .journeyCard .primary,.personalJourneys .form > button { width:100%; }
+}

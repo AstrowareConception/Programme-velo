@@ -20,7 +20,7 @@ function completed(routeId: string, metrics: CompletedSession["metrics"] = { sou
 describe("documented scenic catalogue", () => {
   it("adds nine distinct rides while preserving the fourteen earlier routes", () => {
     expect(scenicRoutes).toHaveLength(9);
-    expect(climbs).toHaveLength(80);
+    expect(climbs).toHaveLength(84);
     expect(new Set(climbs.map((r) => r.id)).size).toBe(climbs.length);
     expect(climbs.filter((r) => ["sorgue-velleron-loop", "vaison-medieval-loop", "uchaux-loop", "enclave-papes-loop", "nice-corniches-loop"].includes(r.id) && routeCategory(r) === "stage" && (r.difficulty ?? 5) <= 3)).toHaveLength(5);
     expect(climbs.find((r) => r.id === "ventoux-bedoin")?.distanceKm).toBe(21);

@@ -1,0 +1,20 @@
+import type { WorkoutTemplate, Segment } from './types';
+const s=(label:string,minutes:number,resistance:string,cadence='libre',rpe='3–4'):Segment=>({label,minutes,resistance,cadence,rpe});
+function workout(id:string,name:string,kind:WorkoutTemplate['kind'],intensity:WorkoutTemplate['intensity'],description:string,segments:Segment[]):WorkoutTemplate {
+  const duration=segments.reduce((a,s)=>a+s.minutes,0);
+  return {id,name,kind,intensity,description,tagline:description,duration,points:duration<10?.5:duration<25?1:duration<=30?2:3,xp:Math.round(duration*2),segments};
+}
+// Cadences are authored in the catalogue reference scale. The common reader offset
+// (comfortable -15 by default) is applied exactly once, as for existing workouts.
+export const masteryWorkouts:WorkoutTemplate[]=[
+  workout('return-10','Reprendre doucement','recovery','easy','Dix minutes pour retrouver le mouvement. Aucun objectif de vitesse, aucun rattrapage.',[s('Réveil des jambes',3,'3–4','libre','2'),s('Un rythme confortable',4,'4–6','libre','2–3'),s('Relâcher',3,'3–4','libre','2')]),
+  workout('return-20','Retrouver ses repères','recovery','easy','Vingt minutes faciles pour évaluer ton confort après une pause.',[s('Se remettre en route',5,'4–5','libre','2'),s('Respirer tranquillement',10,'5–7','70–85','2–3'),s('Finir détendu',5,'3–5','libre','2')]),
+  workout('steady-15','Le métronome','endurance','easy','Garde une cadence régulière sur trois petits plateaux. La précision prime sur la vitesse.',[s('Mise en route',3,'4–6','libre','2'),s('Plateau calme',3,'6–7','75–85'),s('Même rythme, petite bosse',3,'7–9','75–85'),s('Retrouver la souplesse',3,'6–7','75–85'),s('Retour au calme',3,'4–5','libre','2')]),
+  workout('steady-25','La ligne tranquille','endurance','easy','Une cadence stable pendant quinze minutes, avec une résistance légèrement ondulante.',[s('Installation',5,'4–6','libre','2'),s('Régularité I',5,'6–8','75–85'),s('Régularité II',5,'7–9','75–85'),s('Régularité III',5,'6–8','75–85'),s('Relâchement',5,'4–5','libre','2')]),
+  workout('manage-20','Garder une réserve','progressive','easy','Pars avec retenue et cherche à finir aussi proprement que tu as commencé.',[s('Départ retenu',4,'4–6','libre','2'),s('Première moitié',6,'6–8','75–85'),s('Seconde moitié maîtrisée',6,'7–9','75–85'),s('Retour au calme',4,'4–6','libre','2')]),
+  workout('manage-30','Finir avec aisance','progressive','moderate','Deux plateaux comparables pour travailler la gestion de l’effort, sans sprint final.',[s('Préparer le souffle',5,'5–7','libre','2–3'),s('Plateau I',10,'8–10','80–90','4–5'),s('Plateau II',10,'9–11','80–90','4–5'),s('Récupération',5,'4–6','libre','2')]),
+  workout('control-waves-18','Petites bosses, rythme stable','hills','moderate','La résistance change, mais la cadence reste dans la même fenêtre. Allège si le geste se dégrade.',[s('Départ',3,'4–6','libre','2'),s('Bosse I',3,'8–10','75–85','4'),s('Creux',3,'5–7','75–85','3'),s('Bosse II',3,'9–11','75–85','4–5'),s('Sortie de bosse',3,'6–8','75–85','3'),s('Retour au calme',3,'4–5','libre','2')]),
+  workout('comfort-35','Un peu plus longtemps','endurance','easy','Un roulage facile prolongé. La durée est le défi ; conserve un souffle confortable.',[s('Mise en route',5,'4–6','libre','2'),s('Trouver son rythme',10,'6–8','75–85'),s('Conserver son confort',15,'6–8','75–85'),s('Finir doucement',5,'4–5','libre','2')]),
+  workout('precision-6','Six minutes de précision','ladder','easy','Un format express pour suivre deux petites variations de cadence, sans chercher la puissance.',[s('Départ souple',1,'4–5','libre','2'),s('Première cible',2,'5–7','75–85'),s('Seconde cible',2,'5–7','80–90'),s('Relâcher',1,'4–5','libre','2')]),
+  workout('waves-8','Huit minutes ondulées','hills','moderate','Deux petites bosses avec des récupérations. Un complément court, pas une obligation quotidienne.',[s('Départ',2,'4–6','libre','2'),s('Première bosse',1,'9–11','75–85','4–5'),s('Creux',1,'5–6','libre','2'),s('Deuxième bosse',1,'10–12','75–85','4–5'),s('Retour au calme',3,'4–6','libre','2')])
+];

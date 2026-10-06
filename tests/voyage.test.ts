@@ -24,10 +24,10 @@ const withSessions = (sessions: CompletedSession[]) => ({ ...emptyState(), sessi
 describe("Voyage coverage and rewards", () => {
   it("adds distinct trophies without changing the 67 historic goals", () => {
     const all = badges(emptyState());
-    const old = all.filter(b => !b.id.startsWith("voyage-") && !b.id.startsWith("alsace-") && !b.id.startsWith("campaign-alsace-"));
-    expect(old).toHaveLength(67); expect(all).toHaveLength(74);
+    const old = all.filter(b => !["program-return-in-comfort", "program-steady-mastery", "program-manage-your-ride"].includes(b.id) && !b.id.startsWith("voyage-") && !b.id.startsWith("alsace-") && !b.id.startsWith("campaign-alsace-"));
+    expect(old).toHaveLength(67); expect(all).toHaveLength(77);
     for (const trophy of all.filter(b => b.id.startsWith("voyage-"))) expect(old.some(b => b.name === trophy.name)).toBe(false);
-    expect(new Set(all.map(b => b.id)).size).toBe(74);
+    expect(new Set(all.map(b => b.id)).size).toBe(77);
   });
   it("cuts a real distance at 15 km/h without shortening the parent route", () => {
     const before = JSON.stringify(route);

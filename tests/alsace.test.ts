@@ -23,9 +23,9 @@ describe("source-pinned Alsace stages and independent escapes", () => {
     for (const campaign of baseline.campaigns) expect(campaigns.find(c => c.id === campaign.id)).toEqual(campaign);
     const current = badges(emptyState());
     for (const badge of baseline.badges) expect(current.find(b => b.id === badge.id)).toEqual(badge);
-    expect(current).toHaveLength(74);
-    expect(new Set(current.map(b => b.id)).size).toBe(74);
-    expect(new Set(current.map(b => b.name)).size).toBe(74);
+    expect(current).toHaveLength(77);
+    expect(new Set(current.map(b => b.id)).size).toBe(77);
+    expect(new Set(current.map(b => b.name)).size).toBe(77);
   });
 
   it("uses only the reviewed continuous source section and keeps ordered real-distance places", () => {

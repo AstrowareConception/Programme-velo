@@ -1,3 +1,4 @@
+import { normalizeProgram, normalizePlans, normalizeHabits, normalizeJourneys } from "./adaptive-program";
 import { defaultPreferences, emptyState, currentProgramWeek, normalizeWeeklyGoals } from "./data";
 import type { AppState, Preferences } from "./types";
 import type { ClimbChallenge } from "./routes";
@@ -34,7 +35,7 @@ function normalizePreferences(value: unknown): Preferences {
     keepScreenAwake: bool("keepScreenAwake"),
     keepTelemetryTrace: bool("keepTelemetryTrace"),
     resistanceOffset: Math.max(-4, Math.min(4, numberOrUndefined(raw.resistanceOffset) ?? defaultPreferences.resistanceOffset)),
-    cadenceOffset: [-15, 0, 10].includes(Number(raw.cadenceOffset)) ? Number(raw.cadenceOffset) : -15,
+    cadenceOffset: typeof raw.cadenceOffset === "number" && Number.isFinite(raw.cadenceOffset) ? Math.max(-25, Math.min(10, Math.round(raw.cadenceOffset / 5) * 5)) : -15,
     cueVolume: Math.max(0, Math.min(100, numberOrUndefined(raw.cueVolume) ?? 65)),
     cueFrequency: raw.cueFrequency === "changes" ? "changes" : "all",
     announceUpcoming: bool("announceUpcoming"),
@@ -58,6 +59,10 @@ export function normalizeState(value: unknown): AppState {
   };
 
   return {
+    program: normalizeProgram(value.program),
+    programPlans: normalizePlans(value.programPlans),
+    habits: normalizeHabits(value.habits),
+    journeys: normalizeJourneys(value.journeys),
     weeklyGoals: normalizeWeeklyGoals(value.weeklyGoals, currentProgramWeek(profile.startDate)),
     profile,
     guidance: normalizeGuidance(value.guidance),

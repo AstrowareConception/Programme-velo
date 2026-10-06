@@ -8,7 +8,7 @@ export function WorkoutProgramsPanel({ sessions, workouts, onLaunch }: {
 }) {
   const templates = new Map(workouts.map((workout) => [workout.id, workout]));
   return <details className="campaignDrawer workoutPrograms">
-    <summary>Programmes découverte · 3 chemins pour progresser</summary>
+    <summary>Programmes découverte · {workoutPrograms.length} chemins pour progresser</summary>
     <p>Choisis tes séances dans l’ordre qui te convient, sans calendrier imposé. Seules les séances complètes comptent. Chaque programme donne un trophée et un bonus unique ; une même séance peut contribuer à deux programmes.</p>
     <div className="campaignGrid">
       {workoutPrograms.map((program) => {

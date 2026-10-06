@@ -1,3 +1,4 @@
+import { recentFeedback, targetRpe } from "./adaptive-program";
 import type { AppState, WeekTarget, WorkoutTemplate } from "./types";
 import { guidanceSessions } from "./onboarding";
 
@@ -63,7 +64,9 @@ export function recommendAdaptiveWorkout({
   const lastTemplateId = recent[0]?.templateId;
   const discovering = state.guidance?.status === "active" && guidanceSessions(state, now).length < 3;
 
+  const feedback = recentFeedback(state, workouts, now);
   const recoveryNeeded =
+    feedback.difficult || feedback.returnAfterBreak ||
     discovering ||
     energy === "easy" ||
     last72.length >= 4 ||
@@ -99,7 +102,7 @@ export function recommendAdaptiveWorkout({
     if (workout.id === lastTemplateId) score -= 22;
     if (state.guidance?.status === "active" && state.guidance.goal === "endurance" && workout.kind === "endurance" && !recoveryNeeded) score += 8;
     if (varietyMissing > 0 && !recent.slice(0,6).some((session) => session.kind === workout.kind)) score += 18;
-    if (pointsMissing >= 4 && workout.points >= 3 && !recoveryNeeded) score += 10;
+    // Game points never raise training intensity.
 
     return { workout, score };
   }).sort((a,b) => b.score - a.score);
@@ -108,6 +111,8 @@ export function recommendAdaptiveWorkout({
   const reasons: string[] = [];
 
   if (recoveryNeeded) {
+    if (feedback.difficult) reasons.push("Ton ressenti a dépassé les consignes récentes : une séance plus facile est proposée.");
+    if (feedback.returnAfterBreak) reasons.push("Après une interruption, retrouve tes repères sans rattrapage.");
     if (discovering) reasons.push("Tes trois premiers repères se construisent avec des séances faciles.");
     if (energy === "easy") reasons.push("Tu as demandé une journée tranquille.");
     if (last72.length >= 4) reasons.push(`${last72.length} séances sur les 72 dernières heures : priorité à l’assimilation.`);
@@ -132,8 +137,8 @@ export function recommendAdaptiveWorkout({
   const sameWorkoutAvgRpe = average(sameWorkoutRpe);
   const suggestedResistanceDelta: -1 | 0 | 1 =
     discovering ? 0 :
-    sameWorkoutRpe.length >= 2 && sameWorkoutAvgRpe !== undefined && sameWorkoutAvgRpe <= 5.5 ? 1 :
-    sameWorkoutRpe.length >= 2 && sameWorkoutAvgRpe !== undefined && sameWorkoutAvgRpe >= 9 ? -1 : 0;
+    sameWorkoutRpe.length >= 2 && sameWorkoutAvgRpe !== undefined && sameWorkoutAvgRpe < (targetRpe(workout) ?? 4) - 1 ? 1 :
+    sameWorkoutRpe.length >= 2 && sameWorkoutAvgRpe !== undefined && sameWorkoutAvgRpe > (targetRpe(workout) ?? 4) + 1.5 ? -1 : 0;
 
   const rpeCount = recent.filter((session) => typeof session.rpe === "number").length;
   const personalization = rpeCount >= 8 ? "personalized" : rpeCount >= 3 ? "learning" : "initial";
