@@ -319,6 +319,7 @@ test("coach score, combos and BPM above 100 survive deliberate saving and reload
   await page.getByRole("button", { name: /Séances/ }).click();
   await page.getByRole("heading", { name: "Décrassage" }).locator("xpath=ancestor::article").getByRole("button", { name: "Voir / démarrer" }).click();
   await page.clock.install();
+  await page.evaluate(() => (window as any).__emitBike(80, 148));
   await page.getByRole("button", { name: "Démarrer la séance" }).click();
   await page.evaluate(() => { (window as any).__rpm = 80; (window as any).__emitBike(80, 148); setInterval(() => (window as any).__emitBike((window as any).__rpm, 148), 500); });
   await page.clock.runFor(31_000);

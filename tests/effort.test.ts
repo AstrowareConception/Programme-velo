@@ -49,3 +49,7 @@ it("compares only matching settings and qualified completed attempts", () => {
   expect(bestCadenceAttempt([attempt], "other")).toBeUndefined();
   expect(bestCadenceAttempt([{ ...attempt, metrics: { ...attempt.metrics!, cadenceRecordEligible: false } }], key)).toBeUndefined();
 });
+it("reads sparse segment histories after a JSON round trip", () => {
+  const score = addCadenceInterval(emptyCadenceScore(), 2, "libre", 65, 70);
+  expect(cadenceSummary(JSON.parse(JSON.stringify(score)))).toMatchObject({ percent: 100, measuredSeconds: 65 });
+});
