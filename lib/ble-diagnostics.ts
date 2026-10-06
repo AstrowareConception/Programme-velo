@@ -11,9 +11,9 @@ type Characteristic = {
   properties: Partial<Record<typeof propertyNames[number], boolean>>;
   readValue(): Promise<DataView>;
 };
-type Server = { getPrimaryService(id: number): Promise<{ getCharacteristics(): Promise<Characteristic[]> }> };
+type Server = { getPrimaryService(id: string): Promise<{ getCharacteristics(): Promise<Characteristic[]> }> };
 export type DiagnosticDevice = { gatt?: { connect(): Promise<Server>; disconnect(): void } };
-export type DiagnosticBluetooth = { requestDevice(options: { acceptAllDevices: true; optionalServices: number[] }): Promise<DiagnosticDevice> };
+export type DiagnosticBluetooth = { requestDevice(options: { acceptAllDevices: true; optionalServices: string[] }): Promise<DiagnosticDevice> };
 export type BleDiagnosticReport = {
   schemaVersion: 1;
   scope: "standard-services-only";
@@ -89,7 +89,7 @@ export async function diagnoseBle(bluetooth: DiagnosticBluetooth, signal?: Abort
   try {
     ensureActive();
     // Must run immediately within the user's click, before any awaited availability check.
-    device = await bounded(bluetooth.requestDevice({ acceptAllDevices: true, optionalServices: [...DIAGNOSTIC_SERVICES] }), late => late.gatt?.disconnect());
+    device = await bounded(bluetooth.requestDevice({ acceptAllDevices: true, optionalServices: DIAGNOSTIC_SERVICES.map(uuid) }), late => late.gatt?.disconnect());
     operation = { stage: "gatt-connection" };
     if (!device.gatt) throw new Error("GATT unavailable");
     const server = await bounded(device.gatt.connect(), disconnect);
@@ -99,7 +99,7 @@ export async function diagnoseBle(bluetooth: DiagnosticBluetooth, signal?: Abort
       const entry: BleDiagnosticReport["services"][number] = { uuid: uuid(id), status: "unavailable", characteristics: [] };
       report.services.push(entry);
       let service;
-      try { service = await bounded(server.getPrimaryService(id)); entry.status = "present"; }
+      try { service = await bounded(server.getPrimaryService(uuid(id))); entry.status = "present"; }
       catch (error) { entry.status = status(error); entry.errorName = bleErrorName(error); rethrowStop(error); continue; }
       let characteristics;
       operation = { stage: "characteristic-discovery", serviceUuid: uuid(id) };

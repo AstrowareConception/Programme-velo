@@ -23,9 +23,9 @@ async function setup(page: Page, mode: "ftms" | "sport02" | "absent" | "cancelle
         if (mode === "cancelled") throw new DOMException("PRIVATE_ERROR", "NotFoundError");
         if (mode === "pending") return new Promise(() => {});
         return { name: "PRIVATE_BIKE", id: "PRIVATE_ID", gatt: {
-          async connect() { return { async getPrimaryService(id: number) {
+          async connect() { return { async getPrimaryService(id: string) {
             if (mode === "service-timeout") return new Promise(() => {});
-            if (id !== 0x1826 || mode === "absent") throw new DOMException("PRIVATE_ERROR", "NotFoundError");
+            if (id !== uuid(0x1826) || mode === "absent") throw new DOMException("PRIVATE_ERROR", "NotFoundError");
             return { async getCharacteristics() {
               if (mode === "characteristic-timeout") return new Promise(() => {});
               return chars;
