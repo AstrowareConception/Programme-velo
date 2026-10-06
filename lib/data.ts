@@ -314,7 +314,7 @@ export function normalizeWeeklyGoals(raw: unknown, currentWeek: number): WeekTar
 }
 
 export function changeWeeklyGoals(state: AppState, currentWeek: number, sessions: number, minutesPerSession: number): AppState {
-  return { ...state, weeklyGoals: weekTargets.map(legacy => legacy.week < currentWeek ? { ...weekTargetFor(state, legacy.week) } : personalWeekTarget(legacy.week, sessions, minutesPerSession)) };
+  return { ...state, programPlans: state.programPlans?.filter(plan => plan.week < currentWeek), weeklyGoals: weekTargets.map(legacy => legacy.week < currentWeek ? { ...weekTargetFor(state, legacy.week) } : personalWeekTarget(legacy.week, sessions, minutesPerSession)) };
 }
 
 export function emptyState(): AppState {

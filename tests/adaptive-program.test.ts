@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { emptyState, workouts, totalXp } from '../lib/data';
+import { emptyState, workouts, totalXp, changeWeeklyGoals } from '../lib/data';
 import { acceptPlan, buildProgramPlan, normalizeProgram, normalizePlans, normalizeHabits, normalizeJourneys, recentFeedback, weightTrend, comfortableCadence, completedPlannedRide, recalculatePlan } from '../lib/adaptive-program';
 import { createBackup, parseBackup } from '../lib/storage';
 import { masteryWorkouts } from '../lib/mastery-workouts';
@@ -19,6 +19,11 @@ describe('personal programme',()=>{
   expect(templates.every(w=>w.intensity==='easy' && w.duration<=30)).toBe(true);
   expect(p.target.minutes).toBe(templates.reduce((a,w)=>a+w.duration,0));
   const adopted=acceptPlan(s,p,settings);expect(adopted.sessions).toBe(s.sessions);expect(adopted.weeklyGoals?.[1]).toEqual(s.weeklyGoals?.[1]);expect(totalXp(adopted)).toBe(totalXp(s));
+ });
+ it('clears only current and future plans when manual weekly goals replace them',()=>{
+  let s=acceptPlan(state(),buildProgramPlan(state(),settings,1,workouts,now),settings);
+  s=acceptPlan(s,buildProgramPlan(s,settings,2,workouts,now),settings);
+  const changed=changeWeeklyGoals(s,2,3,20);expect(changed.programPlans?.map(p=>p.week)).toEqual([1]);expect(changed.weeklyGoals?.[1].minutes).toBe(60);expect(changed.sessions).toBe(s.sessions);
  });
  it('uses recovery weeks and an interruption without inventing catch-up debt',()=>{
   const s=state(); const p=buildProgramPlan(s,settings,4,workouts,now);expect(p.phase).toBe('Consolidation douce');expect(p.target.minutes).toBeLessThanOrEqual(75);
