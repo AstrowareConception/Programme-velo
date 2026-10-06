@@ -105,4 +105,36 @@ describe("read-only BLE inventory", () => {
     expect((await pending).outcome).toBe("timeout");
     expect(f.disconnect).toHaveBeenCalled();
   });
+  it("does not claim a service is present when its discovery times out", async () => {
+    vi.useFakeTimers();
+    const f = fixture();
+    f.getPrimaryService.mockImplementation(() => new Promise(() => {}));
+    const pending = diagnoseBle(f.bluetooth);
+    await vi.advanceTimersByTimeAsync(15_001);
+    const report = await pending;
+    expect(report).toMatchObject({ outcome: "timeout", failure: { stage: "service-discovery", serviceUuid: uuid(0x1826), errorName: "TimeoutError" } });
+    expect(report.services).toEqual([{ uuid: uuid(0x1826), status: "unavailable", characteristics: [], errorName: "TimeoutError" }]);
+    expect(f.service.getCharacteristics).not.toHaveBeenCalled();
+    expect(f.disconnect).toHaveBeenCalled();
+  });
+  it("keeps a confirmed service present when only characteristic discovery times out", async () => {
+    vi.useFakeTimers();
+    const f = fixture();
+    f.service.getCharacteristics.mockImplementation(() => new Promise(() => {}));
+    const pending = diagnoseBle(f.bluetooth);
+    await vi.advanceTimersByTimeAsync(15_001);
+    const report = await pending;
+    expect(report.failure).toEqual({ stage: "characteristic-discovery", serviceUuid: uuid(0x1826), errorName: "TimeoutError" });
+    expect(report.services[0]).toMatchObject({ status: "present", characteristicStatus: "unavailable", errorName: "TimeoutError" });
+    expect(f.featureRead).not.toHaveBeenCalled();
+  });
+  it("exports only known platform codes, never arbitrary error names", async () => {
+    const f = fixture();
+    const error = new Error("SECRET message");
+    error.name = "SECRET_NAME";
+    f.device.gatt.connect.mockRejectedValue(error);
+    const report = await diagnoseBle(f.bluetooth);
+    expect(report.failure).toEqual({ stage: "gatt-connection", errorName: "UnknownError" });
+    expect(JSON.stringify(report)).not.toContain("SECRET");
+  });
 });

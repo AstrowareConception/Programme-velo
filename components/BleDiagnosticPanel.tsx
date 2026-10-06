@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { diagnoseBle, type BleDiagnosticReport, type DiagnosticBluetooth } from "@/lib/ble-diagnostics";
 import { hasWebBluetooth, webBluetoothHint } from "@/lib/ftms";
+import { describeBleFailure } from "@/lib/ble-failure";
 
 export function BleDiagnosticPanel({ disabled, onBusyChange }: { disabled: boolean; onBusyChange: (busy: boolean) => void }) {
   const [report, setReport] = useState<BleDiagnosticReport | null>(null);
@@ -60,9 +61,11 @@ export function BleDiagnosticPanel({ disabled, onBusyChange }: { disabled: boole
     <p className="finePrint">Périmètre : FTMS, fréquence cardiaque, cadence/vitesse et puissance cycliste. Les services propriétaires non autorisés ne sont pas visibles ici. Un service inaccessible ne prouve pas son absence.</p>
     {report && <div role="status">
       <p><strong>Qualification physique : non établie.</strong> {report.outcome === "inspected" ? "Inventaire terminé, connexion fermée." : "Inventaire incomplet ou annulé. Vérifie les permissions, le réveil du vélo et les autres applications connectées."}</p>
+      {report.failure && <p>Étape interrompue : <strong>{describeBleFailure(report.failure)}</strong> La présence d’un service n’est confirmée qu’après sa découverte réussie.</p>}
       <ul>{report.services.map(service => <li key={service.uuid}>
         {service.uuid.slice(4, 8).toUpperCase()} : {service.status === "present" ? service.characteristicStatus === "present" ? `${service.characteristics.length} caractéristique(s) visible(s)` : "service présent, caractéristiques inaccessibles" : service.status === "not-found" ? "non trouvé lors de cet essai" : "inaccessible lors de cet essai"}
       </li>)}</ul>
+      {report.outcome !== "inspected" && <p>Pour réessayer : ferme les autres applications et onglets Bluetooth, réveille la console, puis relance l’inventaire. Si l’échec se répète, exporte ce rapport et précise ton appareil, ton système et ton navigateur ; aucun contrôle de résistance n’a été envoyé.</p>}
       {report.ftms.featureStatus === "read" && <p>Commande de résistance annoncée : {(report.ftms.targetSettingsBits ?? 0) & 4 ? "oui, à tester séparément" : "non"}.</p>}
       {report.ftms.resistanceRange && <p>Plage FTMS annoncée : <strong>{report.ftms.resistanceRange.min}–{report.ftms.resistanceRange.max}</strong>, pas {report.ftms.resistanceRange.increment}. Ces unités restent à comparer aux niveaux de la console.</p>}
       <details><summary>Voir le rapport technique</summary><pre style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>{JSON.stringify(report, null, 2)}</pre></details>

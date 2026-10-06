@@ -6,7 +6,7 @@ Le 4 octobre 2026, la commande Amazon rapportée par Térence décrit un vélo T
 
 - [PR #16](https://github.com/AstrowareConception/Programme-velo/pull/16) : simulateur logiciel FTMS 1–32, anciennement nommé « Fake TEB5 ». Ce nom n’était pas une qualification constructeur.
 - [PR #28](https://github.com/AstrowareConception/Programme-velo/pull/28) : aucun vélo physique qualifié.
-- Ce lot : diagnostic et tests logiciels uniquement. **Aucun TOPUTURE physique connecté ou testé.**
+- Premier essai réel transmis par Térence le 6 octobre : inventaire interrompu par un délai et laboratoire FTMS inaccessible. La version `9208763` pouvait afficher « service présent » prématurément ; aucune caractéristique FTMS ni télémétrie n’est confirmée. **Qualification physique non établie.**
 
 ## Audit des hypothèses
 
@@ -73,3 +73,22 @@ Commandes : `npm run typecheck`, `npm test`, `npm run test:e2e`, `npm run build`
 Retour arrière : révoquer la connexion et supprimer le JSON local si exporté ; pour retirer le lot logiciel après fusion, revert du commit de fusion. Aucun schéma ni historique à restaurer ; aucune dépendance ou variable d’environnement ajoutée. Aucun changement des règles Voyage dans ce lot.
 
 Références techniques : [Web Bluetooth, permissions et services optionnels (Chrome)](https://developer.chrome.com/docs/capabilities/bluetooth), [Fitness Machine Service (Bluetooth SIG)](https://www.bluetooth.com/specifications/specs/fitness-machine-service-1-0/). Ces références définissent les interfaces ; elles ne certifient aucun modèle TOPUTURE.
+## Diagnostic interrompu lors du premier essai
+
+Si le rapport contient `outcome: "timeout"`, aucune compatibilité n'est établie.
+La version initiale `9208763` créait trop tôt une entrée `status: "present"` :
+un service listé sans `characteristicStatus` pouvait encore être en cours de découverte.
+Ne pas interpréter ce premier rapport comme la preuve que FTMS existe sur le vélo.
+
+Le diagnostic corrigé confirme `present` seulement après une découverte réussie.
+Il exporte l'étape interrompue (`failure.stage`), les UUID concernés et un code
+d'erreur connu du navigateur, sans message brut ni identifiant d'appareil.
+Le laboratoire FTMS indique aussi l'étape et distingue notamment `NotFoundError`,
+`NetworkError`, `SecurityError` et `TimeoutError`.
+
+Fermer les autres applications et onglets connectés au vélo, réveiller la console
+puis retenter l'inventaire. Si l'échec se répète, transmettre le nouveau JSON,
+le système et le navigateur. Un second essai sur un autre appareil compatible
+permet de comparer les environnements, sans conclure à la cause à partir d'un seul échec.
+Ne pas demander le contrôle ni tenter de commande propriétaire pour contourner
+un échec de découverte.

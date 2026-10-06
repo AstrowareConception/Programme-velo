@@ -1,4 +1,5 @@
 import { parseResistanceRange, type ResistanceRange } from "./ftms";
+import { bleErrorName, type BleFailure, type BleOperation } from "./ble-failure";
 
 // Only these standard services are requested. No Device Information / serial numbers.
 export const DIAGNOSTIC_SERVICES = [0x1826, 0x180d, 0x1816, 0x1818] as const;
@@ -18,11 +19,13 @@ export type BleDiagnosticReport = {
   scope: "standard-services-only";
   qualification: "not-qualified";
   outcome: "inspected" | "cancelled-or-not-selected" | "not-authorized" | "unavailable" | "timeout";
+  failure?: BleFailure;
   services: {
     uuid: string;
     status: Status;
     characteristics: { uuid: string; properties: string[] }[];
     characteristicStatus?: Status;
+    errorName?: string;
   }[];
   ftms: {
     featureStatus?: "read" | "invalid" | "unavailable";
@@ -50,6 +53,7 @@ export async function diagnoseBle(bluetooth: DiagnosticBluetooth, signal?: Abort
   };
   let device: DiagnosticDevice | undefined;
   let stopped = false;
+  let operation: BleOperation = { stage: "device-selection" };
   const disconnect = () => { try { device?.gatt?.disconnect(); } catch {} };
   const abortError = () => new DOMException("Diagnostic stopped", "AbortError");
   const abort = () => { stopped = true; disconnect(); };
@@ -84,18 +88,22 @@ export async function diagnoseBle(bluetooth: DiagnosticBluetooth, signal?: Abort
     ensureActive();
     // Must run immediately within the user's click, before any awaited availability check.
     device = await bounded(bluetooth.requestDevice({ acceptAllDevices: true, optionalServices: [...DIAGNOSTIC_SERVICES] }), late => late.gatt?.disconnect());
+    operation = { stage: "gatt-connection" };
     if (!device.gatt) throw new Error("GATT unavailable");
     const server = await bounded(device.gatt.connect(), disconnect);
     for (const id of DIAGNOSTIC_SERVICES) {
       ensureActive();
-      const entry: BleDiagnosticReport["services"][number] = { uuid: uuid(id), status: "present", characteristics: [] };
+      operation = { stage: "service-discovery", serviceUuid: uuid(id) };
+      const entry: BleDiagnosticReport["services"][number] = { uuid: uuid(id), status: "unavailable", characteristics: [] };
       report.services.push(entry);
       let service;
-      try { service = await bounded(server.getPrimaryService(id)); }
-      catch (error) { rethrowStop(error); entry.status = status(error); continue; }
+      try { service = await bounded(server.getPrimaryService(id)); entry.status = "present"; }
+      catch (error) { entry.status = status(error); entry.errorName = bleErrorName(error); rethrowStop(error); continue; }
       let characteristics;
+      operation = { stage: "characteristic-discovery", serviceUuid: uuid(id) };
+      entry.characteristicStatus = "unavailable";
       try { characteristics = await bounded(service.getCharacteristics()); entry.characteristicStatus = "present"; }
-      catch (error) { rethrowStop(error); entry.characteristicStatus = status(error); continue; }
+      catch (error) { entry.characteristicStatus = status(error); entry.errorName = bleErrorName(error); rethrowStop(error); continue; }
       for (const characteristic of characteristics) {
         ensureActive();
         const characteristicUuid = characteristic.uuid.toLowerCase();
@@ -104,6 +112,7 @@ export async function diagnoseBle(bluetooth: DiagnosticBluetooth, signal?: Abort
         entry.characteristics.push({ uuid: characteristicUuid, properties: propertyNames.filter(key => characteristic.properties[key] === true) });
         if (id !== 0x1826) continue;
         if (characteristicUuid === uuid(0x2acc)) {
+          operation = { stage: "characteristic-read", serviceUuid: uuid(id), characteristicUuid };
           try {
             const value = await bounded(characteristic.readValue());
             report.ftms.featureStatus = value.byteLength >= 8 ? "read" : "invalid";
@@ -114,6 +123,7 @@ export async function diagnoseBle(bluetooth: DiagnosticBluetooth, signal?: Abort
           } catch (error) { rethrowStop(error); report.ftms.featureStatus = "unavailable"; }
         }
         if (characteristicUuid === uuid(0x2ad6)) {
+          operation = { stage: "characteristic-read", serviceUuid: uuid(id), characteristicUuid };
           try {
             report.ftms.resistanceRange = parseResistanceRange(await bounded(characteristic.readValue()));
             report.ftms.rangeStatus = report.ftms.resistanceRange ? "read" : "invalid";
@@ -122,6 +132,7 @@ export async function diagnoseBle(bluetooth: DiagnosticBluetooth, signal?: Abort
       }
     }
   } catch (error) {
+    report.failure = { ...operation, errorName: bleErrorName(error) };
     const name = errorName(error);
     report.outcome = name === "TimeoutError" ? "timeout"
       : ["AbortError", "NotFoundError"].includes(name) ? "cancelled-or-not-selected"

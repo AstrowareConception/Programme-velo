@@ -79,6 +79,17 @@ describe("generic FTMS adapter", () => {
     await expect(connectFtmsBike(() => {})).rejects.toThrow();
     expect(f.disconnect).toHaveBeenCalled();
   });
+  it.each(["NotFoundError", "NetworkError", "SecurityError"])("preserves the service-discovery error code %s without raw details", async name => {
+    const f = fixture();
+    f.getPrimaryService.mockRejectedValue(new DOMException("SECRET serial / address", name));
+    let message = "";
+    try { await connectFtmsBike(() => {}); } catch (error) { message = (error as Error).message; }
+    expect(message).toContain("découverte du service 0x1826");
+    expect(message).toContain(name);
+    expect(message).not.toContain("SECRET");
+    expect(f.disconnect).toHaveBeenCalled();
+    expect(f.write).not.toHaveBeenCalled();
+  });
   it("rejects a refused control ACK and never enables resistance", async () => {
     fixture({ result: 5 });
     const bike = await connectFtmsBike(() => {});
