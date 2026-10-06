@@ -7,7 +7,7 @@ Lot préparé depuis main `58a8769bab262903918757bdbe9c29306476d389` (correctif 
 Cinq nouvelles photos créditées : Ventoux, Galibier, Estérel, Obernai et Eguisheim. Dix images, dix-sept parcours illustrés, 574 734 octets facultatifs ; compteur PWA et bouton de préparation suivent le manifeste. [Sources et points de vue](LANDSCAPE-PHOTOS.md). Les contrôles exacts, PR, fusion et version publique seront portés dans l’état de reprise externe après observation. La PR 29 matérielle reste séparée. Nantes constitue la prochaine piste de contenu, sans lot engagé ici.
 
 
-Actualisée le 5 octobre 2026. Le catalogue Estérel est intégré ; le confort du lecteur et le Voyage par portions sont décrits ci-dessous avec les prochaines fonctions. Les références exactes de contrôle, fusion et déploiement figurent dans le document externe d’état de reprise après vérification.
+Actualisée le 6 octobre 2026. Le catalogue Estérel est intégré ; le confort du lecteur et le Voyage par portions sont décrits ci-dessous avec les prochaines fonctions. Les références exactes de contrôle, fusion et déploiement figurent dans le document externe d’état de reprise après vérification.
 
 ## Socle disponible
 
@@ -37,18 +37,17 @@ Cinq photos azuréennes sur huit parcours existants : galeries fermées au dépa
 
 Paquet du build vérifié, compteur de photos et préparation facultative dans Plus ; nouvelle version en attente, consentement des onglets au repos et rechargement accompagné, reprise sauvegardée conservée. [Guide et limites](PWA-OFFLINE.md). Cartes externes et médias exclus ; stockage du navigateur révocable. Références de livraison consignées dans l’état externe après contrôle du commit exact et de la production.
 
-## Prochaine priorité : autres paysages
+## Prochaine priorité : canal de Nantes à Brest
 
-Étendre les photos documentées aux autres régions et aux grands cols, avec les mêmes repères, droits et budgets ; préparer ensuite le Vignoble d’Alsace et ses formats variés. L’enchaînement de plusieurs étapes et le carnet personnel viendront ensuite.
+Le Vignoble d’Alsace et l’extension aux grands cols sont intégrés dans le lot décrit en tête. Préparer les étapes du canal avec les mêmes contrôles de trace, relief et formats courts ; continuer les sélections photographiques documentées au fil des nouveaux packs. L’enchaînement de plusieurs étapes et le carnet personnel viendront ensuite.
 
 ## Packs de parcours suivants
 
 | Priorité | Ensemble | Apport attendu | État |
 | --- | --- | --- | --- |
-| 1 | Vignoble d’Alsace | Villages, vignes et ondulations ; extraits courts et étapes 2/5–3/5 | Sources touristiques repérées ; GPX et coupes à vérifier |
-| 2 | Canal de Nantes à Brest | Pontivy, Rohan, Josselin et écluses ; balades douces | GPX d’étapes publiés ; géométrie et relief à traiter |
-| 3 | Route des Grandes Alpes | Roselend, Izoard et regroupement avec les cols existants | Traces officielles repérées ; préserver tous les IDs précédents |
-| 4 | Ardèche | Balazuc, villages, gorges et reliefs variés | Parcours touristiques repérés ; sélection exacte à établir |
+| 1 | Canal de Nantes à Brest | Pontivy, Rohan, Josselin et écluses ; balades douces | GPX d’étapes publiés ; géométrie et relief à traiter |
+| 2 | Route des Grandes Alpes | Roselend, Izoard et regroupement avec les cols existants | Traces officielles repérées ; préserver tous les IDs précédents |
+| 3 | Ardèche | Balazuc, villages, gorges et reliefs variés | Parcours touristiques repérés ; sélection exacte à établir |
 
 Chaque pack devra proposer les mêmes informations locales : paysages, lieux réellement traversés ou proches clairement distingués, sources, distance, relief et limites. Difficultés fixées après analyse, pas avant. Les objectifs nouveaux doivent avoir une liste et un seuil stables ; les ajouts ne doivent pas déplacer un ancien trophée.
 
