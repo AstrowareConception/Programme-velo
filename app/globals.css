@@ -959,3 +959,4 @@ button:focus-visible, input:focus-visible, .fileButton:focus-within { outline: 2
   .workoutCard > .secondary { min-height: 48px; width: 100%; margin-top: auto; font-size: .85rem; }
 }
 .sessionEssentials .timer small { letter-spacing: .03em; line-height: 1.4; }
+.climbActions button { min-height: 44px; }
