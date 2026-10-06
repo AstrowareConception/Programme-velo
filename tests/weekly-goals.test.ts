@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { changeWeeklyGoals, emptyState, normalizeWeeklyGoals, personalWeekTarget, weekTargetFor, weekTargets } from "../lib/data";
+import { changeWeeklyGoals, emptyState, normalizeWeeklyGoals, personalWeekTarget, weekTargetFor, weekTargets, workouts, weeklyStats } from "../lib/data";
 import { createBackup, parseBackup } from "../lib/storage";
 describe("personal weekly goals", () => {
   it("defaults to four half-hour sessions without increasing the volume", () => {
@@ -25,4 +25,21 @@ describe("personal weekly goals", () => {
     expect(parseBackup(JSON.stringify(backup)).state.weeklyGoals).toEqual(state.weeklyGoals);
     expect(normalizeWeeklyGoals([{ week: 1, minutes: -5 }], 1)[0].minutes).toBe(120);
   });
+});
+
+it("keeps half points through weekly totals and backup without repricing previous sessions", () => {
+  const state = emptyState(); state.profile.startDate = "2026-10-01";
+  const w = workouts.find(w => w.id === "express-reset-3")!;
+  state.sessions = [0,1].map(i => ({id:String(i), templateId:w.id,date:"2026-10-02T12:00:00Z",duration:w.duration,points:w.points,xp:w.xp,intensity:w.intensity,kind:w.kind,bonus:false}));
+  state.sessions.push({...state.sessions[0],id:"historic",points:2});
+  expect(weeklyStats(state,1).points).toBe(3);
+  const restored = parseBackup(JSON.stringify(createBackup(state,[]))).state;
+  expect(restored.sessions.map(s => s.points)).toEqual([0.5,0.5,2]);
+  expect(weeklyStats(restored,1).points).toBe(3);
+});
+it("makes short sessions complements and values sustained easy sessions", () => {
+  expect(workouts.filter(w => w.duration < 10).every(w => w.points <= 0.5)).toBe(true);
+  expect(workouts.find(w => w.id === "calories-10")!.points).toBe(1);
+  expect(workouts.filter(w => !w.bonus && w.intensity === "easy" && w.duration >= 25 && w.duration <= 30).every(w => w.points === 2)).toBe(true);
+  expect(workouts.filter(w => w.bonus).every(w => w.points === 0)).toBe(true);
 });

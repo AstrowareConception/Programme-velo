@@ -993,3 +993,7 @@ button:focus-visible, input:focus-visible, .fileButton:focus-within { outline: 2
 
 .calorieLive { display: grid; gap: 6px; text-align: center; padding: 12px; border: 1px solid #66dfcb; border-radius: 16px; margin: 10px 0; }
 .calorieLive strong { font-size: 2.5rem; color: #b1ff56; }
+
+/* Consistent separation for every top-level settings block, including conditional cards. */
+.morePage { display:grid; grid-template-columns:minmax(0,1fr); gap:20px; }
+.morePage > * { min-width:0; margin-block:0; }

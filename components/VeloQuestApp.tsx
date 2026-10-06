@@ -1460,7 +1460,7 @@ export function VeloQuestApp() {
                 <p className="eyebrow">RECOMMANDATION</p>
                 <h2>{recommendation.name}</h2>
                 <p>{recommendation.tagline}</p>
-                <div className="chips"><span>{recommendation.duration} min</span><span>{recommendation.points} pts</span><span>{recommendation.xp} XP</span><span>{recommendation.intensity === "hard" ? "intense" : recommendation.intensity === "moderate" ? "soutenu" : "facile"}</span><span>{adaptiveCoach.personalization === "personalized" ? "coach personnalisé" : adaptiveCoach.personalization === "learning" ? "coach en apprentissage" : "profil initial"}</span></div>
+                <div className="chips"><span>{recommendation.duration} min</span><span>{quantity(recommendation.points)} pt{recommendation.points > 1 ? "s" : ""}</span><span>{recommendation.xp} XP</span><span>{recommendation.intensity === "hard" ? "intense" : recommendation.intensity === "moderate" ? "soutenu" : "facile"}</span><span>{adaptiveCoach.personalization === "personalized" ? "coach personnalisé" : adaptiveCoach.personalization === "learning" ? "coach en apprentissage" : "profil initial"}</span></div>
                 <div className="coachReasons">{adaptiveCoach.reasons.slice(0,3).map((reason) => <span key={reason}>• {reason}</span>)}</div>
                 {adaptiveCoach.suggestedResistanceDelta !== 0 && <div className="coachTune">Ajustement proposé pour cette séance : <strong>{adaptiveCoach.suggestedResistanceDelta > 0 ? "+" : ""}{adaptiveCoach.suggestedResistanceDelta} niveau</strong> d’après tes RPE précédents.</div>}
               </div>
@@ -1491,6 +1491,7 @@ export function VeloQuestApp() {
       {tab === "sessions" && (
         <section>
           <div className="pageHead pageHeadActions"><div><p className="eyebrow">CATALOGUE</p><h1>Choisis ta quête</h1><p>Du décrassage au HIIT. Le ressenti reste prioritaire sur le numéro de résistance.</p></div><button className="secondary" onClick={openManualLog}>+ Enregistrer une séance déjà faite</button></div>
+          <p className="finePrint">Les formats express de moins de 10 min rapportent 0,5 point : des compléments à tes séances principales. Les bonus récupération restent à 0 point. Les points des séances déjà enregistrées sont conservés.</p>
           <WorkoutProgramsPanel sessions={state.sessions} workouts={workouts} onLaunch={(workout) => launch(workout)} />
           <div className="workoutFilters">
             <button type="button" className="secondary" aria-pressed={expressOnly} onClick={() => setExpressOnly(value => !value)}>Express · moins de 10 min</button>
@@ -1509,7 +1510,7 @@ export function VeloQuestApp() {
                 <div className="sectionHead"><span className={`intensity ${w.intensity}`}>{w.intensity === "easy" ? "FACILE" : w.intensity === "moderate" ? "SOUTENU" : "DUR"}</span><strong>{w.duration} min</strong></div>
                 <h2>{w.name}</h2><p>{w.tagline}</p>
                 <p className="workoutBest"><strong>{isCalorieWorkout(w.id) ? `Record vélo : ${kcalBike ? kcalBike.kcal.toFixed(0) + " kcal · " + kcalBike.deviceName : "à établir"}` : best ? `Record coach : ${score.grade} · ${score.percent?.toFixed(1)} %` : "Record coach : à établir"}</strong><small>{isCalorieWorkout(w.id) ? `Record déclaré : ${kcalManual ? kcalManual.kcal.toFixed(0) + " kcal" : "à établir"} · ${w.duration} min complètes` : "À tes réglages actuels · séance complète"}</small></p>
-                <div className="chips"><span>{w.points} pts</span><span>{w.xp} XP</span><span>{w.segments.length} segments</span></div>
+                <div className="chips"><span>{quantity(w.points)} pt{w.points > 1 ? "s" : ""}</span><span>{w.xp} XP</span><span>{w.segments.length} segments</span></div>
                 <button className="secondary" onClick={() => launch(w)}>Voir / démarrer</button>
               </article>
             ); })}
@@ -1746,7 +1747,7 @@ export function VeloQuestApp() {
       )}
 
       {tab === "more" && (
-        <section>
+        <section className="morePage">
           <div className="pageHead"><p className="eyebrow">PLUS · VERSION {process.env.NEXT_PUBLIC_BUILD_COMMIT?.slice(0, 7)}</p><h1>Réglages, badges & données</h1><p>Tout ce qui personnalise VeloQuest sans encombrer la navigation principale.</p></div>
 
           <InstallCard />

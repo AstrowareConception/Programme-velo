@@ -7,6 +7,7 @@ it("provides complete short workouts at all intensities with unique stable IDs",
   expect(new Set(workouts.map(w => w.id)).size).toBe(workouts.length);
   expect(new Set(expressWorkouts.map(w => w.intensity))).toEqual(new Set(["easy", "moderate", "hard"]));
   for (const w of expressWorkouts) {
+    expect(w.points).toBe(0.5);
     expect(w.duration).toBeGreaterThanOrEqual(3); expect(w.duration).toBeLessThan(10);
     expect(w.segments.reduce((sum, s) => sum + s.minutes, 0)).toBeCloseTo(w.duration);
     expect(w.segments.every(s => s.minutes > 0)).toBe(true);

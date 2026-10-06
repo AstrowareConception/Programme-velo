@@ -13,7 +13,7 @@ export const discoveryWorkouts: WorkoutTemplate[] = [
   },
   {
     id: "contemplative-25", name: "Roulage contemplatif", tagline: "Vingt-cinq minutes pour pédaler sans te presser.",
-    kind: "endurance", duration: 25, points: 1, xp: 40, intensity: "easy",
+    kind: "endurance", duration: 25, points: 2, xp: 40, intensity: "easy",
     description: "Un format doux, facile à placer entre deux séances plus exigeantes. Garde une respiration confortable et ajuste le niveau pour rester à RPE 2–4.",
     segments: [
       { label: "Prendre son rythme", minutes: 5, resistance: "5–7", rpe: "2–3", cadence: "70–85" },
@@ -23,7 +23,7 @@ export const discoveryWorkouts: WorkoutTemplate[] = [
   },
   {
     id: "fluid-cadence-30", name: "Cadence fluide", tagline: "Changer de cadence, garder le même confort.",
-    kind: "ladder", duration: 30, points: 1, xp: 45, intensity: "easy",
+    kind: "ladder", duration: 30, points: 2, xp: 45, intensity: "easy",
     description: "Une échelle de cadence à faible résistance, sans sprint. La cadence est une proposition : réduis-la si le mouvement devient heurté et garde un RPE 3–4.",
     segments: [
       { label: "Mise en route", minutes: 5, resistance: "5–7", rpe: "2–3", cadence: "70–80" },
@@ -36,7 +36,7 @@ export const discoveryWorkouts: WorkoutTemplate[] = [
   },
   {
     id: "little-waves-40", name: "Petites vagues", tagline: "Deux ondulations, des récupérations et aucun mur.",
-    kind: "hills", duration: 40, points: 2, xp: 65, intensity: "moderate",
+    kind: "hills", duration: 40, points: 3, xp: 65, intensity: "moderate",
     description: "Une séance vallonnée accessible : deux petites montées séparées par du roulage facile. Les niveaux restent indicatifs ; conserve le contrôle du souffle et allège si nécessaire.",
     segments: [
       { label: "Départ roulant", minutes: 6, resistance: "6–8", rpe: "2–3", cadence: "75–90" },
@@ -103,7 +103,7 @@ export const discoveryWorkouts: WorkoutTemplate[] = [
   },
   {
     id: "nomadic-endurance-30", name: "Endurance nomade", tagline: "Des changements de rythme, toujours faciles.",
-    kind: "endurance", duration: 30, points: 1, xp: 45, intensity: "easy",
+    kind: "endurance", duration: 30, points: 2, xp: 45, intensity: "easy",
     description: "Alterne deux plages de pédalage régulier avec un passage plus souple. Aucun sprint : conserve RPE 2–4 et choisis une cadence confortable.",
     segments: [
       { label: "Départ", minutes: 5, resistance: "5–7", rpe: "2–3", cadence: "70–80" },

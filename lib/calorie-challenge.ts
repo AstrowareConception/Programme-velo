@@ -1,7 +1,7 @@
 import type { CompletedSession, WorkoutTemplate } from "./types";
 export const calorieWorkouts: WorkoutTemplate[] = [5, 10].map(minutes => ({
   id: `calories-${minutes}`, name: `Défi calories · ${minutes} min`, tagline: "Cadence libre, résistance libre : ton record en kcal sur un temps fixe.",
-  kind: "hiit", intensity: "hard", duration: minutes, points: 2, xp: minutes === 5 ? 15 : 25,
+  kind: "hiit", intensity: "hard", duration: minutes, points: minutes < 10 ? 0.5 : 1, xp: minutes === 5 ? 15 : 25,
   description: "Choisis ton rythme et ta résistance. Le chrono est continu ; un arrêt anticipé ne valide pas de record. Prépare-toi avant de lancer l’épreuve. Les calories sont une estimation de la console, pas une mesure physiologique exacte. Ce défi compte comme séance intense.",
   segments: [{ label: "Défi calories", minutes, resistance: "libre", cadence: "libre", rpe: "à ton choix" }]
 }));
