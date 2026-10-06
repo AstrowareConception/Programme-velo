@@ -4,17 +4,24 @@ import { BleDiagnosticPanel } from "@/components/BleDiagnosticPanel";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { AppState, Measurement, Preferences, TelemetrySample, TimeAttackSplit, WorkoutTemplate } from "@/lib/types";
+import type { AppState, CompletedSession, Measurement, Preferences, TelemetrySample, TimeAttackSplit, VoyagePortion, WorkoutTemplate } from "@/lib/types";
+import { VoyagePanel } from "@/components/VoyagePanel";
+import { voyagePlan, voyageProgress, voyageWorkout } from "@/lib/voyage";
+import { validVoyagePortion } from "@/lib/voyage-progress";
 import { connectFtmsBike, hasWebBluetooth, type BikeConnection, type BikeTelemetry, webBluetoothHint } from "@/lib/ftms";
 import { ClimbProfile } from "@/components/ClimbProfile";
 import { RouteMap } from "@/components/RouteMap";
 import { RoutePlaces } from "@/components/RoutePlaces";
+import { RoutePhotos } from "@/components/RoutePhotos";
 import { WorkoutProgramsPanel } from "@/components/WorkoutProgramsPanel";
 import { OnboardingWizard } from "@/components/OnboardingWizard";
 import { GettingStartedCard } from "@/components/GettingStartedCard";
 import { firstGuidedWorkout, guidanceCandidates, guidanceSessions, initialGuidance } from "@/lib/onboarding";
 import { MetricChart } from "@/components/MetricChart";
 import { InstallCard } from "@/components/InstallCard";
+import { PwaStatusCard, usePwa } from "@/components/PwaProvider";
+import { ReaderViewChoice, SessionComfort } from "@/components/SessionComfort";
+import { screenWakeLabel, useScreenWakeLock } from "@/components/useScreenWakeLock";
 import { PerformanceRecords, SectorAnalysis } from "@/components/PerformancePanel";
 import { ProgressionPalmares } from "@/components/ProgressionPalmares";
 import { CampaignsPanel } from "@/components/CampaignsPanel";
@@ -51,7 +58,8 @@ import {
 } from "@/lib/data";
 import { localInputDate, localInputDateTime, localDateToIso } from "@/lib/dates";
 import { counterDelta } from "@/lib/session";
-import { compactTelemetry, cueSegment, formatClock, requestScreenWakeLock } from "@/lib/session";
+import { compactTelemetry, formatClock } from "@/lib/session";
+import { adjustedResistance, cueSegment, prepareCueAudio, releaseCueAudio } from "@/lib/session-cues";
 import { createBackup, estimateLocalBytes, normalizeState, parseBackup, safeLocalStorageWrite } from "@/lib/storage";
 import { captureSplits, checkpointKilometers, formatRaceTime, ghostDeltaSeconds, ghostDistanceAtElapsed, personalBest, routeAttempts, segmentAttempts, segmentBounds, segmentPersonalBest } from "@/lib/time-attack";
 import { challengesForRoute, evaluateRouteChallenge, routeChallenges, type RouteChallenge } from "@/lib/challenges";
@@ -65,11 +73,15 @@ import {
 
 type Tab = "dashboard" | "sessions" | "climbs" | "progress" | "more";
 type Energy = "easy" | "normal" | "hard";
-type RouteMode = "training" | "timeAttack" | "segmentAttack";
+type RouteMode = "training" | "timeAttack" | "segmentAttack" | "voyage";
 const CUSTOM_ROUTES_KEY = "veloquest:custom-routes:v1";
 
 function pct(value: number, target: number) {
   return Math.min(100, Math.round((value / Math.max(1, target)) * 100));
+}
+
+function quantity(value: number) {
+  return value.toLocaleString("fr-FR", { maximumFractionDigits: 1 });
 }
 
 function uid() {
@@ -90,14 +102,6 @@ function maximum(values: Array<number | undefined>) {
   return nums.length ? Math.max(...nums) : undefined;
 }
 
-function adjustedResistance(label: string, offset: number) {
-  if (!offset || label === "libre") return label;
-  const values = label.match(/\d+(?:[.,]\d+)?/g)?.map((value) => Number(value.replace(",", ".")));
-  if (!values?.length) return label;
-  const adjusted = values.map((value) => Math.max(1, Math.min(32, Math.round(value + offset))));
-  return adjusted.length === 1 ? String(adjusted[0]) : adjusted.join("–");
-}
-
 function n(form: FormData, key: string) {
   const raw = String(form.get(key) ?? "").trim().replace(",", ".");
   if (!raw) return undefined;
@@ -106,12 +110,17 @@ function n(form: FormData, key: string) {
 }
 
 export function VeloQuestApp() {
+  const pwa = usePwa();
   const [state, setState] = useState<AppState>(emptyState());
   const [hydrated, setHydrated] = useState(false);
+  const [stateSaveFailed, setStateSaveFailed] = useState(false);
+  const [routesSaveFailed, setRoutesSaveFailed] = useState(false);
   const [tab, setTab] = useState<Tab>("dashboard");
   const [active, setActive] = useState<WorkoutTemplate | null>(null);
   const [activeClimb, setActiveClimb] = useState<ClimbChallenge | null>(null);
   const [routeMode, setRouteMode] = useState<RouteMode>("training");
+  const [activeVoyage, setActiveVoyage] = useState<VoyagePortion | null>(null);
+  const [voyagePickerOpen, setVoyagePickerOpen] = useState(false);
   const [challengeRoute, setChallengeRoute] = useState<ClimbChallenge | null>(null);
   const [segmentAttackRoute, setSegmentAttackRoute] = useState<ClimbChallenge | null>(null);
   const [segmentAttackIndex, setSegmentAttackIndex] = useState<number | null>(null);
@@ -133,10 +142,13 @@ export function VeloQuestApp() {
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
   const [bike, setBike] = useState<BikeConnection | null>(null);
   const [telemetry, setTelemetry] = useState<BikeTelemetry>({});
+  const [lastTelemetryAt, setLastTelemetryAt] = useState<number | null>(null);
   const [telemetrySamples, setTelemetrySamples] = useState<TelemetrySample[]>([]);
   const [bluetoothError, setBluetoothError] = useState<string | null>(null);
   const [connectingBike, setConnectingBike] = useState(false);
   const [controlGranted, setControlGranted] = useState(false);
+  const [controlBusy, setControlBusy] = useState(false);
+  const controlBusyRef = useRef(false);
   const [testResistanceLevel, setTestResistanceLevel] = useState(1);
   const [diagnosingBike, setDiagnosingBike] = useState(false);
   const [resistanceMappingVerified, setResistanceMappingVerified] = useState(false);
@@ -156,7 +168,25 @@ export function VeloQuestApp() {
   const activeSnapshotRef = useRef<ActiveSessionSnapshot | null>(null);
   const segmentDeadlineRef = useRef(0);
   const timeAttackStartedAtRef = useRef(0);
-  const wakeLockRef = useRef<any>(null);
+  const cuePreferencesRef = useRef<Preferences>(defaultPreferences);
+  const upcomingCueRef = useRef("");
+  const readerRef = useRef<HTMLDivElement>(null);
+  const [foregroundNotice, setForegroundNotice] = useState(false);
+  const preferences: Preferences = { ...defaultPreferences, ...(state.preferences ?? {}) };
+  useEffect(() => { pwa.setBusy(!hydrated || Boolean(active) || Boolean(bike) || connectingBike || diagnosingBike || showSetup || stateSaveFailed || routesSaveFailed); }, [hydrated, active, bike, connectingBike, diagnosingBike, showSetup, stateSaveFailed, routesSaveFailed, pwa.setBusy]);
+  const screenWake = useScreenWakeLock(running && sessionStarted && preferences.keepScreenAwake);
+
+  useEffect(() => {
+    cuePreferencesRef.current = { ...defaultPreferences, ...(state.preferences ?? {}), resistanceOffset: preferences.resistanceOffset + sessionResistanceDelta };
+  }, [state.preferences, preferences.resistanceOffset, sessionResistanceDelta]);
+
+  useEffect(() => {
+    if (!active || showFinish) releaseCueAudio();
+  }, [active, showFinish]);
+  useEffect(() => () => releaseCueAudio(), []);
+  useEffect(() => {
+    if (sessionStarted) readerRef.current?.scrollTo({ top: 0 });
+  }, [sessionStarted, preferences.readerView]);
 
   useEffect(() => {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -192,11 +222,17 @@ export function VeloQuestApp() {
   }, []);
 
   useEffect(() => {
-    if (hydrated && !safeLocalStorageWrite(STORAGE_KEY, state)) setToast("Stockage local plein : exporte une sauvegarde puis allège l’historique.");
+    if (hydrated) {
+      const saved = safeLocalStorageWrite(STORAGE_KEY, state); setStateSaveFailed(!saved);
+      if (!saved) setToast("Stockage local plein : exporte une sauvegarde puis allège l’historique.");
+    }
   }, [state, hydrated]);
 
   useEffect(() => {
-    if (hydrated && !safeLocalStorageWrite(CUSTOM_ROUTES_KEY, customClimbs)) setToast("Impossible d’enregistrer les parcours : stockage local insuffisant.");
+    if (hydrated) {
+      const saved = safeLocalStorageWrite(CUSTOM_ROUTES_KEY, customClimbs); setRoutesSaveFailed(!saved);
+      if (!saved) setToast("Impossible d’enregistrer les parcours : stockage local insuffisant.");
+    }
   }, [customClimbs, hydrated]);
 
   useEffect(() => {
@@ -210,6 +246,7 @@ export function VeloQuestApp() {
       workoutId: active.id,
       routeId: activeClimb?.id,
       routeMode,
+      voyage: activeVoyage ?? undefined,
       challengeId: activeChallenge?.id,
       segmentAttackIndex: segmentAttackIndex ?? undefined,
       segmentIndex,
@@ -225,7 +262,7 @@ export function VeloQuestApp() {
       telemetrySamples: compactTelemetry(telemetrySamples, 180),
       hadBikeConnection: Boolean(bike)
     };
-  }, [active, activeClimb, routeMode, activeChallenge, segmentAttackIndex, segmentIndex, secondsLeft, running, sessionStarted, showFinish, timeAttackElapsedSeconds, timeAttackSplits, pauseCount, sessionResistanceDelta, climbStartDistanceM, telemetrySamples, bike]);
+  }, [active, activeClimb, routeMode, activeVoyage, activeChallenge, segmentAttackIndex, segmentIndex, secondsLeft, running, sessionStarted, showFinish, timeAttackElapsedSeconds, timeAttackSplits, pauseCount, sessionResistanceDelta, climbStartDistanceM, telemetrySamples, bike]);
 
   useEffect(() => {
     if (!active || !sessionStarted) return;
@@ -239,7 +276,11 @@ export function VeloQuestApp() {
     save();
     const timer = window.setInterval(save, 5000);
     const onPageHide = () => save();
-    const onVisibility = () => { if (document.visibilityState === "hidden") save(); };
+    let wasHidden = false;
+    const onVisibility = () => {
+      if (document.visibilityState === "hidden") { wasHidden = true; save(); }
+      else if (wasHidden) { setForegroundNotice(true); wasHidden = false; }
+    };
     window.addEventListener("pagehide", onPageHide);
     document.addEventListener("visibilitychange", onVisibility);
 
@@ -258,6 +299,12 @@ export function VeloQuestApp() {
       const now = Date.now();
       const remaining = Math.ceil((segmentDeadlineRef.current - now) / 1000);
       if (remaining > 0) {
+        const nextSegment = active.segments[segmentIndex + 1];
+        const key = `${active.id}:${segmentIndex}`;
+        if (remaining >= 9 && remaining <= 10 && nextSegment && cuePreferencesRef.current.announceUpcoming && upcomingCueRef.current !== key) {
+          upcomingCueRef.current = key;
+          cueSegment(nextSegment, cuePreferencesRef.current, { previous: active.segments[segmentIndex], upcoming: true });
+        }
         setSecondsLeft(remaining);
         return;
       }
@@ -286,7 +333,7 @@ export function VeloQuestApp() {
       setSegmentIndex(next);
       setSecondsLeft(nextRemainingSeconds);
       segmentDeadlineRef.current = now + nextRemainingSeconds * 1000;
-      cueSegment(active.segments[next], { ...defaultPreferences, ...(state.preferences ?? {}) });
+      cueSegment(active.segments[next], cuePreferencesRef.current, { previous: active.segments[next - 1] });
     }, 250);
 
     return () => window.clearInterval(timer);
@@ -322,41 +369,11 @@ export function VeloQuestApp() {
     ]);
   }, [telemetry, running, active, bike]);
 
-  const preferences: Preferences = { ...defaultPreferences, ...(state.preferences ?? {}) };
-
   useEffect(() => {
     if (!toast) return;
     const timer = window.setTimeout(() => setToast(null), 3200);
     return () => window.clearTimeout(timer);
   }, [toast]);
-
-  useEffect(() => {
-    if (!running || !sessionStarted || !preferences.keepScreenAwake) {
-      try { wakeLockRef.current?.release?.(); } catch {}
-      wakeLockRef.current = null;
-      return;
-    }
-
-    let cancelled = false;
-    const acquire = async () => {
-      const lock = await requestScreenWakeLock();
-      if (!cancelled) wakeLockRef.current = lock;
-      else try { await lock?.release?.(); } catch {}
-    };
-    acquire();
-
-    const onVisibility = () => {
-      if (document.visibilityState === "visible" && running) acquire();
-    };
-    document.addEventListener("visibilitychange", onVisibility);
-
-    return () => {
-      cancelled = true;
-      document.removeEventListener("visibilitychange", onVisibility);
-      try { wakeLockRef.current?.release?.(); } catch {}
-      wakeLockRef.current = null;
-    };
-  }, [running, sessionStarted, preferences.keepScreenAwake]);
 
   const week = currentProgramWeek(state.profile.startDate);
   const target = weekTargets[week - 1];
@@ -479,6 +496,10 @@ export function VeloQuestApp() {
     if (!activeClimb || !active) return 0;
     const timedProgress = totalSessionSeconds ? sessionElapsedSeconds / totalSessionSeconds : 0;
 
+    if (routeMode === "voyage" && activeVoyage) {
+      return (activeVoyage.startKm + Math.min(1, timedProgress) * (activeVoyage.endKm - activeVoyage.startKm)) / activeClimb.distanceKm;
+    }
+
     if (bike && telemetry.distanceM !== undefined && climbStartDistanceM !== null) {
       const localKm = Math.max(0, (telemetry.distanceM - climbStartDistanceM) / 1000);
       if (routeMode === "segmentAttack" && activeSegmentBounds) {
@@ -494,7 +515,7 @@ export function VeloQuestApp() {
     }
 
     return Math.max(0, Math.min(1, timedProgress));
-  }, [activeClimb, active, bike, telemetry.distanceM, climbStartDistanceM, routeMode, activeSegmentBounds, totalSessionSeconds, sessionElapsedSeconds]);
+  }, [activeClimb, active, bike, telemetry.distanceM, climbStartDistanceM, routeMode, activeVoyage, activeSegmentBounds, totalSessionSeconds, sessionElapsedSeconds]);
 
   const currentRouteKm = activeClimb ? climbProgress * activeClimb.distanceKm : 0;
   const routeBest = activeClimb ? personalBest(state.sessions, activeClimb.id) : undefined;
@@ -547,7 +568,7 @@ export function VeloQuestApp() {
       setSegmentIndex(nextIndex);
       const seconds = Math.round(active.segments[nextIndex].minutes * 60);
       setSecondsLeft(seconds);
-      cueSegment(active.segments[nextIndex], preferences);
+      cueSegment(active.segments[nextIndex], cuePreferencesRef.current, { previous: active.segments[segmentIndex] });
     }
 
     const finished = routeMode === "segmentAttack" && activeSegmentBounds
@@ -574,6 +595,14 @@ export function VeloQuestApp() {
     });
   }, [autoResistanceControl, controlGranted, running, sessionStarted, active, segmentIndex, bike]);
 
+  const voyageCard = state.voyage ? <VoyagePanel
+    route={allClimbs.find(route => route.id === state.voyage?.routeId)} sessions={state.sessions}
+    minutes={state.voyage.minutes} interrupted={Boolean(resumeSnapshot)}
+    onMinutes={minutes => setState(prev => ({ ...prev, voyage: prev.voyage ? { ...prev.voyage, minutes } : undefined }))}
+    onStart={launchVoyage} onChoose={() => { setVoyagePickerOpen(false); setTab("climbs"); }}
+    onClear={() => { setState(prev => ({ ...prev, voyage: undefined })); setVoyagePickerOpen(false); setTab("climbs"); }}
+  /> : null;
+
   if (!hydrated) {
     return (
       <main className="splashScreen" aria-busy="true">
@@ -586,10 +615,15 @@ export function VeloQuestApp() {
   }
 
   function resumeInterruptedSession() {
+    if (pwa.locked()) return;
     if (!resumeSnapshot) return;
     const route = resumeSnapshot.routeId ? allClimbs.find((item) => item.id === resumeSnapshot.routeId) ?? null : null;
+    const savedVoyage = resumeSnapshot.routeMode === "voyage" && route && validVoyagePortion(resumeSnapshot.voyage) &&
+      resumeSnapshot.voyage.routeDistanceKm === route.distanceKm && resumeSnapshot.voyage.routeXp === route.xp
+      ? resumeSnapshot.voyage : null;
     const workout = route
-      ? (resumeSnapshot.routeMode === "segmentAttack" && resumeSnapshot.segmentAttackIndex !== undefined
+      ? (resumeSnapshot.routeMode === "voyage" ? (savedVoyage ? voyageWorkout(route, savedVoyage) : undefined)
+        : resumeSnapshot.routeMode === "segmentAttack" && resumeSnapshot.segmentAttackIndex !== undefined
           ? routeSegmentWorkout(route, resumeSnapshot.segmentAttackIndex)
           : climbToWorkout(route))
       : workouts.find((item) => item.id === resumeSnapshot.workoutId);
@@ -601,9 +635,14 @@ export function VeloQuestApp() {
     }
 
     const restored = restoreSessionSnapshot(resumeSnapshot, workout);
+    pwa.setBusy(true);
+    setForegroundNotice(false);
+    void prepareCueAudio(preferences);
+    if (!restored.showFinish) cueSegment(workout.segments[restored.segmentIndex], { ...preferences, resistanceOffset: preferences.resistanceOffset + restored.sessionResistanceDelta });
     setActive(workout);
     setActiveClimb(route);
     setRouteMode(restored.routeMode);
+    setActiveVoyage(savedVoyage);
     setSegmentAttackIndex(restored.segmentAttackIndex ?? null);
     setActiveChallenge(restored.challengeId ? routeChallenges.find((challenge) => challenge.id === restored.challengeId) ?? null : null);
     setSegmentIndex(restored.segmentIndex);
@@ -635,7 +674,7 @@ export function VeloQuestApp() {
   function parkActiveSession() {
     if (activeSnapshotRef.current) {
       const snapshot = { ...activeSnapshotRef.current, savedAt: Date.now() };
-      writeActiveSessionSnapshot(snapshot);
+      if (!writeActiveSessionSnapshot(snapshot)) { setToast("La reprise n’a pas pu être enregistrée. Garde le lecteur ouvert et libère du stockage avant une mise à jour."); return; }
       setResumeSnapshot(snapshot);
     }
     setActive(null);
@@ -647,19 +686,21 @@ export function VeloQuestApp() {
   }
 
   async function connectBike() {
-    if (diagnosingBike || connectingBike) return;
+    if (pwa.locked() || diagnosingBike || connectingBike) return;
     setResistanceMappingVerified(false);
+    setLastTelemetryAt(null);
     if (!hasWebBluetooth()) {
       setBluetoothError(webBluetoothHint() === "ios"
         ? "Sur iPhone/iPad, les navigateurs actuels n’exposent pas Web Bluetooth à la PWA. Le mode guidé et la saisie manuelle restent disponibles."
         : "Web Bluetooth n’est pas disponible dans ce navigateur.");
       return;
     }
+    pwa.setBusy(true);
     setConnectingBike(true);
     setBluetoothError(null);
     try {
       const connection = await connectFtmsBike(
-        (next) => setTelemetry((prev) => ({ ...prev, ...next })),
+        (next) => { setLastTelemetryAt(Date.now()); setTelemetry((prev) => ({ ...prev, ...next })); },
         () => {
           setBike(null);
           setTelemetry({});
@@ -681,7 +722,10 @@ export function VeloQuestApp() {
   }
 
   async function requestBikeControl() {
-    if (!bike?.requestControl) return;
+    if (!bike?.requestControl || active || controlBusyRef.current) return;
+    controlBusyRef.current = true;
+    setControlBusy(true);
+    setBluetoothError(null);
     try {
       await bike.requestControl();
       setControlGranted(true);
@@ -689,11 +733,18 @@ export function VeloQuestApp() {
     } catch (error) {
       setControlGranted(false);
       setBluetoothError(error instanceof Error ? error.message : "Contrôle FTMS refusé.");
+      setAutoResistanceControl(false);
+    } finally {
+      controlBusyRef.current = false;
+      setControlBusy(false);
     }
   }
 
   async function sendTestResistance() {
-    if (!bike?.setResistance || !controlGranted) return;
+    if (!bike?.setResistance || !controlGranted || active || controlBusyRef.current) return;
+    controlBusyRef.current = true;
+    setControlBusy(true);
+    setBluetoothError(null);
     try {
       await bike.setResistance(testResistanceLevel);
       setToast(`Commande ${testResistanceLevel} acquittée ; effet physique à vérifier.`);
@@ -701,6 +752,9 @@ export function VeloQuestApp() {
       setControlGranted(false);
       setAutoResistanceControl(false);
       setBluetoothError(error instanceof Error ? error.message : "Commande de résistance refusée.");
+    } finally {
+      controlBusyRef.current = false;
+      setControlBusy(false);
     }
   }
 
@@ -713,6 +767,9 @@ export function VeloQuestApp() {
   }
 
   function launch(workout: WorkoutTemplate, climb: ClimbChallenge | null = null, mode: RouteMode = "training", resistanceDelta = 0) {
+    if (pwa.locked()) { setToast("Mise à jour en cours : attends le rechargement."); return; }
+    pwa.setBusy(true);
+    setActiveVoyage(null);
     setActive(workout);
     setActiveClimb(climb);
     setRouteMode(climb ? mode : "training");
@@ -739,6 +796,19 @@ export function VeloQuestApp() {
     launch(routeSegmentWorkout(route, index), route, "segmentAttack");
   }
 
+  function launchVoyage() {
+    if (!state.voyage || resumeSnapshot) return;
+    const route = allClimbs.find(item => item.id === state.voyage?.routeId);
+    if (!route) return;
+    const portion = voyagePlan(route, state.sessions, state.voyage.minutes);
+    if (!portion) return;
+    const workout = voyageWorkout(route, portion);
+    if (!workout.segments.length) { setToast("Le profil de ce parcours ne permet pas de préparer cette portion."); return; }
+    launch(workout, route, "voyage");
+    setActiveVoyage(portion);
+    setVoyagePickerOpen(false);
+  }
+
   function finishActive(form: FormData) {
     if (!active) return;
     const loggedAt = String(form.get("loggedAt") ?? "").trim();
@@ -750,10 +820,12 @@ export function VeloQuestApp() {
     const isTimeAttack = routeMode === "timeAttack" && Boolean(activeClimb);
     const isSegmentAttack = routeMode === "segmentAttack" && Boolean(activeClimb) && segmentAttackIndex !== null;
     const isRaceMode = isTimeAttack || isSegmentAttack;
+    const isVoyage = routeMode === "voyage" && Boolean(activeVoyage);
+    const completedPortion = isVoyage && sessionStarted && sessionElapsedSeconds >= totalSessionSeconds - .01;
     const elapsedSeconds = isRaceMode
       ? (n(form, "elapsedSeconds") ?? timeAttackElapsedSeconds)
       : undefined;
-    const duration = isRaceMode && elapsedSeconds !== undefined
+    const duration = isVoyage ? sessionElapsedSeconds / 60 : isRaceMode && elapsedSeconds !== undefined
       ? elapsedSeconds / 60
       : (n(form, "duration") ?? active.duration);
     const previousBest = isTimeAttack && activeClimb
@@ -767,7 +839,7 @@ export function VeloQuestApp() {
       (!previousBest?.metrics?.elapsedSeconds || elapsedSeconds < previousBest.metrics.elapsedSeconds)
     );
     const completedRoute = activeClimb
-      ? (isSegmentAttack
+      ? (isSegmentAttack || isVoyage
           ? false
           : bike && telemetry.distanceM !== undefined && climbStartDistanceM !== null
             ? currentRouteKm >= activeClimb.distanceKm * 0.98
@@ -793,17 +865,13 @@ export function VeloQuestApp() {
       : undefined;
     const awardedXp = active.xp + (isPersonalBest ? 50 : 0) + (challengeResult?.xpBonus ?? 0);
 
-    setState((prev) => ({
-      ...prev,
-      sessions: [
-        ...prev.sessions,
-        {
+    const session: CompletedSession = {
           id: uid(),
           templateId: active.id,
           routeId: activeClimb?.id,
           date,
           duration,
-          points: active.points,
+          points: isVoyage && !completedPortion ? 0 : active.points,
           xp: awardedXp,
           intensity: active.intensity,
           kind: active.kind,
@@ -811,6 +879,7 @@ export function VeloQuestApp() {
           rpe: n(form, "rpe"),
           note: String(form.get("note") ?? "").trim() || undefined,
           metrics: {
+            voyage: isVoyage && activeVoyage ? { ...activeVoyage, completedPortion } : undefined,
             source: hasFtms && manualUsed ? "mixed" : hasFtms ? "ftms" : "manual",
             completedWorkout: activeClimb ? undefined : sessionStarted ? sessionProgressPercent >= 98 : true,
             elapsedSeconds,
@@ -820,7 +889,7 @@ export function VeloQuestApp() {
             challenge: challengeResult,
             completedRoute: activeClimb ? completedRoute : undefined,
             completedSegment,
-            distanceKm: n(form, "distance") ?? autoMetrics.distanceKm ?? (activeClimb ? (isSegmentAttack ? raceCurrentKm : currentRouteKm) : undefined),
+            distanceKm: n(form, "distance") ?? autoMetrics.distanceKm ?? (isVoyage ? undefined : activeClimb ? (isSegmentAttack ? raceCurrentKm : currentRouteKm) : undefined),
             calories: n(form, "calories") ?? autoMetrics.calories,
             avgSpeedKmh: n(form, "avgSpeed") ?? autoMetrics.avgSpeedKmh,
             avgCadenceRpm: n(form, "avgCadence") ?? autoMetrics.avgCadenceRpm,
@@ -832,9 +901,11 @@ export function VeloQuestApp() {
             avgResistance: autoMetrics.avgResistance,
             samples: hasFtms && preferences.keepTelemetryTrace ? compactTelemetry(telemetrySamples) : undefined
           }
-        }
-      ]
-    }));
+        };
+    const nextSessions = [...state.sessions, session];
+    const voyageXpEarned = isVoyage ? totalXp({ ...state, sessions: nextSessions }) - totalXp(state) : 0;
+    const voyageComplete = isVoyage && activeClimb ? voyageProgress(activeClimb, nextSessions).complete : false;
+    setState(prev => ({ ...prev, sessions: [...prev.sessions, session] }));
     setActive(null);
     setActiveClimb(null);
     setRunning(false);
@@ -849,7 +920,8 @@ export function VeloQuestApp() {
     setPauseCount(0);
     setActiveChallenge(null);
     setSegmentAttackIndex(null);
-    setToast(challengeResult
+    setActiveVoyage(null);
+    setToast(isVoyage ? (completedPortion ? `${voyageComplete ? "Voyage achevé" : "Portion enregistrée · la suite t’attend dans Quête"}${voyageXpEarned ? ` · +${voyageXpEarned} XP` : ""}` : "Séance enregistrée. Portion inachevée : aucun kilomètre validé dans le Voyage.") : challengeResult
       ? (challengeResult.success ? `Défi réussi · +${awardedXp} XP` : `Défi manqué · ${challengeResult.summary}`)
       : isPersonalBest
         ? `${isSegmentAttack ? "Nouveau record de secteur" : "Nouveau record personnel"} · +${awardedXp} XP`
@@ -858,6 +930,9 @@ export function VeloQuestApp() {
 
   function beginSession() {
     if (!active) return;
+    void prepareCueAudio(preferences);
+    upcomingCueRef.current = "";
+    setForegroundNotice(false);
     setSessionStarted(true);
     if (activeClimb) setClimbStartDistanceM(telemetry.distanceM ?? null);
     if (routeMode === "timeAttack" || routeMode === "segmentAttack") {
@@ -869,7 +944,7 @@ export function VeloQuestApp() {
     const seconds = Math.round(active.segments[segmentIndex].minutes * 60);
     setSecondsLeft(seconds);
     segmentDeadlineRef.current = Date.now() + seconds * 1000;
-    cueSegment(active.segments[segmentIndex], preferences);
+    cueSegment(active.segments[segmentIndex], cuePreferencesRef.current);
   }
 
   function togglePause() {
@@ -880,17 +955,19 @@ export function VeloQuestApp() {
       return;
     }
     segmentDeadlineRef.current = Date.now() + secondsLeft * 1000;
+    void prepareCueAudio(preferences);
     setRunning(true);
   }
 
   function goToSegment(index: number) {
-    if (!active) return;
+    if (!active || routeMode === "voyage") return;
     const next = Math.max(0, Math.min(active.segments.length - 1, index));
     setSegmentIndex(next);
     const seconds = Math.round(active.segments[next].minutes * 60);
     setSecondsLeft(seconds);
     segmentDeadlineRef.current = Date.now() + seconds * 1000;
-    if (sessionStarted) cueSegment(active.segments[next], preferences);
+    upcomingCueRef.current = "";
+    if (sessionStarted) { void prepareCueAudio(preferences); cueSegment(active.segments[next], cuePreferencesRef.current); }
   }
 
   function launchChallenge(route: ClimbChallenge, challenge: RouteChallenge) {
@@ -899,7 +976,7 @@ export function VeloQuestApp() {
     setActiveChallenge(challenge);
   }
 
-  function updatePreference(key: keyof Omit<Preferences, "resistanceOffset">, value: boolean) {
+  function updatePreference<K extends keyof Preferences>(key: K, value: Preferences[K]) {
     setState((prev) => ({
       ...prev,
       preferences: { ...defaultPreferences, ...(prev.preferences ?? {}), [key]: value }
@@ -993,7 +1070,7 @@ export function VeloQuestApp() {
   function exportCsv() {
     const quote = (value: unknown) => `"${String(value ?? "").replaceAll('"', '""')}"`;
     const sessions = [
-      ["date","seance","duree_min","distance_km","calories","vitesse_moy","rpm_moy","watts_moy","fc_moy","rpe","source"],
+      ["date","seance","duree_min","distance_km","calories","vitesse_moy","rpm_moy","watts_moy","fc_moy","rpe","source","voyage_debut_km","voyage_fin_km","voyage_portion_achevee","voyage_position"],
       ...state.sessions.map((session) => {
         const template = workouts.find((w) => w.id === session.templateId);
         const route = allClimbs.find((c) => c.id === session.routeId);
@@ -1008,7 +1085,11 @@ export function VeloQuestApp() {
           session.metrics?.avgPowerW,
           session.metrics?.avgHeartRate,
           session.rpe,
-          session.metrics?.source
+          session.metrics?.source,
+          session.metrics?.voyage?.startKm,
+          session.metrics?.voyage?.endKm,
+          session.metrics?.voyage?.completedPortion,
+          session.metrics?.voyage?.positionSource
         ];
       })
     ].map((row) => row.map(quote).join(";")).join("\n");
@@ -1136,6 +1217,8 @@ export function VeloQuestApp() {
             onLaunch={() => launch(guidedRecommendation, null, "training", discoveryCount ? adaptiveCoach.suggestedResistanceDelta : 0)}
             onExplore={exploreGentleRides} onReview={reviewGuidance} onFree={leaveGuidance} />}
 
+          {voyageCard}
+
           <details className={guidedView ? "guidedAdvanced" : "legacyDashboard"} open={guidedView ? undefined : true}>
             <summary hidden={!guidedView}>Voir le programme de douze semaines et les outils avancés</summary>
             <div>
@@ -1147,7 +1230,7 @@ export function VeloQuestApp() {
           </section>
 
           <section className="card weeklyMission">
-            <div className="sectionHead"><div><p className="eyebrow">MISSION SEMAINE {week}</p><h2>Ce qu’il reste à conquérir</h2></div><strong>{perfectWeek ? "✓ complète" : `${Math.max(0, target.points - stats.points)} pts restants`}</strong></div>
+            <div className="sectionHead"><div><p className="eyebrow">MISSION SEMAINE {week}</p><h2>Ce qu’il reste à conquérir</h2></div><strong>{perfectWeek ? "✓ complète" : `${quantity(Math.max(0, target.points - stats.points))} pts restants`}</strong></div>
             <div className="missionItems">
               <MissionItem label="Charge" value={stats.points} target={target.points} suffix=" pts" />
               <MissionItem label="Volume" value={stats.minutes} target={target.minutes} suffix=" min" />
@@ -1158,7 +1241,7 @@ export function VeloQuestApp() {
           </section>
 
           <section className="grid achievementGrid">
-            <article className={`card achievement ${perfectWeek ? "success" : ""}`}><span>👑</span><div><small>Semaine</small><strong>{perfectWeek ? "Parfaite" : "En cours"}</strong><em>{stats.points}/{target.points} pts · {stats.hard}/{target.maxHard} séances dures</em></div></article>
+            <article className={`card achievement ${perfectWeek ? "success" : ""}`}><span>👑</span><div><small>Semaine</small><strong>{perfectWeek ? "Parfaite" : "En cours"}</strong><em>{quantity(stats.points)}/{target.points} pts · {stats.hard}/{target.maxHard} séances dures</em></div></article>
             <article className="card achievement"><span>🔥</span><div><small>Série</small><strong>{currentStreak} semaine{currentStreak > 1 ? "s" : ""}</strong><em>parfaite{currentStreak > 1 ? "s" : ""} d’affilée</em></div></article>
             <article className="card achievement"><span>🛣️</span><div><small>Distance totale</small><strong>{totalDistance.toFixed(1)} km</strong><em>enregistrés</em></div></article>
             <article className="card achievement"><span>📉</span><div><small>Transformation</small><strong>{weightLost > 0 ? `-${weightLost.toFixed(1)} kg` : "—"}</strong><em>{waistLost > 0 ? `-${waistLost.toFixed(1)} cm de taille` : "mesures à compléter"}</em></div></article>
@@ -1174,8 +1257,9 @@ export function VeloQuestApp() {
                 <ConsoleMetric label="RPM" value={telemetry.cadenceRpm?.toFixed(0) ?? "—"} />
                 <ConsoleMetric label="KM/H" value={telemetry.speedKmh?.toFixed(1) ?? "—"} />
                 <ConsoleMetric label="WATTS" value={telemetry.powerW?.toFixed(0) ?? "—"} />
-                <ConsoleMetric label="LEVEL" value={telemetry.resistance?.toFixed(0) ?? "—"} />
+                <ConsoleMetric label="LEVEL" value={telemetry.resistance?.toFixed(1) ?? "—"} />
                 <ConsoleMetric label="BPM" value={telemetry.heartRate?.toFixed(0) ?? "—"} />
+                  <ConsoleMetric label="KM VÉLO" value={telemetry.distanceM !== undefined ? (telemetry.distanceM / 1000).toFixed(2) : "—"} />
                 <ConsoleMetric label="KCAL VÉLO" value={telemetry.totalEnergyKcal?.toFixed(0) ?? "—"} />
               </div>
             ) : (
@@ -1393,6 +1477,7 @@ export function VeloQuestApp() {
 
                     {climb.scenery && <details className="sceneryDetails"><summary>Découvrir le paysage</summary><p>{climb.scenery}</p><div className="routeTags">{climb.highlights?.map((highlight) => <span key={highlight}>{highlight}</span>)}</div></details>}
                     <RoutePlaces route={climb} />
+                    {preferences.showRoutePhotos && <RoutePhotos key={climb.id} route={climb} />}
 
                     <div className="timeAttackSummary">
                       <span><small>RECORD</small><strong>{pb?.metrics?.elapsedSeconds !== undefined ? formatRaceTime(pb.metrics.elapsedSeconds) : "—"}</strong></span>
@@ -1408,6 +1493,7 @@ export function VeloQuestApp() {
                       <button className="secondary timeAttackButton" onClick={() => launch(climbToWorkout(climb), climb, "timeAttack")}>⏱ Time Attack</button>
                       <button className="secondary segmentAttackButton" onClick={() => setSegmentAttackRoute(climb)}>⚡ Segments</button>
                       <button className="secondary challengeButton" onClick={() => setChallengeRoute(climb)}>◆ Défis</button>
+                      <button className="secondary" onClick={() => { setState(prev => ({ ...prev, voyage: { routeId: climb.id, minutes: prev.voyage?.minutes ?? 30 } })); setVoyagePickerOpen(true); }}>🧳 Voyage en plusieurs séances</button>
                       {climb.id.startsWith("gpx-") && <button className="secondary dangerButton" onClick={() => deleteCustomClimb(climb.id)}>Supprimer</button>}
                     </div>
                   </article>
@@ -1457,7 +1543,7 @@ export function VeloQuestApp() {
                 return (
                   <button className="sessionHistoryRow" key={session.id} onClick={() => setSelectedSessionId(session.id)}>
                     <span>{dateLabel(session.date)}</span>
-                    <div><strong>{route?.name ?? template?.name ?? session.templateId}</strong><small>{session.duration} min · {session.metrics?.source ?? "manuel"}</small></div>
+                    <div><strong>{route?.name ?? template?.name ?? session.templateId}</strong><small>{session.duration.toFixed(1)} min · {session.metrics?.voyage ? `Voyage · ${session.metrics.voyage.completedPortion ? "portion achevée" : "portion inachevée"}` : session.metrics?.source ?? "manuel"}</small></div>
                     <div className="historyMetrics">
                       {session.metrics?.distanceKm !== undefined && <span>{session.metrics.distanceKm.toFixed(1)} km</span>}
                       {session.metrics?.avgPowerW !== undefined && <span>{session.metrics.avgPowerW.toFixed(0)} W</span>}
@@ -1489,6 +1575,7 @@ export function VeloQuestApp() {
           <div className="pageHead"><p className="eyebrow">PLUS · VERSION {process.env.NEXT_PUBLIC_BUILD_COMMIT?.slice(0, 7)}</p><h1>Réglages, badges & données</h1><p>Tout ce qui personnalise VeloQuest sans encombrer la navigation principale.</p></div>
 
           <InstallCard />
+          <PwaStatusCard />
 
           <section className="card quickGuide">
             <div className="sectionHead"><div><p className="eyebrow">GUIDE RAPIDE</p><h2>Une routine simple</h2></div><span className="spark">4 étapes</span></div>
@@ -1502,11 +1589,11 @@ export function VeloQuestApp() {
 
           <section className="card">
             <div className="sectionHead"><div><p className="eyebrow">CONFORT DE SÉANCE</p><h2>Ton cockpit</h2></div><span className="spark">personnalisable</span></div>
+            <ReaderViewChoice preferences={preferences} onChange={updatePreference} />
+            <SessionComfort preferences={preferences} onChange={updatePreference} />
             <div className="toggleList">
-              <Toggle label="Signaux sonores" description="Un bip à chaque changement de segment." checked={preferences.soundCues} onChange={(v) => updatePreference("soundCues", v)} />
-              <Toggle label="Annonces vocales" description="Annonce le segment et le niveau de résistance." checked={preferences.voiceCues} onChange={(v) => updatePreference("voiceCues", v)} />
               <Toggle label="Retour haptique" description="Vibration si le navigateur et l’appareil le permettent." checked={preferences.haptics} onChange={(v) => updatePreference("haptics", v)} />
-              <Toggle label="Garder l’écran éveillé" description="Empêche la mise en veille pendant une séance quand l’API est disponible." checked={preferences.keepScreenAwake} onChange={(v) => updatePreference("keepScreenAwake", v)} />
+              <Toggle label="Garder l’écran éveillé" description="Demande le maintien pendant l’effort ; le lecteur affiche l’état accordé ou refusé." checked={preferences.keepScreenAwake} onChange={(v) => updatePreference("keepScreenAwake", v)} />
               <Toggle label="Conserver la trace Bluetooth" description="Garde une trace compacte de la télémétrie pour l’historique." checked={preferences.keepTelemetryTrace} onChange={(v) => updatePreference("keepTelemetryTrace", v)} />
               <div className="resistanceCalibration">
                 <div><strong>Calibration résistance 1–32</strong><small>Ajuste tous les niveaux guidés et automatiques sans modifier les séances.</small></div>
@@ -1517,19 +1604,22 @@ export function VeloQuestApp() {
             </div>
           </section>
 
-          <BleDiagnosticPanel disabled={Boolean(bike) || connectingBike || Boolean(active)} onBusyChange={setDiagnosingBike} />
+          <BleDiagnosticPanel disabled={pwa.locked() || Boolean(bike) || connectingBike || Boolean(active)} onBusyChange={setDiagnosingBike} />
 
-          <section className="card">
+          <section className="card" aria-label="Laboratoire FTMS">
             <div className="sectionHead"><div><p className="eyebrow">BLUETOOTH LAB</p><h2>{bike ? bike.deviceName : "Diagnostic FTMS"}</h2></div><span className={bike ? "connectionState onlineText" : "connectionState"}>{bike ? "CONNECTÉ" : "OFFLINE"}</span></div>
             {bike ? (
               <>
                 <div className="consoleMetrics compact">
                   <ConsoleMetric label="RPM" value={telemetry.cadenceRpm?.toFixed(0) ?? "—"} />
                   <ConsoleMetric label="WATTS" value={telemetry.powerW?.toFixed(0) ?? "—"} />
-                  <ConsoleMetric label="LEVEL" value={telemetry.resistance?.toFixed(0) ?? "—"} />
+                  <ConsoleMetric label="LEVEL" value={telemetry.resistance?.toFixed(1) ?? "—"} />
                   <ConsoleMetric label="BPM" value={telemetry.heartRate?.toFixed(0) ?? "—"} />
+                  <ConsoleMetric label="KM/H" value={telemetry.speedKmh?.toFixed(1) ?? "—"} />
+                  <ConsoleMetric label="KM VÉLO" value={telemetry.distanceM !== undefined ? (telemetry.distanceM / 1000).toFixed(2) : "—"} />
                 <ConsoleMetric label="KCAL VÉLO" value={telemetry.totalEnergyKcal?.toFixed(0) ?? "—"} />
                 </div>
+                <p className="finePrint">{lastTelemetryAt === null ? "En attente du premier paquet du vélo. Pédale doucement pour réveiller les mesures." : `Dernier paquet reçu à ${new Date(lastTelemetryAt).toLocaleTimeString("fr-FR")}. Vérifie que les chiffres évoluent en pédalant puis à l’arrêt.`}</p>
                 <div className="diagnosticGrid">
                   <span><small>FTMS</small><strong>{bike.capabilities.ftms ? "OK" : "—"}</strong></span>
                   <span><small>Control Point</small><strong>{bike.capabilities.controlPoint ? "OK" : "non"}</strong></span>
@@ -1540,12 +1630,19 @@ export function VeloQuestApp() {
                 {bike.capabilities.supportsResistanceTarget && bike.requestControl && bike.setResistance && (
                   <div className="controlLab">
                     <div className="sectionHead"><div><small>LABORATOIRE DE CONTRÔLE</small><strong>{controlGranted ? "Contrôle accordé" : "Contrôle non demandé"}</strong></div><span className={controlGranted ? "labState ok" : "labState"}>{controlGranted ? "ARMÉ" : "VERROUILLÉ"}</span></div>
+                    {active && <p>Ferme le lecteur avant les commandes manuelles de test.</p>}
+                    {controlBusy && <p role="status">Commande FTMS en cours…</p>}
                     {!controlGranted ? (
-                      <button className="secondary" onClick={requestBikeControl}>Demander le contrôle FTMS</button>
+                      <button className="secondary" disabled={controlBusy || Boolean(active)} onClick={requestBikeControl}>Demander le contrôle FTMS</button>
                     ) : (
                       <>
-                        <label>Résistance FTMS de test <strong>{testResistanceLevel}</strong><input type="range" min={bike.capabilities.resistanceRange?.min} max={bike.capabilities.resistanceRange?.max} step={bike.capabilities.resistanceRange?.increment} value={testResistanceLevel} onChange={(e) => setTestResistanceLevel(Number(e.target.value))} /></label>
-                        <button className="secondary" onClick={sendTestResistance}>Envoyer ce niveau au vélo</button>
+                        <label>Résistance FTMS de test <strong>{testResistanceLevel}</strong><input type="range" min={bike.capabilities.resistanceRange?.min} max={bike.capabilities.resistanceRange?.max} step={bike.capabilities.resistanceRange?.increment} disabled={controlBusy || Boolean(active)} value={testResistanceLevel} onChange={(e) => setTestResistanceLevel(Number(e.target.value))} /></label>
+                        <button className="secondary" disabled={controlBusy || Boolean(active)} onClick={sendTestResistance}>Envoyer ce niveau au vélo</button>
+                        <div className="modalActions">
+                          <button className="secondary" disabled={controlBusy || Boolean(active)} onClick={() => setTestResistanceLevel(bike.capabilities.resistanceRange!.min)}>Choisir le minimum</button>
+                          <button className="secondary" disabled={controlBusy || Boolean(active)} onClick={() => { const range = bike.capabilities.resistanceRange!; setTestResistanceLevel(Math.min(range.max, Math.round((range.min + range.increment) * 10) / 10)); }}>Choisir un pas au-dessus</button>
+                        </div>
+                        <p className="finePrint">Choisir prépare la consigne. Seul « Envoyer ce niveau au vélo » l’applique. Un acquittement ne confirme pas l’effet physique.</p>
                         {bike.capabilities.resistanceRange?.min === 1 && bike.capabilities.resistanceRange.max === 32 && bike.capabilities.resistanceRange.increment === 1 ? <>
                           <Toggle label="Correspondance physique 1–32 vérifiée pour cette connexion" description="À cocher seulement après avoir comparé les commandes manuelles avec l’écran et la résistance effective du vélo." checked={resistanceMappingVerified} onChange={(verified) => { setResistanceMappingVerified(verified); setAutoResistanceControl(false); }} />
                           {resistanceMappingVerified && <Toggle label="Auto-résistance pour cette connexion" description="À chaque changement de segment, VeloQuest envoie le niveau cible au vélo. Désactivé automatiquement en cas d’erreur." checked={autoResistanceControl} onChange={setAutoResistanceControl} />}
@@ -1554,6 +1651,7 @@ export function VeloQuestApp() {
                     )}
                   </div>
                 )}
+                <button className="secondary" onClick={() => { bike.disconnect(); setBike(null); setTelemetry({}); setControlGranted(false); setAutoResistanceControl(false); setResistanceMappingVerified(false); }}>Déconnecter le vélo après le test</button>
               </>
             ) : (
               <>
@@ -1562,6 +1660,8 @@ export function VeloQuestApp() {
               </>
             )}
           </section>
+
+          {bluetoothError && <p className="errorText" role="alert">{bluetoothError}</p>}
 
           <ProgressionPalmares sessions={state.sessions} routes={allClimbs} />
 
@@ -1646,15 +1746,19 @@ export function VeloQuestApp() {
         </div>
       )}
 
+      {voyagePickerOpen && !active && <div className="modalBackdrop"><section className="sessionModal voyagePicker" role="dialog" aria-label="Préparer mon voyage"><button className="close" aria-label="Fermer le voyage" onClick={() => setVoyagePickerOpen(false)}>×</button>{voyageCard}</section></div>}
+
       {active && (
         <div className="modalBackdrop">
-          <div className={`sessionModal ${activeClimb ? "climbSession" : ""}`}>
+          <div ref={readerRef} className={`sessionModal ${activeClimb ? "climbSession" : ""} ${activeVoyage ? "voyageSession" : ""} ${sessionStarted && !showFinish && preferences.readerView === "essential" ? "essentialSession" : ""}`}>
             <button className="close" aria-label="Mettre la séance de côté" onClick={parkActiveSession}>×</button>
 
             {showFinish ? (
               <form action={finishActive} className="finishForm">
                 <p className="eyebrow">JOURNAL DE SÉANCE</p>
                 <h2>Enregistre ta performance</h2>
+                {activeVoyage && <p className="voyageNext">{sessionElapsedSeconds >= totalSessionSeconds - .01 ? `Portion achevée : ${activeVoyage.startKm.toFixed(2)} → ${activeVoyage.endKm.toFixed(2)} km. Enregistre-la pour avancer dans ton voyage.` : "Portion inachevée : la séance reste dans ton journal, mais ce passage sera à refaire. Tu peux aussi fermer pour conserver la séance et la reprendre."} La distance du Voyage est simulée ; les champs ci-dessous décrivent les mesures du vélo.</p>}
+                {activeVoyage && sessionElapsedSeconds < totalSessionSeconds - .01 && <button type="button" className="secondary" onClick={() => setShowFinish(false)}>Continuer cette portion</button>}
                 {(routeMode === "timeAttack" || routeMode === "segmentAttack") && activeClimb && (
                   <div className="raceFinishBanner">
                     <span><small>CHRONO</small><strong>{formatRaceTime(timeAttackElapsedSeconds)}</strong></span>
@@ -1667,7 +1771,7 @@ export function VeloQuestApp() {
                   <div className="formRow">
                     {(routeMode === "timeAttack" || routeMode === "segmentAttack") && activeClimb
                       ? <label>Chrono final (secondes)<input name="elapsedSeconds" type="number" step="1" defaultValue={timeAttackElapsedSeconds || undefined} /></label>
-                      : <label>Durée (min)<input name="duration" type="number" step="1" defaultValue={active.duration} /></label>}
+                      : <label>Durée (min)<input name="duration" type="number" step="0.01" readOnly={Boolean(activeVoyage)} defaultValue={activeVoyage ? Number((sessionElapsedSeconds / 60).toFixed(2)) : active.duration} /></label>}
                     <label>RPE ressenti /10<input name="rpe" type="number" min="1" max="10" step="0.5" /></label>
                   </div>
                   <div className="formRow">
@@ -1683,20 +1787,21 @@ export function VeloQuestApp() {
                     <label>FC moyenne (bpm)<input name="avgHeartRate" type="number" step="1" defaultValue={autoMetrics.avgHeartRate?.toFixed(0)} /></label>
                   </div>
                   <label>Note<input name="note" placeholder="Jambes, sommeil, difficulté, réglage…" /></label>
-                  <button className="primary" type="submit">Valider la quête · +{active.xp} XP</button>
+                  <button className="primary" type="submit">{activeVoyage ? "Enregistrer ma portion" : `Valider la quête · +${active.xp} XP`}</button>
                 </div>
               </form>
             ) : !sessionStarted ? (
               <div className="sessionPreview">
-                <p className="eyebrow">{activeClimb ? (routeMode === "timeAttack" ? "TIME ATTACK" : routeMode === "segmentAttack" ? "SEGMENT ATTACK" : routeCategory(activeClimb) === "scenic" ? "BALADE · 1/5" : "PARCOURS") : "PRÉPARATION"}</p>
+                <p className="eyebrow">{activeVoyage ? "VOYAGE · PORTION" : activeClimb ? (routeMode === "timeAttack" ? "TIME ATTACK" : routeMode === "segmentAttack" ? "SEGMENT ATTACK" : routeCategory(activeClimb) === "scenic" ? "BALADE · 1/5" : "PARCOURS") : "PRÉPARATION"}</p>
                 <h2>{active.name}</h2>
-                <p className="previewDescription">{scenicSession ? "RPE 2–4, résistance douce et pauses libres. Parcours entier, sans objectif de chrono : choisis selon la durée estimée et ton énergie." : activeClimb?.subtitle ?? active.description}</p>
+                <p className="previewDescription">{activeVoyage ? `${active.tagline} · ≈ ${active.duration.toFixed(1)} min. Position simulée à 15 km/h, pauses libres. Les mesures FTMS sont enregistrées séparément et ne pilotent pas ce mode.` : scenicSession ? "RPE 2–4, résistance douce et pauses libres. Parcours entier, sans objectif de chrono : choisis selon la durée estimée et ton énergie." : activeClimb?.subtitle ?? active.description}</p>
                 {activeClimb?.scenery && <details className="sceneryDetails"><summary>Découvrir le paysage et son profil</summary><p>{activeClimb.scenery}</p><small>{activeClimb.note}</small></details>}
                 {activeClimb && <RoutePlaces route={activeClimb} />}
+                {activeClimb && preferences.showRoutePhotos && <RoutePhotos key={activeClimb.id} route={activeClimb} currentKm={activeVoyage?.startKm} />}
                 <div className="previewStats">
-                  <span><small>{(routeMode === "timeAttack" || routeMode === "segmentAttack") && activeClimb ? "Record" : "Durée"}</small><strong>{(routeMode === "timeAttack" || routeMode === "segmentAttack") && activeClimb ? (activeRaceBest?.metrics?.elapsedSeconds !== undefined ? formatRaceTime(activeRaceBest.metrics.elapsedSeconds) : "à établir") : `${active.duration} min`}</strong></span>
+                  <span><small>{(routeMode === "timeAttack" || routeMode === "segmentAttack") && activeClimb ? "Record" : "Durée"}</small><strong>{(routeMode === "timeAttack" || routeMode === "segmentAttack") && activeClimb ? (activeRaceBest?.metrics?.elapsedSeconds !== undefined ? formatRaceTime(activeRaceBest.metrics.elapsedSeconds) : "à établir") : `${activeVoyage ? active.duration.toFixed(1) : active.duration} min`}</strong></span>
                   <span><small>Intensité</small><strong>{active.intensity === "hard" ? "dure" : active.intensity === "moderate" ? "soutenue" : "facile"}</strong></span>
-                  <span><small>Récompense</small><strong>+{active.xp} XP</strong></span>
+                  <span><small>Récompense</small><strong>{activeVoyage ? `${activeClimb?.xp} XP au bout du voyage` : `+${active.xp} XP`}</strong></span>
                   <span><small>Segments</small><strong>{active.segments.length}</strong></span>
                 </div>
                 {bike && <div className="connectedNotice">✓ {bike.deviceName} connecté · télémétrie automatique activée</div>}
@@ -1714,30 +1819,36 @@ export function VeloQuestApp() {
                       : "Sans distance Bluetooth, le profil avance sur le scénario temporel. Tu pourras saisir le chrono réel du vélo à l’arrivée."}</p>
                   </div>
                 )}
+                <ReaderViewChoice preferences={preferences} onChange={updatePreference} />
+                <SessionComfort preferences={preferences} onChange={updatePreference} />
                 <details className="segmentPlanDisclosure" open={!scenicSession}>
                   <summary>Voir les {active.segments.length} segments et les niveaux</summary>
                   <div className="segmentPlan">
                   {active.segments.map((segment, index) => (
-                    <button key={index} type="button" onClick={() => goToSegment(index)}>
+                    <button key={index} type="button" disabled={Boolean(activeVoyage)} onClick={() => goToSegment(index)}>
                       <span>{String(index + 1).padStart(2, "0")}</span>
-                      <div><strong>{segment.label}</strong><small>{segment.minutes} min · niveau {adjustedResistance(segment.resistance, preferences.resistanceOffset + sessionResistanceDelta)} · RPE {segment.rpe}</small></div>
+                      <div><strong>{segment.label}</strong><small>{activeVoyage ? segment.minutes.toFixed(1) : segment.minutes} min · niveau {adjustedResistance(segment.resistance, preferences.resistanceOffset + sessionResistanceDelta)} · RPE {segment.rpe}</small></div>
                     </button>
                   ))}
                   </div>
                 </details>
                 <div className="previewFooter">
-                  <span>{preferences.keepScreenAwake ? "☀ écran actif" : "écran standard"} · {preferences.voiceCues ? "voix active" : preferences.soundCues ? "bips actifs" : "silencieux"}{sessionResistanceDelta ? ` · coach ${sessionResistanceDelta > 0 ? "+" : ""}${sessionResistanceDelta}` : ""}</span>
+                  <span>{screenWakeLabel(screenWake.status, preferences.keepScreenAwake)} · {preferences.voiceCues ? "voix activée" : preferences.soundCues ? "bips activés" : "silencieux"}{sessionResistanceDelta ? ` · coach ${sessionResistanceDelta > 0 ? "+" : ""}${sessionResistanceDelta}` : ""}</span>
                   <button className="primary bigStart" onClick={beginSession}>{(routeMode === "timeAttack" || routeMode === "segmentAttack") && activeClimb ? "Lancer le chrono" : "Démarrer la séance"}</button>
                 </div>
               </div>
             ) : (
               <>
-                <p className="eyebrow">{activeClimb ? routeCategory(activeClimb) === "scenic" ? "BALADE · RYTHME DOUX" : routeCategory(activeClimb) === "stage" ? "ÉTAPE" : "COL DE LÉGENDE" : active.name.toUpperCase()}</p>
+                <p className="eyebrow">{activeVoyage ? "VOYAGE · PORTION" : activeClimb ? routeCategory(activeClimb) === "scenic" ? "BALADE · RYTHME DOUX" : routeCategory(activeClimb) === "stage" ? "ÉTAPE" : "COL DE LÉGENDE" : active.name.toUpperCase()}</p>
+                <ReaderViewChoice preferences={preferences} onChange={updatePreference} />
+                <div className="sessionScreenStatus"><span role="status">{sessionStarted && !running && preferences.keepScreenAwake ? "Maintien de l’écran en pause" : screenWakeLabel(screenWake.status, preferences.keepScreenAwake)}</span>{preferences.keepScreenAwake && ["refused", "released"].includes(screenWake.status) && <button type="button" className="secondary miniButton" onClick={screenWake.retry}>Réessayer le maintien</button>}</div>
+                {foregroundNotice && <div className="foregroundNotice" role="status"><p>De retour dans VéloQuest. Vérifie la consigne actuelle et la connexion du vélo : les alertes peuvent avoir été interrompues en arrière-plan.</p><button type="button" className="secondary miniButton" onClick={() => setForegroundNotice(false)}>Compris</button></div>}
                 <h2>{active.segments[segmentIndex].label}</h2>
 
                 {activeClimb && (
                   <>
                     <div className="climbLiveTitle"><strong>{activeClimb.name}</strong><span>{routeMode === "segmentAttack" ? `${raceCurrentKm.toFixed(1)} / ${raceDistanceKm.toFixed(1)} km` : `${currentRouteKm.toFixed(1)} / ${activeClimb.distanceKm.toFixed(1)} km`}</span></div>
+                    {activeVoyage && <p className="voyageNext">Voyage · position simulée · portion {activeVoyage.startKm.toFixed(2)} → {activeVoyage.endKm.toFixed(2)} km</p>}
                     {(routeMode === "timeAttack" || routeMode === "segmentAttack") && (
                       <div className="timeAttackHud">
                         <span><small>CHRONO</small><strong>{formatRaceTime(timeAttackElapsedSeconds)}</strong></span>
@@ -1745,11 +1856,11 @@ export function VeloQuestApp() {
                         <span><small>PB</small><strong>{activeRaceBest?.metrics?.elapsedSeconds !== undefined ? formatRaceTime(activeRaceBest.metrics.elapsedSeconds) : "—"}</strong></span>
                       </div>
                     )}
-                    <ClimbProfile climb={activeClimb} progress={climbProgress} ghostProgress={ghostProgress} />
-                    <RouteMap climb={activeClimb} progress={climbProgress} ghostProgress={ghostProgress} />
+                    {preferences.readerView !== "essential" && <ClimbProfile climb={activeClimb} progress={climbProgress} ghostProgress={ghostProgress} />}
+                    {preferences.readerView !== "essential" && <RouteMap climb={activeClimb} progress={climbProgress} ghostProgress={ghostProgress} />}
                     <RoutePlaces route={activeClimb} currentKm={currentRouteKm} />
-                    {activeClimb.scenery && routeMode === "training" && <details className="sceneryDetails"><summary>Ton carnet de paysage</summary><p>{activeClimb.scenery}</p><div className="routeTags">{activeClimb.highlights?.map((highlight) => <span key={highlight}>{highlight}</span>)}</div><small>Pauses libres. La progression affichée reste virtuelle sans distance FTMS.</small></details>}
-                    {routeMode === "timeAttack" && (
+                    {preferences.readerView !== "essential" && activeClimb.scenery && routeMode === "training" && <details className="sceneryDetails"><summary>Ton carnet de paysage</summary><p>{activeClimb.scenery}</p><div className="routeTags">{activeClimb.highlights?.map((highlight) => <span key={highlight}>{highlight}</span>)}</div><small>Pauses libres. La progression affichée reste virtuelle sans distance FTMS.</small></details>}
+                    {preferences.readerView !== "essential" && routeMode === "timeAttack" && (
                       <div className="checkpointStrip">
                         {routeCheckpoints.map((km, index) => {
                           const split = timeAttackSplits.find((item) => item.km === km);
@@ -1760,17 +1871,18 @@ export function VeloQuestApp() {
                   </>
                 )}
 
-                <div className="resistance">
+                <div className="sessionEssentials"><div className="resistance">
                   <small>NIVEAU GUIDÉ</small>
                   <strong>{adjustedResistance(active.segments[segmentIndex].resistance, preferences.resistanceOffset + sessionResistanceDelta)}</strong>
                 </div>
-                <div className="timer" aria-live="off">{formatClock(secondsLeft)}</div>
+                <div className="timer" aria-live="off">{formatClock(secondsLeft)}</div></div>
                 <div className="sessionOverall">
                   <div><span>Segment {segmentIndex + 1}/{active.segments.length}</span><strong>{sessionProgressPercent}%</strong></div>
                   <i><b style={{ width: `${sessionProgressPercent}%` }} /></i>
                   {autoResistanceControl && controlGranted && <small>AUTO LEVEL ACTIF</small>}
                 </div>
                 <div className="segmentMeta"><span>RPE {active.segments[segmentIndex].rpe}</span>{active.segments[segmentIndex].cadence && <span>Cible {active.segments[segmentIndex].cadence} tr/min</span>}</div>
+                {activeClimb && preferences.showRoutePhotos && preferences.readerView !== "essential" && <RoutePhotos key={activeClimb.id} route={activeClimb} currentKm={currentRouteKm} />}
                 {bike && (
                   <div className="liveStrip">
                     <span><small>RPM</small><strong>{telemetry.cadenceRpm?.toFixed(0) ?? "—"}</strong></span>
@@ -1783,14 +1895,16 @@ export function VeloQuestApp() {
                   <div className="nextSegment"><small>ENSUITE</small><strong>{active.segments[segmentIndex + 1].label}</strong><span>niveau {adjustedResistance(active.segments[segmentIndex + 1].resistance, preferences.resistanceOffset + sessionResistanceDelta)}</span></div>
                 )}
                 {active.segments.length <= 30 && <div className="segmentProgress">{active.segments.map((_, i) => <i key={i} className={i <= segmentIndex ? "done" : ""} />)}</div>}
-                <div className="modalActions three">
-                  <button className="secondary" disabled={segmentIndex === 0} onClick={() => goToSegment(segmentIndex - 1)}>← Précédent</button>
+                <SessionComfort preferences={preferences} onChange={updatePreference} />
+                <div className="readerControls"><div className="modalActions three">
+                  <button className="secondary" disabled={Boolean(activeVoyage) || segmentIndex === 0} onClick={() => goToSegment(segmentIndex - 1)}>← Précédent</button>
                   {(routeMode === "timeAttack" || routeMode === "segmentAttack") && activeClimb
                     ? <button className="primary" disabled>Chrono actif</button>
                     : <button className="primary" onClick={togglePause}>{running ? "Pause" : "Reprendre"}</button>}
-                  <button className="secondary" disabled={segmentIndex >= active.segments.length - 1} onClick={() => goToSegment(segmentIndex + 1)}>Suivant →</button>
+                  <button className="secondary" disabled={Boolean(activeVoyage) || segmentIndex >= active.segments.length - 1} onClick={() => goToSegment(segmentIndex + 1)}>Suivant →</button>
                 </div>
                 <button className="finish" onClick={() => { setRunning(false); setShowFinish(true); }}>Terminer et enregistrer</button>
+                </div>
               </>
             )}
           </div>
@@ -1803,6 +1917,7 @@ export function VeloQuestApp() {
             <button className="close" aria-label="Fermer le détail" onClick={() => setSelectedSessionId(null)}>×</button>
             <p className="eyebrow">JOURNAL</p>
             <h2>{selectedRoute?.name ?? selectedTemplate?.name ?? selectedSession.templateId}</h2>
+            {selectedSession.metrics?.voyage && <p className="voyageNext">Voyage · {selectedSession.metrics.voyage.startKm.toFixed(2)} → {selectedSession.metrics.voyage.endKm.toFixed(2)} km · {selectedSession.metrics.voyage.completedPortion ? "portion achevée" : "portion inachevée"} · position simulée. Cette séance seule ne valide pas un parcours entier.</p>}
             <p className="detailDate">{new Intl.DateTimeFormat("fr-FR", { dateStyle: "full", timeStyle: "short" }).format(new Date(selectedSession.date))}</p>
             <div className="detailMetrics">
               <DetailMetric label={selectedSession.metrics?.segmentAttackIndex !== undefined ? `Segment Attack S${selectedSession.metrics.segmentAttackIndex + 1}` : selectedSession.metrics?.timeAttack ? "Time Attack" : "Durée"} value={selectedSession.metrics?.elapsedSeconds !== undefined ? formatRaceTime(selectedSession.metrics.elapsedSeconds) : `${selectedSession.duration.toFixed(1)} min`} />
@@ -1880,7 +1995,7 @@ export function VeloQuestApp() {
 
 function MissionItem({ label, value, target, suffix = "" }: { label: string; value: number; target: number; suffix?: string }) {
   const done = value >= target;
-  return <div className={done ? "missionItem done" : "missionItem"}><span>{done ? "✓" : "•"}</span><div><strong>{label}</strong><small>{value}{suffix} / {target}{suffix}</small></div></div>;
+  return <div className={done ? "missionItem done" : "missionItem"}><span>{done ? "✓" : "•"}</span><div><strong>{label}</strong><small>{quantity(value)}{suffix} / {target}{suffix}</small></div></div>;
 }
 
 function DetailMetric({ label, value }: { label: string; value: string }) {
@@ -1892,7 +2007,7 @@ function ConsoleMetric({ label, value }: { label: string; value: string }) {
 }
 
 function Stat({ label, value, target, suffix = "" }: { label: string; value: number; target: number; suffix?: string }) {
-  return <article className="card stat"><span>{label}</span><strong>{value}{suffix}</strong><small>objectif {target}{suffix}</small><div className="bar"><i style={{ width: `${pct(value, target)}%` }} /></div></article>;
+  return <article className="card stat"><span>{label}</span><strong>{quantity(value)}{suffix}</strong><small>objectif {target}{suffix}</small><div className="bar"><i style={{ width: `${pct(value, target)}%` }} /></div></article>;
 }
 
 function Toggle({ label, description, checked, onChange }: { label: string; description: string; checked: boolean; onChange: (value: boolean) => void }) {

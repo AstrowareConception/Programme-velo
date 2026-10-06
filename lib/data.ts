@@ -1,12 +1,14 @@
 import { localInputDate, localCalendarDay } from "./dates";
 import type { Badge, AppState, Preferences, WeekTarget, WorkoutTemplate } from "./types";
 import { campaignBonusXp, campaigns, campaignProgress, completedRouteIds } from "./campaigns";
+import { voyageBonusXp, voyageRoutes } from "./voyage-progress";
 import { scenicRouteIds } from "./scenic-routes";
 import { explorationRoutes } from "./exploration-routes";
 import { discoveryBadges } from "./discovery-objectives";
 import { discoveryWorkouts } from "./discovery-workouts";
 import { shortRoutes } from "./short-rides";
 import { esterelRoutes } from "./esterel-routes";
+import { alsaceRoutes } from "./alsace-routes";
 import { napoleonShortRoutes } from "./napoleon-short-routes";
 import { workoutProgramBadges, workoutProgramBonusXp } from "./workout-programs";
 import { initialGuidance } from "./onboarding";
@@ -19,7 +21,12 @@ export const defaultPreferences: Preferences = {
   haptics: true,
   keepScreenAwake: true,
   keepTelemetryTrace: true,
-  resistanceOffset: 0
+  resistanceOffset: 0,
+  cueVolume: 65,
+  cueFrequency: "all",
+  announceUpcoming: false,
+  readerView: "full",
+  showRoutePhotos: true
 };
 
 export const workouts: WorkoutTemplate[] = [
@@ -315,7 +322,7 @@ export function sessionsForProgramWeek(state: AppState, week: number) {
 export function weeklyStats(state: AppState, week: number) {
   const all = sessionsForProgramWeek(state, week);
   const structured = all.filter((s) => !s.bonus);
-  const bonuses = all.filter((s) => s.bonus);
+  const bonuses = all.filter((s) => s.bonus && s.metrics?.voyage === undefined);
   const bonusXp = Math.min(60, bonuses.reduce((sum, s) => sum + s.xp, 0));
   return {
     sessions: structured.length,
@@ -329,13 +336,13 @@ export function weeklyStats(state: AppState, week: number) {
 }
 
 export function totalXp(state: AppState) {
-  const sessionXp = state.sessions.filter((s) => !s.bonus).reduce((sum, s) => sum + s.xp, 0);
+  const sessionXp = state.sessions.filter((s) => !s.bonus && s.metrics?.voyage === undefined).reduce((sum, s) => sum + s.xp, 0);
   const completedWeeks = weekTargets.filter((target) => {
     const s = weeklyStats(state, target.week);
     return s.points >= target.points && s.minutes >= target.minutes && s.sessions >= target.sessions && s.variety >= target.variety && s.hard <= target.maxHard;
   }).length;
   const bonusXp = weekTargets.reduce((sum, target) => sum + weeklyStats(state, target.week).bonusXp, 0);
-  return sessionXp + bonusXp + completedWeeks * 250 + campaignBonusXp(state.sessions) + workoutProgramBonusXp(state.sessions);
+  return sessionXp + bonusXp + completedWeeks * 250 + campaignBonusXp(state.sessions) + workoutProgramBonusXp(state.sessions) + voyageBonusXp(state.sessions);
 }
 
 export function levelForXp(xp: number) {
@@ -378,12 +385,19 @@ export function badges(state: AppState): Badge[] {
   const uniqueChallengeIds = new Set(successfulChallenges.map((s) => s.metrics!.challenge!.id));
   const totalDistance = state.sessions.reduce((sum, s) => sum + (s.metrics?.distanceKm ?? 0), 0);
   const sessionsWithPower = state.sessions.filter((s) => (s.metrics?.avgPowerW ?? 0) > 0);
-  const gentleRouteIds = [...scenicRouteIds, ...[...explorationRoutes, ...shortRoutes, ...esterelRoutes, ...napoleonShortRoutes].filter((route) => route.category === "scenic").map((route) => route.id)];
+  const gentleRouteIds = [...scenicRouteIds, ...[...explorationRoutes, ...shortRoutes, ...esterelRoutes, ...napoleonShortRoutes, ...alsaceRoutes].filter((route) => route.category === "scenic").map((route) => route.id)];
   const scenicCount = gentleRouteIds.filter((id) => routeIds.has(id)).length;
   // Preserve the historic relief counters; gentle rides have their own trophies.
   const reliefCount = [...routeIds].filter((id) => !gentleRouteIds.includes(id)).length;
+  const voyages = voyageRoutes(state.sessions);
+  const completedVoyages = voyages.filter(p => p.complete).length;
 
   return [
+    ...[
+      { id: "voyage-first", name: "Première escale", icon: "🧳", target: 1, count: voyages.length ? 1 : 0, description: "Achever et enregistrer une première portion en mode Voyage." },
+      { id: "voyage-complete", name: "Au bout du voyage", icon: "🏁", target: 1, count: completedVoyages, description: "Couvrir un parcours entier en une ou plusieurs portions Voyage, sans kilomètre manquant." },
+      { id: "voyage-three", name: "Voyages au long cours", icon: "📖", target: 3, count: completedVoyages, description: "Achever trois parcours différents en mode Voyage." }
+    ].map((trophy): Badge => ({ id: trophy.id, name: trophy.name, icon: trophy.icon, description: trophy.description, unlocked: trophy.count >= trophy.target, progress: `${Math.min(trophy.count, trophy.target)}/${trophy.target}` })),
     ...discoveryBadges(state.sessions),
     ...workoutProgramBadges(state.sessions),
     ...[

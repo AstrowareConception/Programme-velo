@@ -27,10 +27,13 @@ function fixture({ range = true, feature = true, data = true, controlNotify = tr
     throw new DOMException("Missing", "NotFoundError");
   }) };
   const disconnect = vi.fn();
-  const requestDevice = vi.fn(async () => ({ name: "Unknown brand", addEventListener: vi.fn(), removeEventListener: vi.fn(), gatt: { connect: async () => ({ getPrimaryService: async () => service }), disconnect } }));
+  const getPrimaryService = vi.fn(async () => service);
+  const connect = vi.fn(async () => ({ getPrimaryService }));
+  const device = { name: "Unknown brand", addEventListener: vi.fn(), removeEventListener: vi.fn(), gatt: { connect, disconnect } };
+  const requestDevice = vi.fn(async () => device);
   vi.stubGlobal("navigator", { bluetooth: { requestDevice } });
   vi.stubGlobal("window", globalThis);
-  return { write, disconnect, requestDevice, dataCharacteristic, listeners };
+  return { write, disconnect, requestDevice, dataCharacteristic, listeners, connect, device, getPrimaryService };
 }
 afterEach(() => { vi.unstubAllGlobals(); vi.useRealTimers(); });
 
@@ -91,5 +94,36 @@ describe("generic FTMS adapter", () => {
     await vi.advanceTimersByTimeAsync(1801);
     await pending;
     expect(f.listeners.size).toBe(0);
+  });
+  it("releases a stuck handshake and closes a late GATT connection", async () => {
+    vi.useFakeTimers();
+    const f = fixture();
+    let resolve!: (server: { getPrimaryService: typeof f.getPrimaryService }) => void;
+    f.connect.mockImplementation(() => new Promise(r => { resolve = r; }));
+    const pending = expect(connectFtmsBike(() => {})).rejects.toThrow("délai dépassé");
+    await vi.advanceTimersByTimeAsync(15_001);
+    await pending;
+    expect(f.disconnect).toHaveBeenCalled();
+    const calls = f.disconnect.mock.calls.length;
+    resolve({ getPrimaryService: f.getPrimaryService });
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(f.disconnect.mock.calls.length).toBeGreaterThan(calls);
+    expect(f.getPrimaryService).not.toHaveBeenCalled();
+    expect(f.write).not.toHaveBeenCalled();
+  });
+  it("closes a device selected after the chooser deadline without connecting", async () => {
+    vi.useFakeTimers();
+    const f = fixture();
+    let resolve!: (device: typeof f.device) => void;
+    f.requestDevice.mockImplementation(() => new Promise(r => { resolve = r; }));
+    const pending = expect(connectFtmsBike(() => {})).rejects.toThrow("délai dépassé");
+    await vi.advanceTimersByTimeAsync(15_001);
+    await pending;
+    resolve(f.device);
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(f.disconnect).toHaveBeenCalled();
+    expect(f.connect).not.toHaveBeenCalled();
   });
 });

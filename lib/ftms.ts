@@ -198,8 +198,6 @@ async function controlCommand(characteristic: any, payload: Uint8Array) {
 
   return new Promise<void>(async (resolve, reject) => {
     let settled = false;
-    let controlGranted = false;
-    let disconnected = false;
     const cleanup = () => {
       characteristic.removeEventListener("characteristicvaluechanged", onResponse);
       window.clearTimeout(timeout);
@@ -244,48 +242,75 @@ export async function connectFtmsBike(
   const bluetooth = (navigator as WebBluetoothNavigator).bluetooth;
   if (!bluetooth) throw new Error("Web Bluetooth n’est pas disponible sur ce navigateur.");
 
-  const device = await bluetooth.requestDevice({
-    acceptAllDevices: true, // Names and advertised services do not establish compatibility.
-    optionalServices: [FTMS_SERVICE]
-  });
-
-  const server = await device.gatt?.connect();
-  if (!server) throw new Error("Connexion GATT impossible.");
-
-  let service: any;
-  try {
-    service = await server.getPrimaryService(FTMS_SERVICE);
-  } catch {
-    try { device.gatt?.disconnect(); } catch {}
-    throw new Error("Service FTMS (0x1826) inaccessible lors de cet essai. Vérifie le réveil du vélo et les permissions Bluetooth.");
+  let device: any;
+  let stopped = false;
+  const disconnect = () => { try { device?.gatt?.disconnect(); } catch {} };
+  // A failed/late handshake must release the physical bike for another attempt.
+  async function bounded<T>(operation: Promise<T>, late?: (value: T) => void): Promise<T> {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    try {
+      return await Promise.race([
+        operation.then(value => {
+          if (stopped) { late?.(value); throw new Error("Connexion FTMS expirée."); }
+          return value;
+        }),
+        new Promise<never>((_, reject) => {
+          timer = setTimeout(() => {
+            stopped = true;
+            disconnect();
+            reject(new Error("Connexion FTMS : délai dépassé. Ferme le sélecteur éventuel, réveille le vélo et réessaie."));
+          }, 15_000);
+        })
+      ]);
+    } finally { clearTimeout(timer); }
   }
+  const ensureActive = () => { if (stopped) throw new Error("Connexion FTMS expirée."); };
 
   try {
-    const dataChar = await service.getCharacteristic(INDOOR_BIKE_DATA);
-    const featureChar = await optionalCharacteristic(service, FITNESS_MACHINE_FEATURE);
-    const rangeChar = await optionalCharacteristic(service, SUPPORTED_RESISTANCE_RANGE);
-    const controlPoint = await optionalCharacteristic(service, CONTROL_POINT);
+    device = await bounded(bluetooth.requestDevice({
+      acceptAllDevices: true, // Names and advertised services do not establish compatibility.
+      optionalServices: [FTMS_SERVICE]
+    }), (late: any) => { try { late.gatt?.disconnect(); } catch {} });
+
+    const server: any = await bounded(Promise.resolve(device.gatt?.connect()), disconnect);
+    if (!server) throw new Error("Connexion GATT impossible.");
+
+    let service: any;
+    try {
+      service = await bounded(server.getPrimaryService(FTMS_SERVICE));
+    } catch (error) {
+      if (stopped) throw error;
+      throw new Error("Service FTMS (0x1826) inaccessible lors de cet essai. Vérifie le réveil du vélo et les permissions Bluetooth.");
+    }
+
+    const dataChar: any = await bounded(service.getCharacteristic(INDOOR_BIKE_DATA));
+    const featureChar = await bounded(optionalCharacteristic(service, FITNESS_MACHINE_FEATURE));
+    const rangeChar = await bounded(optionalCharacteristic(service, SUPPORTED_RESISTANCE_RANGE));
+    const controlPoint = await bounded(optionalCharacteristic(service, CONTROL_POINT));
 
     let targetSettingsBits: number | undefined;
     if (featureChar) {
       try {
-        const featureValue: DataView = await featureChar.readValue();
+        const featureValue: DataView = await bounded<DataView>(featureChar.readValue());
         if (featureValue.byteLength >= 8) targetSettingsBits = featureValue.getUint32(4, true);
       } catch {}
     }
+    ensureActive();
 
     let resistanceRange: ResistanceRange | undefined;
     if (rangeChar) {
       try {
-        resistanceRange = parseResistanceRange(await rangeChar.readValue());
+        resistanceRange = parseResistanceRange(await bounded<DataView>(rangeChar.readValue()));
       } catch {}
     }
 
+    ensureActive();
     let controlReady = false;
     if (controlPoint) {
-      try { await controlPoint.startNotifications(); controlReady = true; } catch {}
+      try { await bounded(controlPoint.startNotifications()); controlReady = true; } catch {}
     }
 
+    ensureActive();
     const capabilities: BikeCapabilities = {
       ftms: true,
       indoorBikeData: true,
@@ -302,7 +327,8 @@ export async function connectFtmsBike(
       if (value) onTelemetry(parseIndoorBikeData(value));
     };
 
-    await dataChar.startNotifications();
+    await bounded(dataChar.startNotifications());
+    ensureActive();
     dataChar.addEventListener("characteristicvaluechanged", handler);
 
     let controlGranted = false;
@@ -357,7 +383,8 @@ export async function connectFtmsBike(
       }
     };
   } catch (error) {
-    try { device.gatt?.disconnect(); } catch {}
+    stopped = true;
+    disconnect();
     throw error;
   }
 }

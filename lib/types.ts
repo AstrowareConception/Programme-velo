@@ -65,6 +65,7 @@ export type ChallengeResult = {
 
 export type SessionMetrics = {
   source: "manual" | "ftms" | "mixed";
+  voyage?: VoyagePortion;
   completedWorkout?: boolean;
   challenge?: ChallengeResult;
   completedRoute?: boolean;
@@ -126,6 +127,11 @@ export type Preferences = {
   keepScreenAwake: boolean;
   keepTelemetryTrace: boolean;
   resistanceOffset: number;
+  cueVolume?: number;
+  cueFrequency?: "all" | "changes";
+  announceUpcoming?: boolean;
+  readerView?: "full" | "essential";
+  showRoutePhotos?: boolean;
 };
 
 export type AppState = {
@@ -135,6 +141,17 @@ export type AppState = {
   preferences?: Preferences;
   favoriteRouteIds?: string[];
   guidance?: Guidance;
+  voyage?: { routeId: string; minutes: 15 | 30 | 45 | 60 };
+};
+
+export type VoyagePortion = {
+  version: 1;
+  startKm: number;
+  endKm: number;
+  routeDistanceKm: number;
+  routeXp: number;
+  completedPortion: boolean;
+  positionSource: "simulation";
 };
 
 export type Guidance = {

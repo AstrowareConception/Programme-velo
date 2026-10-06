@@ -2,6 +2,7 @@ import { defaultPreferences, emptyState } from "./data";
 import type { AppState, Preferences } from "./types";
 import type { ClimbChallenge } from "./routes";
 import { normalizeGuidance } from "./onboarding";
+import { validVoyagePortion } from "./voyage-progress";
 
 type Backup = {
   format: "veloquest-backup-v3";
@@ -24,15 +25,20 @@ function stringOr(value: unknown, fallback: string) {
 
 function normalizePreferences(value: unknown): Preferences {
   const raw = isObject(value) ? value : {};
-  const bool = (key: keyof Omit<Preferences, "resistanceOffset">) =>
-    typeof raw[key] === "boolean" ? raw[key] as boolean : defaultPreferences[key];
+  const bool = (key: "soundCues" | "voiceCues" | "haptics" | "keepScreenAwake" | "keepTelemetryTrace" | "announceUpcoming" | "showRoutePhotos") =>
+    typeof raw[key] === "boolean" ? raw[key] as boolean : (defaultPreferences[key] ?? false);
   return {
     soundCues: bool("soundCues"),
     voiceCues: bool("voiceCues"),
     haptics: bool("haptics"),
     keepScreenAwake: bool("keepScreenAwake"),
     keepTelemetryTrace: bool("keepTelemetryTrace"),
-    resistanceOffset: Math.max(-4, Math.min(4, numberOrUndefined(raw.resistanceOffset) ?? defaultPreferences.resistanceOffset))
+    resistanceOffset: Math.max(-4, Math.min(4, numberOrUndefined(raw.resistanceOffset) ?? defaultPreferences.resistanceOffset)),
+    cueVolume: Math.max(0, Math.min(100, numberOrUndefined(raw.cueVolume) ?? 65)),
+    cueFrequency: raw.cueFrequency === "changes" ? "changes" : "all",
+    announceUpcoming: bool("announceUpcoming"),
+    readerView: raw.readerView === "essential" ? "essential" : "full",
+    showRoutePhotos: bool("showRoutePhotos")
   };
 }
 
@@ -53,7 +59,17 @@ export function normalizeState(value: unknown): AppState {
   return {
     profile,
     guidance: normalizeGuidance(value.guidance),
-    sessions: Array.isArray(value.sessions) ? value.sessions.filter(isObject) as AppState["sessions"] : [],
+    voyage: isObject(value.voyage) && typeof value.voyage.routeId === "string" && value.voyage.routeId.length > 0
+      ? { routeId: value.voyage.routeId, minutes: [15, 30, 45, 60].includes(Number(value.voyage.minutes)) ? Number(value.voyage.minutes) as 15 | 30 | 45 | 60 : 30 }
+      : undefined,
+    sessions: Array.isArray(value.sessions) ? value.sessions.filter(isObject).map(session => {
+      const metrics = isObject(session.metrics) ? session.metrics : undefined;
+      if (!metrics || metrics.voyage === undefined || validVoyagePortion(metrics.voyage)) return session;
+      // Do not turn corrupt Voyage data into a legacy whole-route completion.
+      return { ...session, xp: 0, points: 0, metrics: { ...metrics, voyage: undefined,
+        completedRoute: false, completedWorkout: false, completedSegment: false,
+        timeAttack: undefined, segmentAttackIndex: undefined, challenge: undefined } };
+    }) as AppState["sessions"] : [],
     measurements: Array.isArray(value.measurements) ? value.measurements.filter(isObject) as AppState["measurements"] : [],
     preferences: normalizePreferences(value.preferences),
     favoriteRouteIds: Array.isArray(value.favoriteRouteIds)

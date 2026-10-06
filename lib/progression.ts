@@ -1,6 +1,7 @@
 import type { CompletedSession } from "./types";
 import type { ClimbChallenge } from "./routes";
 import { foundingScenicRouteIds } from "./scenic-routes";
+import { allCompletedRouteIds, isStandaloneRouteCompleted, voyageRoutes } from "./voyage-progress";
 
 export type RouteCollection = {
   id: string;
@@ -40,17 +41,18 @@ export const routeCollections: RouteCollection[] = [
 ];
 
 export function isRouteCompleted(session: CompletedSession) {
-  if (!session.routeId) return false;
-  return session.metrics?.completedRoute !== false && session.metrics?.segmentAttackIndex === undefined;
+  return isStandaloneRouteCompleted(session);
 }
 
 export function progressionStats(sessions: CompletedSession[], routes: ClimbChallenge[]) {
   const completedSessions = sessions.filter(isRouteCompleted);
-  const completedRouteIds = new Set(completedSessions.map((session) => session.routeId).filter((id): id is string => Boolean(id)));
+  const completedRouteIds = allCompletedRouteIds(sessions);
+  const completedVoyages = voyageRoutes(sessions).filter(p => p.complete);
   const challengeSuccesses = sessions.filter((session) => session.metrics?.challenge?.success);
   const uniqueChallenges = new Set(challengeSuccesses.map((session) => session.metrics!.challenge!.id));
   const routeById = new Map(routes.map((route) => [route.id, route]));
-  const virtualElevationGainM = completedSessions.reduce((sum, session) => sum + (routeById.get(session.routeId ?? "")?.elevationGainM ?? 0), 0);
+  const virtualElevationGainM = completedSessions.reduce((sum, session) => sum + (routeById.get(session.routeId ?? "")?.elevationGainM ?? 0), 0)
+    + completedVoyages.reduce((sum, p) => sum + (routeById.get(p.routeId)?.elevationGainM ?? 0), 0);
 
   const pbImprovementsByRoute = new Map<string, number>();
   const timeAttacks = sessions
@@ -71,7 +73,7 @@ export function progressionStats(sessions: CompletedSession[], routes: ClimbChal
   return {
     completedRouteIds,
     uniqueRoutes: completedRouteIds.size,
-    totalRouteCompletions: completedSessions.length,
+    totalRouteCompletions: completedSessions.length + completedVoyages.length,
     virtualElevationGainM,
     challengeSuccesses: challengeSuccesses.length,
     uniqueChallenges: uniqueChallenges.size,

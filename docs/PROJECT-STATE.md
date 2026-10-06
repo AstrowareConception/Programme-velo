@@ -1,10 +1,23 @@
-# État de reprise VéloQuest — 4 octobre 2026
+# État de reprise VéloQuest — actualisé le 5 octobre 2026
+
+## 6 octobre 2026 — vignoble d’Alsace et extension des photos
+
+Lot préparé depuis main `58a8769bab262903918757bdbe9c29306476d389` (correctif PWA de la PR 34 livré et vérifié en production). Neuf parcours alsaciens : six étapes continues et trois courts formats distincts, deux carnets (770 XP uniques au total) et deux trophées. Catalogue : 80 parcours, 35 balades, 11 thèmes, 22 carnets et 74 badges. Les anciens parcours et objectifs restent identiques. [Trace, relief et règles](ALSACE-VIGNOBLE.md).
+
+Cinq nouvelles photos créditées : Ventoux, Galibier, Estérel, Obernai et Eguisheim. Dix images, dix-sept parcours illustrés, 574 734 octets facultatifs ; compteur PWA et bouton de préparation suivent le manifeste. [Sources et points de vue](LANDSCAPE-PHOTOS.md). Les contrôles exacts, PR, fusion et version publique seront portés dans l’état de reprise externe après observation. La PR 29 matérielle reste séparée. Nantes constitue la prochaine piste de contenu, sans lot engagé ici.
+
+
+## Construction PWA sur Vercel
+
+La PR 33 a passé les quatre contrôles sur `b390adad97b544c6c172bc7822b87e3d2f7fcfdf` (140 unités, 182 scénarios navigateur), puis a été fusionnée dans main `906c30081ba127726c3ef8a09be2dcf4d3329a6d`, dont la CI a également réussi. Le build Vercel a toutefois échoué avec ENOENT ; la production précédente `703d769` est restée active. L’erreur exacte a été reproduite avec l’adaptateur officiel : Next.js 16.3 y conserve le HTML dans le cache de routes et le paquet `.next/output`, au lieu de `.next/server/app/index.html`.
+
+La correction utilise les fichiers du paquet Vercel, écrit le worker dans les deux destinations et retrouve les chunks préparés malgré le paramètre `?dpl` ajouté par Next.js. Tests de construction des deux formats, refus d’un paquet incomplet et vérification hors réseau avec ce paramètre ajoutés. Les références finales de la correction, les quatre contrôles sur son SHA exact, la CI et la version publique observée seront consignés dans l’état de reprise externe ; cet échec de déploiement ne constitue pas une livraison du lot PWA.
 
 ## Références
 
 - Dépôt : https://github.com/AstrowareConception/Programme-velo ; référence `main`.
 - Production : https://programme-velo.vercel.app/ ; projet Vercel `programme-velo`.
-- Matériel : TOPUTURE commandé le 4 octobre 2026, référence exacte et FTMS à qualifier ; TEB5 est une hypothèse historique. Consignes sur 1–32 niveaux, mode manuel conservé. Voir `HARDWARE-COMPATIBILITY.md`.
+- Matériel : TOPUTURE reçu le 6 octobre 2026, référence exacte et FTMS à qualifier ; TEB5 est une hypothèse historique. Consignes sur 1–32 niveaux, mode manuel conservé. Voir `HARDWARE-COMPATIBILITY.md`.
 
 ## Campagnes intégrées
 
@@ -105,3 +118,42 @@ Une seule trace nommée du GPX Michelin Grenoble–Embrun, inversée et découp�
 Lot préparé depuis main `e9a9738ffb818569e769000106a6adb6f08a3fec` : dix parcours, 71 au total, 29 balades 1/5, dix thèmes, 20 campagnes/carnets et 67 badges. GPX touristique Estérel séparé en trois étapes côtières et un retour intérieur, plus deux courts extraits ; quatre formats courts issus des sources Napoléon existantes. Tous les nouveaux profils utilisent IGN RGE ALTI lissé. [Détails, sources et règles](ESTEREL-ESCALES.md).
 
 Trois carnets (600/100/180 XP uniques), Roches rouges (3 étapes côtières) et Aigle de poche (2 escales sur 4). Les formats courts ne terminent pas les parents. Les anciens carnets Napoléon, trophées courts et PACA restent fixes. Les nouvelles balades restent exclues des compteurs de reliefs. Aucun changement de stockage ; cache PWA v12. [Roadmap](ROADMAP.md) actualisée : mode Voyage, Alsace, canal de Nantes à Brest, Grandes Alpes puis carnet personnel. Les références exactes des tests, de fusion et de production sont consignées dans l’état de reprise externe une fois vérifiées.
+
+## Confort du lecteur et médias personnels
+
+Lot fondé sur main `d440084389c381ea3d12d67611004f4f6ac4871a` (PR 28 livrée). Vue essentielle ou complète, niveau et temps côte à côte, commandes accessibles ; carte/profil/détails masqués uniquement dans la vue essentielle, lieux et chrono de course conservés. Réglages dans Plus, préparation et lecteur : bips/voix, volume, fréquence, test explicite et préavis facultatif dix secondes sur segments minutés. Les annonces utilisent la calibration globale et l’ajustement du coach. Un contexte audio est réutilisé pendant la séance puis libéré.
+
+Le maintien de l’écran affiche la demande, l’accord, le refus, l’absence ou l’interruption. Libération à la pause/fin/fermeture ; retour visible et relance manuelle ; accord tardif après fermeture relâché. Rappel au retour d’arrière-plan. Les préférences facultatives sont validées à l’import, compatibles avec les anciens états et exportées en v3 ; historiques, métriques, défis, courses et reprise ne changent pas. Cache PWA v13, sans promesse de fonctionnement continu en arrière-plan.
+
+[Guide pratique](READER-COMFORT.md), README et roadmap actualisés. Aucun lecteur vidéo intégré ni mode Voyage continu dans ce lot. Les tests de voix et de maintien simulent les API ; casque, podcast/vidéo, iPhone/Android réels et TEB5 restent à éprouver. Contrôles obligatoires sur le SHA proposé, CI, fusion et version publique seront consignés dans l’état de reprise externe après observation. La PR 29 de diagnostic matériel reste distincte et ouverte, sans qualification du vélo physique.
+
+## 5 octobre 2026 — Voyage par portions
+
+Lot fondé sur main `f1eea5a61505dea0063a178485adff847398a077` (PR 30, confort du lecteur). Préparation sur chaque parcours natif ou GPX, portions 15/30/45/60 minutes, prochain passage depuis le premier kilomètre manquant, reprise depuis Quête. Carte, profil, résistance et repères du parcours original conservés ; position temporelle simulée à 15 km/h, mesures du vélo distinctes. Un parcours à la fois, sans raccord automatique Napoléon/Estérel.
+
+Journal avec bornes et achèvement de portion ; union des passages, sans cumul des chevauchements ni validation individuelle de route. XP du parcours une seule fois en Voyage, à son achèvement, sans double bonus avec une réalisation classique antérieure. Recalcul après suppression ; campagnes et palmarès suivent la couverture entière. Trois trophées ajoutés, 70 badges au total, 71 parcours inchangés. Métadonnées Voyage facultatives, export/import JSON v3 et colonnes CSV ; reprise v1 compatible avec les anciennes séances. Cache PWA v14. [Guide Voyage](VOYAGE.md).
+
+Contrôles exacts, PR, fusion et version publique seront consignés dans l’état de reprise externe après observation. La PR 29 reste distincte pour les diagnostics du vélo ; la simulation temporelle et FTMS ne qualifie pas le TOPUTURE physique. Photos documentées et carnet composé de plusieurs étapes restent à développer.
+
+## 5 octobre 2026 — photos azuréennes documentées
+
+Lot préparé depuis main `50304a6` (Voyage livré via PR 31). Cinq photos locales de Cagnes-sur-Mer, Antibes, Golfe-Juan, Cannes et Menton sur huit parcours existants ; 262 746 octets au total, moins de 100 000 par image. Attribution, date, source, licence et limites géographiques visibles. WebP 960 px sans recadrage, métadonnées retirées ; originaux et dérivés identifiés par SHA-256. [Sources et parcours](LANDSCAPE-PHOTOS.md).
+
+Galerie fermée et sans image au départ, navigation d’un lieu à l’autre, suivi du dernier repère illustré en kilomètres absolus pendant l’effort et Voyage, première vue à venir signalée. La navigation libre n’avance aucune séance. Images indisponibles : texte et crédits conservés, relance possible. Préférence facultative `showRoutePhotos`, sauvegardes v2/v3 compatibles, aucun changement d’historique ou de progression. La vue essentielle masque les galeries pendant l’effort. Aucun rapprochement automatique avec un GPX inconnu. Cache v15 ; images non consultées et cartes externes sans garantie hors connexion.
+
+Le catalogue reste à 71 parcours, 29 balades, dix thèmes, 20 campagnes et 70 badges. La PR 29 matérielle demeure distincte. Les quatre contrôles sur le commit exact, les vues mobile/ordinateur et la production doivent être vérifiés avant d’inscrire la livraison dans l’état de reprise externe. Suite : disponibilité hors connexion et mise à jour PWA accompagnée, puis extension photographique documentée et carnets multi-étapes. Le TOPUTURE physique n’est toujours pas qualifié.
+
+## Lot PWA du 5 octobre 2026
+
+Service worker généré à partir du build exact, empreintes des fichiers essentiels et caches distincts par version. Plus affiche la disponibilité vérifiée et le compteur des cinq photos ; préparation et réparation explicites. Nouvelle version en attente sans skipWaiting automatique ; accord de tous les onglets au repos, lecteur ouvert/pause/résultat/formulaire ou échec de sauvegarde bloquants. Verrou temporaire puis rechargement accompagné et reprise sauvegardée conservée. Une précédente version de cache reste conservée. Données locales et catalogue inchangés, aucun badge ni XP ajouté. [Guide PWA](PWA-OFFLINE.md).
+
+Tests navigateur en production ; service workers isolés pour les simulations de métier et activés pour les scénarios PWA réels. Les quatre contrôles sur le SHA exact, les vues mobile/ordinateur et la version publique sont à observer avant d’inscrire la livraison dans l’état externe. Prochaine priorité : autres photos documentées et packs de parcours. Matériel et iPhone/Android réels restent à valider.
+
+
+## 6 octobre 2026 — préparation de la recette du TOPUTURE reçu
+
+Térence confirme la réception du vélo le 6 octobre. Le lot Alsace/photos est déjà intégré dans main `c6e51578895e63931738118589a36f6bf143dcc2` (PR 35). La demande de tester désormais le matériel étend le périmètre à l’intégration de la PR 29 : conflits du lecteur essentiel et du guide réconciliés en conservant Voyage, photos et PWA.
+
+Le diagnostic des services standards ne commande rien et exporte son JSON local explicitement. La procédure courte apparaît dans Plus. La connexion FTMS lit les capacités réellement annoncées ; pas de repli 1–32. Le laboratoire prépare le minimum et un pas voisin sans écriture implicite, affiche vitesse/distance et heure du dernier paquet, évite les commandes concurrentes et expose les refus dans Plus. Les délais de connexion sont bornés et les connexions tardives refermées. Une mise à jour PWA attend la fin du diagnostic ou la déconnexion Bluetooth.
+
+Aucun exemplaire physique n’a encore été qualifié par cette préparation. [Recette](HARDWARE-COMPATIBILITY.md) et [fiche de résultat vierge](HARDWARE-TEST-RESULTS.md) font autorité pour les essais à réaliser par Térence. L’auto-résistance exige une plage annoncée 1–32/pas 1 et une vérification physique explicite à chaque connexion ; deux niveaux essayés ne vérifient pas toute la plage. Les résultats des quatre commandes et la version effectivement publiée seront consignés dans la PR 29 au SHA final.

@@ -1,0 +1,952 @@
+{
+  "base": "58a8769bab262903918757bdbe9c29306476d389",
+  "routeHashes": {
+    "alpe-dhuez": "ec5c629ca2b5f96b256dd73a06571731ae25ac0491bca7c061f6fcf50d4d1063",
+    "ventoux-bedoin": "ac032bddc43c9458cb45d8e111a2e6f8c12b86b9c54c34904fd493aabd129a79",
+    "tourmalet-est": "a3fb5f8e906ce1bf4b43d7d63b674bba8f79bd2e864bbee8305d4e43410b5e2a",
+    "galibier-valloire": "b62639b8732b3200e0c45748f2d4af71cfc9681ee4be9108cf1f3ce17f9026b9",
+    "madeleine-maurienne": "20c5b042609c081e880501041d215d87ae93e4f9a32446ce3a61427453196153",
+    "croix-de-fer-maurienne": "2ba9fb4b4e099c70bfd3fdf64516fde593becfe35b347634a40f61a1de0f1e99",
+    "glandon-cuines": "1fb857914c41a4949cb4d5b4cf181582811a46d8aacf370bd9ff7d4677b15df8",
+    "iseran-bonneval": "4105c4220b92ccc5e9e08ea9427bdb7feddd27064af76e5d1f3561e85455520f",
+    "enclave-papes-loop": "68e6540395e6a76f6126e9170d8775e53e0d470579c407ffe7a997d03b47bf79",
+    "vaison-medieval-loop": "c32f7ad6b796f5f68724b0f6966fb37ba436a526302384fb8999445dc5bf2d91",
+    "uchaux-loop": "c1ddd7f6fb724fe5fd7ebcf7d4a8c8ecf2a7de600caad9ca1800fe1d6b9467de",
+    "sorgue-velleron-loop": "bea543e407935a48dbed0f0be75a454589fc411d5c209963d740a8212f766bbd",
+    "nice-corniches-loop": "b2df3d6b25b420383dd0a58c2ff7303d7aa0d8af5c2c007f2b9ae82287b43bc4",
+    "chaussy-madeleine-stage": "19e89503b1d2b1e4ee756ae7e9fce414125d8b4222b33bc7336fca03a91da6b2",
+    "lac-der-balade": "3c700b6f382344e14392b36ee5452009e34ae57d21197f08fe9f7078cd48d274",
+    "annecy-rive-ouest": "ff06ede8ae6c9145c42dc29d62812c5f961b14f6b7e136a425436eefdfbf8437",
+    "chambord-petit-tour": "0b41b011f4e69fb6b8c899afa5873885a41a4bee06f8bf70055b2357a28965e9",
+    "re-chemins-campagne": "4595da0f294f2de9e57b4b2a0e0a170e156203705df37f8a438facf8f3299763",
+    "marais-poitevin-coulon-damvix": "92c6d3768ddc0c89d72009345d45d73f901e175461712b6c77ac3032ef3ccd44",
+    "canal-midi-carcassonne": "d713243942bd8eaeeff99e5e74f7ca91162f33b2e39cd0ffe8655b935b453007",
+    "loire-tours-villandry": "37960c2d1916da84445eb93fe7f28d58db7848266da36ab0373dc0177215c966",
+    "cagnes-cannes-littoral": "c5f6bf0338c69c60aa651e189c0d54ed30c8b39dcd431fde9e8629045b2b3d0e",
+    "golfe-juan-cannes-balade": "2f9712c8697fe0650c36f613fea3c9f5ec331d66f28b5b0bdd6650c247b3c199",
+    "nice-menton-grande-corniche": "7e75dd121669d73762882d5a85d777bc162fbf404755fc0bb1ed483b8edca20d",
+    "eze-menton-basse-corniche": "93b2c9691459b0f8930b8df0ad74fb23eb1bcb9bacabb8e7c3a7fde1ff2110cb",
+    "menton-garavan-promenade": "01c0cb35e9a2dfc88f20cdbacba4ca13154002ed74b521becbf0678b67c5d6c1",
+    "baux-alpilles-rocher": "cf16511b0d20bf52c9f7271350bace4feffe794ae82c97418d2e42420b4c43c6",
+    "sainte-croix-valensole": "2f70f311209a57ce6d70a313a4df81424909c9061de9c18ce3649e51cf875a77",
+    "castellane-deux-lacs": "90da19fe41326d8d54f59b94f537dcd71f3a9e230627b5e1fad1acdfdfa76c1d",
+    "verdon-route-cretes": "86bff68eeddf78962627dca6b69c4b92f4db537cbdcd4d5e3465f5f8f82feca6",
+    "turini-vesubie-sospel": "b1fa5a2d057185283332186b608832a2090fe3b53b59ebd193e7efb9ac94fce8",
+    "bonette-ubaye-tinee": "756e452f12c6062abab9979922bf9aaac789ce1304a38b1c5c2d57c7ba1005cb",
+    "luberon-calavon": "6daaaf29ab972a21300e7afb51810c5584b4b1a76977bbcfdbbfdca3d31deca2",
+    "camargue-grau-gallician": "f0d00e0ed9ad482cc57278c1c08316a77fafda964fc713aa5691bcd42de62db2",
+    "baie-somme-cayeux-crotoy": "6a91c15e2aeb925877487d26884d73c2fd375d736a123a88b0ff30545a4dd0ad",
+    "bretagne-roscoff-morlaix": "566f9745e58080abae5b88f3d682e0e90337b75f4b02b418f5f6795912f323f2",
+    "loire-blois-chaumont": "5f1b8b37dceb0c00868494fd8cb5e3df06c23236af6f15b38bf555dafc545f98",
+    "alsace-erstein-strasbourg": "5ef5d48703fcc4eec446f5e5470246a89e90e646ff1d2fb84afde3becd09f7a1",
+    "antibes-golfe-juan-short": "9051277c969e154a1b5ce7d320959190a81b743736c772f38bb0d67df0879acd",
+    "eze-cap-ail-short": "49dce80a223fdd38d1de9d6c719c4508ae02910f9f933a0251fdc64960ab5161",
+    "baux-maussane-short": "87748e34a786045c08be4472b370ddcdda24c0f22147d44ab0246774e6a10237",
+    "riez-montagnac-short": "0ba04dc18eb6d4db178efb36d6828c635df97ba1372100d3b19df7845f8ae932",
+    "grau-aigues-short": "fe9cc03d07c3bb7b8b749bd33cb5662d8a17c76a8b3647233d29231b6cb6c275",
+    "cayeux-hourdel-short": "10ea7751d3ed1410172f5d95c57fde916c838e821c9db5ab1a55e957288e5036",
+    "noyelles-crotoy-short": "c08c5628d73c286d133e0fce7f65ae6051afb57075f2005660f06265f89c5ed0",
+    "cande-chaumont-short": "24e582a548ad68c54455d90b8b60563b0d6e4908406bef2d913fc804b947231f",
+    "sevrier-annecy-short": "0a146e4af6f441853f0c2201940b2840b6ec7bab71b4d997d0a7e3c07bf0b49b",
+    "napoleon-golfe-grasse": "b9171fb570fca298fcb10dc9a22147bf36bc4222bb0dc1a13c6f739dc902d3fc",
+    "napoleon-grasse-vallier": "fadcba050c8ed2b16eab5848442430ecd86603f28dadc1b513095f17106f80d2",
+    "napoleon-vallier-seranon": "16d64923b7b44abe0fa87d7c021ade87ca55ee98a7f44390ca43a06d7b209053",
+    "napoleon-seranon-castellane": "a0308dae6b9dac32b22e32cbb7c2ac0e3c52ed82b26ca24c188a1905c257f52b",
+    "napoleon-castellane-barreme": "e33de8f1c10dac14587db34ad948d7dd07671f3e4837ec9543e6757c4d36a96e",
+    "napoleon-barreme-digne": "8cf7b6e9b1d74d62d583c1e4d7e83fafbec05f7b4b0f9464df001d680ccf8a32",
+    "napoleon-digne-sisteron": "26c8f90f12a743b0cb60c83a48bf7458c5b03cc5fd171eab2a23d3faa6b8708d",
+    "napoleon-sisteron-gap": "04a7d5269b7ea300131c84c32fd53c8c438b4c2512a7bd6680e928fcefee43eb",
+    "napoleon-gap-fare": "ff0fd191232f6a1c2e03cb472b6b5f067c8a8479fb83d6b6e5582dc23d1174ef",
+    "napoleon-fare-corps": "5972f22cd93e416e0b70369112b4e058d8faffabb672ff5e2990fa6129d686c7",
+    "napoleon-corps-mure": "2f2186e0dad27429a372812de767aa7ed6a64a49369e089e5ec2d75f43df317b",
+    "napoleon-mure-laffrey": "836050778ad394bb15dc43f92973f8281ea8cb551e8e944659f2bd5a2f9a6926",
+    "napoleon-laffrey-vizille": "c647a6744308fd62390a1f14bd8696404150d45c228a0e40d6e19cd6b97488c5",
+    "napoleon-vizille-grenoble": "6fec917150df760ff9455911b7074750869a8f520a2de0249230b4aa18612a1d",
+    "esterel-raphael-agay": "40bedb33fcbf521e8bebc11ca913cf5abc52897167d1a0d2e7bfaf8a006082e3",
+    "esterel-agay-trayas": "57e4123eb9a53295f2827f57173ff07772a6644330568b37eba892cfc1720ae1",
+    "esterel-trayas-theoule": "f2e362883a6980a7b0661619fc4322ca5a21c04a155e123abf1c0277f9913844",
+    "esterel-theoule-raphael": "56af33a7266336731b38a93b59b1e3a7dda33a245e850cf7cd7d1669cd0f0c18",
+    "esterel-raphael-boulouris-short": "9cc4ea13f1f78f1bfecd4f06bccd2a52fa646ab1f4253bc0b636f1bc94d0cbf7",
+    "esterel-agay-antheor-short": "857e1bd370838286544fedb9f2f6dbb2bc032e5f6c1bbf88efea60a6e48ee975",
+    "napoleon-golfe-cannes-short": "ff6dc00c85429ab4c3c5774a337cb7e4665c891b005c8802a263cacf008b038d",
+    "napoleon-mougins-mouans-short": "30294003a4f606f0553b46e81c62f3bac486242f98442d822f9a4ae5d92d617d",
+    "napoleon-malijai-chateau-short": "f46c13ec023976ad933110aba10e16f6cd5fa30e233a79f849871df2f95dfed1",
+    "napoleon-theoffrey-laffrey-short": "b81d9dfe92cf9d6cfb951acc949911b64887eaffc24a73eee84ef2fbc00e975f"
+  },
+  "campaigns": [
+    {
+      "id": "provence-discovery",
+      "title": "Découverte Provence",
+      "subtitle": "4 étapes accessibles",
+      "description": "Construis de l’endurance avec des profils roulants, des bosses courtes et de vraies descentes.",
+      "icon": "🌿",
+      "routeIds": [
+        "sorgue-velleron-loop",
+        "vaison-medieval-loop",
+        "uchaux-loop",
+        "enclave-papes-loop"
+      ],
+      "xpBonus": 500,
+      "difficultyLabel": "2–3/5"
+    },
+    {
+      "id": "rolling-tour",
+      "title": "Tour Vallonné",
+      "subtitle": "Du roulant aux Corniches",
+      "description": "Une progression variée jusqu’à une étape plus longue sur la Côte d’Azur.",
+      "icon": "🌊",
+      "routeIds": [
+        "vaison-medieval-loop",
+        "enclave-papes-loop",
+        "nice-corniches-loop"
+      ],
+      "xpBonus": 600,
+      "difficultyLabel": "2–3/5"
+    },
+    {
+      "id": "tour-legends-campaign",
+      "title": "Légendes du Tour",
+      "subtitle": "4 monuments",
+      "description": "Alpe d’Huez, Ventoux, Tourmalet et Galibier : le premier grand objectif montagne.",
+      "icon": "🏆",
+      "routeIds": [
+        "alpe-dhuez",
+        "ventoux-bedoin",
+        "tourmalet-est",
+        "galibier-valloire"
+      ],
+      "xpBonus": 1000,
+      "difficultyLabel": "4–5/5"
+    },
+    {
+      "id": "alpine-gauntlet",
+      "title": "Défi des Alpes",
+      "subtitle": "La campagne reine",
+      "description": "Madeleine, Glandon, Croix-de-Fer, Iseran puis l’étape Chaussy + Madeleine.",
+      "icon": "👑",
+      "routeIds": [
+        "madeleine-maurienne",
+        "glandon-cuines",
+        "croix-de-fer-maurienne",
+        "iseran-bonneval",
+        "chaussy-madeleine-stage"
+      ],
+      "xpBonus": 1400,
+      "difficultyLabel": "4–5/5"
+    },
+    {
+      "id": "waterside-notebook",
+      "title": "Au fil de l’eau",
+      "subtitle": "Carnet de 4 balades",
+      "description": "Du Der à Annecy, du Marais poitevin au canal du Midi : quatre paysages d’eau, à découvrir sans objectif de vitesse et avec des pauses libres.",
+      "icon": "🦢",
+      "routeIds": [
+        "lac-der-balade",
+        "annecy-rive-ouest",
+        "marais-poitevin-coulon-damvix",
+        "canal-midi-carcassonne"
+      ],
+      "xpBonus": 450,
+      "difficultyLabel": "1/5 · rythme doux"
+    },
+    {
+      "id": "quiet-heritage",
+      "title": "Échappées patrimoine",
+      "subtitle": "Carnet de 3 balades",
+      "description": "Chambord, la campagne de l’île de Ré et les berges du Cher jusqu’à Villandry : trois traversées pour associer mouvement et découverte.",
+      "icon": "🏰",
+      "routeIds": [
+        "chambord-petit-tour",
+        "re-chemins-campagne",
+        "loire-tours-villandry"
+      ],
+      "xpBonus": 300,
+      "difficultyLabel": "1/5 · rythme doux"
+    },
+    {
+      "id": "azure-passport",
+      "title": "Passeport azuréen",
+      "subtitle": "3 balades au bord de mer",
+      "description": "Golfe-Juan–Cannes, la traversée depuis Cagnes et la promenade mentonnaise : prends le temps de découvrir les ports et les villes. Le format court et le trajet complet sont deux étapes distinctes.",
+      "icon": "🍋",
+      "routeIds": [
+        "golfe-juan-cannes-balade",
+        "cagnes-cannes-littoral",
+        "menton-garavan-promenade"
+      ],
+      "xpBonus": 320,
+      "difficultyLabel": "1/5 · pauses libres",
+      "group": "discovery"
+    },
+    {
+      "id": "riviera-corniches",
+      "title": "Les deux Corniches",
+      "subtitle": "3 étapes de la Riviera",
+      "description": "Èze-sur-Mer et Monaco par la Basse Corniche, Nice–Menton par les hauteurs, puis le Tour des Corniches. Une même côte se découvre depuis trois profils différents.",
+      "icon": "🌅",
+      "routeIds": [
+        "eze-menton-basse-corniche",
+        "nice-menton-grande-corniche",
+        "nice-corniches-loop"
+      ],
+      "xpBonus": 600,
+      "difficultyLabel": "2–3/5",
+      "group": "sport"
+    },
+    {
+      "id": "verdon-journal",
+      "title": "Carnet du Verdon",
+      "subtitle": "3 paysages d’eau et de roche",
+      "description": "Le lac de Sainte-Croix et son plateau, les lacs de Castellane, puis la Route des Crêtes. Progresse des villages aux rampes du Grand Canyon, avec des descentes pour récupérer.",
+      "icon": "🦅",
+      "routeIds": [
+        "sainte-croix-valensole",
+        "castellane-deux-lacs",
+        "verdon-route-cretes"
+      ],
+      "xpBonus": 750,
+      "difficultyLabel": "2–4/5",
+      "group": "sport"
+    },
+    {
+      "id": "provence-postcards",
+      "title": "Cartes postales de Provence",
+      "subtitle": "3 sorties entre villages et vallées",
+      "description": "Le Calavon jusqu’à Apt, les petites routes de Velleron et le tour du rocher des Baux. Découvre trois ambiances provençales à ton rythme.",
+      "icon": "🫒",
+      "routeIds": [
+        "luberon-calavon",
+        "sorgue-velleron-loop",
+        "baux-alpilles-rocher"
+      ],
+      "xpBonus": 400,
+      "difficultyLabel": "1–2/5",
+      "group": "discovery"
+    },
+    {
+      "id": "coast-to-coast",
+      "title": "Les horizons marins",
+      "subtitle": "4 escales en France",
+      "description": "Camargue gardoise, baie de Somme, Bretagne et île de Ré : ports, marais et estuaires. La Bretagne apporte les bosses ; chaque escale complète compte, quel que soit l’ordre.",
+      "icon": "⚓",
+      "routeIds": [
+        "camargue-grau-gallician",
+        "baie-somme-cayeux-crotoy",
+        "bretagne-roscoff-morlaix",
+        "re-chemins-campagne"
+      ],
+      "xpBonus": 650,
+      "difficultyLabel": "1–2/5",
+      "group": "discovery"
+    },
+    {
+      "id": "canals-and-castles",
+      "title": "Canaux et châteaux",
+      "subtitle": "4 étapes de patrimoine",
+      "description": "Chambord, Blois–Chaumont, le canal du Midi et le canal d’Alsace vers Strasbourg. Un carnet de découverte, sans condition de chrono ni de connexion au vélo.",
+      "icon": "🗝️",
+      "routeIds": [
+        "chambord-petit-tour",
+        "loire-blois-chaumont",
+        "canal-midi-carcassonne",
+        "alsace-erstein-strasbourg"
+      ],
+      "xpBonus": 500,
+      "difficultyLabel": "1–2/5",
+      "group": "discovery"
+    },
+    {
+      "id": "southern-alps",
+      "title": "Des forêts aux cimes",
+      "subtitle": "2 grandes traversées des Alpes du Sud",
+      "description": "Franchis le Turini entre Vésubie et Sospel, puis la Bonette entre Ubaye et Tinée. Deux étapes exigeantes à préparer avec des sorties plus douces entre les ascensions.",
+      "icon": "🏔️",
+      "routeIds": [
+        "turini-vesubie-sospel",
+        "bonette-ubaye-tinee"
+      ],
+      "xpBonus": 900,
+      "difficultyLabel": "4–5/5",
+      "group": "sport"
+    },
+    {
+      "id": "napoleon-paca",
+      "title": "Route Napoléon · de la mer à Gap",
+      "subtitle": "Carnet de 8 étapes · ordre libre",
+      "icon": "🦅",
+      "group": "sport",
+      "difficultyLabel": "2–3/5",
+      "xpBonus": 900,
+      "description": "Golfe-Juan, Grasse, Saint-Vallier, Séranon, Castellane, Barrême, Digne, Sisteron et Gap : huit tronçons routiers, à enchaîner au fil de tes séances dans l’ordre de ton choix. La partie au-delà de Gap n’est pas incluse. Chaque étape complète compte une seule fois pour le carnet.",
+      "routeIds": [
+        "napoleon-golfe-grasse",
+        "napoleon-grasse-vallier",
+        "napoleon-vallier-seranon",
+        "napoleon-seranon-castellane",
+        "napoleon-castellane-barreme",
+        "napoleon-barreme-digne",
+        "napoleon-digne-sisteron",
+        "napoleon-sisteron-gap"
+      ]
+    },
+    {
+      "id": "southern-escales",
+      "title": "Escales du Sud",
+      "subtitle": "5 petits formats",
+      "icon": "☀️",
+      "group": "discovery",
+      "difficultyLabel": "1–2/5",
+      "xpBonus": 220,
+      "description": "Antibes, Èze-sur-Mer, les Baux, le pays de Riez et Menton : des sorties courtes de 15 à 30 minutes. Le tronçon de Riez comporte des rampes ; choisis librement ton étape et ton niveau d’effort.",
+      "routeIds": [
+        "antibes-golfe-juan-short",
+        "eze-cap-ail-short",
+        "baux-maussane-short",
+        "riez-montagnac-short",
+        "menton-garavan-promenade"
+      ]
+    },
+    {
+      "id": "half-hour-postcards",
+      "title": "Un paysage en 30 minutes",
+      "subtitle": "4 escales au fil de l’eau",
+      "icon": "📮",
+      "group": "discovery",
+      "difficultyLabel": "1/5",
+      "xpBonus": 180,
+      "description": "Sevrier–Annecy, le Grau-du-Roi–Aigues-Mortes, Cayeux–Le Hourdel et Candé–Chaumont. Quatre tronçons indépendants ; terminer un format court ne valide pas le parcours complet dont il est extrait.",
+      "routeIds": [
+        "sevrier-annecy-short",
+        "grau-aigues-short",
+        "cayeux-hourdel-short",
+        "cande-chaumont-short"
+      ]
+    },
+    {
+      "id": "napoleon-dauphine",
+      "title": "Route Napoléon · de Gap à Grenoble",
+      "subtitle": "Carnet de 6 étapes · ordre libre",
+      "icon": "🏔️",
+      "group": "sport",
+      "difficultyLabel": "2–3/5",
+      "xpBonus": 700,
+      "description": "Col Bayard, Champsaur, Corps, La Mure, Laffrey, Vizille, Brié et Eybens : six tronçons jusqu’à Grenoble. Chaque étape complète compte une seule fois. Ce carnet ajoute un objectif distinct ; les huit étapes et les 900 XP du carnet de la mer à Gap restent inchangés.",
+      "routeIds": [
+        "napoleon-gap-fare",
+        "napoleon-fare-corps",
+        "napoleon-corps-mure",
+        "napoleon-mure-laffrey",
+        "napoleon-laffrey-vizille",
+        "napoleon-vizille-grenoble"
+      ]
+    },
+    {
+      "id": "esterel-notebook",
+      "title": "Estérel · entre mer et forêt",
+      "subtitle": "4 étapes · ordre libre",
+      "icon": "🪨",
+      "group": "sport",
+      "difficultyLabel": "1–3/5",
+      "xpBonus": 600,
+      "description": "Trois étapes sur la Corniche d’Or, de Saint-Raphaël à Théoule par Agay, Anthéor et Le Trayas, puis un retour plus long par l’intérieur de l’Estérel. Chaque parcours complet compte une seule fois ; les deux formats courts ne remplacent pas leurs étapes parentes.",
+      "routeIds": [
+        "esterel-raphael-agay",
+        "esterel-agay-trayas",
+        "esterel-trayas-theoule",
+        "esterel-theoule-raphael"
+      ]
+    },
+    {
+      "id": "esterel-parentheses",
+      "title": "Parenthèses de l’Estérel",
+      "subtitle": "2 petites échappées",
+      "icon": "🌊",
+      "group": "discovery",
+      "difficultyLabel": "1/5",
+      "xpBonus": 100,
+      "description": "Saint-Raphaël–Boulouris et Agay–Anthéor : deux courts extraits de 15 à 30 minutes, au rythme de la découverte. Un carnet indépendant : ces sorties ne valident ni les longues étapes ni le trophée des trois étapes côtières.",
+      "routeIds": [
+        "esterel-raphael-boulouris-short",
+        "esterel-agay-antheor-short"
+      ]
+    },
+    {
+      "id": "napoleon-short-notebook",
+      "title": "Route Napoléon · petites escales",
+      "subtitle": "4 formats de 15 à 30 minutes",
+      "icon": "🦅",
+      "group": "discovery",
+      "difficultyLabel": "1/5",
+      "xpBonus": 180,
+      "description": "Golfe-Juan–Cannes, Mougins–Mouans-Sartoux, Malijai–Château-Arnoux et Saint-Théoffrey–Laffrey : quatre extraits doux, à faire dans l’ordre de ton choix. Un bonus unique et une validation propre à chaque escale, sans terminer les grandes étapes dont elles sont issues.",
+      "routeIds": [
+        "napoleon-golfe-cannes-short",
+        "napoleon-mougins-mouans-short",
+        "napoleon-malijai-chateau-short",
+        "napoleon-theoffrey-laffrey-short"
+      ]
+    }
+  ],
+  "badges": [
+    {
+      "id": "voyage-first",
+      "name": "Première escale",
+      "icon": "🧳",
+      "description": "Achever et enregistrer une première portion en mode Voyage.",
+      "unlocked": false,
+      "progress": "0/1"
+    },
+    {
+      "id": "voyage-complete",
+      "name": "Au bout du voyage",
+      "icon": "🏁",
+      "description": "Couvrir un parcours entier en une ou plusieurs portions Voyage, sans kilomètre manquant.",
+      "unlocked": false,
+      "progress": "0/1"
+    },
+    {
+      "id": "voyage-three",
+      "name": "Voyages au long cours",
+      "icon": "📖",
+      "description": "Achever trois parcours différents en mode Voyage.",
+      "unlocked": false,
+      "progress": "0/3"
+    },
+    {
+      "id": "esterel-red-rocks",
+      "name": "Roches rouges",
+      "icon": "🪨",
+      "description": "Terminer les 3 étapes côtières de Saint-Raphaël à Théoule, par Agay et Le Trayas. Les deux formats courts ne les remplacent pas. Aucun chrono ni XP supplémentaire.",
+      "unlocked": false,
+      "progress": "0/3"
+    },
+    {
+      "id": "napoleon-pocket-eagle",
+      "name": "Aigle de poche",
+      "icon": "🦅",
+      "description": "Terminer 2 escales différentes parmi les 4 formats courts du carnet Route Napoléon · petites escales. Les grandes étapes gardent leurs propres trophées. Aucun XP supplémentaire.",
+      "unlocked": false,
+      "progress": "0/2"
+    },
+    {
+      "id": "short-three",
+      "name": "Petites échappées",
+      "icon": "🌼",
+      "description": "Terminer 3 formats courts différents parmi les 13 tronçons de 15 à 30 minutes du carnet. Pauses libres.",
+      "unlocked": false,
+      "progress": "0/3"
+    },
+    {
+      "id": "short-six",
+      "name": "Collection de parenthèses",
+      "icon": "🧺",
+      "description": "Terminer 6 formats courts différents parmi les 13 du carnet. Répéter un tronçon ne compte pas comme une nouvelle découverte.",
+      "unlocked": false,
+      "progress": "0/6"
+    },
+    {
+      "id": "napoleon-three",
+      "name": "Premiers aigles",
+      "icon": "🦅",
+      "description": "Terminer 3 tronçons différents de la Route Napoléon entre Golfe-Juan et Gap. Aucun ordre imposé.",
+      "unlocked": false,
+      "progress": "0/3"
+    },
+    {
+      "id": "napoleon-north-three",
+      "name": "Dauphiné en poche",
+      "icon": "🏔️",
+      "description": "Terminer 3 tronçons différents parmi les 6 de Gap à Grenoble. Aucun ordre imposé.",
+      "unlocked": false,
+      "progress": "0/3"
+    },
+    {
+      "id": "napoleon-fourteen",
+      "name": "Traversée impériale",
+      "icon": "🦅",
+      "description": "Terminer les 14 tronçons de Golfe-Juan à Grenoble, dans l’ordre de ton choix. Les deux carnets gardent leurs bonus distincts ; ce trophée n’ajoute pas d’XP.",
+      "unlocked": false,
+      "progress": "0/14"
+    },
+    {
+      "id": "discovery-ten",
+      "name": "Carnet de voyage",
+      "icon": "📓",
+      "description": "Terminer 10 parcours natifs différents, de toute difficulté.",
+      "unlocked": false,
+      "progress": "0/10"
+    },
+    {
+      "id": "discovery-twenty",
+      "name": "Grand voyageur",
+      "icon": "🧳",
+      "description": "Terminer 20 parcours natifs différents. Les répétitions ne comptent pas comme de nouvelles découvertes.",
+      "unlocked": false,
+      "progress": "0/20"
+    },
+    {
+      "id": "paca-six",
+      "name": "Enfant du Sud",
+      "icon": "☀️",
+      "description": "Terminer 6 parcours différents parmi les 18 destinations PACA du carnet : littoral, Provence, Verdon et Alpes du Sud.",
+      "unlocked": false,
+      "progress": "0/6"
+    },
+    {
+      "id": "azure-three",
+      "name": "Riviera en poche",
+      "icon": "🍋",
+      "description": "Terminer 3 parcours différents du thème Côte d’Azur, balades ou Corniches.",
+      "unlocked": false,
+      "progress": "0/3"
+    },
+    {
+      "id": "four-horizons",
+      "name": "Aux quatre horizons",
+      "icon": "🧭",
+      "description": "Terminer au moins un parcours dans 4 des 10 territoires de découverte : PACA, Bretagne, Somme, Alsace, Val de Loire, Champagne, Ré, Marais poitevin, Midi, Camargue gardoise.",
+      "unlocked": false,
+      "progress": "0/4"
+    },
+    {
+      "id": "five-difficulties",
+      "name": "Toute la palette",
+      "icon": "🎨",
+      "description": "Terminer au moins un parcours natif à chaque difficulté, de 1/5 à 5/5. Aucun chrono imposé.",
+      "unlocked": false,
+      "progress": "0/5"
+    },
+    {
+      "id": "program-find-your-rhythm",
+      "name": "Trouver son rythme",
+      "icon": "🌱",
+      "description": "Terminer les 4 séances différentes du programme, dans l’ordre de ton choix. Récompense unique : 120 XP.",
+      "unlocked": false,
+      "progress": "0/4"
+    },
+    {
+      "id": "program-first-undulations",
+      "name": "Premières ondulations",
+      "icon": "〰️",
+      "description": "Terminer les 3 séances différentes du programme, dans l’ordre de ton choix. Récompense unique : 160 XP.",
+      "unlocked": false,
+      "progress": "0/3"
+    },
+    {
+      "id": "program-fluid-regularity",
+      "name": "Souplesse et régularité",
+      "icon": "🪶",
+      "description": "Terminer les 3 séances différentes du programme, dans l’ordre de ton choix. Récompense unique : 140 XP.",
+      "unlocked": false,
+      "progress": "0/3"
+    },
+    {
+      "id": "scenic-first",
+      "name": "Premier paysage",
+      "icon": "🌅",
+      "description": "Terminer 1 balade différente. Pauses libres, aucun chrono imposé.",
+      "unlocked": false,
+      "progress": "0/1"
+    },
+    {
+      "id": "scenic-three",
+      "name": "Flâneur de France",
+      "icon": "🧺",
+      "description": "Terminer 3 balades différentes. Pauses libres, aucun chrono imposé.",
+      "unlocked": false,
+      "progress": "0/3"
+    },
+    {
+      "id": "scenic-all",
+      "name": "Atlas des balades",
+      "icon": "🗺️",
+      "description": "Terminer 7 balades différentes. Pauses libres, aucun chrono imposé.",
+      "unlocked": false,
+      "progress": "0/7"
+    },
+    {
+      "id": "campaign-provence-discovery",
+      "name": "Découverte Provence",
+      "icon": "🌿",
+      "description": "Terminer les 4 étapes de la campagne. Bonus unique : 500 XP.",
+      "unlocked": false,
+      "progress": "0/4"
+    },
+    {
+      "id": "campaign-rolling-tour",
+      "name": "Tour Vallonné",
+      "icon": "🌊",
+      "description": "Terminer les 3 étapes de la campagne. Bonus unique : 600 XP.",
+      "unlocked": false,
+      "progress": "0/3"
+    },
+    {
+      "id": "campaign-tour-legends-campaign",
+      "name": "Légendes du Tour",
+      "icon": "🏆",
+      "description": "Terminer les 4 étapes de la campagne. Bonus unique : 1000 XP.",
+      "unlocked": false,
+      "progress": "0/4"
+    },
+    {
+      "id": "campaign-alpine-gauntlet",
+      "name": "Défi des Alpes",
+      "icon": "👑",
+      "description": "Terminer les 5 étapes de la campagne. Bonus unique : 1400 XP.",
+      "unlocked": false,
+      "progress": "0/5"
+    },
+    {
+      "id": "campaign-waterside-notebook",
+      "name": "Au fil de l’eau",
+      "icon": "🦢",
+      "description": "Terminer les 4 étapes de la campagne. Bonus unique : 450 XP.",
+      "unlocked": false,
+      "progress": "0/4"
+    },
+    {
+      "id": "campaign-quiet-heritage",
+      "name": "Échappées patrimoine",
+      "icon": "🏰",
+      "description": "Terminer les 3 étapes de la campagne. Bonus unique : 300 XP.",
+      "unlocked": false,
+      "progress": "0/3"
+    },
+    {
+      "id": "campaign-azure-passport",
+      "name": "Passeport azuréen",
+      "icon": "🍋",
+      "description": "Terminer les 3 étapes de la campagne. Bonus unique : 320 XP.",
+      "unlocked": false,
+      "progress": "0/3"
+    },
+    {
+      "id": "campaign-riviera-corniches",
+      "name": "Les deux Corniches",
+      "icon": "🌅",
+      "description": "Terminer les 3 étapes de la campagne. Bonus unique : 600 XP.",
+      "unlocked": false,
+      "progress": "0/3"
+    },
+    {
+      "id": "campaign-verdon-journal",
+      "name": "Carnet du Verdon",
+      "icon": "🦅",
+      "description": "Terminer les 3 étapes de la campagne. Bonus unique : 750 XP.",
+      "unlocked": false,
+      "progress": "0/3"
+    },
+    {
+      "id": "campaign-provence-postcards",
+      "name": "Cartes postales de Provence",
+      "icon": "🫒",
+      "description": "Terminer les 3 étapes de la campagne. Bonus unique : 400 XP.",
+      "unlocked": false,
+      "progress": "0/3"
+    },
+    {
+      "id": "campaign-coast-to-coast",
+      "name": "Les horizons marins",
+      "icon": "⚓",
+      "description": "Terminer les 4 étapes de la campagne. Bonus unique : 650 XP.",
+      "unlocked": false,
+      "progress": "0/4"
+    },
+    {
+      "id": "campaign-canals-and-castles",
+      "name": "Canaux et châteaux",
+      "icon": "🗝️",
+      "description": "Terminer les 4 étapes de la campagne. Bonus unique : 500 XP.",
+      "unlocked": false,
+      "progress": "0/4"
+    },
+    {
+      "id": "campaign-southern-alps",
+      "name": "Des forêts aux cimes",
+      "icon": "🏔️",
+      "description": "Terminer les 2 étapes de la campagne. Bonus unique : 900 XP.",
+      "unlocked": false,
+      "progress": "0/2"
+    },
+    {
+      "id": "campaign-napoleon-paca",
+      "name": "Route Napoléon · de la mer à Gap",
+      "icon": "🦅",
+      "description": "Terminer les 8 étapes de la campagne. Bonus unique : 900 XP.",
+      "unlocked": false,
+      "progress": "0/8"
+    },
+    {
+      "id": "campaign-southern-escales",
+      "name": "Escales du Sud",
+      "icon": "☀️",
+      "description": "Terminer les 5 étapes de la campagne. Bonus unique : 220 XP.",
+      "unlocked": false,
+      "progress": "0/5"
+    },
+    {
+      "id": "campaign-half-hour-postcards",
+      "name": "Un paysage en 30 minutes",
+      "icon": "📮",
+      "description": "Terminer les 4 étapes de la campagne. Bonus unique : 180 XP.",
+      "unlocked": false,
+      "progress": "0/4"
+    },
+    {
+      "id": "campaign-napoleon-dauphine",
+      "name": "Route Napoléon · de Gap à Grenoble",
+      "icon": "🏔️",
+      "description": "Terminer les 6 étapes de la campagne. Bonus unique : 700 XP.",
+      "unlocked": false,
+      "progress": "0/6"
+    },
+    {
+      "id": "campaign-esterel-notebook",
+      "name": "Estérel · entre mer et forêt",
+      "icon": "🪨",
+      "description": "Terminer les 4 étapes de la campagne. Bonus unique : 600 XP.",
+      "unlocked": false,
+      "progress": "0/4"
+    },
+    {
+      "id": "campaign-esterel-parentheses",
+      "name": "Parenthèses de l’Estérel",
+      "icon": "🌊",
+      "description": "Terminer les 2 étapes de la campagne. Bonus unique : 100 XP.",
+      "unlocked": false,
+      "progress": "0/2"
+    },
+    {
+      "id": "campaign-napoleon-short-notebook",
+      "name": "Route Napoléon · petites escales",
+      "icon": "🦅",
+      "description": "Terminer les 4 étapes de la campagne. Bonus unique : 180 XP.",
+      "unlocked": false,
+      "progress": "0/4"
+    },
+    {
+      "id": "first",
+      "name": "Premier tour de roue",
+      "icon": "🚲",
+      "description": "Terminer une première séance.",
+      "unlocked": false,
+      "progress": "0/1"
+    },
+    {
+      "id": "variety",
+      "name": "Explorateur",
+      "icon": "🧭",
+      "description": "Valider 5 familles de séances.",
+      "unlocked": false,
+      "progress": "0/5"
+    },
+    {
+      "id": "perfect",
+      "name": "Semaine parfaite",
+      "icon": "👑",
+      "description": "Atteindre tous les objectifs d'une semaine sans dépasser la charge dure.",
+      "unlocked": false,
+      "progress": "0/1"
+    },
+    {
+      "id": "streak3",
+      "name": "Trilogie",
+      "icon": "🔥",
+      "description": "Enchaîner 3 semaines parfaites.",
+      "unlocked": false,
+      "progress": "0/3"
+    },
+    {
+      "id": "bonus5",
+      "name": "Encore un tour",
+      "icon": "✨",
+      "description": "Ajouter 5 micro-séances bonus.",
+      "unlocked": false,
+      "progress": "0/5"
+    },
+    {
+      "id": "bonus20",
+      "name": "Régularité d'acier",
+      "icon": "⚙️",
+      "description": "Cumuler 20 micro-séances bonus.",
+      "unlocked": false,
+      "progress": "0/20"
+    },
+    {
+      "id": "weight25",
+      "name": "Allégé",
+      "icon": "⚖️",
+      "description": "Perdre 2,5 kg depuis le départ.",
+      "unlocked": false,
+      "progress": "0.0/2,5 kg"
+    },
+    {
+      "id": "weight5",
+      "name": "Cap -5 kg",
+      "icon": "🏔️",
+      "description": "Perdre 5 kg depuis le départ.",
+      "unlocked": false,
+      "progress": "0.0/5 kg"
+    },
+    {
+      "id": "waist2",
+      "name": "Ceinture gagnée",
+      "icon": "📏",
+      "description": "Perdre 2 cm de tour de taille.",
+      "unlocked": false,
+      "progress": "0.0/2 cm"
+    },
+    {
+      "id": "waist5",
+      "name": "Silhouette",
+      "icon": "🎯",
+      "description": "Perdre 5 cm de tour de taille.",
+      "unlocked": false,
+      "progress": "0.0/5 cm"
+    },
+    {
+      "id": "connected",
+      "name": "Machine liée",
+      "icon": "📡",
+      "description": "Enregistrer une séance avec télémétrie FTMS.",
+      "unlocked": false,
+      "progress": "0/1"
+    },
+    {
+      "id": "climb1",
+      "name": "Premier relief",
+      "icon": "⛰️",
+      "description": "Terminer un parcours hors balades : col, étape ou GPX personnel. Les validations historiques sont conservées.",
+      "unlocked": false,
+      "progress": "0/1"
+    },
+    {
+      "id": "climb3",
+      "name": "Collectionneur de reliefs",
+      "icon": "🏔️",
+      "description": "Terminer 3 parcours différents hors balades. Les validations historiques sont conservées.",
+      "unlocked": false,
+      "progress": "0/3"
+    },
+    {
+      "id": "distance100",
+      "name": "Centurion",
+      "icon": "🛣️",
+      "description": "Cumuler 100 km enregistrés.",
+      "unlocked": false,
+      "progress": "0/100 km"
+    },
+    {
+      "id": "power",
+      "name": "Watts up",
+      "icon": "⚡",
+      "description": "Enregistrer 5 séances avec une puissance moyenne.",
+      "unlocked": false,
+      "progress": "0/5"
+    },
+    {
+      "id": "sessions10",
+      "name": "En selle",
+      "icon": "🔟",
+      "description": "Terminer 10 séances structurées.",
+      "unlocked": false,
+      "progress": "0/10"
+    },
+    {
+      "id": "sessions25",
+      "name": "Habitude ancrée",
+      "icon": "🧱",
+      "description": "Terminer 25 séances structurées.",
+      "unlocked": false,
+      "progress": "0/25"
+    },
+    {
+      "id": "sessions50",
+      "name": "Machine régulière",
+      "icon": "🏁",
+      "description": "Terminer 50 séances structurées.",
+      "unlocked": false,
+      "progress": "0/50"
+    },
+    {
+      "id": "perfect4",
+      "name": "Mois solide",
+      "icon": "🗓️",
+      "description": "Cumuler 4 semaines parfaites.",
+      "unlocked": false,
+      "progress": "0/4"
+    },
+    {
+      "id": "perfect8",
+      "name": "Deux mois d’acier",
+      "icon": "🛡️",
+      "description": "Cumuler 8 semaines parfaites.",
+      "unlocked": false,
+      "progress": "0/8"
+    },
+    {
+      "id": "perfect12",
+      "name": "Conquête des 12 semaines",
+      "icon": "🏆",
+      "description": "Valider les 12 semaines parfaites.",
+      "unlocked": false,
+      "progress": "0/12"
+    },
+    {
+      "id": "distance500",
+      "name": "Grand rouleur",
+      "icon": "🌍",
+      "description": "Cumuler 500 km enregistrés.",
+      "unlocked": false,
+      "progress": "0/500 km"
+    },
+    {
+      "id": "connected10",
+      "name": "100 % connecté",
+      "icon": "📶",
+      "description": "Enregistrer 10 séances avec télémétrie FTMS.",
+      "unlocked": false,
+      "progress": "0/10"
+    },
+    {
+      "id": "goalWeight",
+      "name": "Objectif poids",
+      "icon": "🎖️",
+      "description": "Atteindre l’objectif de poids défini.",
+      "unlocked": false,
+      "progress": "objectif à définir"
+    },
+    {
+      "id": "goalWaist",
+      "name": "Objectif tour de taille",
+      "icon": "🥇",
+      "description": "Atteindre l’objectif de tour de taille défini.",
+      "unlocked": false,
+      "progress": "objectif à définir"
+    },
+    {
+      "id": "challenge1",
+      "name": "Défi relevé",
+      "icon": "◆",
+      "description": "Réussir un premier défi de parcours.",
+      "unlocked": false,
+      "progress": "0/1"
+    },
+    {
+      "id": "challenge5",
+      "name": "Challenger",
+      "icon": "🎲",
+      "description": "Réussir 5 défis de parcours.",
+      "unlocked": false,
+      "progress": "0/5"
+    },
+    {
+      "id": "challenge-variety",
+      "name": "Polyvalent",
+      "icon": "🧩",
+      "description": "Réussir 4 types de défis différents.",
+      "unlocked": false,
+      "progress": "0/4"
+    }
+  ]
+}

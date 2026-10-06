@@ -14,14 +14,14 @@ async function stored(page: Page) { return page.evaluate(() => JSON.parse(localS
 function chambordCard(page: Page) { return page.getByRole("heading", { name: "Chambord · petit tour", exact: true }).locator("xpath=ancestor::article"); }
 async function browse(page: Page) {
   await page.getByRole("button", { name: /Parcours/ }).click();
-  await page.getByRole("button", { name: "Explorer les 29 balades" }).click();
+  await page.getByRole("button", { name: "Explorer les 35 balades" }).click();
 }
 
 test("scenic catalogue, landscape, map profile and favorites work without overflow", async ({ page }, testInfo) => {
   const errors: string[] = []; page.on("pageerror", (error) => errors.push(error.message));
   await seed(page); await page.goto("/"); await browse(page);
-  await expect(page.locator(".routeLibraryCard")).toHaveCount(29);
-  await expect(page.locator(".routeLibraryCard").filter({ hasText: "Difficulté 1/5" })).toHaveCount(29);
+  await expect(page.locator(".routeLibraryCard")).toHaveCount(35);
+  await expect(page.locator(".routeLibraryCard").filter({ hasText: "Difficulté 1/5" })).toHaveCount(35);
   await page.getByLabel("Rechercher").fill("Chambord");
   const card = chambordCard(page);
   await card.getByText("Découvrir le paysage", { exact: true }).click();
@@ -106,7 +106,7 @@ test("a fully ridden scenic route earns its notebook and deletion restores the m
   expect(saved.metrics.completedRoute).toBe(true);
   expect(saved.metrics.timeAttack).toBeUndefined();
   await page.reload(); await page.getByRole("button", { name: /Parcours/ }).click();
-  await page.getByText("Campagnes et carnets · 20 objectifs à découvrir", { exact: true }).click();
+  await page.getByText("Campagnes et carnets · 22 objectifs à découvrir", { exact: true }).click();
   const notebook = page.getByRole("heading", { name: "Échappées patrimoine", exact: true }).locator("xpath=ancestor::article");
   await expect(notebook).toContainText("Campagne terminée");
   await page.getByRole("button", { name: /Plus/ }).click();
@@ -116,7 +116,7 @@ test("a fully ridden scenic route earns its notebook and deletion restores the m
   page.once("dialog", (dialog) => dialog.accept());
   await page.getByRole("button", { name: "Supprimer cette séance" }).click();
   await page.getByRole("button", { name: /Parcours/ }).click();
-  await page.getByText("Campagnes et carnets · 20 objectifs à découvrir", { exact: true }).click();
+  await page.getByText("Campagnes et carnets · 22 objectifs à découvrir", { exact: true }).click();
   await expect(notebook).toContainText("2/3");
   await expect(notebook.getByRole("button", { name: /Continuer/ })).toContainText("Chambord");
   await page.reload(); await page.getByRole("button", { name: /Plus/ }).click();

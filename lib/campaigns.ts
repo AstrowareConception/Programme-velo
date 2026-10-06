@@ -1,5 +1,6 @@
+import { alsaceFullRouteIds, alsaceShortRouteIds } from "./alsace-routes";
 import type { CompletedSession } from "./types";
-import { isRouteCompleted } from "./progression";
+import { allCompletedRouteIds } from "./voyage-progress";
 
 export type Campaign = {
   id: string;
@@ -130,14 +131,14 @@ export const campaigns: Campaign[] = [
   { id: "napoleon-short-notebook", title: "Route Napoléon · petites escales", subtitle: "4 formats de 15 à 30 minutes", icon: "🦅", group: "discovery", difficultyLabel: "1/5", xpBonus: 180,
     description: "Golfe-Juan–Cannes, Mougins–Mouans-Sartoux, Malijai–Château-Arnoux et Saint-Théoffrey–Laffrey : quatre extraits doux, à faire dans l’ordre de ton choix. Un bonus unique et une validation propre à chaque escale, sans terminer les grandes étapes dont elles sont issues.",
     routeIds: ["napoleon-golfe-cannes-short", "napoleon-mougins-mouans-short", "napoleon-malijai-chateau-short", "napoleon-theoffrey-laffrey-short"] },
+  { id: "alsace-vineyards-notebook", title: "Vignoble d’Alsace · la traversée", subtitle: "6 étapes · ordre libre", icon: "🍇", group: "discovery", difficultyLabel: "1–3/5", xpBonus: 650,
+    description: "De Marlenheim à Thann, par Obernai, Dambach, Bergheim, Turckheim et Rouffach. Six étapes complètes, en séance entière ou en Voyage ; les trois formats courts ne les remplacent pas. Bonus unique, sans ordre imposé.", routeIds: [...alsaceFullRouteIds] },
+  { id: "alsace-pocket-notebook", title: "Parenthèses alsaciennes", subtitle: "3 formats courts · 14 à 23 minutes", icon: "🌿", group: "discovery", difficultyLabel: "1/5", xpBonus: 120,
+    description: "Obernai–Bernardswiller, Dambach–Scherwiller et Turckheim–Eguisheim : trois extraits distincts, avec des pauses libres. Leur achèvement ne valide jamais les grandes étapes parentes.", routeIds: [...alsaceShortRouteIds] },
 ];
 
 export function completedRouteIds(sessions: CompletedSession[]) {
-  return new Set(
-    sessions
-      .filter(isRouteCompleted)
-      .map((session) => session.routeId!)
-  );
+  return allCompletedRouteIds(sessions);
 }
 
 export function campaignProgress(campaign: Campaign, sessions: CompletedSession[]) {

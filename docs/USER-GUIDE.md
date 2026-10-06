@@ -60,7 +60,9 @@ Tous les parcours proposent désormais paysage, points d’intérêt et lieux re
 
 ## 3. Pendant la séance
 
-Avant de démarrer, le pré-vol affiche tous les segments.
+Sur les parcours azuréens illustrés, ouvre **Voir les photos** pour découvrir une vue du lieu, avec sa date, son auteur et sa licence. Les flèches parcourent les images ; pendant l’effort, **Suivre les repères** revient au dernier lieu illustré atteint selon les kilomètres affichés. Une vue peut être prise depuis les hauteurs ou ailleurs que sur la route : lis sa légende. La première photo encore à venir porte **À découvrir**. Désactive **Photos des paysages** dans **Plus → Son, voix et média** ou dans les réglages du lecteur pour masquer les galeries. Le choix reste sauvegardé ; la vue essentielle les masque pendant l’effort. [Sélection, droits et limites](LANDSCAPE-PHOTOS.md).
+
+Avant de démarrer, la préparation présente les segments, les lieux et les niveaux. **Vue essentielle** met en avant résistance, temps restant, RPE, prochaine consigne et commandes. Tu peux revenir à **Vue complète** pendant la séance pour retrouver la carte et le profil, sans remettre le chrono à zéro. Le choix se conserve après rechargement et dans l’export JSON.
 
 Pendant l'effort :
 
@@ -68,10 +70,14 @@ Pendant l'effort :
 - le RPE cible reste prioritaire ;
 - la cadence cible est indiquée lorsqu'elle est pertinente ;
 - le prochain segment est annoncé ;
-- l'écran peut être maintenu éveillé ;
-- bip, voix et retour haptique sont configurables.
+- le maintien de l’écran affiche l’état réel : accordé, refusé, indisponible ou interrompu ; **Réessayer le maintien** relance la demande lorsqu’elle est possible ;
+- bips, voix et retour haptique sont configurables. Le volume des alertes et leur fréquence se règlent dans **Son, voix et média** ; **Tester mes alertes** permet de vérifier avec ton casque avant le départ ;
+- le préavis facultatif annonce la prochaine consigne dix secondes avant un changement minuté. Il ne prédit pas un changement piloté par la distance FTMS ;
+- la voix applique la calibration globale et l’ajustement du coach, comme le niveau affiché.
 
 Si tous les niveaux paraissent trop faciles ou trop durs, régler **Plus > Calibration résistance 1–32**.
+
+Pour un podcast, lance-le puis reviens dans VéloQuest. Pour YouTube, utilise une fenêtre flottante si elle est disponible, ou des fenêtres côte à côte sur ordinateur/tablette. Garde les consignes visibles et teste les alertes pendant la lecture du média. Au retour d’un passage en arrière-plan, un rappel invite à vérifier consigne et connexion. La pause relâche le maintien de l’écran ; la reprise le redemande. [Guide complet et limites selon l’appareil](READER-COMFORT.md).
 
 ## 4. Bluetooth
 
@@ -120,7 +126,7 @@ Les **défis** ajoutent une contrainte. Les **campagnes** regroupent plusieurs p
 
 Depuis **Parcours**, les huit thèmes ouvrent directement leur sélection : Côte d’Azur, Verdon, villages de Provence, lacs, mers et estuaires, châteaux, canaux et haute montagne. Un thème peut mélanger plusieurs difficultés. Le menu **Thème** et les filtres de catégorie/difficulté se combinent ; **Tous les paysages** retire seulement le thème. Le raccourci des balades réinitialise ces filtres pour retrouver les 14 formats doux. La recherche reconnaît les noms des villes, quartiers et repères, avec ou sans accents.
 
-**Campagnes et carnets** se déplie à la demande pour alléger l’écran. Les filtres **Découverte**, **Sport** et **En cours** aident à choisir parmi 13 objectifs. Les sept nouveaux carnets donnent un badge et un bonus unique : Passeport azuréen (320 XP), Les deux Corniches (600), Carnet du Verdon (750), Cartes postales de Provence (400), Les horizons marins (650), Canaux et châteaux (500), Des forêts aux cimes (900). Ils n’imposent ni jour, ni vitesse, ni connexion Bluetooth. Les campagnes de montagne demandent de terminer leurs étapes exigeantes ; la difficulté reste affichée.
+**Campagnes et carnets** se déplie à la demande pour alléger l’écran. Les filtres **Découverte**, **Sport** et **En cours** aident à choisir parmi 22 objectifs. Les sept nouveaux carnets donnent un badge et un bonus unique : Passeport azuréen (320 XP), Les deux Corniches (600), Carnet du Verdon (750), Cartes postales de Provence (400), Les horizons marins (650), Canaux et châteaux (500), Des forêts aux cimes (900). Ils n’imposent ni jour, ni vitesse, ni connexion Bluetooth. Les campagnes de montagne demandent de terminer leurs étapes exigeantes ; la difficulté reste affichée.
 
 Six nouveaux trophées dans **Plus** récompensent les parcours natifs différents (10 et 20), six destinations PACA, trois sorties du thème Côte d’Azur, quatre territoires et une réalisation à chacune des cinq difficultés. Ils ne donnent pas de XP supplémentaire. Les répétitions comptent comme des séances, mais pas comme une nouvelle découverte. Tentatives incomplètes et secteurs sont exclus ; suppression et import recalculent les progrès, sans effacer les autres données.
 
@@ -128,7 +134,7 @@ Les nouveaux itinéraires présentent les lieux traversés avant et pendant la s
 
 ### Balades à 1/5
 
-Depuis **Parcours**, choisis **Explorer les 29 balades** ou le filtre **Balades**. Le catalogue propose le Der, la rive ouest d’Annecy, Chambord, l’île de Ré, le Marais poitevin, le canal du Midi et Tours–Villandry, ainsi que le littoral Cagnes-sur-Mer–Cannes, Golfe-Juan–Cannes, Menton–Garavan, le Calavon, les canaux de Camargue gardoise, la baie de Somme et Erstein–Strasbourg. **Découvrir le paysage** présente le lieu et les points d’intérêt. **Partir en balade** ouvre la préparation et un effort facile, RPE 2–4, avec niveaux de base 4–10 ; le réglage manuel reste disponible.
+Depuis **Parcours**, choisis **Explorer les 35 balades** ou le filtre **Balades**. Le catalogue propose le Der, la rive ouest d’Annecy, Chambord, l’île de Ré, le Marais poitevin, le canal du Midi et Tours–Villandry, ainsi que le littoral Cagnes-sur-Mer–Cannes, Golfe-Juan–Cannes, Menton–Garavan, le Calavon, les canaux de Camargue gardoise, la baie de Somme et Erstein–Strasbourg. **Découvrir le paysage** présente le lieu et les points d’intérêt. **Partir en balade** ouvre la préparation et un effort facile, RPE 2–4, avec niveaux de base 4–10 ; le réglage manuel reste disponible.
 
 Les pauses sont libres, les chronos et défis facultatifs. Une sortie à 1/5 peut être longue : le Der approche 140 minutes simulées, Chambord environ 25. Choisis selon ton temps, ou mets une balade en cours de côté pour la reprendre. Le lecteur contient aussi **Ton carnet de paysage**. La carte et le marqueur représentent l’itinéraire virtuel ; ils ne mesurent pas un déplacement extérieur.
 
@@ -205,7 +211,24 @@ Après une mise à jour, recharge en ligne puis vérifie ton journal. **Plus** a
 
 Les tests de vélo simulé ne valident pas ton TEB5 réel. Le compteur « KCAL VÉLO » est cumulatif ; les calories préremplies de séance utilisent sa variation échantillonnée. Corrige-les manuellement si nécessaire.
 
+## Voyage en plusieurs séances
+
+Dans **Parcours**, utilise **Voyage en plusieurs séances** sur le parcours de ton choix, puis sélectionne 15, 30, 45 ou 60 minutes. La carte conserve le parcours entier ; le prochain passage commence au premier kilomètre manquant. Après une portion achevée et enregistrée, **Quête → Continuer mon voyage** retrouve ta position. Tu peux changer de parcours puis revenir sans effacer les portions.
+
+La position est **simulée à 15 km/h**, même avec Bluetooth ; les mesures du vélo restent distinctes. Tu peux mettre en pause et reprendre une portion interrompue. Les commandes de saut de segment sont désactivées. Un arrêt précoce peut être enregistré dans le journal, sans valider ce passage ; **Continuer cette portion** permet de revenir au lecteur avant l’enregistrement.
+
+La route entière se valide quand toutes ses portions sont couvertes, sans trou. Ses XP sont attribués une seule fois en Voyage, sauf s’il existe déjà une séance classique complète à cette date. Les campagnes ajoutent leurs bonus uniques habituels. Trois trophées accompagnent les portions et les parcours achevés. La suppression recalcule position, XP, campagnes et trophées ; le JSON v3 conserve le voyage. Les kilomètres simulés figurent séparément dans le CSV. Ce mode concerne un parcours à la fois, sans raccord automatique entre étapes. [Règles et limites détaillées](VOYAGE.md).
+
+## Emporter une séance et mettre à jour
+
+Dans **Plus → Emporte ta séance**, attends la disponibilité des séances et parcours hors connexion. **Préparer les photos · 575 Ko** conserve les dix images actuelles. Le compteur décrit le cache de cet appareil, sans garantir les cartes externes ni les médias. Une mise à jour attend une action explicite et le repos des lecteurs dans les autres onglets. Une reprise déjà sauvegardée est conservée ; aucun abandon requis. [Guide complet et limites](PWA-OFFLINE.md).
+
+## Vignoble d’Alsace
+
+Le thème **Vignoble d’Alsace** regroupe six étapes continues de Marlenheim à Thann (1/5 à 3/5) et trois formats courts à 1/5 : Obernai–Bernardswiller, Dambach–Scherwiller et Turckheim–Eguisheim. Les deux carnets suivent séparément les grandes étapes et les formats courts. Leur bonus est unique ; une suppression de séance recalcule les coches et les récompenses. Le mode Voyage permet de fractionner les grandes étapes. Les photographies d’Obernai et d’Eguisheim montrent des points de vue documentés, sans ajouter de détour au parcours. [Sources et limites](ALSACE-VIGNOBLE.md).
 
 ### Identifier un nouveau vélo
 
-Dans **Plus → Explorer les services Bluetooth**, lancer l’inventaire sans commande de résistance et exporter le rapport technique local si nécessaire. Le TOPUTURE commandé reste à qualifier : ni son nom ni ses 32 niveaux ne prouvent FTMS. Le diagnostic ne contient aucune mesure personnelle. Voir [la recette matérielle](HARDWARE-COMPATIBILITY.md) avant tout test de contrôle.
+Dans **Plus → Explorer les services Bluetooth**, lancer l’inventaire sans commande de résistance et exporter le rapport technique local si nécessaire. Le TOPUTURE reçu le 6 octobre 2026 reste à qualifier : ni son nom ni ses 32 niveaux ne prouvent FTMS. Le diagnostic ne contient aucune mesure personnelle. Voir [la recette matérielle](HARDWARE-COMPATIBILITY.md) avant tout test de contrôle.
+
+La rubrique **Premier test du vélo · 10 à 15 minutes** guide le premier essai dans Plus. Le laboratoire affiche vitesse, distance et heure du dernier paquet ; « Choisir le minimum » ou « Choisir un pas au-dessus » prépare une consigne, puis « Envoyer ce niveau au vélo » effectue la commande. Reviens au minimum puis déconnecte. Les mises à jour attendent aussi la fin du diagnostic ou la déconnexion Bluetooth. [Fiche vierge de résultats](HARDWARE-TEST-RESULTS.md).

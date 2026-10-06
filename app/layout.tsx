@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "leaflet/dist/leaflet.css";
 import "./globals.css";
-import { ServiceWorkerRegistrar } from "@/components/ServiceWorkerRegistrar";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://veloquest.vercel.app"),
@@ -31,7 +30,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="fr">
       <body>
-        <ServiceWorkerRegistrar />
         {children}
       </body>
     </html>

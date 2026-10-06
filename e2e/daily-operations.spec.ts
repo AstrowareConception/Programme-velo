@@ -57,7 +57,7 @@ test("dated measurement persists and its deletion updates the latest weight", as
 test("deleting the last qualifying stage removes its campaign reward and restores the next stage", async ({ page }) => {
   await seed(page, ["sorgue-velleron-loop", "vaison-medieval-loop", "uchaux-loop", "enclave-papes-loop"].map((routeId, i) => completed(String(i), routeId)));
   await page.goto("/"); await page.getByRole("button", { name: /Parcours/ }).click();
-  await page.getByText("Campagnes et carnets · 20 objectifs à découvrir", { exact: true }).click();
+  await page.getByText("Campagnes et carnets · 22 objectifs à découvrir", { exact: true }).click();
   const campaign = page.getByRole("heading", { name: "Découverte Provence" }).locator("xpath=ancestor::article");
   await expect(campaign).toContainText("Campagne terminée");
   await page.getByRole("button", { name: /Plus/ }).click();
@@ -69,7 +69,7 @@ test("deleting the last qualifying stage removes its campaign reward and restore
   await page.getByRole("button", { name: "Supprimer cette séance" }).click();
   await expect.poll(async () => (await stored(page)).sessions.length).toBe(3);
   await page.getByRole("button", { name: /Parcours/ }).click();
-  await page.getByText("Campagnes et carnets · 20 objectifs à découvrir", { exact: true }).click();
+  await page.getByText("Campagnes et carnets · 22 objectifs à découvrir", { exact: true }).click();
   await expect(campaign).toContainText("3/4");
   await expect(campaign.getByRole("button", { name: /Continuer/ })).toContainText("Uchaux");
   await page.getByRole("button", { name: /Plus/ }).click();
@@ -95,7 +95,7 @@ for (const mode of ["timeAttack", "segmentAttack"] as const) {
     if (mode === "segmentAttack") { expect(metrics.segmentAttackIndex).toBe(0); expect(metrics.completedSegment).toBe(false); }
     else expect(metrics.timeAttack).toBe(true);
     await page.getByRole("button", { name: /Parcours/ }).click();
-    await page.getByText("Campagnes et carnets · 20 objectifs à découvrir", { exact: true }).click();
+    await page.getByText("Campagnes et carnets · 22 objectifs à découvrir", { exact: true }).click();
     await expect(page.getByRole("heading", { name: "Découverte Provence" }).locator("xpath=ancestor::article")).toContainText("0/4");
   });
 }
@@ -106,7 +106,7 @@ test("campaigns and manual logging fit the viewport without browser errors", asy
   await seed(page); await page.goto("/");
   await page.getByRole("button", { name: /Parcours/ }).click();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-  await page.getByText("Campagnes et carnets · 20 objectifs à découvrir", { exact: true }).click();
+  await page.getByText("Campagnes et carnets · 22 objectifs à découvrir", { exact: true }).click();
   await expect(page.getByRole("heading", { name: "Découverte Provence" })).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath("campaigns.png") });
   await page.getByRole("button", { name: /Séances/ }).click();
@@ -132,7 +132,7 @@ test("deleting the fastest route attempt restores the remaining PB after reload"
   await page.getByLabel("Rechercher").fill("Velleron");
   await expect(card).toContainText("15:00");
   await expect(card).not.toContainText("13:20");
-  await page.getByText("Campagnes et carnets · 20 objectifs à découvrir", { exact: true }).click();
+  await page.getByText("Campagnes et carnets · 22 objectifs à découvrir", { exact: true }).click();
   const campaign = page.getByRole("heading", { name: "Découverte Provence" }).locator("xpath=ancestor::article");
   await expect(campaign).toContainText("1/4");
 });

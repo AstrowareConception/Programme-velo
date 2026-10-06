@@ -13,7 +13,7 @@ async function seed(page: Page, sessions: object[] = []) {
 }
 const card = (page: Page, name: string) => page.getByRole("heading", { name, exact: true }).locator("xpath=ancestor::article");
 const browse = (page: Page) => page.getByRole("button", { name: /Parcours/ }).click();
-const objectives = (page: Page) => page.getByText("Campagnes et carnets · 20 objectifs à découvrir", { exact: true }).click();
+const objectives = (page: Page) => page.getByText("Campagnes et carnets · 22 objectifs à découvrir", { exact: true }).click();
 const stored = (page: Page) => page.evaluate(() => JSON.parse(localStorage.getItem("veloquest:v1")!));
 const overflow = (page: Page) => page.evaluate(() => document.documentElement.scrollWidth > innerWidth);
 

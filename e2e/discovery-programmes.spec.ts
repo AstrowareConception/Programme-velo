@@ -13,7 +13,7 @@ async function seed(page: Page, sessions: object[] = []) {
 const card = (page: Page, name: string) => page.getByRole("heading", { name, exact: true }).locator("xpath=ancestor::article");
 const browse = (page: Page) => page.getByRole("button", { name: /Parcours/ }).click();
 const stored = (page: Page) => page.evaluate(() => JSON.parse(localStorage.getItem("veloquest:v1")!));
-const objectives = (page: Page) => page.getByText("Campagnes et carnets · 20 objectifs à découvrir", { exact: true }).click();
+const objectives = (page: Page) => page.getByText("Campagnes et carnets · 22 objectifs à découvrir", { exact: true }).click();
 async function programs(page: Page) {
   if (await page.locator(".workoutPrograms").getAttribute("open") === null) await page.getByText("Programmes découverte · 3 chemins pour progresser", { exact: true }).click();
 }
@@ -52,7 +52,7 @@ test("Route Napoléon accepts out-of-order completions and ignores partial stage
 
 test("short duration filtering composes with themes and clearly distinguishes the Verdon effort", async ({ page }, testInfo) => {
   await seed(page); await browse(page); await page.getByRole("button", { name: "Une balade en 30 minutes", exact: true }).click();
-  await expect(page.locator(".routeLibraryCard")).toHaveCount(18);
+  await expect(page.locator(".routeLibraryCard")).toHaveCount(21);
   await expect(page.getByLabel("Durée simulée")).toHaveValue("30");
   await page.getByLabel("Thème", { exact: true }).selectOption("azure");
   await expect(page.locator(".routeLibraryCard")).toHaveCount(6);

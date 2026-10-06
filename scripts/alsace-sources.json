@@ -1,0 +1,365 @@
+{
+  "alsace-marlenheim-obernai": {
+    "key": "alsace-vignoble-current",
+    "gpxUrl": "https://carto.tourisme-alsace.info/traces/403000009.gpx",
+    "gpxSha256": "19de9d7abf52fc0ce76db2ff52e81015430f82830f97906988a395f58d521f87",
+    "trackOnly": true,
+    "trackName": "Véloroute du Vignoble d'Alsace",
+    "pointRange": [
+      67,
+      7641
+    ],
+    "altitudeSource": "IGN RGE ALTI",
+    "clip": [
+      [
+        48.591276,
+        7.487263
+      ],
+      [
+        48.461063,
+        7.48488
+      ]
+    ],
+    "section": "Marlenheim → Obernai : extrait de la portion continue du GPX officiel, branches et sauts de trace exclus.",
+    "places": [
+      {
+        "label": "Marlenheim",
+        "landmark": "Passage sur la trace publiée dans le secteur de Marlenheim ; aucune visite ni détour ajouté.",
+        "endpoint": "start"
+      },
+      {
+        "label": "Molsheim",
+        "landmark": "Passage sur la trace publiée dans le secteur de Molsheim ; aucune visite ni détour ajouté.",
+        "coordinate": [
+          48.537315,
+          7.499624
+        ]
+      },
+      {
+        "label": "Obernai",
+        "landmark": "Passage sur la trace publiée dans le secteur de Obernai ; aucune visite ni détour ajouté.",
+        "endpoint": "finish"
+      }
+    ]
+  },
+  "alsace-obernai-dambach": {
+    "key": "alsace-vignoble-current",
+    "gpxUrl": "https://carto.tourisme-alsace.info/traces/403000009.gpx",
+    "gpxSha256": "19de9d7abf52fc0ce76db2ff52e81015430f82830f97906988a395f58d521f87",
+    "trackOnly": true,
+    "trackName": "Véloroute du Vignoble d'Alsace",
+    "pointRange": [
+      67,
+      7641
+    ],
+    "altitudeSource": "IGN RGE ALTI",
+    "clip": [
+      [
+        48.461063,
+        7.48488
+      ],
+      [
+        48.323466,
+        7.42189
+      ]
+    ],
+    "section": "Obernai → Dambach-la-Ville : extrait de la portion continue du GPX officiel, branches et sauts de trace exclus.",
+    "places": [
+      {
+        "label": "Obernai",
+        "landmark": "Passage sur la trace publiée dans le secteur de Obernai ; aucune visite ni détour ajouté.",
+        "endpoint": "start"
+      },
+      {
+        "label": "Barr",
+        "landmark": "Passage sur la trace publiée dans le secteur de Barr ; aucune visite ni détour ajouté.",
+        "coordinate": [
+          48.40737,
+          7.448892
+        ]
+      },
+      {
+        "label": "Dambach-la-Ville",
+        "landmark": "Passage sur la trace publiée dans le secteur de Dambach-la-Ville ; aucune visite ni détour ajouté.",
+        "endpoint": "finish"
+      }
+    ]
+  },
+  "alsace-dambach-bergheim": {
+    "key": "alsace-vignoble-current",
+    "gpxUrl": "https://carto.tourisme-alsace.info/traces/403000009.gpx",
+    "gpxSha256": "19de9d7abf52fc0ce76db2ff52e81015430f82830f97906988a395f58d521f87",
+    "trackOnly": true,
+    "trackName": "Véloroute du Vignoble d'Alsace",
+    "pointRange": [
+      67,
+      7641
+    ],
+    "altitudeSource": "IGN RGE ALTI",
+    "clip": [
+      [
+        48.323466,
+        7.42189
+      ],
+      [
+        48.204265,
+        7.371419
+      ]
+    ],
+    "section": "Dambach-la-Ville → Bergheim : extrait de la portion continue du GPX officiel, branches et sauts de trace exclus.",
+    "places": [
+      {
+        "label": "Dambach-la-Ville",
+        "landmark": "Passage sur la trace publiée dans le secteur de Dambach-la-Ville ; aucune visite ni détour ajouté.",
+        "endpoint": "start"
+      },
+      {
+        "label": "Châtenois",
+        "landmark": "Passage sur la trace publiée dans le secteur de Châtenois ; aucune visite ni détour ajouté.",
+        "coordinate": [
+          48.271992,
+          7.399183
+        ]
+      },
+      {
+        "label": "Bergheim",
+        "landmark": "Passage sur la trace publiée dans le secteur de Bergheim ; aucune visite ni détour ajouté.",
+        "endpoint": "finish"
+      }
+    ]
+  },
+  "alsace-bergheim-turckheim": {
+    "key": "alsace-vignoble-current",
+    "gpxUrl": "https://carto.tourisme-alsace.info/traces/403000009.gpx",
+    "gpxSha256": "19de9d7abf52fc0ce76db2ff52e81015430f82830f97906988a395f58d521f87",
+    "trackOnly": true,
+    "trackName": "Véloroute du Vignoble d'Alsace",
+    "pointRange": [
+      67,
+      7641
+    ],
+    "altitudeSource": "IGN RGE ALTI",
+    "clip": [
+      [
+        48.204265,
+        7.371419
+      ],
+      [
+        48.086831,
+        7.280103
+      ]
+    ],
+    "section": "Bergheim → Turckheim : extrait de la portion continue du GPX officiel, branches et sauts de trace exclus.",
+    "places": [
+      {
+        "label": "Bergheim",
+        "landmark": "Passage sur la trace publiée dans le secteur de Bergheim ; aucune visite ni détour ajouté.",
+        "endpoint": "start"
+      },
+      {
+        "label": "Ribeauvillé · plaine orientale",
+        "landmark": "Passage dans la plaine à environ 2,4 km du centre de Ribeauvillé ; le parcours ne visite pas la vieille ville.",
+        "coordinate": [
+          48.182954,
+          7.355484
+        ]
+      },
+      {
+        "label": "Turckheim",
+        "landmark": "Passage sur la trace publiée dans le secteur de Turckheim ; aucune visite ni détour ajouté.",
+        "endpoint": "finish"
+      }
+    ]
+  },
+  "alsace-turckheim-rouffach": {
+    "key": "alsace-vignoble-current",
+    "gpxUrl": "https://carto.tourisme-alsace.info/traces/403000009.gpx",
+    "gpxSha256": "19de9d7abf52fc0ce76db2ff52e81015430f82830f97906988a395f58d521f87",
+    "trackOnly": true,
+    "trackName": "Véloroute du Vignoble d'Alsace",
+    "pointRange": [
+      67,
+      7641
+    ],
+    "altitudeSource": "IGN RGE ALTI",
+    "clip": [
+      [
+        48.086831,
+        7.280103
+      ],
+      [
+        47.957322,
+        7.300085
+      ]
+    ],
+    "section": "Turckheim → Rouffach : extrait de la portion continue du GPX officiel, branches et sauts de trace exclus.",
+    "places": [
+      {
+        "label": "Turckheim",
+        "landmark": "Passage sur la trace publiée dans le secteur de Turckheim ; aucune visite ni détour ajouté.",
+        "endpoint": "start"
+      },
+      {
+        "label": "Eguisheim",
+        "landmark": "Passage sur la trace publiée dans le secteur de Eguisheim ; aucune visite ni détour ajouté.",
+        "coordinate": [
+          48.046237,
+          7.307283
+        ]
+      },
+      {
+        "label": "Rouffach",
+        "landmark": "Passage sur la trace publiée dans le secteur de Rouffach ; aucune visite ni détour ajouté.",
+        "endpoint": "finish"
+      }
+    ]
+  },
+  "alsace-rouffach-thann": {
+    "key": "alsace-vignoble-current",
+    "gpxUrl": "https://carto.tourisme-alsace.info/traces/403000009.gpx",
+    "gpxSha256": "19de9d7abf52fc0ce76db2ff52e81015430f82830f97906988a395f58d521f87",
+    "trackOnly": true,
+    "trackName": "Véloroute du Vignoble d'Alsace",
+    "pointRange": [
+      67,
+      7641
+    ],
+    "altitudeSource": "IGN RGE ALTI",
+    "clip": [
+      [
+        47.957322,
+        7.300085
+      ],
+      [
+        47.808763,
+        7.1069
+      ]
+    ],
+    "section": "Rouffach → Thann : extrait de la portion continue du GPX officiel, branches et sauts de trace exclus.",
+    "places": [
+      {
+        "label": "Rouffach",
+        "landmark": "Passage sur la trace publiée dans le secteur de Rouffach ; aucune visite ni détour ajouté.",
+        "endpoint": "start"
+      },
+      {
+        "label": "Guebwiller",
+        "landmark": "Passage sur la trace publiée dans le secteur de Guebwiller ; aucune visite ni détour ajouté.",
+        "coordinate": [
+          47.906071,
+          7.215342
+        ]
+      },
+      {
+        "label": "Thann",
+        "landmark": "Passage sur la trace publiée dans le secteur de Thann ; aucune visite ni détour ajouté.",
+        "endpoint": "finish"
+      }
+    ]
+  },
+  "alsace-turckheim-eguisheim-short": {
+    "key": "alsace-vignoble-current",
+    "gpxUrl": "https://carto.tourisme-alsace.info/traces/403000009.gpx",
+    "gpxSha256": "19de9d7abf52fc0ce76db2ff52e81015430f82830f97906988a395f58d521f87",
+    "trackOnly": true,
+    "trackName": "Véloroute du Vignoble d'Alsace",
+    "pointRange": [
+      67,
+      7641
+    ],
+    "altitudeSource": "IGN RGE ALTI",
+    "clip": [
+      [
+        48.086831,
+        7.280103
+      ],
+      [
+        48.046237,
+        7.307283
+      ]
+    ],
+    "section": "Turckheim → Eguisheim : extrait de la portion continue du GPX officiel, branches et sauts de trace exclus.",
+    "places": [
+      {
+        "label": "Turckheim",
+        "landmark": "Passage sur la trace publiée dans le secteur de Turckheim ; aucune visite ni détour ajouté.",
+        "endpoint": "start"
+      },
+      {
+        "label": "Eguisheim",
+        "landmark": "Passage sur la trace publiée dans le secteur de Eguisheim ; aucune visite ni détour ajouté.",
+        "endpoint": "finish"
+      }
+    ]
+  },
+  "alsace-dambach-scherwiller-short": {
+    "key": "alsace-vignoble-current",
+    "gpxUrl": "https://carto.tourisme-alsace.info/traces/403000009.gpx",
+    "gpxSha256": "19de9d7abf52fc0ce76db2ff52e81015430f82830f97906988a395f58d521f87",
+    "trackOnly": true,
+    "trackName": "Véloroute du Vignoble d'Alsace",
+    "pointRange": [
+      67,
+      7641
+    ],
+    "altitudeSource": "IGN RGE ALTI",
+    "clip": [
+      [
+        48.323466,
+        7.42189
+      ],
+      [
+        48.287019,
+        7.417912
+      ]
+    ],
+    "section": "Dambach-la-Ville → Scherwiller : petit extrait indépendant de la grande étape.",
+    "places": [
+      {
+        "label": "Dambach-la-Ville",
+        "landmark": "Départ sur la trace officielle.",
+        "endpoint": "start"
+      },
+      {
+        "label": "Scherwiller",
+        "landmark": "Arrivée dans le secteur de Scherwiller sur la trace, sans visite ajoutée.",
+        "endpoint": "finish"
+      }
+    ]
+  },
+  "alsace-obernai-bernardswiller-short": {
+    "key": "alsace-vignoble-current",
+    "gpxUrl": "https://carto.tourisme-alsace.info/traces/403000009.gpx",
+    "gpxSha256": "19de9d7abf52fc0ce76db2ff52e81015430f82830f97906988a395f58d521f87",
+    "trackOnly": true,
+    "trackName": "Véloroute du Vignoble d'Alsace",
+    "pointRange": [
+      67,
+      7641
+    ],
+    "altitudeSource": "IGN RGE ALTI",
+    "clip": [
+      [
+        48.461063,
+        7.48488
+      ],
+      [
+        48.449944,
+        7.462607
+      ]
+    ],
+    "section": "Obernai → Bernardswiller : petit extrait indépendant de la grande étape.",
+    "places": [
+      {
+        "label": "Obernai",
+        "landmark": "Départ sur la trace officielle.",
+        "endpoint": "start"
+      },
+      {
+        "label": "Bernardswiller",
+        "landmark": "Arrivée au bord du village, sur la trace officielle.",
+        "endpoint": "finish"
+      }
+    ]
+  }
+}

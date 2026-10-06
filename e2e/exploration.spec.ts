@@ -14,15 +14,15 @@ async function seed(page: Page, sessions: object[] = []) {
 }
 const browse = (page: Page) => page.getByRole("button", { name: /Parcours/ }).click();
 const card = (page: Page, name: string) => page.getByRole("heading", { name, exact: true }).locator("xpath=ancestor::article");
-const objectives = (page: Page) => page.getByText("Campagnes et carnets · 20 objectifs à découvrir", { exact: true }).click();
+const objectives = (page: Page) => page.getByText("Campagnes et carnets · 22 objectifs à découvrir", { exact: true }).click();
 const stored = (page: Page) => page.evaluate(() => JSON.parse(localStorage.getItem("veloquest:v1")!));
 const overflow = (page: Page) => page.evaluate(() => document.documentElement.scrollWidth > innerWidth);
 
 test("themes, towns and all difficulties filter the expanded catalogue without overflow", async ({ page }, testInfo) => {
   const errors: string[] = []; page.on("pageerror", (e) => errors.push(e.message));
   await seed(page); await browse(page);
-  await expect(page.locator(".routeLibraryCard")).toHaveCount(71);
-  await expect(page.locator(".themeCard")).toHaveCount(10);
+  await expect(page.locator(".routeLibraryCard")).toHaveCount(80);
+  await expect(page.locator(".themeCard")).toHaveCount(11);
   await expect(page.locator(".campaignDrawer")).not.toHaveAttribute("open");
   await page.getByRole("button", { name: /Côte d’Azur Ports/ }).click();
   await expect(page.getByLabel("Thème", { exact: true })).toHaveValue("azure");
@@ -40,8 +40,8 @@ test("themes, towns and all difficulties filter the expanded catalogue without o
     const counts = await page.locator(".routeLibraryCard").count();
     await expect(page.locator(".routeLibraryCard").filter({ hasText: `Difficulté ${level}/5` })).toHaveCount(counts);
   }
-  await page.getByRole("button", { name: "Explorer les 29 balades", exact: true }).click();
-  await expect(page.locator(".routeLibraryCard")).toHaveCount(29);
+  await page.getByRole("button", { name: "Explorer les 35 balades", exact: true }).click();
+  await expect(page.locator(".routeLibraryCard")).toHaveCount(35);
   expect(await overflow(page)).toBe(false);
   await page.screenshot({ path: testInfo.outputPath("nouveaux-themes-et-balades.png") });
   expect(errors).toEqual([]);
