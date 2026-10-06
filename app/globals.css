@@ -939,3 +939,23 @@ button:focus-visible, input:focus-visible, .fileButton:focus-within { outline: 2
   .routeLibraryCard .timeAttackSummary > span { min-width: 0; padding: 10px 7px; }
   .routeLibraryCard .timeAttackSummary small { font-size: .55rem; letter-spacing: .05em; white-space: normal; }
 }
+@media (orientation: landscape) and (max-height: 600px) {
+  .sessionModal .readerControls { position: static; }
+  .sessionModal .sessionEssentials .resistance { min-height: 80px; padding: 6px; }
+}
+@media (max-width: 600px) {
+  .routeLibraryCard .timeAttackSummary span:last-child { grid-column: auto; }
+}
+@media (max-width: 600px) {
+  .workoutGrid { gap: 14px; }
+  .workoutCard { min-height: 0; padding: 18px; border-radius: 20px; }
+  .workoutCard .sectionHead { margin-bottom: 10px; align-items: center; gap: 10px; }
+  .workoutCard .sectionHead > strong { font-size: .85rem; white-space: nowrap; }
+  .workoutCard .intensity { font-size: .59rem; letter-spacing: .1em; padding: 5px 8px; }
+  .workoutCard h2 { margin: 0 0 8px; font-size: 1.3rem; line-height: 1.2; }
+  .workoutCard > p { margin: 0 0 14px; font-size: .85rem; line-height: 1.5; }
+  .workoutCard .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 14px; }
+  .workoutCard .chips span { padding: 5px 8px; font-size: .7rem; }
+  .workoutCard > .secondary { min-height: 48px; width: 100%; margin-top: auto; font-size: .85rem; }
+}
+.sessionEssentials .timer small { letter-spacing: .03em; line-height: 1.4; }

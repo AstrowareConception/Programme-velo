@@ -1957,7 +1957,7 @@ export function VeloQuestApp() {
                   <strong>{currentTarget ?? "Libre"}</strong>
                   <span>{resistanceDirection} · plage {adjustedResistance(active.segments[segmentIndex].resistance, preferences.resistanceOffset + sessionResistanceDelta)}</span>
                 </div>
-                <div className="timer" aria-live="off"><small>RESTE DANS CE SEGMENT</small><strong>{formatClock(secondsLeft)}</strong></div></div>
+                <div className="timer" aria-live="off"><small>RESTE DANS CE SEGMENT</small>{" "}<strong>{formatClock(secondsLeft)}</strong></div></div>
                 <div className="actualResistance"><span>Résistance reçue du vélo</span><strong>{bike ? telemetry.resistance?.toFixed(0) ?? "—" : "—"}</strong><small>{autoResistanceControl && controlGranted ? "Pilotage auto · réponse du vélo différée" : "Réglage manuel · suis la cible"}</small></div>
                 {cadenceLive.percent !== undefined && <p className="liveCadenceScore">Suivi cadence : {cadenceLive.percent.toFixed(1)} % · {cadenceLive.grade} · combo {Math.floor(cadenceScore.comboSeconds)} s ×{Math.min(4, 1 + Math.floor(cadenceScore.comboSeconds / 10))} · {Math.floor(cadenceScore.points)} pts</p>}
                 <div className="sessionOverall">

@@ -184,3 +184,5 @@ Score coach v1 : intégration temporelle à la seconde, mesures de cadence fraî
 Comparaison à réglages identiques (identifiant, mode, segments/durées/cadences/résistances, décalage, version). Record réservé à une épreuve complète et suffisamment mesurée, sans changement de réglages. Historique existant préservé, aucune note rétrospective inventée. Bilan et historique affichent le meilleur précédent et une célébration respectant reduced-motion. Aucun XP supplémentaire ni nouveau déblocage attribué par le score dans cette version.
 
 Le SHA final, la PR, les contrôles CI et la publication sont consignés dans la PR de ce lot ; ces fonctionnalités nouvelles restent à essayer physiquement après validation automatisée.
+
+Complément demandé pendant le lot : cartes Parcours sur grille mobile (départ et Voyage pleine largeur, trois actions régulières), résumé record/tentatives/défis sur trois colonnes, cartes Séances compactes avec séparation badges/bouton. Tests tactiles à 320 px ; absence de chevauchement du lecteur paysage et restauration du chrono couvertes.

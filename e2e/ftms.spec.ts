@@ -242,10 +242,11 @@ test("FTMS control acknowledgement and auto resistance send simulated control-po
   expect(writes.some((bytes) => bytes[0] === 0x00)).toBe(true);
   expect(writes.some((bytes) => bytes[0] === 0x04)).toBe(true);
   await expect.poll(() => page.evaluate(() => (window as any).__ftmsWrites)).toContainEqual([4, 50, 0]);
+  await page.clock.runFor(1000);
   for (const level of [6, 7, 6, 5]) {
     await page.clock.fastForward(60_000);
     await expect(page.locator(".sessionEssentials .resistance strong")).toHaveText(String(level));
-    await page.clock.runFor(100);
+    await page.clock.runFor(1100);
     await expect.poll(() => page.evaluate(() => (window as any).__ftmsWrites.at(-1))).toEqual([4, level * 10, 0]);
   }
 });

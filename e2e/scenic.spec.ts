@@ -176,3 +176,17 @@ test("route actions form a regular touch grid on narrow phones", async ({ page }
   await actions.getByRole("button", { name: "⚡ Segments" }).click();
   await expect(page.getByRole("heading", { name: "Choisis ton secteur." })).toBeVisible();
 });
+
+test("workout badges have space before comfortable mobile start buttons", async ({ page }, info) => {
+  await seed(page); await page.goto("/"); await page.getByRole("button", { name: /Séances/ }).click();
+  if (info.project.name === "mobile-chromium") await page.setViewportSize({ width: 320, height: 740 });
+  const card = page.locator(".workoutCard").first();
+  await card.scrollIntoViewIfNeeded();
+  if (info.project.name === "mobile-chromium") {
+    const layout = await card.evaluate(el => ({ gap: el.querySelector("button")!.getBoundingClientRect().top - el.querySelector(".chips")!.getBoundingClientRect().bottom, height: el.querySelector("button")!.getBoundingClientRect().height, overflow: el.scrollWidth > el.clientWidth }));
+    expect(layout.gap).toBeGreaterThanOrEqual(12); expect(layout.height).toBeGreaterThanOrEqual(44); expect(layout.overflow).toBe(false);
+  }
+  await card.screenshot({ path: info.outputPath("workout-card.png") });
+  await card.getByRole("button", { name: "Voir / démarrer" }).click();
+  await expect(page.getByRole("button", { name: "Démarrer la séance", exact: true })).toBeVisible();
+});
