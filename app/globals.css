@@ -997,3 +997,13 @@ button:focus-visible, input:focus-visible, .fileButton:focus-within { outline: 2
 /* Consistent separation for every top-level settings block, including conditional cards. */
 .morePage { display:grid; grid-template-columns:minmax(0,1fr); gap:20px; }
 .morePage > * { min-width:0; margin-block:0; }
+
+.backupTransfer, .backupPaste { min-width:0; padding:16px; border:1px solid var(--line); border-radius:14px; background:rgba(80,227,255,.035); }
+.backupTransfer { display:grid; gap:12px; }
+.backupTransfer h3, .backupTransfer p { margin:0; }
+.backupTransfer label, .backupPaste label { display:grid; gap:8px; min-width:0; }
+.backupTransfer textarea, .backupPaste textarea { width:100%; min-height:140px; max-height:300px; resize:vertical; font:12px/1.5 monospace; overflow-wrap:anywhere; }
+.backupButtons { display:flex; flex-wrap:wrap; gap:10px; }
+.backupButtons > button { flex:1 1 180px; }
+.backupPaste summary { cursor:pointer; min-height:32px; }
+.backupPaste > button { margin-top:12px; width:100%; }

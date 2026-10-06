@@ -90,14 +90,15 @@ export function createBackup(state: AppState, customClimbs: ClimbChallenge[]): B
 }
 
 export function parseBackup(text: string): { state: AppState; customClimbs: ClimbChallenge[] } {
-  const parsed: unknown = JSON.parse(text);
-  if (isObject(parsed) && (parsed.format === "veloquest-backup-v2" || parsed.format === "veloquest-backup-v3") && "state" in parsed) {
-    return {
-      state: normalizeState(parsed.state),
-      customClimbs: Array.isArray(parsed.customClimbs) ? parsed.customClimbs.filter(isObject) as unknown as ClimbChallenge[] : []
-    };
-  }
-  return { state: normalizeState(parsed), customClimbs: [] };
+  const parsed: unknown = JSON.parse(text.replace(/^\uFEFF/, ""));
+  if (!isObject(parsed)) throw new Error("Sauvegarde invalide");
+  const wrapped = "format" in parsed || "state" in parsed;
+  if (wrapped && parsed.format !== "veloquest-backup-v2" && parsed.format !== "veloquest-backup-v3") throw new Error("Format de sauvegarde inconnu");
+  const candidate = wrapped ? parsed.state : parsed;
+  if (!isObject(candidate) || !(isObject(candidate.profile) || Array.isArray(candidate.sessions) || Array.isArray(candidate.measurements))) throw new Error("Sauvegarde incomplète");
+  if (("profile" in candidate && !isObject(candidate.profile)) || ("sessions" in candidate && !Array.isArray(candidate.sessions)) || ("measurements" in candidate && !Array.isArray(candidate.measurements))) throw new Error("Structure de sauvegarde invalide");
+  return { state: normalizeState(candidate), customClimbs: wrapped && Array.isArray(parsed.customClimbs) ? parsed.customClimbs.filter(isObject) as unknown as ClimbChallenge[] : [] };
+
 }
 
 export function safeLocalStorageWrite(key: string, value: unknown) {
