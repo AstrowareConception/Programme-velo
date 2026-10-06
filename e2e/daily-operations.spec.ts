@@ -10,7 +10,7 @@ async function seed(page: Page, sessions: object[] = []) {
 async function stored(page: Page) { return page.evaluate(() => JSON.parse(localStorage.getItem("veloquest:v1")!)); }
 const completed = (id: string, routeId: string, seconds = 900) => ({ id, routeId, templateId: `climb-${routeId}`, date: "2026-10-03T18:00:00Z", duration: 60, xp: 100, points: 3, intensity: "moderate", kind: "hills", bonus: false, metrics: { source: "manual", completedRoute: true, timeAttack: true, elapsedSeconds: seconds } });
 
-test("retroactive local session survives reload and can be deleted", async ({ page }) => {
+test("retroactive local session survives reload and can be deleted", async ({ page }, info) => {
   await seed(page); await page.goto("/");
   await page.getByRole("button", { name: /Séances/ }).click();
   await page.getByRole("button", { name: /Enregistrer une séance déjà faite/ }).click();
@@ -26,6 +26,7 @@ test("retroactive local session survives reload and can be deleted", async ({ pa
   expect(saved.metrics.timeAttack).toBeUndefined();
   await page.reload();
   await page.getByRole("button", { name: /Suivi/ }).click();
+  await page.locator(".journalCard").screenshot({ path: info.outputPath("mobile-journal.png") });
   await page.locator(".sessionHistoryRow").click();
   await expect(page.locator(".detailDate")).toContainText("2 octobre 2026");
   await expect(page.locator(".detailDate")).toContainText("00:15");

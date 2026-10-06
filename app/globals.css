@@ -224,17 +224,27 @@ button { cursor: pointer; }
 .climbLiveTitle span { color:var(--cyan); font-family:"SFMono-Regular",Consolas,monospace; font-size:.78rem; }
 .connectedNotice { color:var(--lime) !important; border:1px solid rgba(185,255,102,.18); border-radius:12px; padding:10px 12px; background:rgba(185,255,102,.05); font-size:.78rem; }
 .finishForm h2 { margin-bottom:10px; }
-.sessionHistory > .sessionHistoryRow { display:grid; grid-template-columns:85px minmax(150px,1fr) auto; gap:14px; align-items:center; padding:13px 0; width:100%; color:var(--text); background:transparent; border-left:0; border-right:0; border-bottom:0; text-align:left; border-top:1px solid var(--line); }
-.sessionHistory > .sessionHistoryRow > span { color:var(--muted); font-size:.75rem; }
-.sessionHistory strong, .sessionHistory small { display:block; }
-.sessionHistory small { color:var(--muted); margin-top:3px; }
-.historyMetrics { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:5px; }
-.historyMetrics span { font-size:.67rem; color:#d8e0f2; background:rgba(255,255,255,.045); border:1px solid var(--line); border-radius:999px; padding:5px 7px; }
+/* The whole journal row opens the detail, including its labelled touch affordance. */
+.journalCard { margin-bottom:20px; }
+.sessionHistory > .sessionHistoryRow { display:grid; grid-template-columns:75px minmax(0,1fr) minmax(0,auto) 64px; grid-template-areas:"date summary metrics details"; gap:14px; align-items:center; padding:18px 0; width:100%; color:var(--text); background:transparent; border:0; border-top:1px solid var(--line); border-radius:0; text-align:left; }
+.sessionHistoryRow .historyDate { grid-area:date; color:var(--muted); font-size:.75rem; }
+.historySummary { grid-area:summary; min-width:0; overflow-wrap:anywhere; }
+.historySummary strong, .historySummary small { display:block; }
+.historySummary strong { line-height:1.3; }
+.historySummary small { color:var(--muted); margin-top:5px; font-size:.76rem; font-weight:400; line-height:1.45; }
+.historyMetrics { grid-area:metrics; display:flex; flex-wrap:wrap; justify-content:flex-end; gap:7px; min-width:0; }
+.historyMetrics > span { font-size:.72rem; font-weight:500; color:#d8e0f2; background:rgba(255,255,255,.045); border:1px solid var(--line); border-radius:9px; padding:6px 9px; white-space:nowrap; }
+.sessionHistoryRow .historyDetails { grid-area:details; display:flex; align-items:center; justify-content:center; gap:7px; min-height:44px; color:var(--cyan); border:1px solid var(--line); border-radius:12px; font-size:.75rem; }
+.historyDetails > span { font-size:1.25rem; }
+.sessionHistoryRow:focus-visible { outline:2px solid var(--cyan); outline-offset:4px; }
+.sessionHistoryRow:hover .historyDetails { background:rgba(79,224,248,.08); }
 
 @media (max-width: 700px) {
   .climbStats { grid-template-columns:1fr 1fr; }
-  .sessionHistory > .sessionHistoryRow { grid-template-columns:70px 1fr; }
-  .historyMetrics { grid-column:2; justify-content:flex-start; }
+  .sessionHistory > .sessionHistoryRow { grid-template-columns:minmax(0,1fr) 64px; grid-template-areas:"date details" "summary summary" "metrics metrics"; gap:9px 12px; padding:16px 0; }
+  .sessionHistoryRow .historyDetails { grid-row:1; }
+  .historyMetrics { justify-content:flex-start; }
+  .journalCard > h2 { font-size:1.3rem; margin-bottom:12px; }
   .routeMap { height:240px; }
 }
 @media (max-width: 480px) {
