@@ -15,7 +15,7 @@ const browse = (page: Page) => page.getByRole("button", { name: /Parcours/ }).cl
 const stored = (page: Page) => page.evaluate(() => JSON.parse(localStorage.getItem("veloquest:v1")!));
 const objectives = (page: Page) => page.getByText("Campagnes et carnets · 22 objectifs à découvrir", { exact: true }).click();
 async function programs(page: Page) {
-  if (await page.locator(".workoutPrograms").getAttribute("open") === null) await page.getByText("Programmes découverte · 3 chemins pour progresser", { exact: true }).click();
+  if (await page.locator(".workoutPrograms").getAttribute("open") === null) await page.getByText("Programmes découverte · 6 chemins pour progresser", { exact: true }).click();
 }
 const overflow = (page: Page) => page.evaluate(() => document.documentElement.scrollWidth > innerWidth);
 

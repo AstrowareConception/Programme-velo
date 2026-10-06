@@ -1,3 +1,4 @@
+import { canalRoutes } from "./canal-routes";
 import type { WorkoutTemplate } from "./types";
 import { scenicRoutes } from "./scenic-routes";
 import { explorationRoutes } from "./exploration-routes";
@@ -633,7 +634,8 @@ const nativeRoutes: ClimbChallenge[] = [
   ...napoleonNorthRoutes,
   ...esterelRoutes,
   ...napoleonShortRoutes,
-  ...alsaceRoutes
+  ...alsaceRoutes,
+  ...canalRoutes
 ];
 export const climbs = nativeRoutes.map(enrichRouteDescription);
 

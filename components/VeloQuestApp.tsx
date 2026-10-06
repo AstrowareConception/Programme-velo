@@ -1,5 +1,10 @@
 "use client";
 
+import { CadenceCalibration } from "@/components/CadenceCalibration";
+import { AdaptiveProgram } from "@/components/AdaptiveProgram";
+import { WeeklyReview, SessionDebrief } from "@/components/WeeklyReview";
+import { MasteryPanel } from "@/components/MasteryPanel";
+import { PersonalJourneys } from "@/components/PersonalJourneys";
 import { BackupTransfer, BackupPaste } from "@/components/BackupTransfer";
 import { CalorieResult } from "@/components/CalorieResult";
 import { isCalorieWorkout, startCalories, sampleCalories, measuredCaloriesEligible, bestCalorieAttempt, type CalorieAttempt, type CalorieResult as CalorieResultType } from "@/lib/calorie-challenge";
@@ -727,7 +732,7 @@ export function VeloQuestApp() {
       return;
     }
 
-    const restoredOffset = [-15, 0, 10].includes(resumeSnapshot.cadenceOffset ?? 0) ? resumeSnapshot.cadenceOffset ?? 0 : 0;
+    const restoredOffset = Number.isFinite(resumeSnapshot.cadenceOffset) ? Math.max(-25, Math.min(10, Math.round(resumeSnapshot.cadenceOffset! / 5) * 5)) : 0;
     cadenceBase.current = workout;
     workout = withCadenceOffset(workout, restoredOffset);
     setSessionCadenceOffset(restoredOffset);
@@ -1382,6 +1387,7 @@ export function VeloQuestApp() {
             onExplore={exploreGentleRides} onReview={reviewGuidance} onFree={leaveGuidance} />}
 
           {voyageCard}
+          <AdaptiveProgram state={state} week={week} workouts={workouts} onChange={setState} onLaunch={workout => launch(workout)} />
 
           <details className={guidedView ? "guidedAdvanced" : "legacyDashboard"} open={guidedView ? undefined : true}>
             <summary hidden={!guidedView}>Voir le programme de douze semaines et les outils avancés</summary>
@@ -1494,6 +1500,7 @@ export function VeloQuestApp() {
         <section>
           <div className="pageHead pageHeadActions"><div><p className="eyebrow">CATALOGUE</p><h1>Choisis ta quête</h1><p>Du décrassage au HIIT. Le ressenti reste prioritaire sur le numéro de résistance.</p></div><button className="secondary" onClick={openManualLog}>+ Enregistrer une séance déjà faite</button></div>
           <p className="finePrint">Les formats express de moins de 10 min rapportent 0,5 point : des compléments à tes séances principales. Les bonus récupération restent à 0 point. Les points des séances déjà enregistrées sont conservés.</p>
+          <MasteryPanel sessions={state.sessions} />
           <WorkoutProgramsPanel sessions={state.sessions} workouts={workouts} onLaunch={(workout) => launch(workout)} />
           <div className="workoutFilters">
             <button type="button" className="secondary" aria-pressed={expressOnly} onClick={() => setExpressOnly(value => !value)}>Express · moins de 10 min</button>
@@ -1537,6 +1544,10 @@ export function VeloQuestApp() {
             }}>Une balade en 30 minutes</button></div>
           </section>
 
+          <PersonalJourneys state={state} routes={allClimbs}
+            onSave={journey => setState(previous => ({ ...previous, journeys: [...(previous.journeys ?? []), journey] }))}
+            onDelete={id => setState(previous => ({ ...previous, journeys: (previous.journeys ?? []).filter(j => j.id !== id) }))}
+            onContinue={route => { setState(previous => ({ ...previous, voyage: { routeId: route.id, minutes: previous.voyage?.minutes ?? 30 } })); setVoyagePickerOpen(true); }} />
           <RouteThemesPanel sessions={state.sessions} selectedId={routeThemeId} onSelect={(id) => {
             setRouteDuration("all");
             setRouteThemeId(id); setRouteSearch(""); setRouteCategoryFilter("all"); setRouteDifficultyFilter(0); setRouteFavoritesOnly(false);
@@ -1710,6 +1721,7 @@ export function VeloQuestApp() {
             <MetricChart title="Tour de taille" points={waistPoints} unit="cm" target={state.profile.targetWaist} />
           </div>
 
+          <WeeklyReview state={state} week={week} workouts={workouts} onHabits={entry => setState(previous => ({ ...previous, habits: [...(previous.habits ?? []).filter(h => h.date !== entry.date), entry] }))} />
           <PerformanceRecords sessions={state.sessions} />
 
           <section className="card journalCard">
@@ -1771,6 +1783,7 @@ export function VeloQuestApp() {
             <div className="sectionHead"><div><p className="eyebrow">CONFORT DE SÉANCE</p><h2>Ton cockpit</h2></div><span className="spark">personnalisable</span></div>
             <ReaderViewChoice preferences={preferences} onChange={updatePreference} />
             <SessionComfort preferences={preferences} onChange={updatePreference} />
+            <CadenceCalibration sessions={state.sessions} offset={preferences.cadenceOffset ?? -15} onChange={offset => updatePreference("cadenceOffset", offset)} />
             <div className="toggleList">
               <Toggle label="Retour haptique" description="Vibration si le navigateur et l’appareil le permettent." checked={preferences.haptics} onChange={(v) => updatePreference("haptics", v)} />
               <Toggle label="Garder l’écran éveillé" description="Demande le maintien pendant l’effort ; le lecteur affiche l’état accordé ou refusé." checked={preferences.keepScreenAwake} onChange={(v) => updatePreference("keepScreenAwake", v)} />
@@ -2004,7 +2017,7 @@ export function VeloQuestApp() {
                   const offset = Number(event.target.value);
                   const baseline = withCadenceOffset(cadenceBase.current ?? active, offset);
                   setActive(baseline); setSessionCadenceOffset(offset); updatePreference("cadenceOffset", offset);
-                }}><option value={-15}>Doux · −15 tr/min</option><option value={0}>Classique</option><option value={10}>Soutenu · +10 tr/min</option></select></label>}
+                }}>{![-15, 0, 10].includes(sessionCadenceOffset) && <option value={sessionCadenceOffset}>Personnel · {sessionCadenceOffset > 0 ? "+" : ""}{sessionCadenceOffset} tr/min</option>}<option value={-15}>Doux · −15 tr/min</option><option value={0}>Classique</option><option value={10}>Soutenu · +10 tr/min</option></select></label>}
                 <p className="finePrint">{calorieMode ? "Épreuve à rythme libre. Les records du vélo et les saisies déclarées sont séparés ; le compteur du vélo doit être disponible dès le départ pour un record mesuré." : "Les cibles affichées et le score suivent ce réglage. Le RPE est un effort visé, pas une mesure : ton ressenti prime."}</p>
                 {activeChallenge && (
                   <div className="activeChallengeBanner">
@@ -2139,6 +2152,7 @@ export function VeloQuestApp() {
             <p className="eyebrow">JOURNAL</p>
             <h2>{selectedRoute?.name ?? selectedTemplate?.name ?? selectedSession.templateId}</h2>
             {selectedSession.metrics?.voyage && <p className="voyageNext">Voyage · {selectedSession.metrics.voyage.startKm.toFixed(2)} → {selectedSession.metrics.voyage.endKm.toFixed(2)} km · {selectedSession.metrics.voyage.completedPortion ? "portion achevée" : "portion inachevée"} · position simulée. Cette séance seule ne valide pas un parcours entier.</p>}
+            <SessionDebrief state={state} workouts={workouts} sessionId={selectedSession.id} />
             <p className="detailDate">{new Intl.DateTimeFormat("fr-FR", { dateStyle: "full", timeStyle: "short" }).format(new Date(selectedSession.date))}</p>
             {selectedSession.metrics?.calorieChallenge && <CalorieResult result={selectedSession.metrics.calorieChallenge} previous={bestCalorieAttempt(state.sessions.filter(s => s.date < selectedSession.date), selectedSession.templateId, selectedSession.metrics.calorieChallenge.source, selectedSession.metrics.calorieChallenge.deviceName)?.metrics?.calorieChallenge} />}
             {!isCalorieWorkout(selectedSession.templateId) && <CadenceResult score={selectedSession.metrics?.cadenceScore} />}

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { workoutPrograms, workoutProgramProgress, workoutProgramBonusXp } from "../lib/workout-programs";
 import { discoveryWorkouts } from "../lib/discovery-workouts";
-import { badges, emptyState, totalXp, weeklyStats } from "../lib/data";
+import { badges, emptyState, totalXp, weeklyStats, workouts } from "../lib/data";
 import { createBackup, parseBackup } from "../lib/storage";
 import type { CompletedSession } from "../lib/types";
 
@@ -17,7 +17,7 @@ describe("flexible discovery programmes", () => {
     discoveryWorkouts.forEach((workout) => expect(workout.segments.reduce((sum, segment) => sum+segment.minutes, 0)).toBe(workout.duration));
     for (const program of workoutPrograms) {
       expect(new Set(program.workoutIds).size).toBe(program.workoutIds.length);
-      program.workoutIds.forEach((id) => expect(discoveryWorkouts.find((workout) => workout.id === id)?.bonus).not.toBe(true));
+      program.workoutIds.forEach((id) => { const workout = workouts.find(w => w.id === id); expect(workout).toBeDefined(); expect(workout?.bonus).not.toBe(true); });
     }
   });
   it("marks the actual completed workout out of order and ignores repeated discoveries", () => {

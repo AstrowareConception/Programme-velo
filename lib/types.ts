@@ -140,6 +140,10 @@ export type Preferences = {
 };
 
 export type AppState = {
+  program?: import("./adaptive-program").ProgramSettings;
+  programPlans?: import("./adaptive-program").ProgramPlan[];
+  habits?: import("./adaptive-program").HabitDay[];
+  journeys?: import("./adaptive-program").PersonalJourney[];
   weeklyGoals?: WeekTarget[];
   profile: Profile;
   sessions: CompletedSession[];

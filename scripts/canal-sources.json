@@ -1,0 +1,98 @@
+{
+  "canal-pontivy-josselin": {
+    "key": "canal-pontivy-josselin",
+    "gpxUrl": "https://www.francevelotourisme.com/etape/gpx/369",
+    "gpxSha256": "5b1342d9b18e8ce5ca5e4641ed85e01d811ee61e60a418561454ffc3982e198c",
+    "trackOnly": true,
+    "section": "Pontivy → Josselin : étape complète du GPX officiel.",
+    "places": [
+      {
+        "label": "Pontivy",
+        "landmark": "Départ de la trace publiée.",
+        "endpoint": "start"
+      },
+      {
+        "label": "Josselin",
+        "landmark": "Arrivée de la trace publiée.",
+        "endpoint": "finish"
+      }
+    ]
+  },
+  "canal-pontivy-josselin-short": {
+    "key": "canal-pontivy-josselin",
+    "gpxUrl": "https://www.francevelotourisme.com/etape/gpx/369",
+    "gpxSha256": "5b1342d9b18e8ce5ca5e4641ed85e01d811ee61e60a418561454ffc3982e198c",
+    "trackOnly": true,
+    "section": "Premiers 7,5 km environ de l’étape officielle, arrêt sur le chemin de halage.",
+    "places": [
+      {
+        "label": "Pontivy",
+        "landmark": "Départ de la trace publiée.",
+        "endpoint": "start"
+      },
+      {
+        "label": "Halage · fin de la portion courte",
+        "landmark": "Arrêt virtuel sur le tracé, sans arrivée dans la ville suivante.",
+        "endpoint": "finish"
+      }
+    ],
+    "clip": [
+      [
+        48.074368,
+        -2.962291
+      ],
+      [
+        48.112377,
+        -2.909982
+      ]
+    ]
+  },
+  "canal-josselin-peillac": {
+    "key": "canal-josselin-peillac",
+    "gpxUrl": "https://www.francevelotourisme.com/etape/gpx/370",
+    "gpxSha256": "feeea01bf795d4ccc4878264d01d9ab45356f7ebadd4413cfa15ceaedbf29488",
+    "trackOnly": true,
+    "section": "Josselin → Peillac : étape complète du GPX officiel.",
+    "places": [
+      {
+        "label": "Josselin",
+        "landmark": "Départ de la trace publiée.",
+        "endpoint": "start"
+      },
+      {
+        "label": "Peillac",
+        "landmark": "Arrivée de la trace publiée.",
+        "endpoint": "finish"
+      }
+    ]
+  },
+  "canal-josselin-peillac-short": {
+    "key": "canal-josselin-peillac",
+    "gpxUrl": "https://www.francevelotourisme.com/etape/gpx/370",
+    "gpxSha256": "feeea01bf795d4ccc4878264d01d9ab45356f7ebadd4413cfa15ceaedbf29488",
+    "trackOnly": true,
+    "section": "Premiers 7,5 km environ de l’étape officielle, arrêt sur le chemin de halage.",
+    "places": [
+      {
+        "label": "Josselin",
+        "landmark": "Départ de la trace publiée.",
+        "endpoint": "start"
+      },
+      {
+        "label": "Halage · fin de la portion courte",
+        "landmark": "Arrêt virtuel sur le tracé, sans arrivée dans la ville suivante.",
+        "endpoint": "finish"
+      }
+    ],
+    "clip": [
+      [
+        47.952588,
+        -2.548246
+      ],
+      [
+        47.911676,
+        -2.481452
+      ]
+    ]
+  }
+}

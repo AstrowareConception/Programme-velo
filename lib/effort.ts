@@ -77,7 +77,7 @@ export function bestCadenceAttempt(sessions: import("./types").CompletedSession[
 
 /** Apply before starting; the resulting cadence is also the scoring target. */
 export function withCadenceOffset(workout: import("./types").WorkoutTemplate, offset: number) {
-  const safe = [-15, 0, 10].includes(offset) ? offset : 0;
+  const safe = Number.isFinite(offset) ? Math.max(-25, Math.min(10, Math.round(offset / 5) * 5)) : 0;
   return { ...workout, segments: workout.segments.map(segment => {
     const range = numericRange(segment.cadence);
     if (!range || !safe) return { ...segment };

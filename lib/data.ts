@@ -1,3 +1,5 @@
+import { canalRoutes } from "./canal-routes";
+import { masteryWorkouts } from "./mastery-workouts";
 import { calorieWorkouts } from "./calorie-challenge";
 import { expressWorkouts } from "./express-workouts";
 import { localInputDate, localCalendarDay } from "./dates";
@@ -34,6 +36,7 @@ export const defaultPreferences: Preferences = {
 
 export const workouts: WorkoutTemplate[] = [
   ...discoveryWorkouts,
+  ...masteryWorkouts,
   ...expressWorkouts,
   ...calorieWorkouts,
   {
@@ -415,7 +418,7 @@ export function badges(state: AppState): Badge[] {
   const uniqueChallengeIds = new Set(successfulChallenges.map((s) => s.metrics!.challenge!.id));
   const totalDistance = state.sessions.reduce((sum, s) => sum + (s.metrics?.distanceKm ?? 0), 0);
   const sessionsWithPower = state.sessions.filter((s) => (s.metrics?.avgPowerW ?? 0) > 0);
-  const gentleRouteIds = [...scenicRouteIds, ...[...explorationRoutes, ...shortRoutes, ...esterelRoutes, ...napoleonShortRoutes, ...alsaceRoutes].filter((route) => route.category === "scenic").map((route) => route.id)];
+  const gentleRouteIds = [...scenicRouteIds, ...[...explorationRoutes, ...shortRoutes, ...esterelRoutes, ...napoleonShortRoutes, ...alsaceRoutes, ...canalRoutes].filter((route) => route.category === "scenic").map((route) => route.id)];
   const scenicCount = gentleRouteIds.filter((id) => routeIds.has(id)).length;
   // Preserve the historic relief counters; gentle rides have their own trophies.
   const reliefCount = [...routeIds].filter((id) => !gentleRouteIds.includes(id)).length;

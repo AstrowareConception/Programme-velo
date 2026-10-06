@@ -1,5 +1,12 @@
 # Roadmap VéloQuest
 
+## 6 octobre 2026 — programme personnel, maîtrise et carnets
+
+Lot de mise à jour en cours de validation : planning hebdomadaire adapté, bilans, habitudes, débrief, repères de cadence, dix nouvelles séances et trois programmes, défis de maîtrise, carnets personnels et quatre parcours du canal. Voir [fonctionnement et limites](PROGRAMME-PERSONNEL.md) et [sources du canal](CANAL-NANTES-BREST.md).
+
+La synchronisation distante, les nouveaux packs Grandes Alpes/Ardèche et les essais vocaux physiques restent ouverts. Les descriptions matérielles anciennes ci-dessous sont historiques : Bluefy + Toputure TBE5, résistance effective et transfert JSON ont depuis été confirmés par l’utilisateur. Les références de publication de ce lot sont à vérifier dans PROJECT-STATE.
+
+
 ## 6 octobre 2026 — vignoble d’Alsace et extension des photos
 
 Lot préparé depuis main `58a8769bab262903918757bdbe9c29306476d389` (correctif PWA de la PR 34 livré et vérifié en production). Neuf parcours alsaciens : six étapes continues et trois courts formats distincts, deux carnets (770 XP uniques au total) et deux trophées. Catalogue : 80 parcours, 35 balades, 11 thèmes, 22 carnets et 74 badges. Les anciens parcours et objectifs restent identiques. [Trace, relief et règles](ALSACE-VIGNOBLE.md).
