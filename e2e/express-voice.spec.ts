@@ -11,8 +11,8 @@ async function launch(page: Page) { await page.getByRole("heading", { name: "Pau
 async function speech(page: Page, text: string, final = true) { await page.evaluate(({ text, final }) => (window as any).__recognition.onresult?.({ resultIndex: 0, results: [{ isFinal: final, 0: { transcript: text } }] }), { text, final }); }
 test("express filters show all intensities and persist a short workout", async ({ page }) => {
   await seed(page); await catalog(page);
-  await expect(page.locator(".workoutCard")).toHaveCount(9);
-  await page.getByLabel("Intensité des séances").selectOption("hard"); await expect(page.locator(".workoutCard")).toHaveCount(2);
+  await expect(page.locator(".workoutCard")).toHaveCount(10);
+  await page.getByLabel("Intensité des séances").selectOption("hard"); await expect(page.locator(".workoutCard")).toHaveCount(3);
   await page.getByLabel("Intensité des séances").selectOption("all"); await launch(page);
   await page.getByRole("button", { name: "Terminer et enregistrer", exact: true }).click();
   await page.getByLabel("J’ai vérifié le bilan et les champs facultatifs.").check();

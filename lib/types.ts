@@ -64,6 +64,7 @@ export type ChallengeResult = {
 };
 
 export type SessionMetrics = {
+  calorieChallenge?: import("./calorie-challenge").CalorieResult;
   cadenceSettingsKey?: string;
   cadenceRecordEligible?: boolean;
   cadenceScore?: import("./effort").CadenceScore;
