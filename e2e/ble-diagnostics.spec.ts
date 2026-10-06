@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 
-async function setup(page: Page, mode: "ftms" | "absent" | "cancelled" | "pending" | "unsupported" = "ftms") {
+async function setup(page: Page, mode: "ftms" | "absent" | "cancelled" | "pending" | "unsupported" | "service-timeout" | "characteristic-timeout" = "ftms") {
   await page.addInitScript((mode) => {
     localStorage.setItem("veloquest:v1", JSON.stringify({ profile: { name: "PRIVATE_PROFILE", startDate: "2026-10-01" }, sessions: [], measurements: [], favoriteRouteIds: [] }));
     (window as any).__ble = { writes: 0, reads: [], disconnected: 0 };
@@ -24,8 +24,12 @@ async function setup(page: Page, mode: "ftms" | "absent" | "cancelled" | "pendin
         if (mode === "pending") return new Promise(() => {});
         return { name: "PRIVATE_BIKE", id: "PRIVATE_ID", gatt: {
           async connect() { return { async getPrimaryService(id: number) {
+            if (mode === "service-timeout") return new Promise(() => {});
             if (id !== 0x1826 || mode === "absent") throw new DOMException("PRIVATE_ERROR", "NotFoundError");
-            return { async getCharacteristics() { return chars; } };
+            return { async getCharacteristics() {
+              if (mode === "characteristic-timeout") return new Promise(() => {});
+              return chars;
+            } };
           } }; },
           disconnect() { (window as any).__ble.disconnected++; }
         } };
@@ -97,3 +101,31 @@ test("unsupported browser preserves the manual mode", async ({ page }) => {
   await page.getByRole("button", { name: /Séances/ }).click();
   await expect(page.getByRole("heading", { name: "Décrassage" })).toBeVisible();
 });
+
+for (const mode of ["service-timeout", "characteristic-timeout"] as const) {
+  test(`${mode} distinguishes unconfirmed service from inaccessible characteristics`, async ({ page }) => {
+    await setup(page, mode);
+    await page.clock.install();
+    const panel = page.getByRole("region", { name: "Diagnostic matériel BLE" });
+    await panel.getByRole("button", { name: "Inspecter un appareil BLE" }).click();
+    await expect(panel.getByRole("button", { name: "Inventaire en cours…" })).toBeVisible();
+    await page.clock.runFor(15_001);
+    await expect(panel.getByText(/Étape interrompue/)).toContainText(mode === "service-timeout"
+      ? "découverte du service 0x1826 : délai dépassé (TimeoutError)"
+      : "découverte des caractéristiques 0x1826 : délai dépassé (TimeoutError)");
+    await expect(panel.getByText(mode === "service-timeout"
+      ? "1826 : inaccessible lors de cet essai"
+      : "1826 : service présent, caractéristiques inaccessibles", { exact: true })).toBeVisible();
+    await expect(panel).not.toContainText("PRIVATE_ERROR");
+    await expect(panel.getByRole("button", { name: "Inspecter un appareil BLE" })).toBeEnabled();
+    await expect(page.getByRole("button", { name: "Vélo Bluetooth" })).toBeEnabled();
+    const downloadEvent = page.waitForEvent("download");
+    await panel.getByRole("button", { name: "Exporter le rapport sans données personnelles" }).click();
+    const json = await readFile((await (await downloadEvent).path())!, "utf8");
+    expect(JSON.parse(json)).toMatchObject({ outcome: "timeout", failure: { errorName: "TimeoutError" } });
+    expect(json).not.toContain("PRIVATE");
+    expect(await page.evaluate(() => (window as any).__ble.writes)).toBe(0);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+    await panel.screenshot({ path: `test-results/ble-${mode}-${test.info().project.name}.png` });
+  });
+}

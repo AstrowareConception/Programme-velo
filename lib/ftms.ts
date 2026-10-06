@@ -1,3 +1,5 @@
+import { bleErrorName, describeBleFailure, type BleOperation } from "./ble-failure";
+
 export type BikeTelemetry = {
   speedKmh?: number;
   avgSpeedKmh?: number;
@@ -244,6 +246,11 @@ export async function connectFtmsBike(
 
   let device: any;
   let stopped = false;
+  let operation: BleOperation = { stage: "device-selection" };
+  const uuid = (id: number) => `0000${id.toString(16)}-0000-1000-8000-00805f9b34fb`;
+  const characteristicOperation = (stage: BleOperation["stage"], id: number) => {
+    operation = { stage, serviceUuid: uuid(FTMS_SERVICE), characteristicUuid: uuid(id) };
+  };
   const disconnect = () => { try { device?.gatt?.disconnect(); } catch {} };
   // A failed/late handshake must release the physical bike for another attempt.
   async function bounded<T>(operation: Promise<T>, late?: (value: T) => void): Promise<T> {
@@ -258,13 +265,13 @@ export async function connectFtmsBike(
           timer = setTimeout(() => {
             stopped = true;
             disconnect();
-            reject(new Error("Connexion FTMS : délai dépassé. Ferme le sélecteur éventuel, réveille le vélo et réessaie."));
+            reject(new DOMException("Connection timeout", "TimeoutError"));
           }, 15_000);
         })
       ]);
     } finally { clearTimeout(timer); }
   }
-  const ensureActive = () => { if (stopped) throw new Error("Connexion FTMS expirée."); };
+  const ensureActive = () => { if (stopped) throw new DOMException("Connection timeout", "TimeoutError"); };
 
   try {
     device = await bounded(bluetooth.requestDevice({
@@ -272,24 +279,25 @@ export async function connectFtmsBike(
       optionalServices: [FTMS_SERVICE]
     }), (late: any) => { try { late.gatt?.disconnect(); } catch {} });
 
+    operation = { stage: "gatt-connection" };
     const server: any = await bounded(Promise.resolve(device.gatt?.connect()), disconnect);
     if (!server) throw new Error("Connexion GATT impossible.");
 
-    let service: any;
-    try {
-      service = await bounded(server.getPrimaryService(FTMS_SERVICE));
-    } catch (error) {
-      if (stopped) throw error;
-      throw new Error("Service FTMS (0x1826) inaccessible lors de cet essai. Vérifie le réveil du vélo et les permissions Bluetooth.");
-    }
+    operation = { stage: "service-discovery", serviceUuid: uuid(FTMS_SERVICE) };
+    const service: any = await bounded(server.getPrimaryService(FTMS_SERVICE));
 
+    characteristicOperation("characteristic-discovery", INDOOR_BIKE_DATA);
     const dataChar: any = await bounded(service.getCharacteristic(INDOOR_BIKE_DATA));
+    characteristicOperation("characteristic-discovery", FITNESS_MACHINE_FEATURE);
     const featureChar = await bounded(optionalCharacteristic(service, FITNESS_MACHINE_FEATURE));
+    characteristicOperation("characteristic-discovery", SUPPORTED_RESISTANCE_RANGE);
     const rangeChar = await bounded(optionalCharacteristic(service, SUPPORTED_RESISTANCE_RANGE));
+    characteristicOperation("characteristic-discovery", CONTROL_POINT);
     const controlPoint = await bounded(optionalCharacteristic(service, CONTROL_POINT));
 
     let targetSettingsBits: number | undefined;
     if (featureChar) {
+      characteristicOperation("characteristic-read", FITNESS_MACHINE_FEATURE);
       try {
         const featureValue: DataView = await bounded<DataView>(featureChar.readValue());
         if (featureValue.byteLength >= 8) targetSettingsBits = featureValue.getUint32(4, true);
@@ -299,6 +307,7 @@ export async function connectFtmsBike(
 
     let resistanceRange: ResistanceRange | undefined;
     if (rangeChar) {
+      characteristicOperation("characteristic-read", SUPPORTED_RESISTANCE_RANGE);
       try {
         resistanceRange = parseResistanceRange(await bounded<DataView>(rangeChar.readValue()));
       } catch {}
@@ -307,6 +316,7 @@ export async function connectFtmsBike(
     ensureActive();
     let controlReady = false;
     if (controlPoint) {
+      characteristicOperation("notification-subscription", CONTROL_POINT);
       try { await bounded(controlPoint.startNotifications()); controlReady = true; } catch {}
     }
 
@@ -327,6 +337,7 @@ export async function connectFtmsBike(
       if (value) onTelemetry(parseIndoorBikeData(value));
     };
 
+    characteristicOperation("notification-subscription", INDOOR_BIKE_DATA);
     await bounded(dataChar.startNotifications());
     ensureActive();
     dataChar.addEventListener("characteristicvaluechanged", handler);
@@ -385,6 +396,6 @@ export async function connectFtmsBike(
   } catch (error) {
     stopped = true;
     disconnect();
-    throw error;
+    throw new Error(`Connexion FTMS — ${describeBleFailure({ ...operation, errorName: bleErrorName(error) })} Ferme les autres applications connectées au vélo, réveille la console et réessaie. Si l’échec persiste, exporte l’inventaire BLE et précise l’appareil et le navigateur.`);
   }
 }
