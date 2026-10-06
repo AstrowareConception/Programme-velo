@@ -1,5 +1,13 @@
 # État de reprise VéloQuest — actualisé le 5 octobre 2026
 
+## 6 octobre 2026 — résistance et fréquence cardiaque après connexion Bluefy
+
+La PR 38 a été fusionnée et publiée dans main `39af4b93c5b69c5692e52be2a2969eebce40ffef`, vérifié via /api/version. L’utilisateur confirme maintenant la connexion Toputure TBE5 et la télémétrie dans VéloQuest/Bluefy. Capture : 69 rpm, 17,8 km/h, puissance diffusée 13 W, niveau affiché 0,6 alors que le vélo est au niveau 6, BPM 0. La console physique affiche pourtant 93, 95, 88 BPM lorsque les poignées sont tenues. Cela ne prouve pas encore que le service 180D émet ces valeurs, ni la commande physique depuis VéloQuest.
+
+Ce lot corrige la division par dix dans Indoor Bike Data (la plage et les commandes de résistance gardent leur encodage distinct). Ajout d’une souscription facultative au service Heart Rate 180D / mesure 2A37 avec UUID canoniques, formats 8/16 bits, prise en compte de la perte de contact, expiration après dix secondes, nettoyage à la déconnexion. L’échec ou le délai du service cardiaque n’interrompt pas FTMS. Les zéros FTMS ne remplacent pas une mesure cardiaque séparée récente ; zéro sans mesure est affiché comme indisponible. Aucun facteur n’est appliqué aux watts transmis.
+
+TypeScript et 188 tests unitaires réussis localement. Validation navigateur mobile/ordinateur et build requis avant fusion. Essai physique restant : niveau 6 affiché 6 ; BPM suivant la console en tenant les poignées ; contrôle physique de résistance toujours à confirmer dans VéloQuest.
+
 ## 6 octobre 2026 — Bluefy et UUID canoniques
 
 Correctif préparé depuis main `d1fa26957b24b4e6c1d3f714d8235749d094dd0b` (PR 37). Sur iPhone, le test Google indépendant échoue avant sélection avec `0x1826` (nombre JavaScript, rejet brut `2`), mais découvre les services et caractéristiques avec le champ vide ou l’UUID complet sous forme de texte. Captures utilisateur : service 1826, 2ACC et 2AD6 READ, 2AD2 NOTIFY, 2AD9 WRITE/INDICATE. Ce résultat valide la découverte dans Bluefy, pas encore le contrôle depuis VéloQuest. Le test natif antérieur avait permis un changement physique de résistance sur Toputure ; le test FTMS sur Sport02 n’en avait pas produit.

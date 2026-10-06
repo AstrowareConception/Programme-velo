@@ -21,8 +21,8 @@ async function seed(page: Page) {
   }, state);
 }
 
-async function mockFtms(page: Page, mode: "standard" | "sport02" = "standard") {
-  await page.addInitScript((mode) => {
+async function mockFtms(page: Page, mode: "standard" | "sport02" = "standard", heartRateService = false) {
+  await page.addInitScript(({ mode, heartRateService }) => {
     const FTMS_SERVICE = 0x1826;
     const FEATURE = 0x2acc;
     const BIKE_DATA = 0x2ad2;
@@ -63,9 +63,10 @@ async function mockFtms(page: Page, mode: "standard" | "sport02" = "standard") {
               view.setUint16(offset, 2534, true); offset += 2;
               view.setUint16(offset, 176, true); offset += 2;
               view.setUint8(offset++, 0xb0); view.setUint8(offset++, 0x04); view.setUint8(offset++, 0x00);
-              view.setInt16(offset, 180, true); offset += 2;
+              view.setInt16(offset, 18, true); offset += 2;
               view.setInt16(offset, 205, true); offset += 2;
-              view.setUint8(offset, 142);
+              view.setUint8(offset, heartRateService ? 0 : 142);
+              (window as any).__emitBike = () => emit(BIKE_DATA, view);
               emit(BIKE_DATA, view);
             }, 40);
           }
@@ -120,8 +121,26 @@ async function mockFtms(page: Page, mode: "standard" | "sport02" = "standard") {
       }
     };
 
+    const heartListeners = new Set<() => void>();
+    const heartChar = {
+      value: new DataView(new Uint8Array([0, 93]).buffer),
+      async startNotifications() { return heartChar; },
+      async stopNotifications() {},
+      addEventListener(_: string, fn: () => void) { heartListeners.add(fn); },
+      removeEventListener(_: string, fn: () => void) { heartListeners.delete(fn); }
+    };
+    (window as any).__emitHeart = (flags: number, bpm: number) => {
+      heartChar.value = new DataView(new Uint8Array([flags, bpm]).buffer);
+      for (const fn of heartListeners) fn();
+    };
     const server = {
       async getPrimaryService(uuid: string) {
+        if (heartRateService && uuid === "0000180d-0000-1000-8000-00805f9b34fb") return {
+          async getCharacteristic(id: string) {
+            if (id !== "00002a37-0000-1000-8000-00805f9b34fb") throw new Error("wrong characteristic");
+            return heartChar;
+          }
+        };
         if (uuid !== "00001826-0000-1000-8000-00805f9b34fb") throw new Error("service unavailable");
         return service;
       }
@@ -147,7 +166,7 @@ async function mockFtms(page: Page, mode: "standard" | "sport02" = "standard") {
         }
       }
     });
-  }, mode);
+  }, { mode, heartRateService });
 }
 
 test("Sport02-like telemetry remains usable while incomplete control is explained and disabled", async ({ page }) => {
@@ -259,4 +278,23 @@ test("first hardware test sends only explicit minimum and neighbouring commands,
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem("veloquest:v1")!).sessions)).toEqual([]);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await lab.screenshot({ path: `test-results/hardware-lab-${test.info().project.name}.png` });
+});
+
+
+test("separate heart rate supplies BPM, contact loss clears them, and resistance uses whole levels", async ({ page }) => {
+  await seed(page);
+  await mockFtms(page, "standard", true);
+  await page.goto("/");
+  await page.getByRole("button", { name: "Vélo Bluetooth" }).click();
+  const bpm = page.locator(".consoleMetric").filter({ has: page.getByText("BPM", { exact: true }) }).first().locator("strong");
+  await expect(page.locator(".consoleMetric").filter({ has: page.getByText("LEVEL", { exact: true }) }).first().locator("strong")).toHaveText("18.0");
+  await expect(bpm).toHaveText("—");
+  await page.evaluate(() => (window as any).__emitHeart(0, 93));
+  await expect(bpm).toHaveText("93");
+  await page.evaluate(() => (window as any).__emitBike());
+  await expect(bpm).toHaveText("93");
+  await page.evaluate(() => (window as any).__emitHeart(0, 95));
+  await expect(bpm).toHaveText("95");
+  await page.evaluate(() => (window as any).__emitHeart(4, 95));
+  await expect(bpm).toHaveText("—");
 });

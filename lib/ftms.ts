@@ -1,3 +1,4 @@
+import { HEART_RATE_SERVICE, subscribeHeartRate } from "./heart-rate";
 import { bleErrorName, describeBleFailure, type BleOperation } from "./ble-failure";
 
 export type BikeTelemetry = {
@@ -130,7 +131,8 @@ export function parseIndoorBikeData(view: DataView): BikeTelemetry {
   }
   if (flags & (1 << 5)) {
     if (offset + 2 > view.byteLength) return out;
-    out.resistance = view.getInt16(offset, true) / 10;
+    // Indoor Bike Data reports whole levels; target commands still use tenths.
+    out.resistance = view.getInt16(offset, true);
     offset += 2;
   }
   if (flags & (1 << 6)) {
@@ -152,7 +154,7 @@ export function parseIndoorBikeData(view: DataView): BikeTelemetry {
   }
   if (flags & (1 << 9)) {
     if (offset + 1 > view.byteLength) return out;
-    out.heartRate = view.getUint8(offset);
+    out.heartRate = view.getUint8(offset) || undefined;
     offset += 1;
   }
   if (flags & (1 << 10)) {
@@ -303,7 +305,7 @@ export async function connectFtmsBike(
   try {
     device = await bounded(bluetooth.requestDevice({
       acceptAllDevices: true, // Names and advertised services do not establish compatibility.
-      optionalServices: [uuid(FTMS_SERVICE)]
+      optionalServices: [uuid(FTMS_SERVICE), HEART_RATE_SERVICE]
     }), (late: any) => { try { late.gatt?.disconnect(); } catch {} });
 
     operation = { stage: "gatt-connection" };
@@ -374,10 +376,16 @@ export async function connectFtmsBike(
       controlPointStatus
     };
 
+    let lastHeartRateEvent = -Infinity;
     const handler = (event: Event) => {
       const characteristic = event.target as any;
       const value: DataView | undefined = characteristic.value;
-      if (value) onTelemetry(parseIndoorBikeData(value));
+      if (value) {
+        const next = parseIndoorBikeData(value);
+        // FTMS zeroes must not overwrite the separate sensor's recent measurement.
+        if (Date.now() - lastHeartRateEvent < 10_000) delete next.heartRate;
+        onTelemetry(next);
+      }
     };
 
     characteristicOperation("notification-subscription", INDOOR_BIKE_DATA);
@@ -387,12 +395,20 @@ export async function connectFtmsBike(
 
     let controlGranted = false;
     let disconnected = false;
+    let stopHeartRate = () => {};
     const cleanup = () => {
+      stopHeartRate();
       dataChar.removeEventListener("characteristicvaluechanged", handler);
       device.removeEventListener("gattserverdisconnected", disconnectHandler);
     };
     const disconnectHandler = () => { disconnected = true; controlGranted = false; cleanup(); onDisconnected?.(); };
     device.addEventListener("gattserverdisconnected", disconnectHandler);
+
+    stopHeartRate = subscribeHeartRate(server, heartRate => {
+      if (disconnected) return;
+      lastHeartRateEvent = Date.now();
+      onTelemetry({ heartRate });
+    });
 
     let commandPending = false;
     const sendCommand = async (payload: Uint8Array) => {
