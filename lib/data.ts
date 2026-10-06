@@ -18,6 +18,7 @@ export const STORAGE_KEY = "veloquest:v1";
 export const defaultPreferences: Preferences = {
   soundCues: true,
   voiceCues: false,
+  cadenceOffset: -15,
   haptics: true,
   keepScreenAwake: true,
   keepTelemetryTrace: true,

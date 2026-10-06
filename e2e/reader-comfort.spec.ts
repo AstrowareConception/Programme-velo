@@ -63,7 +63,7 @@ test("audio settings persist without changing existing history and can be tested
   await reader(page).getByRole("button", { name: "Vue essentielle" }).click();
   await reader(page).getByRole("button", { name: "Tester mes alertes" }).click();
   await expect(reader(page).getByText(/Test envoyé/)).toBeVisible();
-  await expect.poll(() => spoken(page)).toContainEqual({ text: "Test des alertes VéloQuest. niveau 10. Effort 3 sur dix.", volume: 0.25 });
+  await expect.poll(() => spoken(page)).toContainEqual({ text: "Test des alertes VéloQuest. niveau 10. Effort visé 3 sur dix.", volume: 0.25 });
   await expect(reader(page).getByRole("button", { name: "Démarrer la séance" })).toBeVisible();
   expect(await page.evaluate(() => localStorage.getItem("veloquest:active-session:v1"))).toBeNull();
   await expect.poll(async () => (await saved(page)).preferences.readerView).toBe("essential");
@@ -145,7 +145,7 @@ test("calibrated voice warns once before a timed change and respects mute", asyn
   expect((await spoken(page))[0].text).toContain("niveau 7–9");
   await page.clock.fastForward(290000);
   await expect.poll(async () => (await spoken(page)).length).toBe(2);
-  expect((await spoken(page))[1]).toMatchObject({ text: "Dans dix secondes. Roulage facile. niveau 9–12. Effort 3–4 sur dix.", volume: 0.25 });
+  expect((await spoken(page))[1]).toMatchObject({ text: "Dans dix secondes. Roulage facile. niveau 9–12. Effort visé 3–4 sur dix. Cadence 65–75 tours par minute.", volume: 0.25 });
   await page.clock.fastForward(2000); expect((await spoken(page)).length).toBe(2);
   await page.clock.fastForward(8000); await expect.poll(async () => (await spoken(page)).length).toBe(3);
   await reader(page).getByText("Son, voix et média", { exact: true }).click();
@@ -188,4 +188,34 @@ test("essential controls remain reachable in landscape", async ({ page }, info) 
     return essential.bottom <= controls.top;
   })).toBe(true);
   await page.screenshot({ path: info.outputPath("essential-landscape.png") });
+});
+
+
+test("cadence difficulty is reversible, stored and restored with the active workout", async ({ page }) => {
+  await seed(page); await workout(page);
+  await expect(page.getByLabel("Rythme de pédalage")).toHaveValue("-15");
+  await page.getByLabel("Rythme de pédalage").selectOption("10");
+  await page.getByLabel("Rythme de pédalage").selectOption("-15");
+  await start(page);
+  await expect(reader(page)).toContainText("Cible 60–70 tr/min");
+  await reader(page).getByRole("button", { name: "Pause", exact: true }).click();
+  await reader(page).getByRole("button", { name: "Alléger −1" }).click();
+  await page.reload();
+  await page.getByRole("button", { name: "Reprendre", exact: true }).click();
+  await expect(reader(page)).toContainText("Cible 60–70 tr/min");
+  expect((await saved(page)).sessions).toEqual(base.sessions);
+});
+
+test("coach announces plateaus and sustained pacing advice but stays quiet during pauses", async ({ page }) => {
+  await seed(page, { voiceCues: true }); await page.clock.install(); await workout(page);
+  await page.evaluate(() => { window.speechSynthesis.speak = (utterance: any) => { (window as any).__spoken.push({ text: utterance.text }); utterance.onend?.(); }; });
+  await start(page);
+  await page.clock.runFor(61000);
+  await expect.poll(async () => (await spoken(page)).some((item: any) => item.text.includes("Résistance cible : niveau 8"))).toBe(true);
+  await page.clock.runFor(30000);
+  await expect.poll(async () => (await spoken(page)).some((item: any) => item.text.includes("de la réserve"))).toBe(true);
+  await reader(page).getByRole("button", { name: "Pause", exact: true }).click();
+  const count = (await spoken(page)).length;
+  await page.clock.runFor(100000);
+  expect((await spoken(page)).length).toBe(count);
 });

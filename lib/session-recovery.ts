@@ -4,6 +4,7 @@ export const ACTIVE_SESSION_KEY = "veloquest:active-session:v1";
 
 export type ActiveSessionSnapshot = {
   version: 1;
+  cadenceOffset?: number;
   savedAt: number;
   workoutId: string;
   routeId?: string;

@@ -34,6 +34,7 @@ function normalizePreferences(value: unknown): Preferences {
     keepScreenAwake: bool("keepScreenAwake"),
     keepTelemetryTrace: bool("keepTelemetryTrace"),
     resistanceOffset: Math.max(-4, Math.min(4, numberOrUndefined(raw.resistanceOffset) ?? defaultPreferences.resistanceOffset)),
+    cadenceOffset: [-15, 0, 10].includes(Number(raw.cadenceOffset)) ? Number(raw.cadenceOffset) : -15,
     cueVolume: Math.max(0, Math.min(100, numberOrUndefined(raw.cueVolume) ?? 65)),
     cueFrequency: raw.cueFrequency === "changes" ? "changes" : "all",
     announceUpcoming: bool("announceUpcoming"),

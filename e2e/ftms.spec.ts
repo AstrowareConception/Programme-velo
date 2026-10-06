@@ -11,6 +11,7 @@ const state = {
     haptics: false,
     keepScreenAwake: false,
     keepTelemetryTrace: true,
+    cadenceOffset: 0,
     resistanceOffset: 0
   }
 };
@@ -21,8 +22,8 @@ async function seed(page: Page) {
   }, state);
 }
 
-async function mockFtms(page: Page, mode: "standard" | "sport02" = "standard", heartRateService = false) {
-  await page.addInitScript(({ mode, heartRateService }) => {
+async function mockFtms(page: Page, mode: "standard" | "sport02" = "standard", heartRateService = false, qualified = false) {
+  await page.addInitScript(({ mode, heartRateService, qualified }) => {
     const FTMS_SERVICE = 0x1826;
     const FEATURE = 0x2acc;
     const BIKE_DATA = 0x2ad2;
@@ -151,7 +152,7 @@ async function mockFtms(page: Page, mode: "standard" | "sport02" = "standard", h
     };
 
     const device: any = {
-      name: mode === "sport02" ? "Simulateur FTMS incomplet" : "Simulateur FTMS 1–32",
+      name: qualified ? "Toputure TBE5" : mode === "sport02" ? "Simulateur FTMS incomplet" : "Simulateur FTMS 1–32",
       addEventListener() {},
       removeEventListener() {},
       gatt: {
@@ -170,7 +171,7 @@ async function mockFtms(page: Page, mode: "standard" | "sport02" = "standard", h
         }
       }
     });
-  }, { mode, heartRateService });
+  }, { mode, heartRateService, qualified });
 }
 
 test("Sport02-like telemetry remains usable while incomplete control is explained and disabled", async ({ page }) => {
@@ -352,4 +353,17 @@ test("coach score, combos and BPM above 100 survive deliberate saving and reload
   expect(session.metrics.cadenceRecordEligible).toBe(false);
   await page.reload();
   await expect.poll(async () => (await saved())?.metrics?.cadenceScore).toEqual(session.metrics.cadenceScore);
+});
+
+
+test("qualified Toputure acquires control automatically and sends levels only after start", async ({ page }) => {
+  await seed(page); await mockFtms(page, "standard", false, true); await page.goto("/");
+  await page.getByRole("button", { name: "Vélo Bluetooth" }).click();
+  await expect.poll(() => page.evaluate(() => (window as any).__ftmsWrites)).toEqual([[0]]);
+  await page.getByRole("button", { name: /Séances/ }).click();
+  await page.getByRole("heading", { name: "Décrassage", exact: true }).locator("xpath=ancestor::article").getByRole("button", { name: "Voir / démarrer" }).click();
+  await expect(page.getByText(/résistance automatique activée/)).toBeVisible();
+  await page.getByRole("button", { name: "Démarrer la séance" }).click();
+  await expect(page.getByText("AUTO LEVEL ACTIF")).toBeVisible();
+  await expect.poll(() => page.evaluate(() => (window as any).__ftmsWrites)).toContainEqual([4, 50, 0]);
 });

@@ -970,3 +970,6 @@ button:focus-visible, input:focus-visible, .fileButton:focus-within { outline: 2
   .weeklyGoals input { min-width: 0; }
   .missionCard .sectionHead { align-items: start; }
 }
+
+.effortAdjustments { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 8px 0; }
+.effortAdjustments button { min-height: 44px; padding: 8px; font-size: .85rem; }

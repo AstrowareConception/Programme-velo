@@ -38,7 +38,7 @@ describe("reader preferences and honest audio guidance", () => {
     vi.stubGlobal("navigator", {});
     cueSegment(segment, { ...defaultPreferences, soundCues: false, haptics: false, voiceCues: true, cueVolume: 25, resistanceOffset: 2 }, { upcoming: true });
     expect(speak).toHaveBeenCalledOnce();
-    expect(speak.mock.calls[0][0]).toMatchObject({ text: "Dans dix secondes. Une ville. niveau 10–12. Effort 3–4 sur dix.", volume: 0.25, lang: "fr-FR" });
+    expect(speak.mock.calls[0][0]).toMatchObject({ text: "Dans dix secondes. Une ville. niveau 10–12. Effort visé 3–4 sur dix. Cadence 80–90 tours par minute.", volume: 0.25, lang: "fr-FR" });
     expect(adjustedResistance("31–32", 4)).toBe("32–32");
     expect(adjustedResistance("libre", 4)).toBe("libre");
   });

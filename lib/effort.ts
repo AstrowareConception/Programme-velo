@@ -74,3 +74,13 @@ export function bestCadenceAttempt(sessions: import("./types").CompletedSession[
       return previous === undefined || candidate.percent > previous ? session : best;
     }, undefined);
 }
+
+/** Apply before starting; the resulting cadence is also the scoring target. */
+export function withCadenceOffset(workout: import("./types").WorkoutTemplate, offset: number) {
+  const safe = [-15, 0, 10].includes(offset) ? offset : 0;
+  return { ...workout, segments: workout.segments.map(segment => {
+    const range = numericRange(segment.cadence);
+    if (!range || !safe) return { ...segment };
+    return { ...segment, cadence: range.map(value => Math.max(40, value + safe)).join("–") };
+  }) };
+}
