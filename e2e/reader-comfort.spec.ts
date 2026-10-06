@@ -53,7 +53,7 @@ async function setVolume(page: Page, value: number) {
 }
 async function noOverflow(page: Page) { expect(await reader(page).evaluate(el => el.scrollWidth <= el.clientWidth + 1)).toBe(true); }
 
-test("audio settings persist without changing existing history and can be tested before starting", async ({ page }) => {
+test("audio settings persist without changing existing history and can be tested before starting", async ({ page }, info) => {
   await seed(page); await workout(page);
   await reader(page).getByText("Son, voix et média", { exact: true }).click();
   await reader(page).getByLabel("Voix du coach").check();
@@ -75,6 +75,9 @@ test("audio settings persist without changing existing history and can be tested
   await expect(page.getByLabel("Fréquence des annonces")).toHaveValue("changes");
   await expect(page.getByRole("button", { name: "Vue essentielle" })).toHaveAttribute("aria-pressed", "true");
   expect((await saved(page)).sessions).toEqual(base.sessions);
+  await page.getByText("Son, voix et média", { exact: true }).click();
+  await page.getByRole("heading", { name: "Ton cockpit", exact: true }).scrollIntoViewIfNeeded();
+  await page.screenshot({ path: info.outputPath("settings-spacing.png") });
 });
 
 test("essential workout pauses, restores and finishes without losing its settings", async ({ page }, info) => {

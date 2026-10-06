@@ -1747,7 +1747,7 @@ export function VeloQuestApp() {
       )}
 
       {tab === "more" && (
-        <section>
+        <section className="morePage">
           <div className="pageHead"><p className="eyebrow">PLUS · VERSION {process.env.NEXT_PUBLIC_BUILD_COMMIT?.slice(0, 7)}</p><h1>Réglages, badges & données</h1><p>Tout ce qui personnalise VeloQuest sans encombrer la navigation principale.</p></div>
 
           <InstallCard />
