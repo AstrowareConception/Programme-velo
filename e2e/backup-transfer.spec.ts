@@ -1,0 +1,36 @@
+import { expect, test } from "@playwright/test";
+const source = { profile: { name: "Transfer QA", startDate: "2026-10-01", startWeight: 110 }, sessions: [{id:"s",templateId:"recovery-30",date:"2026-10-06T12:00:00Z",duration:30,points:2,xp:35,intensity:"easy",kind:"recovery",bonus:false}], measurements: [{id:"m",date:"2026-10-06T12:00:00Z",weight:109}], preferences:{voiceCues:false,soundCues:false} };
+test("blocked download and clipboard still allow full backup transfer to a fresh browser", async ({ page, browser }, info) => {
+ await page.addInitScript(value => {
+  localStorage.setItem("veloquest:v1", JSON.stringify(value));
+  HTMLAnchorElement.prototype.click = function() {};
+  Object.defineProperty(navigator,"clipboard",{configurable:true,value:{writeText:async()=>{throw new Error("denied");}}});
+  Object.defineProperty(navigator,"canShare",{configurable:true,value:()=>false});
+ }, source);
+ await page.goto("/"); await page.getByRole("button",{name:/Plus/}).click();
+ await page.getByRole("button",{name:"Exporter une sauvegarde JSON v3"}).click();
+ const panel=page.getByRole("region",{name:"Ta sauvegarde à transférer"});
+ await expect(panel).toContainText("1 séance(s) · 1 mesure(s)");
+ const text=await page.getByLabel("Texte complet de la sauvegarde").inputValue();
+ expect(JSON.parse(text).state.profile).toMatchObject(source.profile);
+ await panel.getByRole("button",{name:"Copier la sauvegarde"}).click();
+ await expect(panel.getByRole("status")).toContainText("Copie automatique indisponible");
+ expect(await page.getByLabel("Texte complet de la sauvegarde").evaluate((el:HTMLTextAreaElement)=>el.selectionEnd-el.selectionStart)).toBe(text.length);
+ await panel.getByRole("button",{name:"Partager le fichier JSON"}).click();
+ await expect(panel.getByRole("status")).toContainText("pas disponible");
+ await panel.screenshot({path:info.outputPath("backup-fallback.png")});
+ const context=await browser.newContext(); const target=await context.newPage();
+ await target.goto(page.url());
+ await target.getByLabel("Restaurer une sauvegarde").setInputFiles({name:"empty.json",mimeType:"application/json",buffer:Buffer.from(JSON.stringify({...source,profile:{name:"Other",startDate:"2026-10-01"},sessions:[],measurements:[]}))});
+ await expect(target.getByRole("dialog")).toHaveCount(0);
+ await target.getByRole("button",{name:/Plus/}).click(); await target.getByText("Coller une sauvegarde",{exact:true}).click();
+ await target.getByLabel("Texte JSON à importer").fill(text); await target.getByRole("button",{name:"Importer le texte collé"}).click();
+ await expect.poll(()=>target.evaluate(()=>JSON.parse(localStorage.getItem("veloquest:v1")!).sessions.length)).toBe(1);
+ await target.reload();
+ const restored=await target.evaluate(()=>JSON.parse(localStorage.getItem("veloquest:v1")!));
+ expect(restored.profile).toMatchObject(source.profile);expect(restored.sessions).toEqual(source.sessions);expect(restored.measurements).toEqual(source.measurements);
+ await target.getByRole("button",{name:/Plus/}).click(); await target.getByText("Coller une sauvegarde",{exact:true}).click();
+ await target.getByLabel("Texte JSON à importer").fill("{}"); target.once("dialog", dialog => dialog.accept()); await target.getByRole("button",{name:"Importer le texte collé"}).click();
+ expect(await target.evaluate(()=>JSON.parse(localStorage.getItem("veloquest:v1")!).sessions)).toEqual(source.sessions);
+ await context.close();
+});

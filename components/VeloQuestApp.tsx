@@ -1,5 +1,6 @@
 "use client";
 
+import { BackupTransfer, BackupPaste } from "@/components/BackupTransfer";
 import { CalorieResult } from "@/components/CalorieResult";
 import { isCalorieWorkout, startCalories, sampleCalories, measuredCaloriesEligible, bestCalorieAttempt, type CalorieAttempt, type CalorieResult as CalorieResultType } from "@/lib/calorie-challenge";
 import { VoiceCommands } from "@/components/VoiceCommands";
@@ -153,6 +154,7 @@ export function VeloQuestApp() {
   const [availableMinutes, setAvailableMinutes] = useState(35);
   const [energy, setEnergy] = useState<Energy>("normal");
   const [sessionResistanceDelta, setSessionResistanceDelta] = useState(0);
+  const [backupExport, setBackupExport] = useState<ReturnType<typeof createBackup> | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [online, setOnline] = useState(true);
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
@@ -1205,13 +1207,10 @@ export function VeloQuestApp() {
 
   function exportData() {
     const backup = createBackup(state, customClimbs);
-    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `veloquest-${localInputDate()}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+    setBackupExport(backup);
+    // Keep a visible fallback even if the browser silently ignores downloads.
+    try { downloadText(`veloquest-${localInputDate()}.json`, JSON.stringify(backup, null, 2), "application/json"); }
+    catch { /* Copy, manual selection and sharing remain available. */ }
   }
 
   function downloadText(filename: string, content: string, type = "text/csv;charset=utf-8") {
@@ -1220,8 +1219,10 @@ export function VeloQuestApp() {
     const a = document.createElement("a");
     a.href = url;
     a.download = filename;
+    document.body.appendChild(a);
     a.click();
-    URL.revokeObjectURL(url);
+    a.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 60000);
   }
 
   function exportCsv() {
@@ -1273,7 +1274,8 @@ export function VeloQuestApp() {
       setCustomClimbs(parsed.customClimbs);
       setAvailableMinutes(parsed.state.guidance?.sessionMinutes ?? 35);
       setShowSetup(false);
-      setToast("Sauvegarde importée.");
+      setBackupExport(null);
+      setToast(`Sauvegarde importée : ${parsed.state.sessions.length} séance(s), ${parsed.state.measurements.length} mesure(s).`);
     } catch {
       alert("Sauvegarde invalide.");
     }
@@ -1863,8 +1865,10 @@ export function VeloQuestApp() {
             <button className="secondary" onClick={reviewGuidance}>Revoir le guide de démarrage</button>
             <div className="storageMeter"><span>Empreinte locale</span><strong>{localBytes < 1024 * 1024 ? `${Math.max(1, Math.round(localBytes / 1024))} Ko` : `${(localBytes / 1024 / 1024).toFixed(2)} Mo`}</strong></div>
             <button className="secondary" onClick={exportData}>Exporter une sauvegarde JSON v3</button>
+            {backupExport && <BackupTransfer backup={backupExport} filename={`veloquest-${localInputDate()}.json`} onClose={() => setBackupExport(null)} />}
             <button className="secondary" onClick={exportCsv}>Exporter séances + mesures en CSV</button>
             <label className="secondary fileButton">Importer une sauvegarde<input type="file" accept="application/json" onChange={(e) => importData(e.target.files?.[0])} /></label>
+            <BackupPaste onImport={importData} />
             <Link href="/confidentialite" className="secondary linkButton">Confidentialité & stockage local</Link>
             <button className="secondary dangerButton" onClick={resetLocalData}>Réinitialiser les données de cet appareil</button>
           </section>
