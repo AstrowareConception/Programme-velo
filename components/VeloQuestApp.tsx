@@ -6,7 +6,7 @@ import { WeeklyGoalsForm } from "@/components/WeeklyGoalsForm";
 import { EffortProfile } from "@/components/EffortProfile";
 import { CoachComparison } from "@/components/CoachComparison";
 import { CadenceResult } from "@/components/CadenceResult";
-import { addCadenceInterval, bestCadenceAttempt, cadenceSummary, effortSettingsKey, emptyCadenceScore, numericRange, resistanceTarget } from "@/lib/effort";
+import { withCadenceOffset, addCadenceInterval, bestCadenceAttempt, cadenceSummary, effortSettingsKey, emptyCadenceScore, numericRange, resistanceTarget } from "@/lib/effort";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { AppState, CompletedSession, Measurement, Preferences, TelemetrySample, TimeAttackSplit, VoyagePortion, WorkoutTemplate } from "@/lib/types";
@@ -65,7 +65,7 @@ import {
 import { localInputDate, localInputDateTime, localDateToIso } from "@/lib/dates";
 import { counterDelta } from "@/lib/session";
 import { compactTelemetry, formatClock } from "@/lib/session";
-import { adjustedResistance, cueSegment, prepareCueAudio, releaseCueAudio } from "@/lib/session-cues";
+import { cueCoach, adjustedResistance, cueSegment, prepareCueAudio, releaseCueAudio } from "@/lib/session-cues";
 import { createBackup, estimateLocalBytes, normalizeState, parseBackup, safeLocalStorageWrite } from "@/lib/storage";
 import { captureSplits, checkpointKilometers, formatRaceTime, ghostDeltaSeconds, ghostDistanceAtElapsed, personalBest, routeAttempts, segmentAttempts, segmentBounds, segmentPersonalBest } from "@/lib/time-attack";
 import { challengesForRoute, evaluateRouteChallenge, routeChallenges, type RouteChallenge } from "@/lib/challenges";
@@ -165,6 +165,9 @@ export function VeloQuestApp() {
   const [testResistanceLevel, setTestResistanceLevel] = useState(1);
   const [diagnosingBike, setDiagnosingBike] = useState(false);
   const [resistanceMappingVerified, setResistanceMappingVerified] = useState(false);
+  const cadenceBase = useRef<WorkoutTemplate | null>(null);
+  const [sessionCadenceOffset, setSessionCadenceOffset] = useState(0);
+  const coachFeedback = useRef({ belowSince: 0, lastAt: 0, lastAdviceAt: 0, lastLevel: undefined as number | undefined });
   const [autoResistanceControl, setAutoResistanceControl] = useState(false);
   const [climbStartDistanceM, setClimbStartDistanceM] = useState<number | null>(null);
   const [customClimbs, setCustomClimbs] = useState<ClimbChallenge[]>([]);
@@ -289,10 +292,11 @@ export function VeloQuestApp() {
       sessionResistanceDelta,
       climbStartDistanceM,
       telemetrySamples: compactTelemetry(telemetrySamples, 180),
+      cadenceOffset: sessionCadenceOffset,
       cadenceScore, cadenceSettingsKey, cadenceSettingsChanged,
       hadBikeConnection: Boolean(bike)
     };
-  }, [active, activeClimb, routeMode, activeVoyage, activeChallenge, segmentAttackIndex, segmentIndex, secondsLeft, running, sessionStarted, showFinish, timeAttackElapsedSeconds, timeAttackSplits, pauseCount, sessionResistanceDelta, climbStartDistanceM, telemetrySamples, cadenceScore, cadenceSettingsKey, cadenceSettingsChanged, bike]);
+  }, [active, activeClimb, routeMode, activeVoyage, activeChallenge, segmentAttackIndex, segmentIndex, secondsLeft, running, sessionStarted, showFinish, timeAttackElapsedSeconds, timeAttackSplits, pauseCount, sessionResistanceDelta, climbStartDistanceM, telemetrySamples, cadenceScore, cadenceSettingsKey, cadenceSettingsChanged, bike, sessionCadenceOffset]);
 
   useEffect(() => {
     if (!active || !sessionStarted) return;
@@ -644,6 +648,24 @@ export function VeloQuestApp() {
     }).finally(() => { autoWriteBusy.current = false; });
   }, [autoResistanceControl, controlGranted, running, sessionStarted, active, segmentIndex, bike, currentTarget, secondsLeft]);
 
+  useEffect(() => {
+    const feedback = coachFeedback.current;
+    if (!active || !running || !sessionStarted || showFinish) { feedback.belowSince = 0; return; }
+    const now = Date.now();
+    const range = numericRange(active.segments[segmentIndex]?.cadence);
+    const reading = cadenceReading.current;
+    const below = range && reading.rpm !== undefined && now - reading.at <= 5000 && reading.rpm < range[0];
+    if (!below) feedback.belowSince = 0;
+    else if (!feedback.belowSince) feedback.belowSince = now;
+    if (now - feedback.lastAdviceAt >= 45000 && feedback.belowSince && now - feedback.belowSince >= 15000) {
+      if (cueCoach("La cadence est sous la cible. Privilégie un rythme confortable ; allège la résistance ou fais une pause si l’effort est trop élevé.", preferences)) { feedback.lastAdviceAt = now; feedback.lastAt = now; }
+    } else if (now - feedback.lastAdviceAt >= 90000) {
+      if (cueCoach("Garde un rythme régulier et de la réserve pour la suite. Le ressenti cible reste un repère, adapte l’effort à tes sensations.", preferences)) { feedback.lastAdviceAt = now; feedback.lastAt = now; }
+    } else if (feedback.lastLevel !== currentTarget && currentTarget !== undefined && now - feedback.lastAt >= 8000) {
+      if (cueCoach(`${autoResistanceControl && controlGranted ? "Pilotage automatique" : "Résistance cible"} : niveau ${currentTarget}.`, preferences)) { feedback.lastAt = now; feedback.lastLevel = currentTarget; }
+    }
+  }, [active, running, sessionStarted, showFinish, segmentIndex, secondsLeft, currentTarget, autoResistanceControl, controlGranted, preferences]);
+
   const voyageCard = state.voyage ? <VoyagePanel
     route={allClimbs.find(route => route.id === state.voyage?.routeId)} sessions={state.sessions}
     minutes={state.voyage.minutes} interrupted={Boolean(resumeSnapshot)}
@@ -670,7 +692,7 @@ export function VeloQuestApp() {
     const savedVoyage = resumeSnapshot.routeMode === "voyage" && route && validVoyagePortion(resumeSnapshot.voyage) &&
       resumeSnapshot.voyage.routeDistanceKm === route.distanceKm && resumeSnapshot.voyage.routeXp === route.xp
       ? resumeSnapshot.voyage : null;
-    const workout = route
+    let workout = route
       ? (resumeSnapshot.routeMode === "voyage" ? (savedVoyage ? voyageWorkout(route, savedVoyage) : undefined)
         : resumeSnapshot.routeMode === "segmentAttack" && resumeSnapshot.segmentAttackIndex !== undefined
           ? routeSegmentWorkout(route, resumeSnapshot.segmentAttackIndex)
@@ -683,6 +705,10 @@ export function VeloQuestApp() {
       return;
     }
 
+    const restoredOffset = [-15, 0, 10].includes(resumeSnapshot.cadenceOffset ?? 0) ? resumeSnapshot.cadenceOffset ?? 0 : 0;
+    cadenceBase.current = workout;
+    workout = withCadenceOffset(workout, restoredOffset);
+    setSessionCadenceOffset(restoredOffset);
     const restored = restoreSessionSnapshot(resumeSnapshot, workout);
     pwa.setBusy(true);
     setForegroundNotice(false);
@@ -768,6 +794,18 @@ export function VeloQuestApp() {
       setAutoResistanceControl(false);
       const range = connection.capabilities.resistanceRange;
       setTestResistanceLevel(range?.min ?? 1);
+      // This model and mapping were physically confirmed by the user on 6 October.
+      const qualified = /^toputure t(?:be|eb)5$/i.test(connection.deviceName.trim()) && range?.min === 1 && range.max === 32 && range.increment === 1 && connection.capabilities.supportsResistanceTarget;
+      if (qualified && connection.requestControl && connection.setResistance) {
+        setResistanceMappingVerified(true);
+        try {
+          await connection.requestControl();
+          setControlGranted(true);
+          setAutoResistanceControl(true);
+        } catch (error) {
+          setBluetoothError(`Pilotage automatique indisponible : ${error instanceof Error ? error.message : "contrôle refusé"}`);
+        }
+      }
       setToast(range ? `${connection.deviceName} connecté · résistance ${range.min}–${range.max}` : `${connection.deviceName} connecté`);
     } catch (error) {
       setBluetoothError(error instanceof Error ? error.message : "Connexion Bluetooth impossible.");
@@ -777,13 +815,14 @@ export function VeloQuestApp() {
   }
 
   async function requestBikeControl() {
-    if (!bike?.requestControl || active || controlBusyRef.current) return;
+    if (!bike?.requestControl || controlBusyRef.current) return;
     controlBusyRef.current = true;
     setControlBusy(true);
     setBluetoothError(null);
     try {
       await bike.requestControl();
       setControlGranted(true);
+      if (resistanceMappingVerified) setAutoResistanceControl(true);
       setToast("Contrôle FTMS accordé par le vélo.");
     } catch (error) {
       setControlGranted(false);
@@ -825,7 +864,10 @@ export function VeloQuestApp() {
     if (pwa.locked()) { setToast("Mise à jour en cours : attends le rechargement."); return; }
     pwa.setBusy(true);
     setActiveVoyage(null);
-    setActive(workout);
+    cadenceBase.current = workout;
+    const offset = preferences.cadenceOffset ?? -15;
+    setSessionCadenceOffset(offset);
+    setActive(withCadenceOffset(workout, offset));
     setActiveClimb(climb);
     setRouteMode(climb ? mode : "training");
     setSessionResistanceDelta(Math.max(-1, Math.min(1, resistanceDelta)));
@@ -997,6 +1039,7 @@ export function VeloQuestApp() {
     void prepareCueAudio(preferences);
     upcomingCueRef.current = "";
     setForegroundNotice(false);
+    coachFeedback.current = { belowSince: 0, lastAt: Date.now(), lastAdviceAt: Date.now(), lastLevel: currentTarget };
     setSessionStarted(true);
     setCadenceSettingsKey(currentSettingsKey);
     setCadenceSettingsChanged(false);
@@ -1889,7 +1932,16 @@ export function VeloQuestApp() {
                   <span><small>Récompense</small><strong>{activeVoyage ? `${activeClimb?.xp} XP au bout du voyage` : `+${active.xp} XP`}</strong></span>
                   <span><small>Segments</small><strong>{active.segments.length}</strong></span>
                 </div>
-                {bike && <div className="connectedNotice">✓ {bike.deviceName} connecté · télémétrie automatique activée</div>}
+                {bike && <div className="connectedNotice">✓ {bike.deviceName} connecté · {autoResistanceControl && controlGranted ? "résistance automatique activée" : "télémétrie active · résistance manuelle"}
+                  {resistanceMappingVerified && !autoResistanceControl && <button type="button" className="secondary" disabled={controlBusy} onClick={() => controlGranted ? setAutoResistanceControl(true) : void requestBikeControl()}>Activer le pilotage automatique</button>}
+                  {bluetoothError && <p role="status">{bluetoothError}</p>}
+                </div>}
+                <label>Rythme de pédalage<select value={sessionCadenceOffset} onChange={event => {
+                  const offset = Number(event.target.value);
+                  const baseline = withCadenceOffset(cadenceBase.current ?? active, offset);
+                  setActive(baseline); setSessionCadenceOffset(offset); updatePreference("cadenceOffset", offset);
+                }}><option value={-15}>Doux · −15 tr/min</option><option value={0}>Classique</option><option value={10}>Soutenu · +10 tr/min</option></select></label>
+                <p className="finePrint">Les cibles affichées et le score suivent ce réglage. Le RPE est un effort visé, pas une mesure : ton ressenti prime.</p>
                 {activeChallenge && (
                   <div className="activeChallengeBanner">
                     <span>{activeChallenge.icon}</span>
@@ -1964,13 +2016,18 @@ export function VeloQuestApp() {
                 </div>
                 <div className="timer" aria-live="off"><small>RESTE DANS CE SEGMENT</small>{" "}<strong>{formatClock(secondsLeft)}</strong></div></div>
                 <div className="actualResistance"><span>Résistance reçue du vélo</span><strong>{bike ? telemetry.resistance?.toFixed(0) ?? "—" : "—"}</strong><small>{autoResistanceControl && controlGranted ? "Pilotage auto · réponse du vélo différée" : "Réglage manuel · suis la cible"}</small></div>
+                <div className="effortAdjustments" role="group" aria-label="Adapter l’effort">
+                  <button type="button" className="secondary" disabled={sessionResistanceDelta <= -4} onClick={() => setSessionResistanceDelta(value => Math.max(-4, value - 1))}>Alléger −1</button>
+                  <button type="button" className="secondary" disabled={sessionResistanceDelta >= 4} onClick={() => setSessionResistanceDelta(value => Math.min(4, value + 1))}>Renforcer +1</button>
+                </div>
+                {bike && !autoResistanceControl && <p className="finePrint">Résistance manuelle : {bluetoothError ?? "pilotage automatique non activé pour cette connexion."}{resistanceMappingVerified && <button type="button" className="secondary" disabled={controlBusy} onClick={() => controlGranted ? setAutoResistanceControl(true) : void requestBikeControl()}>Activer le pilotage automatique</button>}</p>}
                 {cadenceLive.percent !== undefined && <p className="liveCadenceScore">Suivi cadence : {cadenceLive.percent.toFixed(1)} % · {cadenceLive.grade} · combo {Math.floor(cadenceScore.comboSeconds)} s ×{Math.min(4, 1 + Math.floor(cadenceScore.comboSeconds / 10))} · {Math.floor(cadenceScore.points)} pts</p>}
                 <div className="sessionOverall">
                   <div><span>Segment {segmentIndex + 1}/{active.segments.length}</span><strong>{sessionProgressPercent}%</strong></div>
                   <i><b style={{ width: `${sessionProgressPercent}%` }} /></i>
                   {autoResistanceControl && controlGranted && <small>AUTO LEVEL ACTIF</small>}
                 </div>
-                <div className="segmentMeta"><span>RPE {active.segments[segmentIndex].rpe}</span>{active.segments[segmentIndex].cadence && <span>Cible {active.segments[segmentIndex].cadence} tr/min</span>}</div>
+                <div className="segmentMeta"><span>Effort visé {active.segments[segmentIndex].rpe}/10</span>{active.segments[segmentIndex].cadence && <span>Cible {active.segments[segmentIndex].cadence} tr/min</span>}</div>
                 {activeClimb && preferences.showRoutePhotos && preferences.readerView !== "essential" && <RoutePhotos key={activeClimb.id} route={activeClimb} currentKm={currentRouteKm} />}
                 {bike && (
                   <div className="liveStrip">

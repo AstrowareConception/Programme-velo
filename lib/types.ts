@@ -130,6 +130,7 @@ export type Preferences = {
   keepScreenAwake: boolean;
   keepTelemetryTrace: boolean;
   resistanceOffset: number;
+  cadenceOffset?: number;
   cueVolume?: number;
   cueFrequency?: "all" | "changes";
   announceUpcoming?: boolean;

@@ -65,7 +65,7 @@ export function cueSegment(segment: Segment, preferences: Preferences, options: 
       if (speaking) window.speechSynthesis.cancel();
       const level = adjustedResistance(segment.resistance, preferences.resistanceOffset);
       const resistance = level === "libre" ? "résistance libre" : `niveau ${level}`;
-      const utterance = new SpeechSynthesisUtterance(`${options.upcoming ? "Dans dix secondes. " : ""}${segment.label}. ${resistance}. Effort ${segment.rpe} sur dix.`);
+      const utterance = new SpeechSynthesisUtterance(`${options.upcoming ? "Dans dix secondes. " : ""}${segment.label}. ${resistance}. Effort visé ${segment.rpe} sur dix.${segment.cadence ? ` Cadence ${segment.cadence === "libre" ? "libre" : segment.cadence + " tours par minute"}.` : ""}`);
       utterance.lang = "fr-FR";
       utterance.rate = 1.05;
       utterance.volume = volume;
@@ -92,4 +92,19 @@ export function releaseCueAudio() {
   try { if (player && player.state !== "closed") void player.close().catch(() => undefined); } catch {}
   try { if (speaking && typeof window !== "undefined") window.speechSynthesis.cancel(); } catch {}
   speaking = false;
+}
+
+/** Supplemental coaching never interrupts an existing segment announcement. */
+export function cueCoach(text: string, preferences: Preferences) {
+  if (typeof window === "undefined" || !preferences.voiceCues || document.visibilityState === "hidden" || !("speechSynthesis" in window) || !("SpeechSynthesisUtterance" in window) || speaking || window.speechSynthesis.speaking) return false;
+  const volume = Math.max(0, Math.min(100, preferences.cueVolume ?? 65)) / 100;
+  if (!volume) return false;
+  try {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "fr-FR"; utterance.rate = 1.05; utterance.volume = volume;
+    speaking = true;
+    utterance.onend = utterance.onerror = () => { speaking = false; };
+    window.speechSynthesis.speak(utterance);
+    return true;
+  } catch { speaking = false; return false; }
 }

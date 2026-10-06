@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addCadenceInterval, cadenceSummary, emptyCadenceScore, numericRange, resistanceTarget } from "../lib/effort";
+import { withCadenceOffset, addCadenceInterval, cadenceSummary, emptyCadenceScore, numericRange, resistanceTarget } from "../lib/effort";
 const segment = { label: "Col", minutes: 1.5, resistance: "11–15", rpe: "5" };
 describe("effort profile", () => {
   it("executes every plateau in the ascent and descent", () => {
@@ -52,4 +52,14 @@ it("compares only matching settings and qualified completed attempts", () => {
 it("reads sparse segment histories after a JSON round trip", () => {
   const score = addCadenceInterval(emptyCadenceScore(), 2, "libre", 65, 70);
   expect(cadenceSummary(JSON.parse(JSON.stringify(score)))).toMatchObject({ percent: 100, measuredSeconds: 65 });
+});
+
+it("adapts cadence without touching free segments or resistance and changes the record settings", () => {
+ const workout = { id: "bonus", name: "Bonus", tagline: "", description: "", kind: "bonus" as const, intensity: "easy" as const, duration: 2, points: 0, xp: 0, segments: [{...segment, cadence: "80–90"}, {...segment, cadence: "libre"}] };
+ const soft = withCadenceOffset(workout, -15);
+ expect(soft.segments[0].cadence).toBe("65–75");
+ expect(soft.segments[1].cadence).toBe("libre");
+ expect(soft.segments[0].resistance).toBe("11–15");
+ expect(workout.segments[0].cadence).toBe("80–90");
+ expect(withCadenceOffset(workout, 10).segments[0].cadence).toBe("90–100");
 });

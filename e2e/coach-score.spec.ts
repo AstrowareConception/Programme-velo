@@ -10,7 +10,7 @@ for (const reducedMotion of [false, true]) test(`comparable record survives savi
   await page.emulateMedia({ reducedMotion: reducedMotion ? "reduce" : "no-preference" });
   await page.addInitScript(({ history, key, score }) => {
     if (!localStorage.getItem("veloquest:v1")) {
-      localStorage.setItem("veloquest:v1", JSON.stringify({ profile: { name: "Coach QA", startDate: "2026-10-01" }, sessions: [history, { ...history, id: "other-settings", metrics: { ...history.metrics, cadenceSettingsKey: "different", cadenceScore: score } }], measurements: [], preferences: { soundCues: false, voiceCues: false, haptics: false, resistanceOffset: 0 } }));
+      localStorage.setItem("veloquest:v1", JSON.stringify({ profile: { name: "Coach QA", startDate: "2026-10-01" }, sessions: [history, { ...history, id: "other-settings", metrics: { ...history.metrics, cadenceSettingsKey: "different", cadenceScore: score } }], measurements: [], preferences: { soundCues: false, voiceCues: false, haptics: false, cadenceOffset: 0, resistanceOffset: 0 } }));
       localStorage.setItem("veloquest:active-session:v1", JSON.stringify({ version: 1, savedAt: Date.now(), workoutId: "recovery-30", routeMode: "training", segmentIndex: 2, secondsLeft: 0, running: false, sessionStarted: true, showFinish: true, timeAttackElapsedSeconds: 0, timeAttackSplits: [], pauseCount: 0, sessionResistanceDelta: 0, telemetrySamples: [], hadBikeConnection: false, cadenceScore: score, cadenceSettingsKey: key, cadenceSettingsChanged: false }));
     }
   }, { history, key, score: score(1) });

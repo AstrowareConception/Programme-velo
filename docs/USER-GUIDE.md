@@ -244,3 +244,10 @@ Le bilan présente la note, les points, le meilleur combo et le détail des segm
 ### Objectifs hebdomadaires réglables
 
 Dans Quête, « Régler mes objectifs » ouvre le formulaire de Plus. Choisis le nombre de séances et la durée habituelle : 4×30 donne 120 minutes, 5×25 donne 125 minutes. La base est désormais 120 minutes et ne monte plus automatiquement. Charge et variété suivent ce réglage ; le nombre maximal de séances dures demeure une limite, pas une mission à remplir. Les changements portent sur la semaine courante et les suivantes, sans recalculer les objectifs des semaines passées. Tes séances déjà enregistrées restent comptabilisées.
+
+### Après connexion et choix du rythme
+Le Toputure TBE5 validé demande automatiquement le contrôle quand ses capacités1–32 sont disponibles. Avant le départ, vérifie « résistance automatique activée » ; les consignes commencent au démarrage. Si le vélo refuse, le lecteur montre le problème et permet de relancer le pilotage. Les autres modèles conservent leur vérification matérielle.
+
+Avant la séance, « Rythme de pédalage » propose Doux (défaut, −15tr/min), Classique ou Soutenu (+10). Le score suit ces cibles et les records restent comparés à réglages identiques. Pendant la séance, Alléger−1/Renforcer+1 adapte la résistance ; une modification en cours exclut le record comparable mais conserve ton résultat. L'effort visé sur10 est un repère : saisis ton véritable ressenti au bilan.
+
+Avec la voix activée, le coach annonce les cadences et paliers puis donne des rappels espacés de gestion de l'effort. Une baisse durable de cadence déclenche une proposition d'alléger ou de faire une pause ; aucune estimation de fatigue ou d'état de santé n'est déduite de cette mesure.
