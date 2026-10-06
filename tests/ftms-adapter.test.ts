@@ -57,7 +57,7 @@ describe("generic FTMS adapter", () => {
   it("does not assume a brand or write before explicit control; encodes reported increments", async () => {
     const f = fixture();
     const bike = await connectFtmsBike(() => {});
-    expect(f.requestDevice).toHaveBeenCalledWith({ acceptAllDevices: true, optionalServices: [uuid(0x1826)] });
+    expect(f.requestDevice).toHaveBeenCalledWith({ acceptAllDevices: true, optionalServices: [uuid(0x1826), uuid(0x180d)] });
     expect(f.write).not.toHaveBeenCalled();
     await expect(bike.setResistance!(1.3)).rejects.toThrow("contrôle");
     await bike.requestControl!();

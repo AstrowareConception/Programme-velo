@@ -17,7 +17,7 @@ describe("parseIndoorBikeData", () => {
     view.setUint16(o, 2534, true); o += 2; // 25.34 km/h
     view.setUint16(o, 176, true); o += 2; // 88 rpm
     view.setUint8(o++, 0x39); view.setUint8(o++, 0x30); view.setUint8(o++, 0x00); // 12345 m
-    view.setInt16(o, 230, true); o += 2; // level 23
+    view.setInt16(o, 23, true); o += 2; // level 23
     view.setInt16(o, 215, true); o += 2;
     view.setUint8(o, 148);
 
@@ -85,4 +85,10 @@ it("does not misread later fields after a truncated flagged energy block", () =>
   view.setUint16(0, (1 << 0) | (1 << 8) | (1 << 9), true);
   expect(parseIndoorBikeData(view)).toEqual({});
   expect(parseIndoorBikeData(new DataView(new ArrayBuffer(1)))).toEqual({});
+});
+
+
+it("reports level six without changing following power/heart-rate offsets; zero BPM is unavailable", () => {
+  const bytes = new Uint8Array([0x61, 0x02, 6, 0, 13, 0, 0]);
+  expect(parseIndoorBikeData(new DataView(bytes.buffer))).toEqual({ resistance: 6, powerW: 13, heartRate: undefined });
 });
