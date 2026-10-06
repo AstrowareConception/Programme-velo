@@ -17,7 +17,7 @@ La correction utilise les fichiers du paquet Vercel, écrit le worker dans les d
 
 - Dépôt : https://github.com/AstrowareConception/Programme-velo ; référence `main`.
 - Production : https://programme-velo.vercel.app/ ; projet Vercel `programme-velo`.
-- Matériel : TOPUTURE TEB5, consignes sur 1–32 niveaux, mode manuel conservé.
+- Matériel : TOPUTURE reçu le 6 octobre 2026, référence exacte et FTMS à qualifier ; TEB5 est une hypothèse historique. Consignes sur 1–32 niveaux, mode manuel conservé. Voir `HARDWARE-COMPATIBILITY.md`.
 
 ## Campagnes intégrées
 
@@ -103,7 +103,7 @@ Une suppression recalcule les indicateurs depuis les séances restantes. Les XP 
 
 Avant fusion : `npm run typecheck`, `npm test`, `npm run test:e2e`, `npm run build` sur le commit exact de la PR, puis contrôle visuel mobile/ordinateur. Vérifier ensuite la CI de `main`, le déploiement Vercel, `/api/version` et l'URL publique.
 
-Aucun essai TEB5 physique ni validation Safari/iPhone physique n'est réalisé par les tests Chromium. Prochaine étape matérielle : suivre `docs/TEB5-BLUETOOTH-VALIDATION.md` et conserver un relevé de la télémétrie et du contrôle effectifs.
+Aucun essai TEB5 physique ni validation Safari/iPhone physique n'est réalisé par les tests Chromium. Prochaine étape matérielle : suivre `docs/HARDWARE-COMPATIBILITY.md` et conserver un relevé de la télémétrie et du contrôle effectifs.
 
 Le document d'état externe livré après déploiement complète ce point avec les commits finaux, PR et résultats réellement observés, sans anticiper la publication.
 
@@ -148,3 +148,12 @@ Le catalogue reste à 71 parcours, 29 balades, dix thèmes, 20 campagnes et 70 b
 Service worker généré à partir du build exact, empreintes des fichiers essentiels et caches distincts par version. Plus affiche la disponibilité vérifiée et le compteur des cinq photos ; préparation et réparation explicites. Nouvelle version en attente sans skipWaiting automatique ; accord de tous les onglets au repos, lecteur ouvert/pause/résultat/formulaire ou échec de sauvegarde bloquants. Verrou temporaire puis rechargement accompagné et reprise sauvegardée conservée. Une précédente version de cache reste conservée. Données locales et catalogue inchangés, aucun badge ni XP ajouté. [Guide PWA](PWA-OFFLINE.md).
 
 Tests navigateur en production ; service workers isolés pour les simulations de métier et activés pour les scénarios PWA réels. Les quatre contrôles sur le SHA exact, les vues mobile/ordinateur et la version publique sont à observer avant d’inscrire la livraison dans l’état externe. Prochaine priorité : autres photos documentées et packs de parcours. Matériel et iPhone/Android réels restent à valider.
+
+
+## 6 octobre 2026 — préparation de la recette du TOPUTURE reçu
+
+Térence confirme la réception du vélo le 6 octobre. Le lot Alsace/photos est déjà intégré dans main `c6e51578895e63931738118589a36f6bf143dcc2` (PR 35). La demande de tester désormais le matériel étend le périmètre à l’intégration de la PR 29 : conflits du lecteur essentiel et du guide réconciliés en conservant Voyage, photos et PWA.
+
+Le diagnostic des services standards ne commande rien et exporte son JSON local explicitement. La procédure courte apparaît dans Plus. La connexion FTMS lit les capacités réellement annoncées ; pas de repli 1–32. Le laboratoire prépare le minimum et un pas voisin sans écriture implicite, affiche vitesse/distance et heure du dernier paquet, évite les commandes concurrentes et expose les refus dans Plus. Les délais de connexion sont bornés et les connexions tardives refermées. Une mise à jour PWA attend la fin du diagnostic ou la déconnexion Bluetooth.
+
+Aucun exemplaire physique n’a encore été qualifié par cette préparation. [Recette](HARDWARE-COMPATIBILITY.md) et [fiche de résultat vierge](HARDWARE-TEST-RESULTS.md) font autorité pour les essais à réaliser par Térence. L’auto-résistance exige une plage annoncée 1–32/pas 1 et une vérification physique explicite à chaque connexion ; deux niveaux essayés ne vérifient pas toute la plage. Les résultats des quatre commandes et la version effectivement publiée seront consignés dans la PR 29 au SHA final.

@@ -125,7 +125,7 @@ async function mockFtms(page: Page) {
     };
 
     const device: any = {
-      name: "Fake TEB5",
+      name: "Simulateur FTMS 1–32",
       addEventListener() {},
       removeEventListener() {},
       gatt: {
@@ -144,33 +144,36 @@ async function mockFtms(page: Page) {
   });
 }
 
-test("FTMS connection exposes live TEB5 telemetry and capabilities", async ({ page }) => {
+test("FTMS connection exposes simulated telemetry and capabilities", async ({ page }) => {
   await seed(page);
   await mockFtms(page);
   await page.goto("/");
 
-  await page.getByRole("button", { name: /TEB5/ }).click();
-  await expect(page.getByText("Fake TEB5").first()).toBeVisible();
+  await page.getByRole("button", { name: "Vélo Bluetooth" }).click();
+  await expect(page.getByText("Simulateur FTMS 1–32").first()).toBeVisible();
   await expect(page.getByText("88").first()).toBeVisible();
   await expect(page.getByText("205").first()).toBeVisible();
   await expect(page.getByText("142").first()).toBeVisible();
 
   await page.getByRole("button", { name: /Plus/ }).click();
+  await expect(page.getByRole("button", { name: "Inspecter un appareil BLE" })).toBeDisabled();
   await expect(page.getByText("Control Point")).toBeVisible();
   await expect(page.getByText("Résistance cible")).toBeVisible();
   await expect(page.getByText("1–32", { exact: true })).toBeVisible();
 });
 
-test("FTMS control acknowledgement and auto resistance send real control-point commands", async ({ page }) => {
+test("FTMS control acknowledgement and auto resistance send simulated control-point commands", async ({ page }) => {
   await seed(page);
   await mockFtms(page);
   await page.goto("/");
 
-  await page.getByRole("button", { name: /TEB5/ }).click();
+  await page.getByRole("button", { name: "Vélo Bluetooth" }).click();
   await page.getByRole("button", { name: /Plus/ }).click();
 
   await page.getByRole("button", { name: "Demander le contrôle FTMS" }).click();
   await expect(page.getByText("Contrôle accordé")).toBeVisible();
+  await expect(page.getByLabel("Auto-résistance pour cette connexion")).toHaveCount(0);
+  await page.locator("label.toggleRow").filter({ hasText: "Correspondance physique 1–32 vérifiée pour cette connexion" }).click();
   await page.locator("label.toggleRow").filter({ hasText: "Auto-résistance pour cette connexion" }).click();
   await expect(page.getByLabel("Auto-résistance pour cette connexion")).toBeChecked();
 
@@ -188,4 +191,46 @@ test("FTMS control acknowledgement and auto resistance send real control-point c
   const writes = await page.evaluate(() => (window as any).__ftmsWrites as number[][]);
   expect(writes.some((bytes) => bytes[0] === 0x00)).toBe(true);
   expect(writes.some((bytes) => bytes[0] === 0x04)).toBe(true);
+});
+
+test("first hardware test sends only explicit minimum and neighbouring commands, then resets on reconnect", async ({ page }) => {
+  await seed(page);
+  await mockFtms(page);
+  await page.goto("/");
+  await page.getByRole("button", { name: /Plus/ }).click();
+  const diagnostic = page.getByRole("region", { name: "Diagnostic matériel BLE" });
+  await diagnostic.getByText("Premier test du vélo · 10 à 15 minutes").click();
+  await expect(diagnostic.getByText(/Pédale doucement une minute/)).toBeVisible();
+  await page.getByRole("button", { name: "Connecter pour la télémétrie FTMS" }).click();
+  const lab = page.getByRole("region", { name: "Laboratoire FTMS" });
+  await expect(lab.getByText(/Dernier paquet reçu à/)).toBeVisible();
+  await expect.poll(() => page.evaluate(() => (window as any).__ftmsWrites)).toEqual([]);
+  await lab.getByRole("button", { name: "Demander le contrôle FTMS" }).click();
+  await expect(lab.getByText("Contrôle accordé")).toBeVisible();
+  const level = lab.getByRole("slider");
+  await expect(level).toHaveValue("1");
+  await lab.getByRole("button", { name: "Envoyer ce niveau au vélo" }).click();
+  await expect.poll(() => page.evaluate(() => (window as any).__ftmsWrites)).toEqual([[0], [4, 10, 0]]);
+  await expect(page.getByText("Commande 1 acquittée ; effet physique à vérifier.")).toBeVisible();
+  await lab.getByRole("button", { name: "Choisir un pas au-dessus" }).click();
+  await expect(level).toHaveValue("2");
+  expect(await page.evaluate(() => (window as any).__ftmsWrites)).toEqual([[0], [4, 10, 0]]);
+  await lab.getByRole("button", { name: "Envoyer ce niveau au vélo" }).click();
+  await expect.poll(() => page.evaluate(() => (window as any).__ftmsWrites)).toEqual([[0], [4, 10, 0], [4, 20, 0]]);
+  await lab.getByRole("button", { name: "Choisir le minimum" }).click();
+  await lab.getByRole("button", { name: "Envoyer ce niveau au vélo" }).click();
+  await expect.poll(() => page.evaluate(() => (window as any).__ftmsWrites)).toEqual([[0], [4, 10, 0], [4, 20, 0], [4, 10, 0]]);
+  await lab.locator("label.toggleRow").filter({ hasText: "Correspondance physique 1–32" }).click();
+  await lab.locator("label.toggleRow").filter({ hasText: "Auto-résistance pour cette connexion" }).click();
+  await lab.getByRole("button", { name: "Déconnecter le vélo après le test" }).click();
+  await expect(diagnostic.getByRole("button", { name: "Inspecter un appareil BLE" })).toBeEnabled();
+  await page.getByRole("button", { name: "Connecter pour la télémétrie FTMS" }).click();
+  await expect(lab.getByText("Contrôle non demandé")).toBeVisible();
+  await lab.getByRole("button", { name: "Demander le contrôle FTMS" }).click();
+  await expect(lab.getByText("Contrôle accordé")).toBeVisible();
+  await expect(lab.getByLabel("Correspondance physique 1–32 vérifiée pour cette connexion")).not.toBeChecked();
+  await expect(lab.getByLabel("Auto-résistance pour cette connexion")).toHaveCount(0);
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem("veloquest:v1")!).sessions)).toEqual([]);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await lab.screenshot({ path: `test-results/hardware-lab-${test.info().project.name}.png` });
 });

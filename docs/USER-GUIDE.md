@@ -66,7 +66,7 @@ Avant de démarrer, la préparation présente les segments, les lieux et les niv
 
 Pendant l'effort :
 
-- le niveau TEB5 cible est affiché en grand ;
+- le niveau guidé 1–32 cible est affiché en grand ;
 - le RPE cible reste prioritaire ;
 - la cadence cible est indiquée lorsqu'elle est pertinente ;
 - le prochain segment est annoncé ;
@@ -75,7 +75,7 @@ Pendant l'effort :
 - le préavis facultatif annonce la prochaine consigne dix secondes avant un changement minuté. Il ne prédit pas un changement piloté par la distance FTMS ;
 - la voix applique la calibration globale et l’ajustement du coach, comme le niveau affiché.
 
-Si tous les niveaux paraissent trop faciles ou trop durs, régler **Plus > Calibration résistance TEB5**.
+Si tous les niveaux paraissent trop faciles ou trop durs, régler **Plus > Calibration résistance 1–32**.
 
 Pour un podcast, lance-le puis reviens dans VéloQuest. Pour YouTube, utilise une fenêtre flottante si elle est disponible, ou des fenêtres côte à côte sur ordinateur/tablette. Garde les consignes visibles et teste les alertes pendant la lecture du média. Au retour d’un passage en arrière-plan, un rappel invite à vérifier consigne et connexion. La pause relâche le maintien de l’écran ; la reprise le redemande. [Guide complet et limites selon l’appareil](READER-COMFORT.md).
 
@@ -89,7 +89,7 @@ Sur navigateur compatible Web Bluetooth :
 
 Sur iPhone, utiliser le mode guidé et saisir les valeurs affichées sur le vélo en fin de séance.
 
-Le pilotage automatique ne doit être utilisé qu'après validation du protocole documenté dans `docs/TEB5-BLUETOOTH-VALIDATION.md`.
+Le pilotage automatique ne doit être utilisé qu'après validation du protocole documenté dans `docs/HARDWARE-COMPATIBILITY.md`.
 
 ## 5. Micro-séances bonus
 
@@ -226,3 +226,9 @@ Dans **Plus → Emporte ta séance**, attends la disponibilité des séances et 
 ## Vignoble d’Alsace
 
 Le thème **Vignoble d’Alsace** regroupe six étapes continues de Marlenheim à Thann (1/5 à 3/5) et trois formats courts à 1/5 : Obernai–Bernardswiller, Dambach–Scherwiller et Turckheim–Eguisheim. Les deux carnets suivent séparément les grandes étapes et les formats courts. Leur bonus est unique ; une suppression de séance recalcule les coches et les récompenses. Le mode Voyage permet de fractionner les grandes étapes. Les photographies d’Obernai et d’Eguisheim montrent des points de vue documentés, sans ajouter de détour au parcours. [Sources et limites](ALSACE-VIGNOBLE.md).
+
+### Identifier un nouveau vélo
+
+Dans **Plus → Explorer les services Bluetooth**, lancer l’inventaire sans commande de résistance et exporter le rapport technique local si nécessaire. Le TOPUTURE reçu le 6 octobre 2026 reste à qualifier : ni son nom ni ses 32 niveaux ne prouvent FTMS. Le diagnostic ne contient aucune mesure personnelle. Voir [la recette matérielle](HARDWARE-COMPATIBILITY.md) avant tout test de contrôle.
+
+La rubrique **Premier test du vélo · 10 à 15 minutes** guide le premier essai dans Plus. Le laboratoire affiche vitesse, distance et heure du dernier paquet ; « Choisir le minimum » ou « Choisir un pas au-dessus » prépare une consigne, puis « Envoyer ce niveau au vélo » effectue la commande. Reviens au minimum puis déconnecte. Les mises à jour attendent aussi la fin du diagnostic ou la déconnexion Bluetooth. [Fiche vierge de résultats](HARDWARE-TEST-RESULTS.md).

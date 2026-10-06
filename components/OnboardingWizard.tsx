@@ -64,7 +64,7 @@ export function OnboardingWizard({ guide, profile, preferences, firstWorkout, ha
           <div className="guideHint">Ton cap de départ : {guide.weeklySessions} séances de {guide.sessionMinutes} minutes, à placer quand cela te convient. La découverte commence par 15 minutes faciles.</div>
         </div>}
         {guide.step === 2 && <div className="form">
-          <p>Tu peux commencer sans Bluetooth. Sur le TEB5, règle toi-même les niveaux de résistance de 1 à 32 en suivant le lecteur.</p>
+          <p>Tu peux commencer sans Bluetooth. Les consignes du lecteur vont de 1 à 32 : adapte manuellement la résistance à ton vélo et à ton ressenti.</p>
           <div className="guideHint"><strong>Le ressenti passe avant le chiffre.</strong> RPE signifie « ressenti d’effort » : 1 est très facile, 10 est maximal. Pour commencer, vise 2–3 et diminue la résistance si nécessaire.</div>
           <label className="onboardingToggle"><input type="checkbox" checked={preferences.soundCues} onChange={(event) => onPreferences({ ...preferences, soundCues: event.target.checked })} /> Un son aux changements de segment</label>
           <p>À la fin, indique ton ressenti et, si tu le souhaites, les kilomètres ou calories affichés sur ton vélo.</p>

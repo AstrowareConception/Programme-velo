@@ -1,4 +1,6 @@
-# Validation Bluetooth du TOPUTURE TEB5
+# Ancien protocole Bluetooth du TEB5
+
+> Ce document décrit l’hypothèse matérielle historique. Il n’identifie pas le TOPUTURE commandé le 4 octobre 2026 et ne constitue pas un résultat de test. Pour cet exemplaire, commencer par [le diagnostic privé et la recette matérielle](HARDWARE-COMPATIBILITY.md). Les niveaux proposés plus bas ne doivent pas être envoyés avant vérification de la plage et des unités réellement annoncées.
 
 Ce protocole doit être exécuté avec le vélo réel avant de considérer le pilotage automatique de résistance comme validé.
 

@@ -66,3 +66,8 @@ Suivre le [protocole TEB5](TEB5-BLUETOOTH-VALIDATION.md) : données réellement 
 ## Contrôles avant chaque publication
 
 Sur le commit exact proposé : `npm run typecheck`, `npm test`, `npm run test:e2e`, `npm run build`, parcours utilisateur sur mobile et ordinateur. Aucun contrôle obligatoire en échec. Vérifier ensuite le SHA effectivement publié par Vercel et `/api/version`, puis actualiser README, guides et état de reprise.
+
+
+### Matériel reçu — 6 octobre 2026
+
+Diagnostic BLE, recette intégrée, commandes manuelles min/pas voisin et fiche de résultat préparés dans le lot PR 29, réconcilié avec main c6e5157. À réaliser sur l’exemplaire : identification exacte, export du diagnostic, cohérence de la télémétrie, retour au minimum, déconnexion/reconnexion et effet physique des commandes. Compatibilité réelle encore inconnue.

@@ -4,7 +4,7 @@
 
 Application : [programme-velo.vercel.app](https://programme-velo.vercel.app/) · Dépôt : [AstrowareConception/Programme-velo](https://github.com/AstrowareConception/Programme-velo)
 
-VéloQuest est une PWA personnelle Next.js / React / TypeScript. Elle associe un programme souple de douze semaines, des séances guidées, des parcours variés et un suivi local. Le matériel de référence est le **TOPUTURE TEB5, 32 niveaux de résistance**. Le mode manuel permet de suivre les consignes et de saisir les valeurs du vélo sans connexion Bluetooth.
+VéloQuest est une PWA personnelle Next.js / React / TypeScript. Elle associe un programme souple de douze semaines, des séances guidées, des parcours variés et un suivi local. Les consignes utilisent une échelle **1–32**. Le TOPUTURE reçu le 6 octobre 2026 reste à identifier précisément et à qualifier ; la commande ne prouve pas FTMS. Le mode manuel permet de suivre les consignes et de saisir les valeurs du vélo sans connexion Bluetooth.
 
 ## Fonctions disponibles
 
@@ -89,7 +89,7 @@ Lance ton média séparément et garde VéloQuest visible : podcast en arrière-
 
 Les calories de séance préremplies depuis FTMS sont la variation du compteur d'énergie sur les échantillons conservés, avec gestion des remises à zéro. « KCAL VÉLO » affiche le compteur du vélo. Une saisie manuelle permet de corriger la valeur de séance. Les watts et calories affichés par le matériel peuvent eux-mêmes être estimés.
 
-Les tests FTMS simulés vérifient le protocole logiciel et l'interface. **Ils ne prouvent pas le fonctionnement du TEB5 physique**, notamment le changement effectif de résistance. Voir le [protocole matériel](docs/TEB5-BLUETOOTH-VALIDATION.md). Sur un appareil sans Web Bluetooth, le mode manuel reste disponible ; aucune enveloppe native iOS n'est livrée.
+Les tests FTMS simulés vérifient le protocole logiciel et l'interface. **Ils ne prouvent pas le fonctionnement du TEB5 physique**, notamment le changement effectif de résistance. Voir le [diagnostic et la recette TOPUTURE](docs/HARDWARE-COMPATIBILITY.md). Sur un appareil sans Web Bluetooth, le mode manuel reste disponible ; aucune enveloppe native iOS n'est livrée.
 
 ## Données et PWA
 
@@ -133,7 +133,8 @@ La version est visible dans **Plus** et dans [l'endpoint de version](https://pro
 ## Guides
 
 - [Guide utilisateur](docs/USER-GUIDE.md)
-- [Validation Bluetooth du TEB5](docs/TEB5-BLUETOOTH-VALIDATION.md)
+- [Compatibilité matérielle : diagnostic BLE privé et recette TOPUTURE](docs/HARDWARE-COMPATIBILITY.md)
+- [Ancien protocole TEB5, contexte historique](docs/TEB5-BLUETOOTH-VALIDATION.md)
 - [État technique de reprise](docs/PROJECT-STATE.md)
 - [Sources des balades et méthode des profils](docs/SCENIC-ROUTES.md)
 

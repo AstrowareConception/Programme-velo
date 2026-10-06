@@ -161,13 +161,27 @@ async function optionalCharacteristic(service: any, uuid: number) {
   }
 }
 
-function parseResistanceRange(view?: DataView): ResistanceRange | undefined {
+export function parseResistanceRange(view?: DataView): ResistanceRange | undefined {
   if (!view || view.byteLength < 6) return undefined;
-  return {
+  const range = {
     min: view.getInt16(0, true) / 10,
     max: view.getInt16(2, true) / 10,
     increment: view.getUint16(4, true) / 10
   };
+  return range.min <= range.max && range.increment > 0 ? range : undefined;
+}
+
+export function normalizeResistance(level: number, range: ResistanceRange): number {
+  if (!Number.isFinite(level) || !Number.isFinite(range.min) || !Number.isFinite(range.max)
+    || !Number.isFinite(range.increment) || range.min > range.max || range.increment <= 0) {
+    throw new Error("Plage ou résistance FTMS invalide.");
+  }
+  const min = Math.round(range.min * 10);
+  const max = Math.round(range.max * 10);
+  const step = Math.round(range.increment * 10);
+  if (step < 1 || min < -32768 || max > 32767) throw new Error("Plage FTMS invalide.");
+  const steps = Math.min(Math.floor((max - min) / step), Math.max(0, Math.round((level * 10 - min) / step)));
+  return (min + steps * step) / 10;
 }
 
 async function writeControlPoint(characteristic: any, bytes: Uint8Array) {
@@ -228,102 +242,149 @@ export async function connectFtmsBike(
   const bluetooth = (navigator as WebBluetoothNavigator).bluetooth;
   if (!bluetooth) throw new Error("Web Bluetooth n’est pas disponible sur ce navigateur.");
 
-  const device = await bluetooth.requestDevice({
-    filters: [
-      { services: [FTMS_SERVICE] },
-      { namePrefix: "TOPUTURE" },
-      { namePrefix: "Sport" },
-      { namePrefix: "SPORT" }
-    ],
-    optionalServices: [FTMS_SERVICE]
-  });
+  let device: any;
+  let stopped = false;
+  const disconnect = () => { try { device?.gatt?.disconnect(); } catch {} };
+  // A failed/late handshake must release the physical bike for another attempt.
+  async function bounded<T>(operation: Promise<T>, late?: (value: T) => void): Promise<T> {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    try {
+      return await Promise.race([
+        operation.then(value => {
+          if (stopped) { late?.(value); throw new Error("Connexion FTMS expirée."); }
+          return value;
+        }),
+        new Promise<never>((_, reject) => {
+          timer = setTimeout(() => {
+            stopped = true;
+            disconnect();
+            reject(new Error("Connexion FTMS : délai dépassé. Ferme le sélecteur éventuel, réveille le vélo et réessaie."));
+          }, 15_000);
+        })
+      ]);
+    } finally { clearTimeout(timer); }
+  }
+  const ensureActive = () => { if (stopped) throw new Error("Connexion FTMS expirée."); };
 
-  const server = await device.gatt?.connect();
-  if (!server) throw new Error("Connexion GATT impossible.");
-
-  let service: any;
   try {
-    service = await server.getPrimaryService(FTMS_SERVICE);
-  } catch {
-    try { device.gatt?.disconnect(); } catch {}
-    throw new Error("Le vélo sélectionné ne fournit pas le service FTMS (0x1826).");
-  }
+    device = await bounded(bluetooth.requestDevice({
+      acceptAllDevices: true, // Names and advertised services do not establish compatibility.
+      optionalServices: [FTMS_SERVICE]
+    }), (late: any) => { try { late.gatt?.disconnect(); } catch {} });
 
-  const dataChar = await service.getCharacteristic(INDOOR_BIKE_DATA);
-  const featureChar = await optionalCharacteristic(service, FITNESS_MACHINE_FEATURE);
-  const rangeChar = await optionalCharacteristic(service, SUPPORTED_RESISTANCE_RANGE);
-  const controlPoint = await optionalCharacteristic(service, CONTROL_POINT);
+    const server: any = await bounded(Promise.resolve(device.gatt?.connect()), disconnect);
+    if (!server) throw new Error("Connexion GATT impossible.");
 
-  let targetSettingsBits: number | undefined;
-  if (featureChar) {
+    let service: any;
     try {
-      const featureValue: DataView = await featureChar.readValue();
-      if (featureValue.byteLength >= 8) targetSettingsBits = featureValue.getUint32(4, true);
-    } catch {}
-  }
-
-  let resistanceRange: ResistanceRange | undefined;
-  if (rangeChar) {
-    try {
-      resistanceRange = parseResistanceRange(await rangeChar.readValue());
-    } catch {}
-  }
-
-  if (controlPoint) {
-    try { await controlPoint.startNotifications(); } catch {}
-  }
-
-  const capabilities: BikeCapabilities = {
-    ftms: true,
-    indoorBikeData: true,
-    resistanceRange,
-    supportsResistanceTarget: targetSettingsBits !== undefined ? Boolean(targetSettingsBits & (1 << 2)) : Boolean(controlPoint && rangeChar),
-    supportsPowerTarget: targetSettingsBits !== undefined ? Boolean(targetSettingsBits & (1 << 3)) : false,
-    controlPoint: Boolean(controlPoint),
-    targetSettingsBits
-  };
-
-  const handler = (event: Event) => {
-    const characteristic = event.target as any;
-    const value: DataView | undefined = characteristic.value;
-    if (value) onTelemetry(parseIndoorBikeData(value));
-  };
-
-  await dataChar.startNotifications();
-  dataChar.addEventListener("characteristicvaluechanged", handler);
-
-  const disconnectHandler = () => onDisconnected?.();
-  device.addEventListener("gattserverdisconnected", disconnectHandler);
-
-  const requestControl = controlPoint
-    ? async () => {
-        await controlCommand(controlPoint, new Uint8Array([0x00]));
-      }
-    : undefined;
-
-  const setResistance = controlPoint && capabilities.supportsResistanceTarget
-    ? async (level: number) => {
-        const range = capabilities.resistanceRange;
-        const min = range?.min ?? 1;
-        const max = range?.max ?? 32;
-        const clamped = Math.max(min, Math.min(max, level));
-        const value = Math.round(clamped * 10);
-        const payload = new Uint8Array(3);
-        payload[0] = 0x04;
-        new DataView(payload.buffer).setInt16(1, value, true);
-        await controlCommand(controlPoint, payload);
-      }
-    : undefined;
-
-  return {
-    deviceName: device.name || "Vélo FTMS",
-    capabilities,
-    requestControl,
-    setResistance,
-    disconnect: () => {
-      try { dataChar.removeEventListener("characteristicvaluechanged", handler); } catch {}
-      try { device.removeEventListener("gattserverdisconnected", disconnectHandler); } catch {}
-      try { device.gatt?.disconnect(); } catch {}
+      service = await bounded(server.getPrimaryService(FTMS_SERVICE));
+    } catch (error) {
+      if (stopped) throw error;
+      throw new Error("Service FTMS (0x1826) inaccessible lors de cet essai. Vérifie le réveil du vélo et les permissions Bluetooth.");
     }
-  };
+
+    const dataChar: any = await bounded(service.getCharacteristic(INDOOR_BIKE_DATA));
+    const featureChar = await bounded(optionalCharacteristic(service, FITNESS_MACHINE_FEATURE));
+    const rangeChar = await bounded(optionalCharacteristic(service, SUPPORTED_RESISTANCE_RANGE));
+    const controlPoint = await bounded(optionalCharacteristic(service, CONTROL_POINT));
+
+    let targetSettingsBits: number | undefined;
+    if (featureChar) {
+      try {
+        const featureValue: DataView = await bounded<DataView>(featureChar.readValue());
+        if (featureValue.byteLength >= 8) targetSettingsBits = featureValue.getUint32(4, true);
+      } catch {}
+    }
+    ensureActive();
+
+    let resistanceRange: ResistanceRange | undefined;
+    if (rangeChar) {
+      try {
+        resistanceRange = parseResistanceRange(await bounded<DataView>(rangeChar.readValue()));
+      } catch {}
+    }
+
+    ensureActive();
+    let controlReady = false;
+    if (controlPoint) {
+      try { await bounded(controlPoint.startNotifications()); controlReady = true; } catch {}
+    }
+
+    ensureActive();
+    const capabilities: BikeCapabilities = {
+      ftms: true,
+      indoorBikeData: true,
+      resistanceRange,
+      supportsResistanceTarget: targetSettingsBits !== undefined && Boolean(targetSettingsBits & (1 << 2)),
+      supportsPowerTarget: targetSettingsBits !== undefined ? Boolean(targetSettingsBits & (1 << 3)) : false,
+      controlPoint: Boolean(controlPoint),
+      targetSettingsBits
+    };
+
+    const handler = (event: Event) => {
+      const characteristic = event.target as any;
+      const value: DataView | undefined = characteristic.value;
+      if (value) onTelemetry(parseIndoorBikeData(value));
+    };
+
+    await bounded(dataChar.startNotifications());
+    ensureActive();
+    dataChar.addEventListener("characteristicvaluechanged", handler);
+
+    let controlGranted = false;
+    let disconnected = false;
+    const cleanup = () => {
+      dataChar.removeEventListener("characteristicvaluechanged", handler);
+      device.removeEventListener("gattserverdisconnected", disconnectHandler);
+    };
+    const disconnectHandler = () => { disconnected = true; controlGranted = false; cleanup(); onDisconnected?.(); };
+    device.addEventListener("gattserverdisconnected", disconnectHandler);
+
+    let commandPending = false;
+    const sendCommand = async (payload: Uint8Array) => {
+      if (disconnected) throw new Error("Connexion FTMS fermée.");
+      if (commandPending) throw new Error("Une commande FTMS est déjà en cours.");
+      commandPending = true;
+      try {
+        await controlCommand(controlPoint, payload);
+        if (disconnected) throw new Error("Connexion FTMS fermée.");
+      }
+      catch (error) { controlGranted = false; throw error; }
+      finally { commandPending = false; }
+    };
+    const requestControl = controlReady
+      ? async () => {
+          await sendCommand(new Uint8Array([0x00]));
+          controlGranted = true;
+        }
+      : undefined;
+
+    const setResistance = controlReady && resistanceRange && capabilities.supportsResistanceTarget
+      ? async (level: number) => {
+          if (!controlGranted) throw new Error("Demande de contrôle FTMS requise.");
+          const value = Math.round(normalizeResistance(level, resistanceRange) * 10);
+          const payload = new Uint8Array(3);
+          payload[0] = 0x04;
+          new DataView(payload.buffer).setInt16(1, value, true);
+          await sendCommand(payload);
+        }
+      : undefined;
+
+    return {
+      deviceName: device.name || "Vélo FTMS",
+      capabilities,
+      requestControl,
+      setResistance,
+      disconnect: () => {
+        disconnected = true;
+        controlGranted = false;
+        cleanup();
+        try { device.gatt?.disconnect(); } catch {}
+      }
+    };
+  } catch (error) {
+    stopped = true;
+    disconnect();
+    throw error;
+  }
 }
