@@ -240,3 +240,7 @@ Le profil du lecteur montre les niveaux de résistance prévus ; la position bla
 Le score compare la cadence reçue à la fourchette du segment, limites incluses. En cadence libre, toute mesure est réussie. Le calcul utilise le temps, pas le nombre de paquets Bluetooth. Le combo augmente tant que la cadence convient, jusqu'à ×4 après trente secondes. Les pauses ne donnent pas de points. Une donnée manquante ne vaut pas un échec dans le pourcentage mais coupe le combo et réduit la couverture.
 
 Le bilan présente la note, les points, le meilleur combo et le détail des segments. La préparation, le bilan et l'historique permettent de comparer les épreuves aux mêmes paramètres. Seules les épreuves complètes suffisamment mesurées établissent un record. Un nouveau record est célébré ; les animations sont désactivées si le système demande de réduire les mouvements. Le bilan exige de cocher la relecture avant le bouton d'enregistrement ; la touche Entrée d'un champ ne valide plus la séance.
+
+### Objectifs hebdomadaires réglables
+
+Dans Quête, « Régler mes objectifs » ouvre le formulaire de Plus. Choisis le nombre de séances et la durée habituelle : 4×30 donne 120 minutes, 5×25 donne 125 minutes. La base est désormais 120 minutes et ne monte plus automatiquement. Charge et variété suivent ce réglage ; le nombre maximal de séances dures demeure une limite, pas une mission à remplir. Les changements portent sur la semaine courante et les suivantes, sans recalculer les objectifs des semaines passées. Tes séances déjà enregistrées restent comptabilisées.

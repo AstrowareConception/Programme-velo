@@ -2,6 +2,7 @@
 
 import { BleDiagnosticPanel } from "@/components/BleDiagnosticPanel";
 import Image from "next/image";
+import { WeeklyGoalsForm } from "@/components/WeeklyGoalsForm";
 import { EffortProfile } from "@/components/EffortProfile";
 import { CoachComparison } from "@/components/CoachComparison";
 import { CadenceResult } from "@/components/CadenceResult";
@@ -51,7 +52,8 @@ import {
   emptyState,
   levelForXp,
   totalXp,
-  weekTargets,
+  weekTargetFor,
+  changeWeeklyGoals,
   weeklyStats,
   sessionsForProgramWeek,
   workouts,
@@ -404,7 +406,7 @@ export function VeloQuestApp() {
   }, [toast]);
 
   const week = currentProgramWeek(state.profile.startDate);
-  const target = weekTargets[week - 1];
+  const target = weekTargetFor(state, week);
   const stats = weeklyStats(state, week);
   const xp = totalXp(state);
   const level = levelForXp(xp);
@@ -1301,6 +1303,7 @@ export function VeloQuestApp() {
 
           <section className="card weeklyMission">
             <div className="sectionHead"><div><p className="eyebrow">MISSION SEMAINE {week}</p><h2>Ce qu’il reste à conquérir</h2></div><strong>{perfectWeek ? "✓ complète" : `${quantity(Math.max(0, target.points - stats.points))} pts restants`}</strong></div>
+            <p className="weeklyGoalHint">Objectif : {target.sessions} séances · {target.minutes} min au total. <button className="secondary miniButton" onClick={() => { setTab("more"); window.setTimeout(() => document.getElementById("weekly-goals")?.scrollIntoView({ block: "start" }), 0); }}>Régler mes objectifs</button></p>
             <div className="missionItems">
               <MissionItem label="Charge" value={stats.points} target={target.points} suffix=" pts" />
               <MissionItem label="Volume" value={stats.minutes} target={target.minutes} suffix=" min" />
@@ -1656,6 +1659,8 @@ export function VeloQuestApp() {
               <div><span>4</span><p><strong>Suis les tendances.</strong><small>Poids, tour de taille, régularité et volume comptent davantage qu’une valeur isolée.</small></p></div>
             </div>
           </section>
+
+          <WeeklyGoalsForm key={`${week}-${target.sessions}-${target.minutes}`} target={target} onSave={(sessions, minutes) => { setState(previous => changeWeeklyGoals(previous, week, sessions, minutes)); setToast("Objectifs enregistrés pour cette semaine et les suivantes."); }} />
 
           <section className="card">
             <div className="sectionHead"><div><p className="eyebrow">CONFORT DE SÉANCE</p><h2>Ton cockpit</h2></div><span className="spark">personnalisable</span></div>

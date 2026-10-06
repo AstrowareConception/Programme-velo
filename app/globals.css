@@ -960,3 +960,13 @@ button:focus-visible, input:focus-visible, .fileButton:focus-within { outline: 2
 }
 .sessionEssentials .timer small { letter-spacing: .03em; line-height: 1.4; }
 .climbActions button { min-height: 44px; }
+.weeklyGoalHint { color: var(--muted); font-size: .78rem; line-height: 1.6; }
+.weeklyGoalHint button { margin: 8px 0 8px 8px; min-height: 44px; }
+.weeklyGoals { scroll-margin-top: 20px; }
+.weeklyGoals p, .weeklyGoals small { color: var(--muted); line-height: 1.5; }
+.weeklyGoals > small { display: block; margin-top: 14px; }
+@media (max-width: 600px) {
+  .weeklyGoals .formRow { grid-template-columns: 1fr 1fr; }
+  .weeklyGoals input { min-width: 0; }
+  .missionCard .sectionHead { align-items: start; }
+}

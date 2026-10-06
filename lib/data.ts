@@ -285,8 +285,33 @@ export const weekTargets: WeekTarget[] = [
   { week: 12, points: 14, minutes: 280, sessions: 5, variety: 4, maxHard: 2 }
 ];
 
+export function personalWeekTarget(week: number, sessions = 4, minutesPerSession = 30): WeekTarget {
+  const count = Math.max(1, Math.min(7, Math.round(sessions)));
+  const duration = Math.max(10, Math.min(120, Math.round(minutesPerSession / 5) * 5));
+  return { week, sessions: count, minutes: count * duration, points: count * 2, variety: Math.min(3, count), maxHard: Math.min(count, weekTargets[week - 1]?.maxHard ?? 3) };
+}
+
+export function weekTargetFor(state: AppState, week: number): WeekTarget {
+  return state.weeklyGoals?.find(target => target.week === week) ?? weekTargets[week - 1];
+}
+
+// Migration freezes past legacy goals and starts the manageable routine now.
+export function normalizeWeeklyGoals(raw: unknown, currentWeek: number): WeekTarget[] {
+  return weekTargets.map(legacy => {
+    const saved = Array.isArray(raw) ? raw.find(value => value?.week === legacy.week) : undefined;
+    if (saved && ["minutes", "sessions", "points", "variety", "maxHard"].every(key => typeof saved[key] === "number" && Number.isFinite(saved[key]) && saved[key] >= 0)
+      && saved.sessions >= 1 && saved.sessions <= 7 && saved.minutes >= 10 && saved.minutes <= 840 && saved.variety <= saved.sessions && saved.maxHard <= saved.sessions) return { week: legacy.week, minutes: saved.minutes, sessions: saved.sessions, points: saved.points, variety: saved.variety, maxHard: saved.maxHard };
+    return legacy.week < currentWeek ? { ...legacy } : personalWeekTarget(legacy.week);
+  });
+}
+
+export function changeWeeklyGoals(state: AppState, currentWeek: number, sessions: number, minutesPerSession: number): AppState {
+  return { ...state, weeklyGoals: weekTargets.map(legacy => legacy.week < currentWeek ? { ...weekTargetFor(state, legacy.week) } : personalWeekTarget(legacy.week, sessions, minutesPerSession)) };
+}
+
 export function emptyState(): AppState {
   return {
+    weeklyGoals: weekTargets.map(target => personalWeekTarget(target.week)),
     profile: {
       name: "",
       startDate: localInputDate()
@@ -337,7 +362,7 @@ export function weeklyStats(state: AppState, week: number) {
 
 export function totalXp(state: AppState) {
   const sessionXp = state.sessions.filter((s) => !s.bonus && s.metrics?.voyage === undefined).reduce((sum, s) => sum + s.xp, 0);
-  const completedWeeks = weekTargets.filter((target) => {
+  const completedWeeks = weekTargets.map(target => weekTargetFor(state, target.week)).filter((target) => {
     const s = weeklyStats(state, target.week);
     return s.points >= target.points && s.minutes >= target.minutes && s.sessions >= target.sessions && s.variety >= target.variety && s.hard <= target.maxHard;
   }).length;
@@ -355,7 +380,7 @@ export function levelTitle(level: number) {
 }
 
 export function isPerfectWeek(state: AppState, week: number) {
-  const target = weekTargets[week - 1];
+  const target = weekTargetFor(state, week);
   const s = weeklyStats(state, week);
   return s.points >= target.points && s.minutes >= target.minutes && s.sessions >= target.sessions && s.variety >= target.variety && s.hard <= target.maxHard;
 }

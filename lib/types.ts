@@ -138,6 +138,7 @@ export type Preferences = {
 };
 
 export type AppState = {
+  weeklyGoals?: WeekTarget[];
   profile: Profile;
   sessions: CompletedSession[];
   measurements: Measurement[];
