@@ -1709,7 +1709,7 @@ export function VeloQuestApp() {
 
           <PerformanceRecords sessions={state.sessions} />
 
-          <section className="card">
+          <section className="card journalCard">
             <h2>Journal des séances</h2>
             <div className="sessionHistory">
               {[...state.sessions].sort((a,b) => b.date.localeCompare(a.date)).slice(0,20).map((session) => {
@@ -1717,15 +1717,15 @@ export function VeloQuestApp() {
                 const route = allClimbs.find((c) => c.id === session.routeId);
                 return (
                   <button className="sessionHistoryRow" key={session.id} onClick={() => setSelectedSessionId(session.id)}>
-                    <span>{dateLabel(session.date)}</span>
-                    <div><strong>{route?.name ?? template?.name ?? session.templateId}</strong><small>{session.duration.toFixed(1)} min · {session.metrics?.voyage ? `Voyage · ${session.metrics.voyage.completedPortion ? "portion achevée" : "portion inachevée"}` : session.metrics?.source ?? "manuel"}</small></div>
-                    <div className="historyMetrics">
-                      {session.metrics?.distanceKm !== undefined && <span>{session.metrics.distanceKm.toFixed(1)} km</span>}
+                    <span className="historyDate">{dateLabel(session.date)}</span>
+                    <span className="historySummary"><strong>{route?.name ?? template?.name ?? session.templateId}</strong><small>{session.duration.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} min · {session.metrics?.voyage ? `Voyage · ${session.metrics.voyage.completedPortion ? "portion achevée" : "portion inachevée"}` : session.metrics?.source === "mixed" ? "Vélo + saisie" : session.metrics?.source === "ftms" ? "Vélo connecté" : "Saisie manuelle"}</small></span>
+                    <span className="historyMetrics">
+                      {session.metrics?.distanceKm !== undefined && <span>{session.metrics.distanceKm.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} km</span>}
                       {session.metrics?.avgPowerW !== undefined && <span>{session.metrics.avgPowerW.toFixed(0)} W</span>}
                       {session.metrics?.avgHeartRate !== undefined && <span>{session.metrics.avgHeartRate.toFixed(0)} bpm</span>}
                       {session.rpe !== undefined && <span>RPE {session.rpe}</span>}
-                      <span>›</span>
-                    </div>
+                    </span>
+                    <span className="historyDetails" aria-hidden="true">Voir <span>›</span></span>
                   </button>
                 );
               })}
