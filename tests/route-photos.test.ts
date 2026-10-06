@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import assets from "../lib/landscape-photos.json";
 import { climbs } from "../lib/routes";
-import { photoRouteBindings, routePhotoIndex, routePhotos } from "../lib/route-photos";
+import { photoRouteBindings, routePhotoDate, landscapeDownloadBytes, routePhotoIndex, routePhotos } from "../lib/route-photos";
 import { createBackup, normalizeState, parseBackup } from "../lib/storage";
 
 const route = climbs.find(r => r.id === "cagnes-cannes-littoral")!;
@@ -49,7 +49,10 @@ describe("documented landscape photos", () => {
       expect(photo.originalSha256).toMatch(/^[a-f0-9]{64}$/);
       total += bytes.length;
     }
-    expect(total).toBeLessThan(300_000);
+    expect(total).toBeLessThan(600_000);
+    expect(landscapeDownloadBytes).toBe(total);
+    expect(routePhotoDate("2007-08")).toBe("août 2007");
+    expect(routePhotoDate("2024-09-01")).toBe("1 sept. 2024");
   });
 
   it("preserves photo choices, journal, Voyage and GPX across old and current backups", () => {

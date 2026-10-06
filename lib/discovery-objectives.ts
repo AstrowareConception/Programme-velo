@@ -1,3 +1,4 @@
+import { alsaceFullRouteIds, alsaceShortRouteIds } from "./alsace-routes";
 import type { Badge, CompletedSession } from "./types";
 import { climbs, routeDifficulty } from "./routes";
 import { completedRouteIds } from "./campaigns";
@@ -21,6 +22,8 @@ export function discoveryBadges(sessions: CompletedSession[]): Badge[] {
   const esterelCoastCount = esterelCoastalRouteIds.filter((id) => completed.has(id)).length;
   const napoleonShortCount = napoleonShortRouteIds.filter((id) => completed.has(id)).length;
   return [
+    { id: "alsace-villages", name: "Vignes et villages", icon: "🍇", description: "Terminer 3 étapes différentes parmi les 6 du Vignoble d’Alsace. Les petits formats ne les remplacent pas ; aucun XP supplémentaire.", target: 3, count: alsaceFullRouteIds.filter(id => completed.has(id)).length },
+    { id: "alsace-pocket", name: "Vignoble en poche", icon: "🌿", description: "Terminer les 3 Parenthèses alsaciennes. Répétitions et étapes parentes ne remplacent aucun extrait ; aucun XP supplémentaire.", target: 3, count: alsaceShortRouteIds.filter(id => completed.has(id)).length },
     { id: "esterel-red-rocks", name: "Roches rouges", icon: "🪨", description: "Terminer les 3 étapes côtières de Saint-Raphaël à Théoule, par Agay et Le Trayas. Les deux formats courts ne les remplacent pas. Aucun chrono ni XP supplémentaire.", target: 3, count: esterelCoastCount },
     { id: "napoleon-pocket-eagle", name: "Aigle de poche", icon: "🦅", description: "Terminer 2 escales différentes parmi les 4 formats courts du carnet Route Napoléon · petites escales. Les grandes étapes gardent leurs propres trophées. Aucun XP supplémentaire.", target: 2, count: napoleonShortCount },
     { id: "short-three", name: "Petites échappées", icon: "🌼", description: "Terminer 3 formats courts différents parmi les 13 tronçons de 15 à 30 minutes du carnet. Pauses libres.", target: 3, count: shortCount },

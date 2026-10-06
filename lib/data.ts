@@ -8,6 +8,7 @@ import { discoveryBadges } from "./discovery-objectives";
 import { discoveryWorkouts } from "./discovery-workouts";
 import { shortRoutes } from "./short-rides";
 import { esterelRoutes } from "./esterel-routes";
+import { alsaceRoutes } from "./alsace-routes";
 import { napoleonShortRoutes } from "./napoleon-short-routes";
 import { workoutProgramBadges, workoutProgramBonusXp } from "./workout-programs";
 import { initialGuidance } from "./onboarding";
@@ -384,7 +385,7 @@ export function badges(state: AppState): Badge[] {
   const uniqueChallengeIds = new Set(successfulChallenges.map((s) => s.metrics!.challenge!.id));
   const totalDistance = state.sessions.reduce((sum, s) => sum + (s.metrics?.distanceKm ?? 0), 0);
   const sessionsWithPower = state.sessions.filter((s) => (s.metrics?.avgPowerW ?? 0) > 0);
-  const gentleRouteIds = [...scenicRouteIds, ...[...explorationRoutes, ...shortRoutes, ...esterelRoutes, ...napoleonShortRoutes].filter((route) => route.category === "scenic").map((route) => route.id)];
+  const gentleRouteIds = [...scenicRouteIds, ...[...explorationRoutes, ...shortRoutes, ...esterelRoutes, ...napoleonShortRoutes, ...alsaceRoutes].filter((route) => route.category === "scenic").map((route) => route.id)];
   const scenicCount = gentleRouteIds.filter((id) => routeIds.has(id)).length;
   // Preserve the historic relief counters; gentle rides have their own trophies.
   const reliefCount = [...routeIds].filter((id) => !gentleRouteIds.includes(id)).length;

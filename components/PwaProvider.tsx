@@ -1,5 +1,7 @@
 "use client";
 
+import { landscapeDownloadBytes } from "@/lib/route-photos";
+
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 
 type Availability = { release: string; ready: boolean; photos: number; photoTotal: number };
@@ -114,7 +116,7 @@ export function PwaStatusCard() {
     <p role="status">{pwa.availability?.ready ? "Séances et parcours prêts hors connexion sur cet appareil." : pwa.available ? "Préparation à vérifier : garde une connexion et réessaie." : "Mode hors connexion indisponible dans ce navigateur ou cette session."}</p>
     <p>{pwa.availability ? `Photos : ${pwa.availability.photos}/${pwa.availability.photoTotal} disponibles hors connexion.` : "Photos : disponibilité non vérifiée."}</p>
     <p className="muted">Les cartes externes, YouTube et les podcasts ont leurs propres besoins réseau. Les GPX importés et tes historiques restent locaux. Le navigateur peut retirer le cache ; exporte tes données pour les sauvegarder.</p>
-    <div className="pwaActions"><button className="btn secondary" onClick={() => void pwa.refresh()} disabled={!pwa.available || pwa.working}>Vérifier la disponibilité</button><button className="btn secondary" onClick={() => void pwa.preparePhotos()} disabled={!pwa.availability?.ready || !pwa.online || pwa.working || pwa.availability.photos === pwa.availability.photoTotal}>Préparer les photos · 263 Ko</button></div>
+    <div className="pwaActions"><button className="btn secondary" onClick={() => void pwa.refresh()} disabled={!pwa.available || pwa.working}>Vérifier la disponibilité</button><button className="btn secondary" onClick={() => void pwa.preparePhotos()} disabled={!pwa.availability?.ready || !pwa.online || pwa.working || pwa.availability.photos === pwa.availability.photoTotal}>Préparer les photos · {Math.ceil(landscapeDownloadBytes / 1000)} Ko</button></div>
     {pwa.waiting && <div className="pwaUpdate"><strong>Une mise à jour est prête</strong><p>{pwa.busy ? "Termine ou mets ta séance de côté, puis ferme les formulaires. Si le stockage est plein, exporte tes données avant toute mise à jour." : "Tu peux l’appliquer maintenant ou continuer et revenir plus tard."}</p><button className="btn primary" onClick={() => void pwa.applyUpdate()} disabled={pwa.busy || pwa.working}>Mettre à jour maintenant</button></div>}
     {pwa.notice && <p role="status">{pwa.notice}</p>}
   </section>;

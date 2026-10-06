@@ -49,10 +49,26 @@ Modifications : orientation normalisée selon l’original, réduction à 960 px
 
 ## Chargement et PWA
 
-Les cinq images représentent **262 746 octets** au total, chacune sous 100 000 octets. Elles sont servies depuis l’application, sans requête à Wikimedia lors de la lecture. `next/image` conserve les dimensions, le texte alternatif et le chargement différé ; les WebP déjà allégés sont servis directement afin de rester identiques aux fichiers documentés et cacheables sous une URL locale. Une seule photo est montée à la fois. Pas de préchargement des cinq images, ni de téléchargement de tout le catalogue.
+Le premier lot représentait **262 746 octets** ; les dix images actuelles représentent **574 734 octets** au total, chacune sous 100 000 octets. Elles sont servies depuis l’application, sans requête à Wikimedia lors de la lecture. `next/image` conserve les dimensions, le texte alternatif et le chargement différé ; les WebP déjà allégés sont servis directement afin de rester identiques aux fichiers documentés et cacheables sous une URL locale. Une seule photo est montée à la fois. Pas de préchargement du catalogue, ni de téléchargement de tout le catalogue.
 
-Cache PWA v15 : le service worker existant peut conserver une image après sa consultation. Les photos non consultées et les cartes externes ne sont pas garanties hors connexion. Le lot PWA suivant ajoute un compteur vérifié et **Préparer les photos · 263 Ko** dans Plus pour télécharger les cinq images. [Fonctionnement et limites](PWA-OFFLINE.md). Installation, veille, casque et TOPUTURE physique restent à valider sur appareils réels.
+Cache PWA v15 : le service worker existant peut conserver une image après sa consultation. Les photos non consultées et les cartes externes ne sont pas garanties hors connexion. Le lot PWA livré ajoute un compteur vérifié et **Préparer les photos** dans Plus pour télécharger les dix images (575 Ko affichés). [Fonctionnement et limites](PWA-OFFLINE.md). Installation, veille, casque et TOPUTURE physique restent à valider sur appareils réels.
 
 ## Contrôles du lot
 
 Tests des correspondances exactes avec les repères, absence d’images attribuées aux GPX inconnus, kilomètres absolus, intégrité des fichiers et budget, absence d’EXIF, crédits, ancien export et réglage conservé. Scénarios navigateur sur mobile et ordinateur : absence de requête avant ouverture, navigation et droits, masquage/rechargement, lecture Voyage à mi-parcours, pause/reprise et vue essentielle, échec de photo puis relance. Régression complète, typecheck et build obligatoires sur le commit final. Les SHA, PR, CI et version réellement publique seront ajoutés à l’état de reprise externe après observation.
+
+## Extension du 6 octobre 2026
+
+Cinq photographies supplémentaires, droits et dates vérifiés sur Wikimedia Commons. Les neuf nouvelles correspondances portent la couverture à dix-sept parcours : Ventoux par Bédoin, Galibier depuis Valloire, les deux étapes Agay–Trayas, trois parcours passant par Obernai et deux par Eguisheim. Les anciennes correspondances sont conservées.
+
+| Source | Auteur | Date disponible | Droits | Dérivé local |
+| --- | --- | --- | --- | --- |
+| [Le sommet minéral du Ventoux](https://commons.wikimedia.org/wiki/File:Mont_Ventou.JPG) | Véronique PAGNIER | 2007-08 | [Domaine public](https://commons.wikimedia.org/wiki/File:Mont_Ventou.JPG#Licensing) | `ventoux.webp` · 640×980 · 44,170 octets |
+| [Le Galibier, côté Hautes-Alpes](https://commons.wikimedia.org/wiki/File:Col_du_Galibier_depuis_la_route_c%C3%B4t%C3%A9_Hautes-Alpes_(septembre_2024).JPG) | Florian Pépellin | 2024-09-01 | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) | `galibier.webp` · 800×598 · 55,834 octets |
+| [Les roches rouges du cap Roux](https://commons.wikimedia.org/wiki/File:Esterel_-_Pic_du_cap_roux_(37462515710).jpg) | s_wh | 2017-07-17 | [CC BY-SA 2.0](https://creativecommons.org/licenses/by-sa/2.0/) | `esterel-cap-roux.webp` · 800×533 · 79,474 octets |
+| [Obernai, les toits dans la lumière hivernale](https://commons.wikimedia.org/wiki/File:Le_centre_d%27Obernai_hivernal_depuis_le_mont_national.jpg) | Valentin F.R. | 2018-02-13 | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | `obernai.webp` · 800×500 · 65,162 octets |
+| [Eguisheim entre les rangs de vigne](https://commons.wikimedia.org/wiki/File:Vue_depuis_les_vignes_(Eguisheim)_(2).jpg) | Gzen92 | 2017-10-14 | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) | `eguisheim.webp` · 800×600 · 67,348 octets |
+
+Le Ventoux ne fournit que le mois d’août 2007 : aucun jour n’est inventé. Le Galibier est vu du versant Hautes-Alpes, opposé au départ depuis Valloire. Le cap Roux illustre le massif, sans représenter la route côtière ni une montée au sommet. Obernai est photographié depuis le mont National, absent du tracé. Eguisheim est vu depuis les vignes, sans visite ajoutée à ses rues. Ces différences sont affichées dans les légendes.
+
+Les nouveaux dérivés sont réduits sans recadrage ni agrandissement, WebP qualité 72, métadonnées retirées. Ils pèsent chacun moins de 80 Ko. `scripts/landscape-sources.json` conserve les dimensions maximales et empreintes des originaux ; `scripts/build-landscape-photos.py` vérifie ces empreintes avant reconstruction. Le manifeste conserve aussi les SHA-256 des dérivés.

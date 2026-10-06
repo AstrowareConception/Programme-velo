@@ -5,6 +5,7 @@ import { shortRoutes } from "./short-rides";
 import { napoleonRoutes } from "./napoleon-routes";
 import { napoleonNorthRoutes } from "./napoleon-north-routes";
 import { esterelRoutes } from "./esterel-routes";
+import { alsaceRoutes } from "./alsace-routes";
 import { napoleonShortRoutes } from "./napoleon-short-routes";
 import { enrichRouteDescription } from "./route-descriptions";
 
@@ -631,7 +632,8 @@ const nativeRoutes: ClimbChallenge[] = [
   ...napoleonRoutes,
   ...napoleonNorthRoutes,
   ...esterelRoutes,
-  ...napoleonShortRoutes
+  ...napoleonShortRoutes,
+  ...alsaceRoutes
 ];
 export const climbs = nativeRoutes.map(enrichRouteDescription);
 

@@ -18,13 +18,13 @@ const badge = (sessions: CompletedSession[], id: string) => discoveryBadges(sess
 describe("documented exploration routes", () => {
   it("adds fifteen sourced destinations across all five difficulties without changing the original objectives", () => {
     expect(explorationRoutes).toHaveLength(15);
-    expect(climbs).toHaveLength(71);
-    expect(climbs.filter((r) => r.category === "scenic")).toHaveLength(29);
+    expect(climbs).toHaveLength(80);
+    expect(climbs.filter((r) => r.category === "scenic")).toHaveLength(35);
     expect(new Set(explorationRoutes.map((r) => r.difficulty))).toEqual(new Set([1, 2, 3, 4, 5]));
     expect(routeCollections.find((c) => c.id === "scenic-france")?.routeIds).toHaveLength(7);
     expect(campaigns.find((c) => c.id === "quiet-heritage")?.xpBonus).toBe(300);
     expect(campaigns.find((c) => c.id === "waterside-notebook")?.routeIds).toHaveLength(4);
-    expect(new Set(climbs.map((r) => r.id)).size).toBe(71);
+    expect(new Set(climbs.map((r) => r.id)).size).toBe(80);
   });
 
   it("keeps source checksums, coherent terrain and ordered real-distance landmarks on every new route", () => {
@@ -85,7 +85,7 @@ describe("documented exploration routes", () => {
     expect(routeSearchText(explorationRoutes.find((r) => r.id === "sainte-croix-valensole")!)).toContain("roumoules");
     expect(routeSearchText(explorationRoutes.find((r) => r.id === "eze-menton-basse-corniche")!)).toContain("eze-sur-mer");
     const ids = new Set(climbs.map((r) => r.id));
-    expect(routeThemes).toHaveLength(10);
+    expect(routeThemes).toHaveLength(11);
     expect(discoveryTerritories[0].routeIds).toHaveLength(18);
     for (const group of [...routeThemes, ...campaigns, ...discoveryTerritories]) {
       expect(new Set(group.routeIds).size).toBe(group.routeIds.length);

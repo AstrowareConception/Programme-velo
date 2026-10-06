@@ -70,6 +70,11 @@ for route_id, source in json.loads(Path(args.sources).read_text()).items():
             points.append(point)
     if len(points) < 2:
         raise ValueError(f'{route_id}: insufficient geometry')
+    if 'pointRange' in source:
+        start, finish = source['pointRange']
+        if not source.get('gpxSha256') or not 0 <= start < finish <= len(points):
+            raise ValueError(f'{route_id}: point selection requires a pinned source and valid bounds')
+        points = points[start:finish]
     if source.get('reverse'):
         points.reverse()
     if 'clip' in source:

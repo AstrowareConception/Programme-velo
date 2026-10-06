@@ -1,9 +1,11 @@
+import { alsaceRouteIds } from "./alsace-routes";
 import { esterelRouteIds, esterelCoastalRouteIds, esterelShortRouteIds } from "./esterel-routes";
 import { napoleonShortRouteIds } from "./napoleon-short-routes";
 
 export type RouteTheme = { id: string; title: string; icon: string; description: string; routeIds: string[] };
 
 export const routeThemes: RouteTheme[] = [
+  { id: "alsace-vineyards", title: "Vignoble d’Alsace", icon: "🍇", description: "Six étapes de Marlenheim à Thann et trois courtes parenthèses, entre villes, vignes et piémont. Ordre libre, Voyage possible.", routeIds: [...alsaceRouteIds] },
   { id: "napoleon", title: "Route Napoléon", icon: "🦅", description: "Quatorze grandes étapes et quatre escales courtes, de Golfe-Juan à Grenoble. Trois carnets indépendants, ordre libre.",
     routeIds: ["napoleon-golfe-grasse", "napoleon-grasse-vallier", "napoleon-vallier-seranon", "napoleon-seranon-castellane", "napoleon-castellane-barreme", "napoleon-barreme-digne", "napoleon-digne-sisteron", "napoleon-sisteron-gap", "napoleon-gap-fare", "napoleon-fare-corps", "napoleon-corps-mure", "napoleon-mure-laffrey", "napoleon-laffrey-vizille", "napoleon-vizille-grenoble"] },
   { id: "azure", title: "Côte d’Azur", icon: "🍋", description: "Ports, villes et Corniches, de Saint-Raphaël à Menton.",

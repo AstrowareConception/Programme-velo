@@ -1,5 +1,12 @@
 # État de reprise VéloQuest — actualisé le 5 octobre 2026
 
+## 6 octobre 2026 — vignoble d’Alsace et extension des photos
+
+Lot préparé depuis main `58a8769bab262903918757bdbe9c29306476d389` (correctif PWA de la PR 34 livré et vérifié en production). Neuf parcours alsaciens : six étapes continues et trois courts formats distincts, deux carnets (770 XP uniques au total) et deux trophées. Catalogue : 80 parcours, 35 balades, 11 thèmes, 22 carnets et 74 badges. Les anciens parcours et objectifs restent identiques. [Trace, relief et règles](ALSACE-VIGNOBLE.md).
+
+Cinq nouvelles photos créditées : Ventoux, Galibier, Estérel, Obernai et Eguisheim. Dix images, dix-sept parcours illustrés, 574 734 octets facultatifs ; compteur PWA et bouton de préparation suivent le manifeste. [Sources et points de vue](LANDSCAPE-PHOTOS.md). Les contrôles exacts, PR, fusion et version publique seront portés dans l’état de reprise externe après observation. La PR 29 matérielle reste séparée. Nantes constitue la prochaine piste de contenu, sans lot engagé ici.
+
+
 ## Construction PWA sur Vercel
 
 La PR 33 a passé les quatre contrôles sur `b390adad97b544c6c172bc7822b87e3d2f7fcfdf` (140 unités, 182 scénarios navigateur), puis a été fusionnée dans main `906c30081ba127726c3ef8a09be2dcf4d3329a6d`, dont la CI a également réussi. Le build Vercel a toutefois échoué avec ENOENT ; la production précédente `703d769` est restée active. L’erreur exacte a été reproduite avec l’adaptateur officiel : Next.js 16.3 y conserve le HTML dans le cache de routes et le paquet `.next/output`, au lieu de `.next/server/app/index.html`.
