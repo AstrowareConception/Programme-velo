@@ -1560,9 +1560,9 @@ export function VeloQuestApp() {
 
                     <div className="climbActions">
                       <button className="primary" onClick={() => launch(climbToWorkout(climb), climb, "training")}>{category === "scenic" ? "Partir en balade" : "Entraînement"}</button>
-                      <button className="secondary timeAttackButton" onClick={() => launch(climbToWorkout(climb), climb, "timeAttack")}>⏱ Time Attack</button>
-                      <button className="secondary segmentAttackButton" onClick={() => setSegmentAttackRoute(climb)}>⚡ Segments</button>
-                      <button className="secondary challengeButton" onClick={() => setChallengeRoute(climb)}>◆ Défis</button>
+                      <button className="secondary timeAttackButton" onClick={() => launch(climbToWorkout(climb), climb, "timeAttack")}><span className="actionIcon">⏱</span>{" "}<span>Time Attack</span></button>
+                      <button className="secondary segmentAttackButton" onClick={() => setSegmentAttackRoute(climb)}><span className="actionIcon">⚡</span>{" "}<span>Segments</span></button>
+                      <button className="secondary challengeButton" onClick={() => setChallengeRoute(climb)}><span className="actionIcon">◆</span>{" "}<span>Défis</span></button>
                       <button className="secondary" onClick={() => { setState(prev => ({ ...prev, voyage: { routeId: climb.id, minutes: prev.voyage?.minutes ?? 30 } })); setVoyagePickerOpen(true); }}>🧳 Voyage en plusieurs séances</button>
                       {climb.id.startsWith("gpx-") && <button className="secondary dangerButton" onClick={() => deleteCustomClimb(climb.id)}>Supprimer</button>}
                     </div>

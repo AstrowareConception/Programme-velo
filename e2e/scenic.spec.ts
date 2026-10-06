@@ -157,3 +157,22 @@ test("the extra guided workouts and soft bonus keep their own preflight and manu
   await expect(page.getByRole("heading", { name: "Parenthèse souple", exact: true })).toBeVisible();
   await expect(page.locator(".previewStats")).toContainText("12 min");
 });
+
+test("route actions form a regular touch grid on narrow phones", async ({ page }, info) => {
+  await seed(page); await page.goto("/"); await browse(page);
+  await page.getByLabel("Rechercher").fill("Chambord");
+  const actions = chambordCard(page).locator(".climbActions");
+  if (info.project.name === "mobile-chromium") await page.setViewportSize({ width: 320, height: 740 });
+  await actions.scrollIntoViewIfNeeded();
+  const boxes = await actions.locator("button").evaluateAll(elements => elements.map(el => { const r = el.getBoundingClientRect(); return { x: r.x, y: r.y, width: r.width, height: r.height, overflow: el.scrollWidth > el.clientWidth }; }));
+  expect(boxes.every(box => box.height >= 44 && !box.overflow)).toBe(true);
+  if (info.project.name === "mobile-chromium") {
+    expect(Math.abs(boxes[1].y - boxes[2].y)).toBeLessThan(1);
+    expect(Math.abs(boxes[1].y - boxes[3].y)).toBeLessThan(1);
+    expect(Math.abs(boxes[1].width - boxes[3].width)).toBeLessThan(1);
+    expect(boxes[0].width).toBeGreaterThan(boxes[1].width * 2);
+  }
+  await actions.screenshot({ path: info.outputPath("route-actions.png") });
+  await actions.getByRole("button", { name: "⚡ Segments" }).click();
+  await expect(page.getByRole("heading", { name: "Choisis ton secteur." })).toBeVisible();
+});

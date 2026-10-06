@@ -929,3 +929,13 @@ button:focus-visible, input:focus-visible, .fileButton:focus-within { outline: 2
 .essentialSession .sessionScreenStatus { order: 1; }
 .essentialSession > h2, .essentialSession .sessionEssentials { order: 2; }
 .essentialSession .readerControls { order: 9; }
+@media (max-width: 600px) {
+  .routeLibraryCard .climbActions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .routeLibraryCard .climbActions button { min-width: 0; min-height: 56px; padding: 10px 5px; border-radius: 14px; font-size: .75rem; line-height: 1.25; white-space: normal; }
+  .routeLibraryCard .climbActions button:first-child,
+  .routeLibraryCard .climbActions button:nth-child(n+5) { grid-column: 1 / -1; min-height: 48px; font-size: .85rem; }
+  .routeLibraryCard .climbActions .actionIcon { display: block; font-size: 1.2rem; margin-bottom: 5px; }
+  .routeLibraryCard .timeAttackSummary { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  .routeLibraryCard .timeAttackSummary > span { min-width: 0; padding: 10px 7px; }
+  .routeLibraryCard .timeAttackSummary small { font-size: .55rem; letter-spacing: .05em; white-space: normal; }
+}
