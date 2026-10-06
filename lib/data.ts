@@ -1,3 +1,4 @@
+import { expressWorkouts } from "./express-workouts";
 import { localInputDate, localCalendarDay } from "./dates";
 import type { Badge, AppState, Preferences, WeekTarget, WorkoutTemplate } from "./types";
 import { campaignBonusXp, campaigns, campaignProgress, completedRouteIds } from "./campaigns";
@@ -32,6 +33,7 @@ export const defaultPreferences: Preferences = {
 
 export const workouts: WorkoutTemplate[] = [
   ...discoveryWorkouts,
+  ...expressWorkouts,
   {
     id: "recovery-30",
     name: "Décrassage",

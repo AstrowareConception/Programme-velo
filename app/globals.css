@@ -973,3 +973,10 @@ button:focus-visible, input:focus-visible, .fileButton:focus-within { outline: 2
 
 .effortAdjustments { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 8px 0; }
 .effortAdjustments button { min-height: 44px; padding: 8px; font-size: .85rem; }
+
+.workoutFilters { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 18px 0; }
+.workoutFilters button, .workoutFilters select { min-height: 44px; }
+.workoutFilters [aria-pressed="true"] { border-color: var(--cyan); }
+.workoutBest { display: grid; gap: 4px; margin: 8px 0 14px !important; font-size: .9rem !important; }
+.workoutBest small { font-size: .75rem; opacity: .75; }
+.voiceCommands { margin: 8px 0; }

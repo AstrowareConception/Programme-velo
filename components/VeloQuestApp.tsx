@@ -1,5 +1,6 @@
 "use client";
 
+import { VoiceCommands } from "@/components/VoiceCommands";
 import { BleDiagnosticPanel } from "@/components/BleDiagnosticPanel";
 import Image from "next/image";
 import { WeeklyGoalsForm } from "@/components/WeeklyGoalsForm";
@@ -168,6 +169,8 @@ export function VeloQuestApp() {
   const cadenceBase = useRef<WorkoutTemplate | null>(null);
   const [sessionCadenceOffset, setSessionCadenceOffset] = useState(0);
   const coachFeedback = useRef({ belowSince: 0, lastAt: 0, lastAdviceAt: 0, lastLevel: undefined as number | undefined });
+  const [expressOnly, setExpressOnly] = useState(false);
+  const [sessionIntensityFilter, setSessionIntensityFilter] = useState("all");
   const [autoResistanceControl, setAutoResistanceControl] = useState(false);
   const [climbStartDistanceM, setClimbStartDistanceM] = useState<number | null>(null);
   const [customClimbs, setCustomClimbs] = useState<ClimbChallenge[]>([]);
@@ -1445,15 +1448,24 @@ export function VeloQuestApp() {
         <section>
           <div className="pageHead pageHeadActions"><div><p className="eyebrow">CATALOGUE</p><h1>Choisis ta quête</h1><p>Du décrassage au HIIT. Le ressenti reste prioritaire sur le numéro de résistance.</p></div><button className="secondary" onClick={openManualLog}>+ Enregistrer une séance déjà faite</button></div>
           <WorkoutProgramsPanel sessions={state.sessions} workouts={workouts} onLaunch={(workout) => launch(workout)} />
+          <div className="workoutFilters">
+            <button type="button" className="secondary" aria-pressed={expressOnly} onClick={() => setExpressOnly(value => !value)}>Express · moins de 10 min</button>
+            <label>Intensité des séances<select value={sessionIntensityFilter} onChange={event => setSessionIntensityFilter(event.target.value)}><option value="all">Toutes</option><option value="easy">Facile</option><option value="moderate">Soutenue</option><option value="hard">Dure</option></select></label>
+          </div>
           <div className="grid workoutGrid">
-            {workouts.map((w) => (
+            {workouts.filter(w => (!expressOnly || w.duration < 10) && (sessionIntensityFilter === "all" || w.intensity === sessionIntensityFilter)).map((w) => {
+              const key = effortSettingsKey(w.id, withCadenceOffset(w, preferences.cadenceOffset ?? -15).segments, preferences.resistanceOffset, "training");
+              const best = bestCadenceAttempt(state.sessions, key);
+              const score = cadenceSummary(best?.metrics?.cadenceScore);
+              return (
               <article className={`card workoutCard ${w.bonus ? "bonusCard" : ""}`} key={w.id}>
                 <div className="sectionHead"><span className={`intensity ${w.intensity}`}>{w.intensity === "easy" ? "FACILE" : w.intensity === "moderate" ? "SOUTENU" : "DUR"}</span><strong>{w.duration} min</strong></div>
                 <h2>{w.name}</h2><p>{w.tagline}</p>
+                <p className="workoutBest"><strong>{best ? `Record coach : ${score.grade} · ${score.percent?.toFixed(1)} %` : "Record coach : à établir"}</strong><small>À tes réglages actuels · séance complète</small></p>
                 <div className="chips"><span>{w.points} pts</span><span>{w.xp} XP</span><span>{w.segments.length} segments</span></div>
                 <button className="secondary" onClick={() => launch(w)}>Voir / démarrer</button>
               </article>
-            ))}
+            ); })}
           </div>
         </section>
       )}
@@ -2016,6 +2028,17 @@ export function VeloQuestApp() {
                 </div>
                 <div className="timer" aria-live="off"><small>RESTE DANS CE SEGMENT</small>{" "}<strong>{formatClock(secondsLeft)}</strong></div></div>
                 <div className="actualResistance"><span>Résistance reçue du vélo</span><strong>{bike ? telemetry.resistance?.toFixed(0) ?? "—" : "—"}</strong><small>{autoResistanceControl && controlGranted ? "Pilotage auto · réponse du vélo différée" : "Réglage manuel · suis la cible"}</small></div>
+                <VoiceCommands onCommand={command => {
+                  if (command === "lighter" || command === "harder") {
+                    const delta = command === "lighter" ? -1 : 1;
+                    const next = Math.max(-4, Math.min(4, sessionResistanceDelta + delta));
+                    setSessionResistanceDelta(next);
+                    return next === sessionResistanceDelta ? "Limite de réglage atteinte." : `${delta < 0 ? "Cible allégée" : "Cible renforcée"} d’un niveau.${autoResistanceControl && controlGranted ? " Pilotage automatique actif." : " À régler sur le vélo en mode manuel."}`;
+                  }
+                  if (routeMode === "timeAttack" || routeMode === "segmentAttack") return "Le chrono de cette épreuve ne peut pas être mis en pause.";
+                  if ((command === "pause" && running) || (command === "resume" && !running)) togglePause();
+                  return command === "pause" ? "Séance en pause." : "Séance reprise.";
+                }} />
                 <div className="effortAdjustments" role="group" aria-label="Adapter l’effort">
                   <button type="button" className="secondary" disabled={sessionResistanceDelta <= -4} onClick={() => setSessionResistanceDelta(value => Math.max(-4, value - 1))}>Alléger −1</button>
                   <button type="button" className="secondary" disabled={sessionResistanceDelta >= 4} onClick={() => setSessionResistanceDelta(value => Math.min(4, value + 1))}>Renforcer +1</button>

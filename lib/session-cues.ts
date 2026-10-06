@@ -108,3 +108,5 @@ export function cueCoach(text: string, preferences: Preferences) {
     return true;
   } catch { speaking = false; return false; }
 }
+
+export function coachIsSpeaking() { return speaking || (typeof window !== "undefined" && Boolean(window.speechSynthesis?.speaking)); }
