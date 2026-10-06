@@ -593,7 +593,7 @@ export function VeloQuestApp() {
       setControlGranted(false);
       setBluetoothError(error instanceof Error ? error.message : "Pilotage automatique interrompu.");
     });
-  }, [autoResistanceControl, controlGranted, running, sessionStarted, active, segmentIndex, bike]);
+  }, [autoResistanceControl, controlGranted, running, sessionStarted, active, segmentIndex, bike, preferences.resistanceOffset, sessionResistanceDelta]);
 
   const voyageCard = state.voyage ? <VoyagePanel
     route={allClimbs.find(route => route.id === state.voyage?.routeId)} sessions={state.sessions}
