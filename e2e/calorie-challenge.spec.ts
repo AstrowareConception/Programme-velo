@@ -13,7 +13,9 @@ for (const complete of [true, false]) test(`declared calories remain separate an
  await page.getByLabel("Calories affichées").fill("42");
  const result=page.getByRole("status", {name:"Résultat du défi calories"});
  await expect(result).toContainText(complete ? "Premier record calories" : "Hors record");
- await page.getByLabel("J’ai vérifié le bilan et les champs facultatifs.").check(); await page.getByRole("button", {name:/Valider la quête/}).click(); await page.reload();
+ await page.getByLabel("J’ai vérifié le bilan et les champs facultatifs.").check(); await page.getByRole("button", {name:/Valider la quête/}).click();
+ await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem("veloquest:v1")!).sessions.length)).toBe(1);
+ await page.reload();
  const entry=await page.evaluate(() => JSON.parse(localStorage.getItem("veloquest:v1")!).sessions.at(-1));
  expect(entry.metrics.calorieChallenge).toMatchObject({source:"manual",kcal:42,eligible:complete});
  expect(entry.duration).toBe(complete ? 5 : 1);

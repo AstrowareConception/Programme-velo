@@ -392,7 +392,9 @@ test("calorie challenge measures only the fixed interval and preserves its devic
   await page.clock.runFor(1000); await page.evaluate(() => (window as any).__emitEnergy(999));
   await expect(page.getByLabel("Calories affichées")).toHaveValue("60");
   await page.getByLabel("J’ai vérifié le bilan et les champs facultatifs.").check();
-  await page.getByRole("button", { name: /Valider la quête/ }).click(); await page.reload();
+  await page.getByRole("button", { name: /Valider la quête/ }).click();
+  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem("veloquest:v1")!).sessions.length)).toBe(1);
+  await page.reload();
   const entry = await page.evaluate(() => JSON.parse(localStorage.getItem("veloquest:v1")!).sessions.at(-1));
   expect(entry.metrics.calorieChallenge).toMatchObject({ source: "ftms", kcal: 60, eligible: true, durationSeconds: 300, deviceName: "Toputure TBE5" });
   expect(entry.metrics.cadenceScore).toBeUndefined();

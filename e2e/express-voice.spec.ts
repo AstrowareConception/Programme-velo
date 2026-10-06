@@ -17,6 +17,7 @@ test("express filters show all intensities and persist a short workout", async (
   await page.getByRole("button", { name: "Terminer et enregistrer", exact: true }).click();
   await page.getByLabel("J’ai vérifié le bilan et les champs facultatifs.").check();
   await page.getByRole("button", { name: /Valider la quête/ }).click();
+  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem("veloquest:v1")!).sessions.length)).toBe(1);
   await page.reload();
   const sessions = await page.evaluate(() => JSON.parse(localStorage.getItem("veloquest:v1")!).sessions);
   expect(sessions[0].templateId).toBe("express-reset-3"); expect(sessions[0].duration).toBe(3);
