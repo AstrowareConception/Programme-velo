@@ -126,6 +126,6 @@ describe("Estérel and independent Napoléon escapes", () => {
     restored.sessions.push(...[...napoleonRouteIds, ...napoleonNorthRouteIds].map((id) => complete(id)));
     expect(campaignBonusXp(restored.sessions)).toBe(1880);
     expect(badge(restored.sessions, "napoleon-fourteen").unlocked).toBe(true);
-    expect(badges(emptyState()).filter(b => !b.id.startsWith("voyage-"))).toHaveLength(67);
+    expect(badges(emptyState()).filter(b => !b.id.startsWith("voyage-") && !b.id.startsWith("alsace-") && !b.id.startsWith("campaign-alsace-"))).toHaveLength(67);
   });
 });

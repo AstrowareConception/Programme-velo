@@ -3,9 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import type { ClimbChallenge } from "@/lib/routes";
-import { routePhotoIndex, routePhotos, type RoutePhotoStop } from "@/lib/route-photos";
-
-const photoDate = new Intl.DateTimeFormat("fr-FR", { dateStyle: "medium", timeZone: "UTC" });
+import { routePhotoDate, routePhotoIndex, routePhotos, type RoutePhotoStop } from "@/lib/route-photos";
 
 function PhotoFigure({ stop }: { stop: RoutePhotoStop }) {
   const [failed, setFailed] = useState(false);
@@ -17,7 +15,7 @@ function PhotoFigure({ stop }: { stop: RoutePhotoStop }) {
     </div>
     <figcaption>
       <strong>{photo.title}</strong><p>{photo.caption}</p>
-      <small>Photo du {photoDate.format(new Date(`${photo.date}T12:00:00Z`))} · {photo.author} · <a href={photo.licenseUrl} target="_blank" rel="noopener noreferrer">{photo.license}</a> · <a href={photo.sourceUrl} target="_blank" rel="noopener noreferrer">Source et original ↗</a></small>
+      <small>Photo · {routePhotoDate(photo.date)} · {photo.author} · <a href={photo.licenseUrl} target="_blank" rel="noopener noreferrer">{photo.license}</a> · <a href={photo.sourceUrl} target="_blank" rel="noopener noreferrer">Source et original ↗</a></small>
       <small>Version allégée en WebP, sans recadrage · même licence que l’original.</small>
     </figcaption>
   </figure>;

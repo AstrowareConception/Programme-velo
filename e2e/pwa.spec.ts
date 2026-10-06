@@ -1,3 +1,5 @@
+import assets from "../lib/landscape-photos.json";
+import { landscapeDownloadBytes } from "../lib/route-photos";
 import { test as base, expect, type Page } from '@playwright/test';
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
@@ -62,9 +64,9 @@ async function route(page: Page) {
 }
 test('real offline shell and explicitly prepared photos survive a cold reload with the existing data', async ({ page, context, pwaServer }, info) => {
   const errors: string[] = []; page.on('pageerror', e => errors.push(e.message));
-  await boot(page, pwaServer); await expect(panel(page)).toContainText('Photos : 0/5');
-  await panel(page).getByRole('button', { name: 'Préparer les photos · 263 Ko', exact: true }).click();
-  await expect(panel(page)).toContainText('Photos : 5/5');
+  await boot(page, pwaServer); await expect(panel(page)).toContainText(`Photos : 0/${Object.keys(assets).length}`);
+  await panel(page).getByRole('button', { name: `Préparer les photos · ${Math.ceil(landscapeDownloadBytes / 1000)} Ko`, exact: true }).click();
+  await expect(panel(page)).toContainText(`Photos : ${Object.keys(assets).length}/${Object.keys(assets).length}`);
   await panel(page).screenshot({ path: info.outputPath('pwa-ready.png') });
   await context.setOffline(true); await page.reload();
   expect(await page.evaluate(async () => {
@@ -81,6 +83,11 @@ test('real offline shell and explicitly prepared photos survive a cold reload wi
     await expect.poll(() => gallery.getByRole('img').evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth === 960)).toBe(true);
     if (i < 3) await gallery.getByRole('button', { name: 'Photo suivante', exact: true }).click();
   }
+  await page.getByRole('textbox', { name: 'Rechercher', exact: true }).fill('Alsace · Turckheim → Eguisheim');
+  const alsace = page.locator('.routeLibraryCard'); await alsace.getByText(/Voir les photos ·/).click();
+  const newImage = alsace.getByRole('img', { name: /rangs de vigne/ }); await newImage.scrollIntoViewIfNeeded();
+  await expect.poll(() => newImage.evaluate(el => (el as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
+  await expect(alsace).toContainText('Gzen92');
   const data = await stored(page); expect(data.sessions).toEqual(state.sessions); expect(data.measurements).toEqual(state.measurements); expect(data.favoriteRouteIds).toEqual(state.favoriteRouteIds); expect(data.voyage).toEqual(state.voyage); expect(errors).toEqual([]);
 });
 test('missing photos stay textual offline and an evicted required file is detected then repaired online', async ({ page, context, pwaServer }) => {

@@ -12,6 +12,15 @@ const menton: Binding = { id: "menton", place: "Menton · vieux port" };
 
 // Explicit route/place bindings: never infer photographs from an imported GPX's name.
 export const photoRouteBindings: Record<string, Binding[]> = {
+  "ventoux-bedoin": [{ id: "ventoux", place: "Mont Ventoux · sommet" }],
+  "galibier-valloire": [{ id: "galibier", place: "Col du Galibier" }],
+  "esterel-agay-trayas": [{ id: "esterel-cap-roux", place: "Anthéor" }],
+  "esterel-agay-antheor-short": [{ id: "esterel-cap-roux", place: "Anthéor" }],
+  "alsace-marlenheim-obernai": [{ id: "obernai", place: "Obernai" }],
+  "alsace-obernai-dambach": [{ id: "obernai", place: "Obernai" }],
+  "alsace-obernai-bernardswiller-short": [{ id: "obernai", place: "Obernai" }],
+  "alsace-turckheim-rouffach": [{ id: "eguisheim", place: "Eguisheim" }],
+  "alsace-turckheim-eguisheim-short": [{ id: "eguisheim", place: "Eguisheim" }],
   "cagnes-cannes-littoral": [cagnes, antibes, golfe, cannes],
   "golfe-juan-cannes-balade": [golfe, cannes],
   "antibes-golfe-juan-short": [antibes, golfe],
@@ -21,6 +30,16 @@ export const photoRouteBindings: Record<string, Binding[]> = {
   "eze-menton-basse-corniche": [menton],
   "menton-garavan-promenade": [menton]
 };
+
+export const landscapeDownloadBytes = Object.values(assets).reduce((sum, photo) => sum + photo.bytes, 0);
+
+// Preserve the precision documented by the photographer instead of inventing a day.
+export function routePhotoDate(date: string) {
+  const monthOnly = /^\d{4}-\d{2}$/.test(date);
+  return new Intl.DateTimeFormat("fr-FR", monthOnly
+    ? { month: "long", year: "numeric", timeZone: "UTC" }
+    : { dateStyle: "medium", timeZone: "UTC" }).format(new Date(`${date}${monthOnly ? "-01" : ""}T12:00:00Z`));
+}
 
 export function routePhotos(route: ClimbChallenge): RoutePhotoStop[] {
   const bindings = Object.hasOwn(photoRouteBindings, route.id) ? photoRouteBindings[route.id] : [];

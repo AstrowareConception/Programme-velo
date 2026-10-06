@@ -6,7 +6,7 @@ Dans **Plus → Emporte ta séance**, vérifie la disponibilité sur l’apparei
 
 1. Ouvre VéloQuest avec une connexion, puis **Plus**. Attends la préparation.
 2. Utilise **Vérifier la disponibilité**. En ligne, les fichiers essentiels manquants ou corrompus de la version active sont retéléchargés si cette même version est encore accessible.
-3. Pour les galeries, choisis **Préparer les photos · 263 Ko** : les cinq images documentées actuelles sont téléchargées et vérifiées. Le compteur indique les photos effectivement présentes. Les images consultées sont aussi conservées quand leur chargement réussit.
+3. Pour les galeries, choisis **Préparer les photos** (575 Ko pour les dix images actuelles) : les images documentées sont téléchargées et vérifiées. Le compteur indique les photos effectivement présentes. Les images consultées sont aussi conservées quand leur chargement réussit.
 4. Coupe la connexion et recharge pour vérifier ton appareil avant la première utilisation réelle. Retrouve tes séances, parcours, profil, Voyage et reprise locale. Tu peux conserver les photos masquées dans les réglages, même après préparation.
 
 Sans préparation photographique, une image manquante laisse ses textes et crédits avec une action de relance ; reconnecte-toi pour la charger. Les cartes externes, les vidéos et les podcasts ne font pas partie du paquet de VéloQuest. La page Confidentialité et les sites sources ne sont pas annoncés disponibles hors connexion. Une carte peut donc rester sans fond, tandis que les consignes et le profil local continuent à fonctionner.
