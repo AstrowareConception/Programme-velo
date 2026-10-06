@@ -1,4 +1,4 @@
-import { defaultPreferences, emptyState } from "./data";
+import { defaultPreferences, emptyState, currentProgramWeek, normalizeWeeklyGoals } from "./data";
 import type { AppState, Preferences } from "./types";
 import type { ClimbChallenge } from "./routes";
 import { normalizeGuidance } from "./onboarding";
@@ -57,6 +57,7 @@ export function normalizeState(value: unknown): AppState {
   };
 
   return {
+    weeklyGoals: normalizeWeeklyGoals(value.weeklyGoals, currentProgramWeek(profile.startDate)),
     profile,
     guidance: normalizeGuidance(value.guidance),
     voyage: isObject(value.voyage) && typeof value.voyage.routeId === "string" && value.voyage.routeId.length > 0

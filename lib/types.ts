@@ -64,6 +64,9 @@ export type ChallengeResult = {
 };
 
 export type SessionMetrics = {
+  cadenceSettingsKey?: string;
+  cadenceRecordEligible?: boolean;
+  cadenceScore?: import("./effort").CadenceScore;
   source: "manual" | "ftms" | "mixed";
   voyage?: VoyagePortion;
   completedWorkout?: boolean;
@@ -135,6 +138,7 @@ export type Preferences = {
 };
 
 export type AppState = {
+  weeklyGoals?: WeekTarget[];
   profile: Profile;
   sessions: CompletedSession[];
   measurements: Measurement[];

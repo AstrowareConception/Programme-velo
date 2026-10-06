@@ -57,7 +57,7 @@ test("first session is prepared, paused, restored and completed before the next 
   await page.getByRole("button", { name: "Reprendre", exact: true }).click();
   await page.clock.fastForward(16 * 60 * 1000);
   await page.getByLabel("RPE ressenti /10").fill("3");
-  await page.getByRole("button", { name: /Valider la quête/ }).click();
+  await page.getByLabel("J’ai vérifié le bilan et les champs facultatifs.").check(); await page.getByRole("button", { name: /Valider la quête/ }).click();
   await expect(guideCard(page)).toContainText("Tu as commencé");
   await expect.poll(async () => (await stored(page)).sessions.length).toBe(1);
   expect((await stored(page)).sessions[0].metrics.completedWorkout).toBe(true);
@@ -80,14 +80,14 @@ test("an interrupted workout does not advance discovery, and deleting a complete
   await page.getByRole("button", { name: "Démarrer la séance" }).click();
   await page.clock.fastForward(60_000);
   await page.getByRole("button", { name: "Terminer et enregistrer" }).click();
-  await page.getByRole("button", { name: /Valider la quête/ }).click();
+  await page.getByLabel("J’ai vérifié le bilan et les champs facultatifs.").check(); await page.getByRole("button", { name: /Valider la quête/ }).click();
   await expect(guideCard(page).locator(".guideMilestones .done")).toHaveCount(0);
   await expect.poll(async () => (await stored(page)).sessions.length).toBe(1);
   expect((await stored(page)).sessions[0].metrics.completedWorkout).toBe(false);
   await guideCard(page).getByRole("button", { name: "Préparer ma première séance" }).click();
   await page.getByRole("button", { name: "Démarrer la séance" }).click();
   await page.clock.fastForward(16 * 60 * 1000);
-  await page.getByRole("button", { name: /Valider la quête/ }).click();
+  await page.getByLabel("J’ai vérifié le bilan et les champs facultatifs.").check(); await page.getByRole("button", { name: /Valider la quête/ }).click();
   await expect(guideCard(page).locator(".guideMilestones .done")).toHaveCount(1);
   await expect.poll(async () => (await stored(page)).sessions.length).toBe(2);
   const completedId = (await stored(page)).sessions[1].id;
@@ -137,7 +137,7 @@ test("the third full session reveals daily choices and easy rides while hard ene
   await page.getByRole("button", { name: "Démarrer la séance" }).click();
   await page.clock.fastForward(26 * 60 * 1000);
   await page.getByLabel("RPE ressenti /10").fill("4");
-  await page.getByRole("button", { name: /Valider la quête/ }).click();
+  await page.getByLabel("J’ai vérifié le bilan et les champs facultatifs.").check(); await page.getByRole("button", { name: /Valider la quête/ }).click();
   await expect(guideCard(page).locator(".guideMilestones .done")).toHaveCount(3);
   await expect(page.getByLabel("Temps pour aujourd’hui")).toBeVisible();
   await page.getByLabel("Temps pour aujourd’hui").selectOption("45");

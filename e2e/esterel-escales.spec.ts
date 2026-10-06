@@ -64,7 +64,7 @@ test("a real Napoléon escape resumes, completes only the short carnet and recom
   await page.getByRole("button", { name: "Reprendre", exact: true }).click();
   await expect(page.locator(".routePlaceNow strong")).toHaveText("Saint-Théoffrey");
   await page.getByRole("button", { name: "Reprendre", exact: true }).click(); await page.clock.fastForward(12 * 60_000);
-  await page.getByRole("button", { name: /Valider la quête/ }).click();
+  await page.getByLabel("J’ai vérifié le bilan et les champs facultatifs.").check(); await page.getByRole("button", { name: /Valider la quête/ }).click();
   await expect.poll(async () => (await stored(page)).sessions.length).toBe(4);
   const result = (await stored(page)).sessions.at(-1);
   expect(result.routeId).toBe(shortIds[3]); expect(result.metrics.completedRoute).toBe(true);

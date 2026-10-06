@@ -18,7 +18,7 @@ test("retroactive local session survives reload and can be deleted", async ({ pa
   await page.getByLabel("Durée (min)").fill("42");
   await page.getByLabel("Distance (km)").fill("17.5");
   await page.getByLabel("Calories affichées").fill("230");
-  await page.getByRole("button", { name: /Valider la quête/ }).click();
+  await page.getByLabel("J’ai vérifié le bilan et les champs facultatifs.").check(); await page.getByRole("button", { name: /Valider la quête/ }).click();
   await expect.poll(async () => (await stored(page)).sessions.length).toBe(1);
   const saved = (await stored(page)).sessions[0];
   expect(saved.date).toBe("2026-10-01T22:15:00.000Z");
@@ -88,7 +88,7 @@ for (const mode of ["timeAttack", "segmentAttack"] as const) {
     await page.goto("/"); await page.getByRole("button", { name: "Reprendre" }).click();
     await expect(page.locator(".timeAttackHud")).toBeVisible();
     await page.getByRole("button", { name: "Terminer et enregistrer" }).click();
-    await page.getByRole("button", { name: /Valider la quête/ }).click();
+    await page.getByLabel("J’ai vérifié le bilan et les champs facultatifs.").check(); await page.getByRole("button", { name: /Valider la quête/ }).click();
     await expect.poll(async () => (await stored(page)).sessions.length).toBe(1);
     const metrics = (await stored(page)).sessions[0].metrics;
     expect(metrics.completedRoute).toBe(false);

@@ -232,3 +232,15 @@ Le thème **Vignoble d’Alsace** regroupe six étapes continues de Marlenheim �
 Dans **Plus → Explorer les services Bluetooth**, lancer l’inventaire sans commande de résistance et exporter le rapport technique local si nécessaire. Le TOPUTURE reçu le 6 octobre 2026 reste à qualifier : ni son nom ni ses 32 niveaux ne prouvent FTMS. Le diagnostic ne contient aucune mesure personnelle. Voir [la recette matérielle](HARDWARE-COMPATIBILITY.md) avant tout test de contrôle.
 
 La rubrique **Premier test du vélo · 10 à 15 minutes** guide le premier essai dans Plus. Le laboratoire affiche vitesse, distance et heure du dernier paquet ; « Choisir le minimum » ou « Choisir un pas au-dessus » prépare une consigne, puis « Envoyer ce niveau au vélo » effectue la commande. Reviens au minimum puis déconnecte. Les mises à jour attendent aussi la fin du diagnostic ou la déconnexion Bluetooth. [Fiche vierge de résultats](HARDWARE-TEST-RESULTS.md).
+
+### Suivi du coach, combos et records
+
+Le profil du lecteur montre les niveaux de résistance prévus ; la position blanche avance avec la séance. Une plage 11–15 suit 11,12,13,14,15,14,13,12,11 sur le segment. Les très courts segments réduisent le nombre de paliers pour laisser au moins cinq secondes par commande. La cible est distincte du niveau envoyé par le vélo. Le pilotage automatique conserve son activation explicite dans Plus.
+
+Le score compare la cadence reçue à la fourchette du segment, limites incluses. En cadence libre, toute mesure est réussie. Le calcul utilise le temps, pas le nombre de paquets Bluetooth. Le combo augmente tant que la cadence convient, jusqu'à ×4 après trente secondes. Les pauses ne donnent pas de points. Une donnée manquante ne vaut pas un échec dans le pourcentage mais coupe le combo et réduit la couverture.
+
+Le bilan présente la note, les points, le meilleur combo et le détail des segments. La préparation, le bilan et l'historique permettent de comparer les épreuves aux mêmes paramètres. Seules les épreuves complètes suffisamment mesurées établissent un record. Un nouveau record est célébré ; les animations sont désactivées si le système demande de réduire les mouvements. Le bilan exige de cocher la relecture avant le bouton d'enregistrement ; la touche Entrée d'un champ ne valide plus la séance.
+
+### Objectifs hebdomadaires réglables
+
+Dans Quête, « Régler mes objectifs » ouvre le formulaire de Plus. Choisis le nombre de séances et la durée habituelle : 4×30 donne 120 minutes, 5×25 donne 125 minutes. La base est désormais 120 minutes et ne monte plus automatiquement. Charge et variété suivent ce réglage ; le nombre maximal de séances dures demeure une limite, pas une mission à remplir. Les changements portent sur la semaine courante et les suivantes, sans recalculer les objectifs des semaines passées. Tes séances déjà enregistrées restent comptabilisées.

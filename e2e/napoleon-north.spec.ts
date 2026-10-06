@@ -67,7 +67,7 @@ test("a real northern ride resumes, completes both the new carnet and trophy, th
   await page.getByRole("button", { name: "Reprendre", exact: true }).click();
   await expect(page.locator(".routePlaceNow strong")).toHaveText("Laffrey");
   await page.getByRole("button", { name: "Reprendre", exact: true }).click(); await page.clock.fastForward(18 * 60_000);
-  await page.getByRole("button", { name: /Valider la quête/ }).click();
+  await page.getByLabel("J’ai vérifié le bilan et les champs facultatifs.").check(); await page.getByRole("button", { name: /Valider la quête/ }).click();
   await expect.poll(async () => (await stored(page)).sessions.length).toBe(14);
   expect((await stored(page)).sessions.at(-1).metrics.completedRoute).toBe(true);
   await browse(page); await objectives(page); await expect(card(page, "Route Napoléon · de Gap à Grenoble")).toContainText("Campagne terminée");

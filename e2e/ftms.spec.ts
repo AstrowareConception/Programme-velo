@@ -17,7 +17,7 @@ const state = {
 
 async function seed(page: Page) {
   await page.addInitScript((value) => {
-    localStorage.setItem("veloquest:v1", JSON.stringify(value));
+    if (!localStorage.getItem("veloquest:v1")) localStorage.setItem("veloquest:v1", JSON.stringify(value));
   }, state);
 }
 
@@ -66,7 +66,11 @@ async function mockFtms(page: Page, mode: "standard" | "sport02" = "standard", h
               view.setInt16(offset, 18, true); offset += 2;
               view.setInt16(offset, 205, true); offset += 2;
               view.setUint8(offset, heartRateService ? 0 : 142);
-              (window as any).__emitBike = () => emit(BIKE_DATA, view);
+              (window as any).__emitBike = (rpm?: number, bpm?: number) => {
+                if (rpm !== undefined) view.setUint16(4, rpm * 2, true);
+                if (bpm !== undefined) view.setUint8(13, bpm);
+                emit(BIKE_DATA, view);
+              };
               emit(BIKE_DATA, view);
             }, 40);
           }
@@ -225,6 +229,7 @@ test("FTMS control acknowledgement and auto resistance send simulated control-po
   await page.getByRole("button", { name: /Séances/ }).click();
   const card = page.getByRole("heading", { name: "Décrassage" }).locator("xpath=ancestor::article");
   await card.getByRole("button", { name: "Voir / démarrer" }).click();
+  await page.clock.install();
   await page.getByRole("button", { name: "Démarrer la séance" }).click();
 
   await expect(page.getByText("AUTO LEVEL ACTIF")).toBeVisible();
@@ -236,6 +241,14 @@ test("FTMS control acknowledgement and auto resistance send simulated control-po
   const writes = await page.evaluate(() => (window as any).__ftmsWrites as number[][]);
   expect(writes.some((bytes) => bytes[0] === 0x00)).toBe(true);
   expect(writes.some((bytes) => bytes[0] === 0x04)).toBe(true);
+  await expect.poll(() => page.evaluate(() => (window as any).__ftmsWrites)).toContainEqual([4, 50, 0]);
+  await page.clock.runFor(1000);
+  for (const level of [6, 7, 6, 5]) {
+    await page.clock.fastForward(60_000);
+    await expect(page.locator(".sessionEssentials .resistance strong")).toHaveText(String(level));
+    await page.clock.runFor(1100);
+    await expect.poll(() => page.evaluate(() => (window as any).__ftmsWrites.at(-1))).toEqual([4, level * 10, 0]);
+  }
 });
 
 test("first hardware test sends only explicit minimum and neighbouring commands, then resets on reconnect", async ({ page }) => {
@@ -297,4 +310,46 @@ test("separate heart rate supplies BPM, contact loss clears them, and resistance
   await expect(bpm).toHaveText("95");
   await page.evaluate(() => (window as any).__emitHeart(4, 95));
   await expect(bpm).toHaveText("—");
+});
+
+
+test("coach score, combos and BPM above 100 survive deliberate saving and reload", async ({ page }, info) => {
+  await seed(page); await mockFtms(page); await page.goto("/");
+  await page.getByRole("button", { name: "Vélo Bluetooth" }).click();
+  await expect(page.getByText("142").first()).toBeVisible();
+  await page.getByRole("button", { name: /Séances/ }).click();
+  await page.getByRole("heading", { name: "Décrassage" }).locator("xpath=ancestor::article").getByRole("button", { name: "Voir / démarrer" }).click();
+  await page.clock.install();
+  await page.evaluate(() => (window as any).__emitBike(80, 148));
+  await page.getByRole("button", { name: "Démarrer la séance" }).click();
+  await page.evaluate(() => { (window as any).__rpm = 80; (window as any).__emitBike(80, 148); setInterval(() => (window as any).__emitBike((window as any).__rpm, 148), 500); });
+  await page.clock.runFor(31_000);
+  await expect(page.locator(".liveCadenceScore")).toContainText("×4");
+  await expect(page.locator(".actualResistance")).toContainText("18");
+  await expect(page.getByRole("img", { name: /Profil d’effort/ })).toBeVisible();
+  expect(await page.locator(".sessionModal").evaluate(el => el.scrollWidth <= el.clientWidth + 1)).toBe(true);
+  await page.screenshot({ path: info.outputPath("mobile-effort-reader.png") });
+  await page.getByRole("button", { name: "Pause", exact: true }).click();
+  await page.clock.runFor(10_000);
+  await page.getByRole("button", { name: "Reprendre", exact: true }).click();
+  await page.evaluate(() => { (window as any).__rpm = 100; (window as any).__emitBike(100, 148); });
+  await page.clock.runFor(5000);
+  await expect(page.locator(".liveCadenceScore")).toContainText("combo 0 s ×1");
+  await page.getByRole("button", { name: "Terminer et enregistrer" }).click();
+  await page.getByLabel("RPE ressenti /10").fill("5");
+  await page.getByLabel("RPE ressenti /10").press("Enter");
+  await expect(page.getByRole("heading", { name: "Enregistre ta performance" })).toBeVisible();
+  await expect(page.getByRole("button", { name: /Valider la quête/ })).toBeDisabled();
+  await page.getByLabel("J’ai vérifié le bilan et les champs facultatifs.").check();
+  await page.getByRole("button", { name: /Valider la quête/ }).click();
+  const saved = () => page.evaluate(() => JSON.parse(localStorage.getItem("veloquest:v1")!).sessions.at(-1));
+  await expect.poll(async () => (await saved())?.metrics?.avgHeartRate).toBe(148);
+  const session = await saved();
+  expect(session.metrics.maxHeartRate).toBe(148);
+  expect(session.metrics.cadenceScore.bestComboSeconds).toBeGreaterThanOrEqual(30);
+  expect(session.metrics.cadenceScore.comboSeconds).toBe(0);
+  expect(session.metrics.cadenceScore.segments[0].eligibleSeconds).toBeLessThan(40);
+  expect(session.metrics.cadenceRecordEligible).toBe(false);
+  await page.reload();
+  await expect.poll(async () => (await saved())?.metrics?.cadenceScore).toEqual(session.metrics.cadenceScore);
 });

@@ -74,7 +74,7 @@ test("the short coastal ride finishes at Cannes and never validates Cagnes to Ca
   await page.getByRole("button", { name: "Démarrer la séance" }).click();
   await page.clock.fastForward(31 * 60 * 1000);
   await expect(page.getByLabel("Date et heure de la séance")).toBeVisible();
-  await page.getByRole("button", { name: /Valider la quête/ }).click();
+  await page.getByLabel("J’ai vérifié le bilan et les champs facultatifs.").check(); await page.getByRole("button", { name: /Valider la quête/ }).click();
   await expect.poll(async () => (await stored(page)).sessions.length).toBe(1);
   const saved = (await stored(page)).sessions[0];
   expect(saved.routeId).toBe("golfe-juan-cannes-balade");
@@ -98,7 +98,7 @@ test("a fully ridden scenic route earns its notebook and deletion restores the m
   await page.clock.fastForward(26 * 60 * 1000);
   await expect(page.getByLabel("Date et heure de la séance")).toBeVisible();
   await page.getByLabel("RPE ressenti /10").fill("3");
-  await page.getByRole("button", { name: /Valider la quête/ }).click();
+  await page.getByLabel("J’ai vérifié le bilan et les champs facultatifs.").check(); await page.getByRole("button", { name: /Valider la quête/ }).click();
   await expect.poll(async () => (await stored(page)).sessions.length).toBe(3);
   const saved = (await stored(page)).sessions.at(-1);
   expect(saved.routeId).toBe("chambord-petit-tour");
@@ -135,7 +135,7 @@ test("a paused scenic ride restores the gentle reader and an unfinished ride ear
   await page.getByText("Ton carnet de paysage", { exact: true }).click();
   await expect(page.locator(".sceneryDetails")).toContainText("Chambord");
   await page.getByRole("button", { name: "Terminer et enregistrer" }).click();
-  await page.getByRole("button", { name: /Valider la quête/ }).click();
+  await page.getByLabel("J’ai vérifié le bilan et les champs facultatifs.").check(); await page.getByRole("button", { name: /Valider la quête/ }).click();
   await expect.poll(async () => (await stored(page)).sessions.length).toBe(1);
   expect((await stored(page)).sessions[0].metrics.completedRoute).toBe(false);
   await page.getByRole("button", { name: /Plus/ }).click();
@@ -156,4 +156,37 @@ test("the extra guided workouts and soft bonus keep their own preflight and manu
   await page.getByRole("button", { name: "12 min souples" }).click();
   await expect(page.getByRole("heading", { name: "Parenthèse souple", exact: true })).toBeVisible();
   await expect(page.locator(".previewStats")).toContainText("12 min");
+});
+
+test("route actions form a regular touch grid on narrow phones", async ({ page }, info) => {
+  await seed(page); await page.goto("/"); await browse(page);
+  await page.getByLabel("Rechercher").fill("Chambord");
+  const actions = chambordCard(page).locator(".climbActions");
+  if (info.project.name === "mobile-chromium") await page.setViewportSize({ width: 320, height: 740 });
+  await actions.scrollIntoViewIfNeeded();
+  const boxes = await actions.locator("button").evaluateAll(elements => elements.map(el => { const r = el.getBoundingClientRect(); return { x: r.x, y: r.y, width: r.width, height: r.height, overflow: el.scrollWidth > el.clientWidth }; }));
+  expect(boxes.every(box => box.height >= 44 && !box.overflow)).toBe(true);
+  if (info.project.name === "mobile-chromium") {
+    expect(Math.abs(boxes[1].y - boxes[2].y)).toBeLessThan(1);
+    expect(Math.abs(boxes[1].y - boxes[3].y)).toBeLessThan(1);
+    expect(Math.abs(boxes[1].width - boxes[3].width)).toBeLessThan(1);
+    expect(boxes[0].width).toBeGreaterThan(boxes[1].width * 2);
+  }
+  await actions.screenshot({ path: info.outputPath("route-actions.png") });
+  await actions.getByRole("button", { name: "⚡ Segments" }).click();
+  await expect(page.getByRole("heading", { name: "Choisis ton secteur." })).toBeVisible();
+});
+
+test("workout badges have space before comfortable mobile start buttons", async ({ page }, info) => {
+  await seed(page); await page.goto("/"); await page.getByRole("button", { name: /Séances/ }).click();
+  if (info.project.name === "mobile-chromium") await page.setViewportSize({ width: 320, height: 740 });
+  const card = page.locator(".workoutCard").first();
+  await card.scrollIntoViewIfNeeded();
+  if (info.project.name === "mobile-chromium") {
+    const layout = await card.evaluate(el => ({ gap: el.querySelector("button")!.getBoundingClientRect().top - el.querySelector(".chips")!.getBoundingClientRect().bottom, height: el.querySelector("button")!.getBoundingClientRect().height, overflow: el.scrollWidth > el.clientWidth }));
+    expect(layout.gap).toBeGreaterThanOrEqual(12); expect(layout.height).toBeGreaterThanOrEqual(44); expect(layout.overflow).toBe(false);
+  }
+  await card.screenshot({ path: info.outputPath("workout-card.png") });
+  await card.getByRole("button", { name: "Voir / démarrer" }).click();
+  await expect(page.getByRole("button", { name: "Démarrer la séance", exact: true })).toBeVisible();
 });
