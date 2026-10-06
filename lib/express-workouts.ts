@@ -4,7 +4,7 @@ const make = (id: string, name: string, intensity: WorkoutTemplate["intensity"],
   id: `express-${id}`, name, intensity, tagline, segments,
   kind: intensity === "hard" ? "hiit" : intensity === "moderate" ? "progressive" : "recovery",
   duration: segments.reduce((sum, segment) => sum + segment.minutes, 0),
-  points: intensity === "hard" ? 2 : 1, xp: intensity === "hard" ? 25 : intensity === "moderate" ? 18 : 10,
+  points: 0.5, xp: intensity === "hard" ? 25 : intensity === "moderate" ? 18 : 10,
   description: `${tagline} Format express complet avec mise en route et retour au calme.${intensity === "hard" ? " Les passages durs restent courts : ajuste la résistance à ton ressenti. Cette séance compte dans le plafond hebdomadaire d’intensité." : ""}`
 });
 export const expressWorkouts: WorkoutTemplate[] = [
