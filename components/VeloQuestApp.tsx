@@ -1,5 +1,8 @@
 "use client";
 
+import { CalorieResult } from "@/components/CalorieResult";
+import { isCalorieWorkout, startCalories, sampleCalories, measuredCaloriesEligible, bestCalorieAttempt, type CalorieAttempt, type CalorieResult as CalorieResultType } from "@/lib/calorie-challenge";
+import { VoiceCommands } from "@/components/VoiceCommands";
 import { BleDiagnosticPanel } from "@/components/BleDiagnosticPanel";
 import Image from "next/image";
 import { WeeklyGoalsForm } from "@/components/WeeklyGoalsForm";
@@ -168,6 +171,15 @@ export function VeloQuestApp() {
   const cadenceBase = useRef<WorkoutTemplate | null>(null);
   const [sessionCadenceOffset, setSessionCadenceOffset] = useState(0);
   const coachFeedback = useRef({ belowSince: 0, lastAt: 0, lastAdviceAt: 0, lastLevel: undefined as number | undefined });
+  const calorieTracker = useRef<CalorieAttempt | undefined>(undefined);
+  const calorieReading = useRef<{ kcal: number; at: number } | undefined>(undefined);
+  const [calorieAttempt, setCalorieAttempt] = useState<CalorieAttempt | undefined>();
+  const [calorieLevel, setCalorieLevel] = useState<number | undefined>();
+  const [calorieSource, setCalorieSource] = useState<"ftms" | "manual">("manual");
+  const [manualChallengeCalories, setManualChallengeCalories] = useState("");
+  const [caloriesOnly, setCaloriesOnly] = useState(false);
+  const [expressOnly, setExpressOnly] = useState(false);
+  const [sessionIntensityFilter, setSessionIntensityFilter] = useState("all");
   const [autoResistanceControl, setAutoResistanceControl] = useState(false);
   const [climbStartDistanceM, setClimbStartDistanceM] = useState<number | null>(null);
   const [customClimbs, setCustomClimbs] = useState<ClimbChallenge[]>([]);
@@ -195,7 +207,7 @@ export function VeloQuestApp() {
   useEffect(() => { setFinishReviewed(false); }, [showFinish]);
 
   useEffect(() => {
-    if (!running || !sessionStarted || !active || showFinish) return;
+    if (!running || !sessionStarted || !active || showFinish || isCalorieWorkout(active.id)) return;
     let previous = Date.now();
     const timer = window.setInterval(() => {
       const now = Date.now();
@@ -616,9 +628,17 @@ export function VeloQuestApp() {
     }
   }, [routeMode, activeClimb, activeSegmentBounds, bike, climbStartDistanceM, sessionStarted, currentRouteKm, climbProgress, segmentIndex, active, running]);
 
-  const currentTarget = active ? resistanceTarget(active.segments[segmentIndex], currentSegmentSeconds - secondsLeft, preferences.resistanceOffset + sessionResistanceDelta) : undefined;
+  const calorieMode = isCalorieWorkout(active?.id);
+  const currentTarget = calorieMode ? calorieLevel : active ? resistanceTarget(active.segments[segmentIndex], currentSegmentSeconds - secondsLeft, preferences.resistanceOffset + sessionResistanceDelta) : undefined;
   const currentRange = active ? numericRange(active.segments[segmentIndex].resistance) : undefined;
   const resistanceDirection = !currentRange ? "Libre" : currentRange[0] === currentRange[1] ? "Palier" : secondsLeft > currentSegmentSeconds / 2 ? "Montée de résistance" : "Descente de résistance";
+  const calorieComplete = Boolean(calorieMode && calorieTracker.current && sessionElapsedSeconds >= totalSessionSeconds - .01);
+  const calorieValue = calorieSource === "ftms" ? calorieAttempt?.kcal : manualChallengeCalories.trim() ? Number(manualChallengeCalories) : undefined;
+  const calorieResult: CalorieResultType | undefined = calorieMode && calorieValue !== undefined && Number.isFinite(calorieValue) && calorieValue >= 0 ? {
+    version: 1, durationSeconds: Math.round((active?.duration ?? 0) * 60), source: calorieSource, deviceName: calorieSource === "ftms" ? calorieAttempt?.deviceName : undefined, kcal: calorieValue,
+    eligible: calorieComplete && (calorieSource === "manual" || measuredCaloriesEligible(calorieAttempt))
+  } : undefined;
+  const caloriePrevious = active && calorieMode ? bestCalorieAttempt(state.sessions, active.id, calorieSource, calorieSource === "ftms" ? calorieAttempt?.deviceName ?? bike?.deviceName : undefined) : undefined;
   const cadenceLive = cadenceSummary(cadenceScore);
   const currentSettingsKey = active ? effortSettingsKey(active.id, active.segments, preferences.resistanceOffset + sessionResistanceDelta, routeMode) : undefined;
   const comparisonKey = cadenceSettingsKey ?? currentSettingsKey;
@@ -709,6 +729,7 @@ export function VeloQuestApp() {
     cadenceBase.current = workout;
     workout = withCadenceOffset(workout, restoredOffset);
     setSessionCadenceOffset(restoredOffset);
+    calorieTracker.current = undefined; setCalorieAttempt(undefined); setManualChallengeCalories(""); setCalorieSource("manual"); setCalorieLevel(undefined);
     const restored = restoreSessionSnapshot(resumeSnapshot, workout);
     pwa.setBusy(true);
     setForegroundNotice(false);
@@ -755,6 +776,7 @@ export function VeloQuestApp() {
       if (!writeActiveSessionSnapshot(snapshot)) { setToast("La reprise n’a pas pu être enregistrée. Garde le lecteur ouvert et libère du stockage avant une mise à jour."); return; }
       setResumeSnapshot(snapshot);
     }
+    calorieTracker.current = undefined;
     setActive(null);
     setActiveClimb(null);
     setActiveChallenge(null);
@@ -765,6 +787,8 @@ export function VeloQuestApp() {
 
   async function connectBike() {
     if (pwa.locked() || diagnosingBike || connectingBike) return;
+    if (calorieTracker.current) { calorieTracker.current = { ...calorieTracker.current, valid: false }; setCalorieAttempt(calorieTracker.current); }
+    calorieReading.current = undefined;
     setResistanceMappingVerified(false);
     setLastTelemetryAt(null);
     if (!hasWebBluetooth()) {
@@ -779,10 +803,16 @@ export function VeloQuestApp() {
     try {
       const connection = await connectFtmsBike(
         (next) => {
+          if (next.totalEnergyKcal !== undefined) {
+            const now = Date.now(); calorieReading.current = { kcal: next.totalEnergyKcal, at: now };
+            if (calorieTracker.current) { calorieTracker.current = sampleCalories(calorieTracker.current, next.totalEnergyKcal, now); setCalorieAttempt(calorieTracker.current); }
+          }
           if (Object.prototype.hasOwnProperty.call(next, "cadenceRpm")) cadenceReading.current = { at: Date.now(), rpm: next.cadenceRpm };
           setLastTelemetryAt(Date.now()); setTelemetry((prev) => ({ ...prev, ...next }));
         },
         () => {
+          if (calorieTracker.current) { calorieTracker.current = { ...calorieTracker.current, valid: false }; setCalorieAttempt(calorieTracker.current); }
+          calorieReading.current = undefined;
           setBike(null);
           setTelemetry({});
           setControlGranted(false);
@@ -864,6 +894,7 @@ export function VeloQuestApp() {
     if (pwa.locked()) { setToast("Mise à jour en cours : attends le rechargement."); return; }
     pwa.setBusy(true);
     setActiveVoyage(null);
+    calorieTracker.current = undefined; setCalorieAttempt(undefined); setManualChallengeCalories(""); setCalorieLevel(undefined);
     cadenceBase.current = workout;
     const offset = preferences.cadenceOffset ?? -15;
     setSessionCadenceOffset(offset);
@@ -925,7 +956,7 @@ export function VeloQuestApp() {
     const elapsedSeconds = isRaceMode
       ? (n(form, "elapsedSeconds") ?? timeAttackElapsedSeconds)
       : undefined;
-    const duration = isVoyage ? sessionElapsedSeconds / 60 : isRaceMode && elapsedSeconds !== undefined
+    const duration = calorieMode ? sessionElapsedSeconds / 60 : isVoyage ? sessionElapsedSeconds / 60 : isRaceMode && elapsedSeconds !== undefined
       ? elapsedSeconds / 60
       : (n(form, "duration") ?? active.duration);
     const previousBest = isTimeAttack && activeClimb
@@ -990,7 +1021,8 @@ export function VeloQuestApp() {
             completedRoute: activeClimb ? completedRoute : undefined,
             completedSegment,
             distanceKm: n(form, "distance") ?? autoMetrics.distanceKm ?? (isVoyage ? undefined : activeClimb ? (isSegmentAttack ? raceCurrentKm : currentRouteKm) : undefined),
-            calories: n(form, "calories") ?? autoMetrics.calories,
+            calories: calorieMode ? calorieResult?.kcal : n(form, "calories") ?? autoMetrics.calories,
+            calorieChallenge: calorieResult,
             avgSpeedKmh: n(form, "avgSpeed") ?? autoMetrics.avgSpeedKmh,
             avgCadenceRpm: n(form, "avgCadence") ?? autoMetrics.avgCadenceRpm,
             maxCadenceRpm: autoMetrics.maxCadenceRpm,
@@ -999,9 +1031,9 @@ export function VeloQuestApp() {
             avgHeartRate: n(form, "avgHeartRate") ?? autoMetrics.avgHeartRate,
             maxHeartRate: autoMetrics.maxHeartRate,
             avgResistance: autoMetrics.avgResistance,
-            cadenceScore,
-            cadenceSettingsKey: comparisonKey,
-            cadenceRecordEligible,
+            cadenceScore: calorieMode ? undefined : cadenceScore,
+            cadenceSettingsKey: calorieMode ? undefined : comparisonKey,
+            cadenceRecordEligible: !calorieMode && cadenceRecordEligible,
             samples: hasFtms && preferences.keepTelemetryTrace ? compactTelemetry(telemetrySamples) : undefined
           }
         };
@@ -1009,6 +1041,7 @@ export function VeloQuestApp() {
     const voyageXpEarned = isVoyage ? totalXp({ ...state, sessions: nextSessions }) - totalXp(state) : 0;
     const voyageComplete = isVoyage && activeClimb ? voyageProgress(activeClimb, nextSessions).complete : false;
     setState(prev => ({ ...prev, sessions: [...prev.sessions, session] }));
+    calorieTracker.current = undefined;
     setActive(null);
     setActiveClimb(null);
     setRunning(false);
@@ -1039,6 +1072,10 @@ export function VeloQuestApp() {
     void prepareCueAudio(preferences);
     upcomingCueRef.current = "";
     setForegroundNotice(false);
+    if (isCalorieWorkout(active.id)) {
+      calorieTracker.current = startCalories(Date.now(), active.duration * 60, bike ? calorieReading.current : undefined, bike?.deviceName);
+      setCalorieAttempt(calorieTracker.current); setCalorieSource(calorieTracker.current.baseline !== undefined ? "ftms" : "manual");
+    }
     coachFeedback.current = { belowSince: 0, lastAt: Date.now(), lastAdviceAt: Date.now(), lastLevel: currentTarget };
     setSessionStarted(true);
     setCadenceSettingsKey(currentSettingsKey);
@@ -1056,8 +1093,18 @@ export function VeloQuestApp() {
     cueSegment(active.segments[segmentIndex], cuePreferencesRef.current);
   }
 
+  function changeEffort(delta: number) {
+    if (calorieMode) {
+      const previous = calorieLevel ?? telemetry.resistance ?? 1;
+      const next = Math.max(1, Math.min(32, Math.round(previous + delta)));
+      setCalorieLevel(next); return next !== previous;
+    }
+    const next = Math.max(-4, Math.min(4, sessionResistanceDelta + delta));
+    setSessionResistanceDelta(next); return next !== sessionResistanceDelta;
+  }
+
   function togglePause() {
-    if (!active || !sessionStarted || routeMode === "timeAttack" || routeMode === "segmentAttack") return;
+    if (!active || isCalorieWorkout(active.id) || !sessionStarted || routeMode === "timeAttack" || routeMode === "segmentAttack") return;
     if (running) {
       setPauseCount((count) => count + 1);
       setRunning(false);
@@ -1445,15 +1492,27 @@ export function VeloQuestApp() {
         <section>
           <div className="pageHead pageHeadActions"><div><p className="eyebrow">CATALOGUE</p><h1>Choisis ta quête</h1><p>Du décrassage au HIIT. Le ressenti reste prioritaire sur le numéro de résistance.</p></div><button className="secondary" onClick={openManualLog}>+ Enregistrer une séance déjà faite</button></div>
           <WorkoutProgramsPanel sessions={state.sessions} workouts={workouts} onLaunch={(workout) => launch(workout)} />
+          <div className="workoutFilters">
+            <button type="button" className="secondary" aria-pressed={expressOnly} onClick={() => setExpressOnly(value => !value)}>Express · moins de 10 min</button>
+            <button type="button" className="secondary" aria-pressed={caloriesOnly} onClick={() => { setCaloriesOnly(value => !value); setExpressOnly(false); setSessionIntensityFilter("all"); }}>Défis calories</button>
+            <label>Intensité des séances<select value={sessionIntensityFilter} onChange={event => setSessionIntensityFilter(event.target.value)}><option value="all">Toutes</option><option value="easy">Facile</option><option value="moderate">Soutenue</option><option value="hard">Dure</option></select></label>
+          </div>
           <div className="grid workoutGrid">
-            {workouts.map((w) => (
+            {workouts.filter(w => (!expressOnly || w.duration < 10) && (!caloriesOnly || isCalorieWorkout(w.id)) && (sessionIntensityFilter === "all" || w.intensity === sessionIntensityFilter)).map((w) => {
+              const key = effortSettingsKey(w.id, withCadenceOffset(w, preferences.cadenceOffset ?? -15).segments, preferences.resistanceOffset, "training");
+              const best = bestCadenceAttempt(state.sessions, key);
+              const score = cadenceSummary(best?.metrics?.cadenceScore);
+              const kcalBike = bestCalorieAttempt(state.sessions, w.id, "ftms", bike?.deviceName)?.metrics?.calorieChallenge;
+              const kcalManual = bestCalorieAttempt(state.sessions, w.id, "manual")?.metrics?.calorieChallenge;
+              return (
               <article className={`card workoutCard ${w.bonus ? "bonusCard" : ""}`} key={w.id}>
                 <div className="sectionHead"><span className={`intensity ${w.intensity}`}>{w.intensity === "easy" ? "FACILE" : w.intensity === "moderate" ? "SOUTENU" : "DUR"}</span><strong>{w.duration} min</strong></div>
                 <h2>{w.name}</h2><p>{w.tagline}</p>
+                <p className="workoutBest"><strong>{isCalorieWorkout(w.id) ? `Record vélo : ${kcalBike ? kcalBike.kcal.toFixed(0) + " kcal · " + kcalBike.deviceName : "à établir"}` : best ? `Record coach : ${score.grade} · ${score.percent?.toFixed(1)} %` : "Record coach : à établir"}</strong><small>{isCalorieWorkout(w.id) ? `Record déclaré : ${kcalManual ? kcalManual.kcal.toFixed(0) + " kcal" : "à établir"} · ${w.duration} min complètes` : "À tes réglages actuels · séance complète"}</small></p>
                 <div className="chips"><span>{w.points} pts</span><span>{w.xp} XP</span><span>{w.segments.length} segments</span></div>
                 <button className="secondary" onClick={() => launch(w)}>Voir / démarrer</button>
               </article>
-            ))}
+            ); })}
           </div>
         </section>
       )}
@@ -1881,8 +1940,7 @@ export function VeloQuestApp() {
                 <p className="eyebrow">JOURNAL DE SÉANCE</p>
                 <h2>Enregistre ta performance</h2>
                 <p>Vérifie les mesures ci-dessous, puis confirme l’enregistrement. Les champs vides restent facultatifs.</p>
-                <CadenceResult score={cadenceScore} />
-                <CoachComparison score={cadenceScore} previous={previousCadenceBest?.metrics?.cadenceScore} eligible={cadenceRecordEligible} />
+                {calorieMode ? <CalorieResult result={calorieResult} previous={caloriePrevious?.metrics?.calorieChallenge} /> : <><CadenceResult score={cadenceScore} /><CoachComparison score={cadenceScore} previous={previousCadenceBest?.metrics?.cadenceScore} eligible={cadenceRecordEligible} /></>}
                 {activeVoyage && <p className="voyageNext">{sessionElapsedSeconds >= totalSessionSeconds - .01 ? `Portion achevée : ${activeVoyage.startKm.toFixed(2)} → ${activeVoyage.endKm.toFixed(2)} km. Enregistre-la pour avancer dans ton voyage.` : "Portion inachevée : la séance reste dans ton journal, mais ce passage sera à refaire. Tu peux aussi fermer pour conserver la séance et la reprendre."} La distance du Voyage est simulée ; les champs ci-dessous décrivent les mesures du vélo.</p>}
                 {activeVoyage && sessionElapsedSeconds < totalSessionSeconds - .01 && <button type="button" className="secondary" onClick={() => setShowFinish(false)}>Continuer cette portion</button>}
                 {(routeMode === "timeAttack" || routeMode === "segmentAttack") && activeClimb && (
@@ -1897,12 +1955,13 @@ export function VeloQuestApp() {
                   <div className="formRow">
                     {(routeMode === "timeAttack" || routeMode === "segmentAttack") && activeClimb
                       ? <label>Chrono final (secondes)<input name="elapsedSeconds" type="number" step="1" defaultValue={timeAttackElapsedSeconds || undefined} /></label>
-                      : <label>Durée (min)<input name="duration" type="number" step="0.01" readOnly={Boolean(activeVoyage)} defaultValue={activeVoyage ? Number((sessionElapsedSeconds / 60).toFixed(2)) : active.duration} /></label>}
+                      : <label>Durée (min)<input name="duration" type="number" step="0.01" readOnly={Boolean(activeVoyage) || calorieMode} defaultValue={calorieMode ? Number((sessionElapsedSeconds / 60).toFixed(2)) : activeVoyage ? Number((sessionElapsedSeconds / 60).toFixed(2)) : active.duration} /></label>}
                     <label>RPE ressenti /10<input name="rpe" type="number" min="1" max="10" step="0.5" /></label>
                   </div>
+                  {calorieMode && <label>Origine des calories<select value={calorieSource} onChange={event => setCalorieSource(event.target.value as "ftms" | "manual")}><option value="manual">Saisie déclarée · record séparé</option><option value="ftms" disabled={calorieAttempt?.kcal === undefined}>Compteur du vélo sur cette épreuve</option></select></label>}
                   <div className="formRow">
                     <label>Distance (km)<input name="distance" type="number" step="0.01" defaultValue={autoMetrics.distanceKm?.toFixed(2)} /></label>
-                    <label>Calories affichées<input name="calories" type="number" step="1" defaultValue={autoMetrics.calories?.toFixed(0)} /></label>
+                    <label>Calories affichées{calorieMode ? <input name="calories" type="number" min="0" step="1" readOnly={calorieSource === "ftms"} value={calorieSource === "ftms" ? calorieAttempt?.kcal ?? "" : manualChallengeCalories} onChange={event => setManualChallengeCalories(event.target.value)} /> : <input name="calories" type="number" step="1" defaultValue={autoMetrics.calories?.toFixed(0)} />}</label>
                   </div>
                   <div className="formRow">
                     <label>Vitesse moyenne<input name="avgSpeed" type="number" step="0.1" defaultValue={autoMetrics.avgSpeedKmh?.toFixed(1)} /></label>
@@ -1936,12 +1995,12 @@ export function VeloQuestApp() {
                   {resistanceMappingVerified && !autoResistanceControl && <button type="button" className="secondary" disabled={controlBusy} onClick={() => controlGranted ? setAutoResistanceControl(true) : void requestBikeControl()}>Activer le pilotage automatique</button>}
                   {bluetoothError && <p role="status">{bluetoothError}</p>}
                 </div>}
-                <label>Rythme de pédalage<select value={sessionCadenceOffset} onChange={event => {
+                {!calorieMode && <label>Rythme de pédalage<select value={sessionCadenceOffset} onChange={event => {
                   const offset = Number(event.target.value);
                   const baseline = withCadenceOffset(cadenceBase.current ?? active, offset);
                   setActive(baseline); setSessionCadenceOffset(offset); updatePreference("cadenceOffset", offset);
-                }}><option value={-15}>Doux · −15 tr/min</option><option value={0}>Classique</option><option value={10}>Soutenu · +10 tr/min</option></select></label>
-                <p className="finePrint">Les cibles affichées et le score suivent ce réglage. Le RPE est un effort visé, pas une mesure : ton ressenti prime.</p>
+                }}><option value={-15}>Doux · −15 tr/min</option><option value={0}>Classique</option><option value={10}>Soutenu · +10 tr/min</option></select></label>}
+                <p className="finePrint">{calorieMode ? "Épreuve à rythme libre. Les records du vélo et les saisies déclarées sont séparés ; le compteur du vélo doit être disponible dès le départ pour un record mesuré." : "Les cibles affichées et le score suivent ce réglage. Le RPE est un effort visé, pas une mesure : ton ressenti prime."}</p>
                 {activeChallenge && (
                   <div className="activeChallengeBanner">
                     <span>{activeChallenge.icon}</span>
@@ -2008,7 +2067,8 @@ export function VeloQuestApp() {
                   </>
                 )}
 
-                <EffortProfile workout={active} elapsed={sessionElapsedSeconds} offset={preferences.resistanceOffset + sessionResistanceDelta} />
+                {calorieMode && <div className="calorieLive" role="status"><strong>{calorieAttempt?.kcal === undefined ? "—" : calorieAttempt.kcal.toFixed(0)} kcal</strong><span>Sur cette épreuve · estimation du vélo</span><small>{caloriePrevious ? `Record comparable : ${caloriePrevious.metrics!.calorieChallenge!.kcal.toFixed(0)} kcal` : "Premier record à établir"}</small><p>Chrono continu · cadence et résistance libres</p></div>}
+                {!calorieMode && <EffortProfile workout={active} elapsed={sessionElapsedSeconds} offset={preferences.resistanceOffset + sessionResistanceDelta} />}
                 <div className="sessionEssentials"><div className="resistance">
                   <small>RÉSISTANCE CIBLE</small>
                   <strong>{currentTarget ?? "Libre"}</strong>
@@ -2016,18 +2076,28 @@ export function VeloQuestApp() {
                 </div>
                 <div className="timer" aria-live="off"><small>RESTE DANS CE SEGMENT</small>{" "}<strong>{formatClock(secondsLeft)}</strong></div></div>
                 <div className="actualResistance"><span>Résistance reçue du vélo</span><strong>{bike ? telemetry.resistance?.toFixed(0) ?? "—" : "—"}</strong><small>{autoResistanceControl && controlGranted ? "Pilotage auto · réponse du vélo différée" : "Réglage manuel · suis la cible"}</small></div>
+                <VoiceCommands onCommand={command => {
+                  if (command === "lighter" || command === "harder") {
+                    const delta = command === "lighter" ? -1 : 1;
+                    const changed = changeEffort(delta);
+                    return !changed ? "Limite de réglage atteinte." : `${delta < 0 ? "Cible allégée" : "Cible renforcée"} d’un niveau.${autoResistanceControl && controlGranted ? " Pilotage automatique actif." : " À régler sur le vélo en mode manuel."}`;
+                  }
+                  if (calorieMode || routeMode === "timeAttack" || routeMode === "segmentAttack") return "Le chrono de cette épreuve ne peut pas être mis en pause.";
+                  if ((command === "pause" && running) || (command === "resume" && !running)) togglePause();
+                  return command === "pause" ? "Séance en pause." : "Séance reprise.";
+                }} />
                 <div className="effortAdjustments" role="group" aria-label="Adapter l’effort">
-                  <button type="button" className="secondary" disabled={sessionResistanceDelta <= -4} onClick={() => setSessionResistanceDelta(value => Math.max(-4, value - 1))}>Alléger −1</button>
-                  <button type="button" className="secondary" disabled={sessionResistanceDelta >= 4} onClick={() => setSessionResistanceDelta(value => Math.min(4, value + 1))}>Renforcer +1</button>
+                  <button type="button" className="secondary" disabled={calorieMode ? (calorieLevel ?? telemetry.resistance ?? 1) <= 1 : sessionResistanceDelta <= -4} onClick={() => changeEffort(-1)}>Alléger −1</button>
+                  <button type="button" className="secondary" disabled={calorieMode ? (calorieLevel ?? telemetry.resistance ?? 1) >= 32 : sessionResistanceDelta >= 4} onClick={() => changeEffort(1)}>Renforcer +1</button>
                 </div>
                 {bike && !autoResistanceControl && <p className="finePrint">Résistance manuelle : {bluetoothError ?? "pilotage automatique non activé pour cette connexion."}{resistanceMappingVerified && <button type="button" className="secondary" disabled={controlBusy} onClick={() => controlGranted ? setAutoResistanceControl(true) : void requestBikeControl()}>Activer le pilotage automatique</button>}</p>}
-                {cadenceLive.percent !== undefined && <p className="liveCadenceScore">Suivi cadence : {cadenceLive.percent.toFixed(1)} % · {cadenceLive.grade} · combo {Math.floor(cadenceScore.comboSeconds)} s ×{Math.min(4, 1 + Math.floor(cadenceScore.comboSeconds / 10))} · {Math.floor(cadenceScore.points)} pts</p>}
+                {!calorieMode && cadenceLive.percent !== undefined && <p className="liveCadenceScore">Suivi cadence : {cadenceLive.percent.toFixed(1)} % · {cadenceLive.grade} · combo {Math.floor(cadenceScore.comboSeconds)} s ×{Math.min(4, 1 + Math.floor(cadenceScore.comboSeconds / 10))} · {Math.floor(cadenceScore.points)} pts</p>}
                 <div className="sessionOverall">
                   <div><span>Segment {segmentIndex + 1}/{active.segments.length}</span><strong>{sessionProgressPercent}%</strong></div>
                   <i><b style={{ width: `${sessionProgressPercent}%` }} /></i>
                   {autoResistanceControl && controlGranted && <small>AUTO LEVEL ACTIF</small>}
                 </div>
-                <div className="segmentMeta"><span>Effort visé {active.segments[segmentIndex].rpe}/10</span>{active.segments[segmentIndex].cadence && <span>Cible {active.segments[segmentIndex].cadence} tr/min</span>}</div>
+                {!calorieMode && <div className="segmentMeta"><span>Effort visé {active.segments[segmentIndex].rpe}/10</span>{active.segments[segmentIndex].cadence && <span>Cible {active.segments[segmentIndex].cadence} tr/min</span>}</div>}
                 {activeClimb && preferences.showRoutePhotos && preferences.readerView !== "essential" && <RoutePhotos key={activeClimb.id} route={activeClimb} currentKm={currentRouteKm} />}
                 {bike && (
                   <div className="liveStrip">
@@ -2044,12 +2114,12 @@ export function VeloQuestApp() {
                 <SessionComfort preferences={preferences} onChange={updatePreference} />
                 <div className="readerControls"><div className="modalActions three">
                   <button className="secondary" disabled={Boolean(activeVoyage) || segmentIndex === 0} onClick={() => goToSegment(segmentIndex - 1)}>← Précédent</button>
-                  {(routeMode === "timeAttack" || routeMode === "segmentAttack") && activeClimb
+                  {calorieMode || ((routeMode === "timeAttack" || routeMode === "segmentAttack") && activeClimb)
                     ? <button className="primary" disabled>Chrono actif</button>
                     : <button className="primary" onClick={togglePause}>{running ? "Pause" : "Reprendre"}</button>}
                   <button className="secondary" disabled={Boolean(activeVoyage) || segmentIndex >= active.segments.length - 1} onClick={() => goToSegment(segmentIndex + 1)}>Suivant →</button>
                 </div>
-                <button className="finish" onClick={() => { setRunning(false); setShowFinish(true); }}>Terminer et enregistrer</button>
+                <button className="finish" onClick={() => { if (calorieTracker.current) calorieTracker.current = { ...calorieTracker.current, end: Math.min(calorieTracker.current.end, Date.now()) }; setRunning(false); setShowFinish(true); }}>Terminer et enregistrer</button>
                 </div>
               </>
             )}
@@ -2065,7 +2135,8 @@ export function VeloQuestApp() {
             <h2>{selectedRoute?.name ?? selectedTemplate?.name ?? selectedSession.templateId}</h2>
             {selectedSession.metrics?.voyage && <p className="voyageNext">Voyage · {selectedSession.metrics.voyage.startKm.toFixed(2)} → {selectedSession.metrics.voyage.endKm.toFixed(2)} km · {selectedSession.metrics.voyage.completedPortion ? "portion achevée" : "portion inachevée"} · position simulée. Cette séance seule ne valide pas un parcours entier.</p>}
             <p className="detailDate">{new Intl.DateTimeFormat("fr-FR", { dateStyle: "full", timeStyle: "short" }).format(new Date(selectedSession.date))}</p>
-            <CadenceResult score={selectedSession.metrics?.cadenceScore} />
+            {selectedSession.metrics?.calorieChallenge && <CalorieResult result={selectedSession.metrics.calorieChallenge} previous={bestCalorieAttempt(state.sessions.filter(s => s.date < selectedSession.date), selectedSession.templateId, selectedSession.metrics.calorieChallenge.source, selectedSession.metrics.calorieChallenge.deviceName)?.metrics?.calorieChallenge} />}
+            {!isCalorieWorkout(selectedSession.templateId) && <CadenceResult score={selectedSession.metrics?.cadenceScore} />}
             <CoachComparison score={selectedSession.metrics?.cadenceScore} previous={bestCadenceAttempt(state.sessions.filter(session => session.date < selectedSession.date), selectedSession.metrics?.cadenceSettingsKey)?.metrics?.cadenceScore} eligible={Boolean(selectedSession.metrics?.cadenceRecordEligible)} />
             <div className="detailMetrics">
               <DetailMetric label={selectedSession.metrics?.segmentAttackIndex !== undefined ? `Segment Attack S${selectedSession.metrics.segmentAttackIndex + 1}` : selectedSession.metrics?.timeAttack ? "Time Attack" : "Durée"} value={selectedSession.metrics?.elapsedSeconds !== undefined ? formatRaceTime(selectedSession.metrics.elapsedSeconds) : `${selectedSession.duration.toFixed(1)} min`} />

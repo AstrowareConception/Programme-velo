@@ -102,6 +102,9 @@ async function mockFtms(page: Page, mode: "standard" | "sport02" = "standard", h
     }
 
     characteristic(BIKE_DATA);
+    (window as any).__emitEnergy = (kcal: number) => {
+      const view = new DataView(new ArrayBuffer(9)); view.setUint16(0, 1 << 8, true); view.setUint16(2, 2000, true); view.setUint16(4, kcal, true); emit(BIKE_DATA, view);
+    };
     if (mode === "standard") characteristic(FEATURE, () => {
       const view = new DataView(new ArrayBuffer(8));
       view.setUint32(4, 1 << 2, true);
@@ -366,4 +369,33 @@ test("qualified Toputure acquires control automatically and sends levels only af
   await page.getByRole("button", { name: "Démarrer la séance" }).click();
   await expect(page.getByText("AUTO LEVEL ACTIF")).toBeVisible();
   await expect.poll(() => page.evaluate(() => (window as any).__ftmsWrites)).toContainEqual([4, 50, 0]);
+});
+
+
+test("calorie challenge measures only the fixed interval and preserves its device record", async ({ page }) => {
+  await seed(page); await mockFtms(page, "standard", false, true); await page.goto("/");
+  await page.getByRole("button", { name: "Vélo Bluetooth" }).click();
+  await page.getByRole("button", { name: /Séances/ }).click();
+  await page.getByRole("heading", { name: "Défi calories · 5 min", exact: true }).locator("xpath=ancestor::article").getByRole("button", { name: "Voir / démarrer" }).click();
+  await page.clock.install({ time: new Date("2026-10-06T18:00:00Z") }); await page.clock.pauseAt(new Date("2026-10-06T18:00:01Z")); await page.evaluate(() => (window as any).__emitEnergy(200));
+  await page.getByRole("button", { name: "Démarrer la séance" }).click();
+  await expect(page.getByRole("button", { name: "Chrono actif", exact: true })).toBeDisabled();
+  await expect(page.locator(".liveCadenceScore")).toHaveCount(0);
+  expect(await page.evaluate(() => (window as any).__ftmsWrites)).toEqual([[0]]);
+  await page.evaluate(() => { let kcal = 200; (window as any).__energyTimer = setInterval(() => (window as any).__emitEnergy(++kcal), 5000); });
+  await page.clock.runFor(300000);
+  await page.evaluate(() => { clearInterval((window as any).__energyTimer); });
+  await expect(page.getByRole("heading", { name: "Enregistre ta performance" })).toBeVisible();
+  const result = page.getByRole("status", { name: "Résultat du défi calories" });
+  await expect(result).toContainText("Premier record calories");
+  await expect(result).toContainText("60 kcal");
+  await page.clock.runFor(1000); await page.evaluate(() => (window as any).__emitEnergy(999));
+  await expect(page.getByLabel("Calories affichées")).toHaveValue("60");
+  await page.getByLabel("J’ai vérifié le bilan et les champs facultatifs.").check();
+  await page.getByRole("button", { name: /Valider la quête/ }).click();
+  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem("veloquest:v1")!).sessions.length)).toBe(1);
+  await page.reload();
+  const entry = await page.evaluate(() => JSON.parse(localStorage.getItem("veloquest:v1")!).sessions.at(-1));
+  expect(entry.metrics.calorieChallenge).toMatchObject({ source: "ftms", kcal: 60, eligible: true, durationSeconds: 300, deviceName: "Toputure TBE5" });
+  expect(entry.metrics.cadenceScore).toBeUndefined();
 });

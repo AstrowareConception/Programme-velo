@@ -251,3 +251,16 @@ Le Toputure TBE5 validé demande automatiquement le contrôle quand ses capacit�
 Avant la séance, « Rythme de pédalage » propose Doux (défaut, −15tr/min), Classique ou Soutenu (+10). Le score suit ces cibles et les records restent comparés à réglages identiques. Pendant la séance, Alléger−1/Renforcer+1 adapte la résistance ; une modification en cours exclut le record comparable mais conserve ton résultat. L'effort visé sur10 est un repère : saisis ton véritable ressenti au bilan.
 
 Avec la voix activée, le coach annonce les cadences et paliers puis donne des rappels espacés de gestion de l'effort. Une baisse durable de cadence déclenche une proposition d'alléger ou de faire une pause ; aucune estimation de fatigue ou d'état de santé n'est déduite de cette mesure.
+
+### Séances express et meilleurs scores
+Dans Séances, active « Express · moins de10min » et choisis éventuellement une intensité. Huit formats de3 à9minutes proposent douceur, cadence, vagues ou efforts courts. Les séances dures comptent toujours dans le plafond d’intensité hebdomadaire. La carte indique le meilleur score coach d’une séance complète aux réglages actuels ; changer cadence ou résistance peut afficher un autre record ou « à établir ».
+
+### Commandes vocales facultatives
+Pendant le lecteur, ouvre « Commandes vocales », active l’écoute puis autorise le micro si le navigateur le demande. Dis une phrase entière : « Vélo allège », « Vélo renforce », « Vélo pause » ou « Vélo reprends ». Alléger/renforcer modifie d’un niveau la cible, comme les boutons ; sans pilotage automatique, le réglage physique reste manuel. Le chrono des Time Attack/Segment Attack ne se met pas en pause. Aucune commande vocale ne termine ni n’enregistre la séance.
+
+L’écoute cesse au bilan, à la fermeture et en arrière-plan. Elle n’est pas garantie dans Bluefy : une fonction indisponible ou une autorisation refusée est indiquée clairement. Le navigateur peut recourir à un service en ligne ; VéloQuest n’enregistre ni audio ni transcription. Garde les boutons comme solution de repli et coupe le micro via le bouton dédié.
+
+### Défis calories · 5 ou10 minutes
+Dans Séances, choisis « Défis calories ». Objectif : améliorer tes kcal sur une durée fixe. Cadence et résistance restent libres ; aucun profil automatique n’est imposé. Tu peux utiliser Alléger/Renforcer (ou la voix) pour choisir ton niveau si le pilotage du vélo est disponible. Prépare-toi avant de lancer : le chrono continue jusqu’au terme, même si tu ralentis. Terminer plus tôt garde une trace mais n’établit pas de record.
+
+Le compteur cumulé du vélo est soustrait à sa valeur de départ : les calories précédentes et celles après la fin ne comptent pas. Une mesure manquante au départ/à l’arrivée, un compteur remis à zéro ou une interruption de réception exclut le record mesuré. Le bilan permet une saisie déclarée avec un record distinct. Les records5 et10min sont séparés, et les mesures du vélo sont comparées avec le même nom d’appareil. Ce sont les estimations du vélo, pas une mesure exacte de dépense physiologique. Le bilan affiche un nouveau record lorsque tu dépasses ta précédente performance comparable.
