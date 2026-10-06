@@ -91,7 +91,7 @@ test("essential workout pauses, restores and finishes without losing its setting
   await noOverflow(page); await page.screenshot({ path: info.outputPath("essential-reader.png") });
   await page.clock.fastForward(30 * 60 * 1000);
   await expect(page.getByRole("heading", { name: "Enregistre ta performance" })).toBeVisible();
-  await page.getByRole("button", { name: /Valider/ }).click();
+  await page.getByLabel("J’ai vérifié le bilan et les champs facultatifs.").check(); await page.getByRole("button", { name: /Valider/ }).click();
   await expect.poll(async () => (await saved(page)).sessions.length).toBe(2);
   const data = await saved(page); expect(data.sessions[0]).toEqual(originalSession); expect(data.sessions[1].metrics.completedWorkout).toBe(true);
 });

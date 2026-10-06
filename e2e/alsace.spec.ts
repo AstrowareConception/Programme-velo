@@ -60,7 +60,7 @@ test("an Alsace escape pauses, reloads, finishes and loses its unique notebook b
   await page.getByRole("button", { name: "Reprendre", exact: true }).click();
   await expect(page.locator(".routePlaceNow strong")).toHaveText("Obernai");
   await page.getByRole("button", { name: "Reprendre", exact: true }).click(); await page.clock.fastForward(15 * 60_000);
-  await page.getByRole("button", { name: /Valider la quête/ }).click();
+  await page.getByLabel("J’ai vérifié le bilan et les champs facultatifs.").check(); await page.getByRole("button", { name: /Valider la quête/ }).click();
   await expect.poll(async () => (await stored(page)).sessions.length).toBe(3);
   expect((await stored(page)).sessions.at(-1).metrics.completedRoute).toBe(true);
   await page.reload(); await browse(page); await objectives(page);

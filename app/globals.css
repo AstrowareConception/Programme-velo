@@ -876,3 +876,49 @@ button:focus-visible, input:focus-visible, .fileButton:focus-within { outline: 2
 .pwaActions .btn, .pwaUpdate .btn { min-height: 44px; white-space: normal; }
 .pwaUpdate { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
 .pwaUpdateLock { position: fixed; inset: 0; z-index: 9999; display: grid; place-content: center; padding: 28px; background: rgba(7,10,19,.97); text-align: center; }
+
+/* During exercise, prioritize target, received level, progress and live data. */
+.effortProfile { margin: 12px 0; color: var(--cyan, #54dcf2); }
+.effortProfile figcaption { display: flex; justify-content: space-between; font-size: .78rem; }
+.effortProfile figcaption span, .effortProfile small { color: #a5aec2; font-size: .66rem; }
+.effortProfile svg { display: block; width: 100%; height: 68px; margin: 5px 0; background: #111c2b; border-radius: 8px; }
+.sessionModal .sessionEssentials { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 12px; }
+.sessionModal .sessionEssentials .resistance { width: auto; height: auto; min-height: 108px; margin: 0; padding: 12px 8px; border-radius: 16px; aspect-ratio: auto; }
+.sessionEssentials .resistance small { font-size: .63rem; letter-spacing: .06em; }
+.sessionEssentials .resistance strong { font-size: 2.5rem; line-height: 1.15; }
+.sessionEssentials .resistance span { font-size: .65rem; text-align: center; color: #adb7c9; }
+.sessionModal .sessionEssentials .timer { font-size: clamp(1.7rem, 7vw, 3rem); margin: 0; }
+.sessionEssentials .timer small { display: block; font-size: .6rem; color: #adb7c9; font-weight: 500; }
+.actualResistance { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 12px; padding: 8px 0; font-size: .78rem; }
+.actualResistance strong { color: #c5fa65; font-size: 1.25rem; }
+.actualResistance small { flex-basis: 100%; color: #a5aec2; font-size: .67rem; }
+.liveCadenceScore { font-size: .73rem; color: #c5fa65; margin: 5px 0; }
+.cadenceResult { margin: 12px 0; padding: 14px; border: 1px solid #3d5861; border-radius: 12px; }
+.cadenceResult strong { color: #bff96b; }
+.cadenceResult p, .cadenceResult summary { font-size: .76rem; line-height: 1.5; }
+.finishReview { display: flex !important; align-items: center; gap: 10px; }
+.finishReview input { width: 22px; height: 22px; flex-shrink: 0; }
+@media (max-width: 600px) {
+  .sessionModal .readerViewChoice { margin: 8px 0; }
+  .sessionModal .readerViewChoice button { min-height: 36px; padding: 8px; }
+  .sessionModal .sessionScreenStatus { font-size: .65rem; margin-bottom: 6px; }
+  .sessionModal > h2 { font-size: 1.4rem; margin-bottom: 10px; }
+  .sessionModal .sessionOverall { margin: 8px 0; }
+  .sessionModal .liveStrip { margin: 10px 0; padding: 12px 8px; }
+  .sessionModal .readerControls .modalActions.three { grid-template-columns: 1fr 1fr 1fr; }
+  .sessionModal .readerControls button { padding: 10px 5px; font-size: .72rem; }
+  .sessionModal .readerControls { position: static; padding-top: 6px; }
+  .sessionModal .nextSegment { margin: 8px 0; font-size: .72rem; }
+  .sessionModal .segmentProgress { margin: 8px 0; }
+}
+.coachComparison { position: relative; overflow: hidden; margin: 12px 0; padding: 16px; border: 1px solid #3d5861; border-radius: 16px; background: #142337; }
+.coachComparison > strong { display: block; margin-bottom: 12px; color: #69e5e9; }
+.coachComparison > div { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: .75rem; }
+.coachComparison b { display: block; font-size: 1.2rem; margin: 6px 0; }
+.coachComparison p, .coachComparison small { font-size: .72rem; color: #b4c1d4; }
+.coachRecord { border-color: #c1f861; background: linear-gradient(125deg, #183838, #283421); animation: recordGlow 1.2s ease-out 2; }
+.coachRecord > strong { color: #d8ff8a; }
+.recordSparkles { display: block; color: #eece60; word-spacing: 22px; text-align: center; font-size: 1.5rem; animation: recordSpark 1s ease-out 2; }
+@keyframes recordGlow { 50% { box-shadow: 0 0 20px #baff5944; } }
+@keyframes recordSpark { from { transform: translateY(10px); opacity: .2; } to { transform: translateY(0); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .coachRecord, .recordSparkles { animation: none; } }

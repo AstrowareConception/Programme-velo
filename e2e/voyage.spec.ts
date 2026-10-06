@@ -32,7 +32,7 @@ async function begin(page: Page, continuation = false) {
 async function finish(page: Page, minutes: number) {
   await page.clock.fastForward(Math.ceil(minutes * 60 + 1) * 1000);
   await expect(reader(page).getByText(/Portion achevée/)).toBeVisible();
-  await reader(page).getByRole("button", { name: "Enregistrer ma portion" }).click();
+  await page.getByLabel("J’ai vérifié le bilan et les champs facultatifs.").check(); await reader(page).getByRole("button", { name: "Enregistrer ma portion" }).click();
 }
 async function noOverflow(page: Page) { expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true); }
 
@@ -85,7 +85,7 @@ test("early finish or an edited measured distance cannot validate a Voyage porti
   await expect(reader(page).getByRole("button", { name: "Reprendre", exact: true })).toBeVisible();
   await reader(page).getByRole("button", { name: "Terminer et enregistrer" }).click();
   await reader(page).getByLabel("Distance (km)", { exact: true }).fill("999");
-  await reader(page).getByRole("button", { name: "Enregistrer ma portion" }).click();
+  await page.getByLabel("J’ai vérifié le bilan et les champs facultatifs.").check(); await reader(page).getByRole("button", { name: "Enregistrer ma portion" }).click();
   await page.getByRole("button", { name: /⌂ Quête/ }).click();
   await expect(panel(page)).toContainText("0.00 → 3.75 km");
   const session = (await stored(page)).sessions[1];

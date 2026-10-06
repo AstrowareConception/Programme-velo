@@ -23,6 +23,9 @@ export type ActiveSessionSnapshot = {
   climbStartDistanceM?: number | null;
   telemetrySamples: TelemetrySample[];
   hadBikeConnection: boolean;
+  cadenceSettingsKey?: string;
+  cadenceSettingsChanged?: boolean;
+  cadenceScore?: import("./effort").CadenceScore;
 };
 
 export function advanceWorkoutPosition(

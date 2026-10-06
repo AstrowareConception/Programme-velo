@@ -64,6 +64,9 @@ export type ChallengeResult = {
 };
 
 export type SessionMetrics = {
+  cadenceSettingsKey?: string;
+  cadenceRecordEligible?: boolean;
+  cadenceScore?: import("./effort").CadenceScore;
   source: "manual" | "ftms" | "mixed";
   voyage?: VoyagePortion;
   completedWorkout?: boolean;

@@ -171,3 +171,16 @@ Térence confirme la réception du vélo le 6 octobre. Le lot Alsace/photos est 
 Le diagnostic des services standards ne commande rien et exporte son JSON local explicitement. La procédure courte apparaît dans Plus. La connexion FTMS lit les capacités réellement annoncées ; pas de repli 1–32. Le laboratoire prépare le minimum et un pas voisin sans écriture implicite, affiche vitesse/distance et heure du dernier paquet, évite les commandes concurrentes et expose les refus dans Plus. Les délais de connexion sont bornés et les connexions tardives refermées. Une mise à jour PWA attend la fin du diagnostic ou la déconnexion Bluetooth.
 
 Aucun exemplaire physique n’a encore été qualifié par cette préparation. [Recette](HARDWARE-COMPATIBILITY.md) et [fiche de résultat vierge](HARDWARE-TEST-RESULTS.md) font autorité pour les essais à réaliser par Térence. L’auto-résistance exige une plage annoncée 1–32/pas 1 et une vérification physique explicite à chaque connexion ; deux niveaux essayés ne vérifient pas toute la plage. Les résultats des quatre commandes et la version effectivement publiée seront consignés dans la PR 29 au SHA final.
+
+## 6 octobre 2026 — première séance physique et lecteur avec score coach
+
+Base du lot : main dd248938bd44f7743cd0cdfe65d48d0c66733c93 (PR 39, après PR 38).
+Térence confirme sur Toputure TBE5 avec Bluefy : télémétrie, BPM, résistance commandée à la volée (environ deux secondes), première séance enregistrée. Windows/Sport02 ne deviennent pas qualifiés par ce résultat. La précision physiologique des poignées n'est pas établie.
+
+Évolution demandée : lecteur mobile compact, profil de résistance (explicitement distinct de l'altitude), cible instantanée et niveau reçu ; une montée/descente dans chaque plage avec paliers d'au moins cinq secondes. Bilan protégé de l'envoi implicite par le clavier et case de relecture explicite. BPM non plafonnés à 95 : tests de décodage 8/16 bits et sauvegarde simulée à 148 ; moyenne/max historiques issus des échantillons espacés de dix secondes.
+
+Score coach v1 : intégration temporelle à la seconde, mesures de cadence fraîches de cinq secondes maximum, pauses exclues, cadence libre toujours réussie si une mesure existe (zéro inclus). Hors-cible ou données absentes cassent le combo ; pause le fige. 10 points/seconde, multiplicateurs ×2/×3/×4 après 10/20/30 secondes. Note selon pourcentage de temps mesuré dans la cible, S=100, A+=95, A=90, A−=85, B+=80, B=75, B−=70, C=60, D=40, E en dessous. Couverture affichée ; score provisoire sous 60 s ou 80 % de couverture. Données et agrégats par segment conservés même sans trace détaillée.
+
+Comparaison à réglages identiques (identifiant, mode, segments/durées/cadences/résistances, décalage, version). Record réservé à une épreuve complète et suffisamment mesurée, sans changement de réglages. Historique existant préservé, aucune note rétrospective inventée. Bilan et historique affichent le meilleur précédent et une célébration respectant reduced-motion. Aucun XP supplémentaire ni nouveau déblocage attribué par le score dans cette version.
+
+Le SHA final, la PR, les contrôles CI et la publication sont consignés dans la PR de ce lot ; ces fonctionnalités nouvelles restent à essayer physiquement après validation automatisée.

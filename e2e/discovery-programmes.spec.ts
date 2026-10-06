@@ -73,7 +73,7 @@ test("an actual short coastal ride restores after pause and validates only its o
   await page.getByRole("button", { name: "Reprendre", exact: true }).click();
   await expect(page.locator(".routePlaceNow strong")).toHaveText("Antibes");
   await page.getByRole("button", { name: "Reprendre", exact: true }).click(); await page.clock.fastForward(17 * 60_000);
-  await page.getByRole("button", { name: /Valider la quête/ }).click();
+  await page.getByLabel("J’ai vérifié le bilan et les champs facultatifs.").check(); await page.getByRole("button", { name: /Valider la quête/ }).click();
   await expect.poll(async () => (await stored(page)).sessions.length).toBe(1);
   expect((await stored(page)).sessions[0].metrics.completedRoute).toBe(true);
   expect((await stored(page)).sessions[0].routeId).toBe("antibes-golfe-juan-short");
@@ -91,7 +91,7 @@ test("a discovery programme completes with a real workout, earns its trophy and 
   await expect(program.locator(".programSteps button.done")).toHaveCount(3);
   await program.getByRole("button", { name: /Souffle tranquille/ }).click();
   await page.getByRole("button", { name: "Démarrer la séance" }).click(); await page.clock.fastForward(19 * 60_000);
-  await page.getByLabel("RPE ressenti /10").fill("3"); await page.getByRole("button", { name: /Valider la quête/ }).click();
+  await page.getByLabel("RPE ressenti /10").fill("3"); await page.getByLabel("J’ai vérifié le bilan et les champs facultatifs.").check(); await page.getByRole("button", { name: /Valider la quête/ }).click();
   await expect.poll(async () => (await stored(page)).sessions.length).toBe(5);
   await page.getByRole("button", { name: /Séances/ }).click(); await programs(page);
   await expect(program).toContainText("Programme terminé");

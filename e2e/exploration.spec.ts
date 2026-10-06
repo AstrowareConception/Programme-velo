@@ -77,7 +77,7 @@ test("Menton ride finishes at Garavan, earns one passport and survives history d
   await page.clock.fastForward(4 * 60 * 1000);
   await expect(page.getByLabel("RPE ressenti /10")).toBeVisible();
   await page.getByLabel("RPE ressenti /10").fill("3");
-  await page.getByRole("button", { name: /Valider la quête/ }).click();
+  await page.getByLabel("J’ai vérifié le bilan et les champs facultatifs.").check(); await page.getByRole("button", { name: /Valider la quête/ }).click();
   await expect.poll(async () => (await stored(page)).sessions.length).toBe(3);
   expect((await stored(page)).sessions.at(-1).metrics.completedRoute).toBe(true);
   await browse(page); await objectives(page);
