@@ -922,3 +922,10 @@ button:focus-visible, input:focus-visible, .fileButton:focus-within { outline: 2
 @keyframes recordGlow { 50% { box-shadow: 0 0 20px #baff5944; } }
 @keyframes recordSpark { from { transform: translateY(10px); opacity: .2; } to { transform: translateY(0); opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .coachRecord, .recordSparkles { animation: none; } }
+/* Keep the timer above route details in the essential landscape reader. */
+.essentialSession { display: flex; flex-direction: column; }
+.essentialSession > * { order: 3; }
+.essentialSession .readerViewChoice { order: 0; }
+.essentialSession .sessionScreenStatus { order: 1; }
+.essentialSession > h2, .essentialSession .sessionEssentials { order: 2; }
+.essentialSession .readerControls { order: 9; }

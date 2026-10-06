@@ -617,10 +617,12 @@ export function VeloQuestApp() {
   const currentSettingsKey = active ? effortSettingsKey(active.id, active.segments, preferences.resistanceOffset + sessionResistanceDelta, routeMode) : undefined;
   const comparisonKey = cadenceSettingsKey ?? currentSettingsKey;
   const previousCadenceBest = bestCadenceAttempt(state.sessions, comparisonKey);
+  const distanceScoredRace = Boolean(activeClimb && bike && climbStartDistanceM !== null && (routeMode === "timeAttack" || routeMode === "segmentAttack"));
+  const cadenceExerciseComplete = distanceScoredRace ? raceCurrentKm >= raceDistanceKm * .98 : sessionProgressPercent >= 98;
   const cadenceRecordEligible = Boolean(active && !cadenceSettingsChanged && comparisonKey === currentSettingsKey && !cadenceLive.provisional && active.segments.every((segment, index) => {
     const scored = numericRange(segment.cadence) || segment.cadence === "libre";
-    return !scored || (cadenceScore.segments[index]?.eligibleSeconds ?? 0) >= segment.minutes * 60 * .98;
-  }) && sessionProgressPercent >= 98);
+    return !scored || (cadenceScore.segments[index]?.eligibleSeconds ?? 0) >= (distanceScoredRace ? 1 : segment.minutes * 60 * .98);
+  }) && cadenceExerciseComplete);
   useEffect(() => {
     if (sessionStarted && cadenceSettingsKey && currentSettingsKey !== cadenceSettingsKey) setCadenceSettingsChanged(true);
   }, [sessionStarted, cadenceSettingsKey, currentSettingsKey]);
@@ -1023,6 +1025,7 @@ export function VeloQuestApp() {
 
   function goToSegment(index: number) {
     if (!active || routeMode === "voyage") return;
+    if (sessionStarted) setCadenceSettingsChanged(true);
     const next = Math.max(0, Math.min(active.segments.length - 1, index));
     setSegmentIndex(next);
     const seconds = Math.round(active.segments[next].minutes * 60);
@@ -1132,7 +1135,7 @@ export function VeloQuestApp() {
   function exportCsv() {
     const quote = (value: unknown) => `"${String(value ?? "").replaceAll('"', '""')}"`;
     const sessions = [
-      ["date","seance","duree_min","distance_km","calories","vitesse_moy","rpm_moy","watts_moy","fc_moy","rpe","source","voyage_debut_km","voyage_fin_km","voyage_portion_achevee","voyage_position"],
+      ["date","seance","duree_min","distance_km","calories","vitesse_moy","rpm_moy","watts_moy","fc_moy","rpe","source","voyage_debut_km","voyage_fin_km","voyage_portion_achevee","voyage_position","score_coach_pct","note_coach","couverture_pct","points_combo","meilleur_combo_s"],
       ...state.sessions.map((session) => {
         const template = workouts.find((w) => w.id === session.templateId);
         const route = allClimbs.find((c) => c.id === session.routeId);
@@ -1151,7 +1154,12 @@ export function VeloQuestApp() {
           session.metrics?.voyage?.startKm,
           session.metrics?.voyage?.endKm,
           session.metrics?.voyage?.completedPortion,
-          session.metrics?.voyage?.positionSource
+          session.metrics?.voyage?.positionSource,
+          cadenceSummary(session.metrics?.cadenceScore).percent?.toFixed(1),
+          session.metrics?.cadenceScore ? cadenceSummary(session.metrics.cadenceScore).grade : undefined,
+          session.metrics?.cadenceScore ? cadenceSummary(session.metrics.cadenceScore).coverage.toFixed(1) : undefined,
+          session.metrics?.cadenceScore?.points,
+          session.metrics?.cadenceScore?.bestComboSeconds
         ];
       })
     ].map((row) => row.map(quote).join(";")).join("\n");
