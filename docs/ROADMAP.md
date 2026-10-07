@@ -31,17 +31,17 @@ Cette roadmap remplace les listes historiques devenues obsolètes. Le produit di
 
 ### P0.2 — Architecture multi-vélos
 
-**État : conception démarrée.**
+**État : phase A en cours — registre d’adaptateurs créé et qualification de marque sortie de l’interface.**
 
 VéloQuest doit pouvoir accueillir plusieurs marques et modèles **lorsque leurs protocoles sont accessibles**. La voie principale est Bluetooth FTMS ; les protocoles propriétaires éventuels sont des adaptateurs optionnels et ne doivent jamais être devinés.
 
 Le socle visé :
 
-- un contrat `BikeAdapter` indépendant de l'interface ;
+- un contrat `BikeAdapter` indépendant de l'interface — **premier registre FTMS préparé** ;
 - découverte, connexion, télémétrie et contrôle séparés ;
 - description normalisée des capacités : vitesse, cadence, distance, puissance, calories, fréquence cardiaque, résistance, contrôle ;
 - profil de mappage entre l'échelle VéloQuest 1–32 et l'échelle réelle du vélo ;
-- qualification enregistrée par **adaptateur + modèle/capacités**, pas par simple expression régulière sur le nom Bluetooth ;
+- qualification centralisée par **adaptateur + modèle/capacités** ; la logique de nom n'est plus dispersée dans `VeloQuestApp.tsx` et devra ensuite devenir persistante/révocable ;
 - FTMS générique comme premier adaptateur ;
 - possibilité ultérieure d'ajouter des adaptateurs documentés pour des appareils non conformes ou partiellement conformes ;
 - mode manuel toujours disponible.
