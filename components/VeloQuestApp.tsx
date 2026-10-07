@@ -36,6 +36,8 @@ import { MetricChart } from "@/components/MetricChart";
 import { InstallCard } from "@/components/InstallCard";
 import { PwaStatusCard, PwaUpdateBanner, usePwa } from "@/components/PwaProvider";
 import { SessionJourneySteps, SessionReviewSummary } from "@/components/SessionJourney";
+import { ReleaseAnnouncement, ReleaseNotesCard } from "@/components/ReleaseNotes";
+import { QuickGuideCard, ReaderHelp } from "@/components/ReaderHelp";
 import { SessionDashboard } from "@/components/SessionDashboard";
 import { ReaderViewChoice, SessionComfort } from "@/components/SessionComfort";
 import { screenWakeLabel, useScreenWakeLock } from "@/components/useScreenWakeLock";
@@ -1242,6 +1244,10 @@ export function VeloQuestApp() {
         <div className="heroRune"><span>{level}</span><small>NIVEAU</small><em>{currentLevelTitle}</em></div>
       </section>
 
+      <ReleaseAnnouncement visible={tab === "dashboard" && !active && !showSetup && !resumeSnapshot && state.guidance?.status !== "setup" && (!guidedView || discoveryCount >= 3)} onOpen={() => {
+        setTab("more"); window.setTimeout(() => document.getElementById("release-notes-title")?.focus(), 0);
+      }} />
+
       {tab === "dashboard" && (
         <>
           {resumeSnapshot && (
@@ -1642,15 +1648,8 @@ export function VeloQuestApp() {
           <InstallCard />
           <PwaStatusCard />
 
-          <section className="card quickGuide">
-            <div className="sectionHead"><div><p className="eyebrow">GUIDE RAPIDE</p><h2>Une routine simple</h2></div><span className="spark">4 étapes</span></div>
-            <div className="guideSteps">
-              <div><span>1</span><p><strong>Choisis selon ton temps.</strong><small>Le Coach Express adapte la séance au créneau et à ton énergie.</small></p></div>
-              <div><span>2</span><p><strong>Respecte surtout le RPE.</strong><small>Le niveau guidé 1–32 est un repère ; utilise la calibration globale s’il est trop facile ou trop dur.</small></p></div>
-              <div><span>3</span><p><strong>Enregistre la séance.</strong><small>Bluetooth si disponible, sinon recopie simplement les chiffres utiles du vélo.</small></p></div>
-              <div><span>4</span><p><strong>Suis les tendances.</strong><small>Poids, tour de taille, régularité et volume comptent davantage qu’une valeur isolée.</small></p></div>
-            </div>
-          </section>
+          <ReleaseNotesCard />
+          <QuickGuideCard />
 
           <WeeklyGoalsForm key={`${week}-${target.sessions}-${target.minutes}`} target={target} onSave={(sessions, minutes) => { setState(previous => changeWeeklyGoals(previous, week, sessions, minutes)); setToast("Objectifs enregistrés pour cette semaine et les suivantes."); }} />
 
@@ -1928,6 +1927,7 @@ export function VeloQuestApp() {
                       : "Sans distance Bluetooth, le profil avance sur le scénario temporel. Tu pourras saisir le chrono réel du vélo à l’arrivée."}</p>
                   </div>
                 )}
+                <ReaderHelp />
                 <ReaderViewChoice preferences={preferences} onChange={updatePreference} />
                 <SessionComfort preferences={preferences} onChange={updatePreference} />
                 <details className="segmentPlanDisclosure" open={!scenicSession}>

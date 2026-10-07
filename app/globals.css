@@ -1227,3 +1227,40 @@ button:focus-visible, input:focus-visible, .fileButton:focus-within { outline: 2
   .journeyFooter { flex-direction:column; align-items:stretch; }
   .sessionJourneySteps { gap:8px 12px; font-size:.65rem; }
 }
+
+/* Discovery: optional help and editorial updates, outside the active reader. */
+.releaseAnnouncement { display:flex; align-items:center; justify-content:space-between; gap:20px; border:1px solid #294950; border-radius:20px; padding:20px 24px; margin:0 0 24px; background:linear-gradient(110deg, #102b30, #111b2e); }
+.releaseAnnouncement h2 { font-size:1.1rem; margin:6px 0; }
+.releaseAnnouncement p:not(.eyebrow) { color:var(--muted); font-size:.85rem; line-height:1.6; margin:6px 0 0; }
+.releaseActions { display:flex; gap:10px; align-items:center; flex-shrink:0; flex-wrap:wrap; }
+.releaseActions button { min-height:44px; }
+.releaseNotes article { margin-top:20px; }
+.releaseNotes time { color:var(--cyan); font-size:.75rem; }
+.releaseNotes h3 { margin:8px 0; font-size:1.25rem; }
+.releaseChanges { list-style:none; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; padding:0; margin:20px 0; }
+.releaseChanges li { border:1px solid var(--line); border-radius:14px; padding:18px; background:rgba(255,255,255,.025); }
+.releaseChanges strong { font-size:.9rem; }
+.releaseChanges p { font-size:.85rem; margin:8px 0 0; }
+.previousRelease { border-top:1px solid var(--line); padding:16px 0; }
+.previousRelease summary, .readerHelp summary { cursor:pointer; font-weight:700; line-height:1.6; padding:8px 0; }
+.previousRelease summary span { color:var(--muted); font-weight:400; font-size:.8rem; }
+.readerHelp { margin:18px 0; border:1px solid var(--line); border-radius:14px; padding:4px 14px; background:rgba(255,255,255,.025); font-size:.8rem; }
+.readerHelp summary { color:var(--cyan); min-height:44px; display:list-item; align-content:center; }
+.readerHelp dl { margin:4px 0 14px; }
+.readerHelp dl > div + div { margin-top:14px; }
+.readerHelp dt { font-weight:700; line-height:1.6; }
+.readerHelp dd { margin:4px 0 0; color:var(--muted); line-height:1.7; }
+.releaseNotes h2:focus-visible, .readerHelp summary:focus-visible, .previousRelease summary:focus-visible { outline:2px solid var(--cyan); outline-offset:5px; border-radius:4px; }
+@media (max-width:700px) {
+  .releaseAnnouncement { align-items:stretch; flex-direction:column; padding:20px; gap:16px; }
+  .releaseChanges { grid-template-columns:1fr; }
+}
+
+.cyclingGlossary > p { line-height:1.65; }
+.cyclingGlossary h3 { font-size:.85rem; margin:20px 0 10px; color:var(--text); }
+.glossaryTerms { display:grid; gap:8px; }
+.glossaryTerms > details { border:1px solid var(--line); border-radius:10px; padding:0 12px; background:rgba(255,255,255,.02); }
+.glossaryTerms summary { color:var(--text); font-size:.8rem; }
+.glossaryTerms p { color:var(--muted); line-height:1.7; margin:8px 0 14px; }
+.glossaryExample { border-left:2px solid var(--cyan); padding-left:12px; }
+.glossaryExample strong { display:block; color:var(--cyan); font-size:.7rem; margin-bottom:3px; }
