@@ -78,3 +78,14 @@ Avant le départ, le profil de résistance complète la durée, l’intensité e
 Le bilan conserve tous les champs et la case de vérification obligatoire. Une rotation ne réinitialise pas les valeurs saisies. Le récapitulatif ne prétend pas que la séance est enregistrée : il faut confirmer, puis retrouver le résultat dans **Suivi**.
 
 Lorsqu’une mise à jour PWA est prête, une annonce apparaît sur les écrans principaux, en dehors du lecteur et de sa préparation/bilan. **Plus** conserve son panneau détaillé. La mise à jour demande une action explicite ; elle reste protégée pendant une séance, une saisie, une connexion vélo ou lorsqu’un autre onglet est occupé. Il n’est pas nécessaire d’effacer les données pour mettre l’application à jour.
+
+
+## Repères et nouveautés
+
+Avant le départ, « Les repères du lecteur » explique niveau de résistance, cadence, RPE et mesure indisponible. Cette aide repliée s’ouvre au clavier ou au toucher, sans démarrer la séance ni changer ses réglages. Elle reste accessible dans Plus → Guide rapide. Les consignes, valeurs reçues et distances simulées y sont distinguées.
+
+Plus → Quoi de neuf regroupe les jalons éditoriaux. L’annonce sur Quête est facultative, disparaît après « Voir les nouveautés » ou « Plus tard » et se synchronise entre onglets du même navigateur. Le marqueur local ne contient qu’un identifiant de version ; il ne fait pas partie de l’export sportif. Si son stockage échoue, la consultation fonctionne mais l’annonce pourra revenir au rechargement. Les notes restent consultables dans Plus.
+
+L’annonce ne s’affiche pas pendant une séance, la configuration ou une reprise en attente, ni avant les trois premières séances complètes du démarrage accompagné. Il n’y a pas de pop-up automatique. Le contenu correspond à la version actuellement ouverte, pas à une version distante en attente d’installation.
+
+Maintenance : ajouter un jalon en tête de `lib/releases.ts` avec un nouvel identifiant stable, une date et des changements réellement livrés. Un simple rebuild ne doit pas changer cet identifiant. Garder les précédents jalons pour la consultation dans Plus ; ne pas annoncer les éléments futurs de la roadmap comme disponibles.
