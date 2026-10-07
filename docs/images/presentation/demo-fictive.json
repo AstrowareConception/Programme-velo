@@ -1,0 +1,212 @@
+{
+  "format": "veloquest-backup-v3",
+  "exportedAt": "2026-10-07T05:00:00.000Z",
+  "state": {
+    "profile": {
+      "name": "Camille · démo fictive",
+      "startDate": "2026-09-21",
+      "startWeight": 86,
+      "startWaist": 98
+    },
+    "sessions": [
+      {
+        "id": "demo-0",
+        "templateId": "first-pedals-15",
+        "date": "2026-09-21T17:00:00.000Z",
+        "duration": 15,
+        "points": 1,
+        "xp": 25,
+        "intensity": "easy",
+        "kind": "recovery",
+        "bonus": false,
+        "rpe": 3,
+        "note": "EXEMPLE FICTIF pour la présentation, aucune performance réelle.",
+        "metrics": {
+          "source": "manual",
+          "completedWorkout": true,
+          "distanceKm": 4.2
+        }
+      },
+      {
+        "id": "demo-1",
+        "templateId": "breathing-18",
+        "date": "2026-09-23T17:00:00.000Z",
+        "duration": 18,
+        "points": 1,
+        "xp": 30,
+        "intensity": "easy",
+        "kind": "recovery",
+        "bonus": false,
+        "rpe": 3,
+        "note": "EXEMPLE FICTIF pour la présentation, aucune performance réelle.",
+        "metrics": {
+          "source": "manual",
+          "completedWorkout": true,
+          "distanceKm": 5.1
+        }
+      },
+      {
+        "id": "demo-2",
+        "templateId": "contemplative-25",
+        "date": "2026-09-25T17:00:00.000Z",
+        "duration": 25,
+        "points": 2,
+        "xp": 40,
+        "intensity": "easy",
+        "kind": "endurance",
+        "bonus": false,
+        "rpe": 4,
+        "note": "EXEMPLE FICTIF pour la présentation, aucune performance réelle.",
+        "metrics": {
+          "source": "manual",
+          "completedWorkout": true,
+          "distanceKm": 7
+        }
+      },
+      {
+        "id": "demo-3",
+        "templateId": "fluid-cadence-30",
+        "date": "2026-09-28T17:00:00.000Z",
+        "duration": 30,
+        "points": 2,
+        "xp": 45,
+        "intensity": "easy",
+        "kind": "endurance",
+        "bonus": false,
+        "rpe": 3,
+        "note": "EXEMPLE FICTIF pour la présentation, aucune performance réelle.",
+        "metrics": {
+          "source": "manual",
+          "completedWorkout": true,
+          "distanceKm": 8.5
+        }
+      },
+      {
+        "id": "demo-4",
+        "templateId": "return-20",
+        "date": "2026-09-30T17:00:00.000Z",
+        "duration": 20,
+        "points": 1,
+        "xp": 40,
+        "intensity": "easy",
+        "kind": "recovery",
+        "bonus": false,
+        "rpe": 3,
+        "note": "EXEMPLE FICTIF pour la présentation, aucune performance réelle.",
+        "metrics": {
+          "source": "manual",
+          "completedWorkout": true,
+          "distanceKm": 5.8
+        }
+      },
+      {
+        "id": "demo-5",
+        "templateId": "steady-15",
+        "date": "2026-10-02T17:00:00.000Z",
+        "duration": 15,
+        "points": 1,
+        "xp": 30,
+        "intensity": "easy",
+        "kind": "endurance",
+        "bonus": false,
+        "rpe": 4,
+        "note": "EXEMPLE FICTIF pour la présentation, aucune performance réelle.",
+        "metrics": {
+          "source": "manual",
+          "completedWorkout": true,
+          "distanceKm": 4.5
+        }
+      },
+      {
+        "id": "demo-6",
+        "templateId": "contemplative-25",
+        "date": "2026-10-05T17:00:00.000Z",
+        "duration": 25,
+        "points": 2,
+        "xp": 40,
+        "intensity": "easy",
+        "kind": "endurance",
+        "bonus": false,
+        "rpe": 3,
+        "note": "EXEMPLE FICTIF pour la présentation, aucune performance réelle.",
+        "metrics": {
+          "source": "manual",
+          "completedWorkout": true,
+          "distanceKm": 7.2
+        }
+      },
+      {
+        "id": "demo-7",
+        "templateId": "manage-20",
+        "date": "2026-10-06T17:00:00.000Z",
+        "duration": 20,
+        "points": 1,
+        "xp": 40,
+        "intensity": "easy",
+        "kind": "endurance",
+        "bonus": false,
+        "rpe": 3,
+        "note": "EXEMPLE FICTIF pour la présentation, aucune performance réelle.",
+        "metrics": {
+          "source": "manual",
+          "completedWorkout": true,
+          "distanceKm": 6
+        }
+      }
+    ],
+    "measurements": [
+      {
+        "id": "demo-m0",
+        "date": "2026-09-21T12:00:00.000Z",
+        "weight": 86,
+        "waist": 98,
+        "abdomen": 102
+      },
+      {
+        "id": "demo-m1",
+        "date": "2026-09-25T12:00:00.000Z",
+        "weight": 86.2,
+        "waist": 98,
+        "abdomen": 102
+      },
+      {
+        "id": "demo-m2",
+        "date": "2026-09-28T12:00:00.000Z",
+        "weight": 85.9,
+        "waist": 97.9,
+        "abdomen": 101.9
+      },
+      {
+        "id": "demo-m3",
+        "date": "2026-10-02T12:00:00.000Z",
+        "weight": 86,
+        "waist": 97.9,
+        "abdomen": 101.9
+      },
+      {
+        "id": "demo-m4",
+        "date": "2026-10-05T12:00:00.000Z",
+        "weight": 85.8,
+        "waist": 97.8,
+        "abdomen": 101.8
+      },
+      {
+        "id": "demo-m5",
+        "date": "2026-10-06T12:00:00.000Z",
+        "weight": 85.9,
+        "waist": 97.8,
+        "abdomen": 101.8
+      }
+    ],
+    "preferences": {
+      "soundCues": false,
+      "voiceCues": false,
+      "haptics": false,
+      "keepScreenAwake": true,
+      "keepTelemetryTrace": true,
+      "resistanceOffset": 0
+    },
+    "favoriteRouteIds": []
+  },
+  "customClimbs": []
+}

@@ -6,6 +6,18 @@ Application : [programme-velo.vercel.app](https://programme-velo.vercel.app/) ·
 
 VéloQuest est une PWA personnelle Next.js / React / TypeScript. Elle associe un programme souple de douze semaines, des séances guidées, des parcours variés et un suivi local. Les consignes utilisent une échelle **1–32**. Le Toputure TBE5 a été testé physiquement par l’utilisateur le 6 octobre 2026 avec Bluefy sur iPhone : télémétrie, résistance effective et transfert JSON confirmés. Cette qualification ne s’étend pas automatiquement aux autres appareils ou navigateurs. Le mode manuel permet de suivre les consignes et de saisir les valeurs du vélo sans connexion Bluetooth.
 
+## Découvrir VéloQuest en images
+
+**Donne une destination à chaque coup de pédale.** Construis ta semaine, explore la France depuis ton vélo, reprends tes voyages et transforme ta régularité en progression.
+
+**[Lire la présentation complète et illustrée →](docs/PRESENTATION.md)**
+
+44 séances · 84 parcours, dont 38 balades faciles · 12 thèmes de découverte · 12 semaines de programme · 6 programmes découverte · 22 campagnes et carnets · 77 badges.
+
+[![VéloQuest : une semaine adaptée à ton rythme](docs/images/presentation/02-semaine-adaptee.jpg)](docs/PRESENTATION.md)
+
+[Explorer les séances et les parcours](docs/PRESENTATION.md#parcours) · [Découvrir le mode Voyage](docs/PRESENTATION.md#voyage) · [Tous les contenus et récompenses](docs/CATALOGUE.md) · [Ouvrir l’application](https://programme-velo.vercel.app/)
+
 ## Mise à jour programme personnel — PR 46
 
 Quête accueille **Ma semaine adaptée** : disponibilités, créneaux, semaines allégées, remplacement et déplacement de séances, objectifs cohérents avec le planning confirmé. Suivi regroupe le bilan hebdomadaire, les tendances de poids et les habitudes facultatives. Les points du jeu ne poussent plus le coach vers une charge supérieure.
@@ -47,7 +59,7 @@ Le guide et ses réglages sont sauvegardés avec les données locales et le JSON
 
 ## Campagnes et historique
 
-Le **mode Voyage** permet de terminer un parcours natif ou un GPX en portions de 15/30/45/60 minutes, puis de le retrouver dans Quête. Carte, profil et lieux conservent les kilomètres du parcours entier. Cette première version utilise une position **simulée à 15 km/h** ; la distance mesurée sur le vélo reste distincte. Seules les portions achevées et enregistrées comptent. Les chevauchements ne multiplient pas la progression ; les XP du parcours sont attribués une seule fois en Voyage à sa fin, sans second bonus s’il existe déjà une séance classique complète à cette date. Suppression et restauration recalculent couverture, campagnes et trophées. Trois trophées Voyage complètent les récompenses ; le catalogue actuel compte **74 badges**, avec les carnets et trophées alsaciens. Voir [le guide Voyage](docs/VOYAGE.md).
+Le **mode Voyage** permet de terminer un parcours natif ou un GPX en portions de 15/30/45/60 minutes, puis de le retrouver dans Quête. Carte, profil et lieux conservent les kilomètres du parcours entier. Cette première version utilise une position **simulée à 15 km/h** ; la distance mesurée sur le vélo reste distincte. Seules les portions achevées et enregistrées comptent. Les chevauchements ne multiplient pas la progression ; les XP du parcours sont attribués une seule fois en Voyage à sa fin, sans second bonus s’il existe déjà une séance classique complète à cette date. Suppression et restauration recalculent couverture, campagnes et trophées. Trois trophées Voyage complètent les récompenses ; le catalogue actuel compte **77 badges**, avec les carnets et trophées alsaciens. Voir [le guide Voyage](docs/VOYAGE.md).
 
 Les coches reflètent les parcours réellement terminés, même réalisés dans le désordre. « Continuer » propose la première étape encore manquante. Une séance complète peut compter pour plusieurs campagnes qui contiennent le même parcours.
 
@@ -57,7 +69,7 @@ La suppression recalcule les semaines, niveaux, campagnes, badges, collections, 
 
 ## Balades et programmes de découverte
 
-Le filtre **Balades** et le raccourci **Explorer les 35 balades** ouvrent trente-cinq parcours à 1/5 : tour du lac du Der, rive ouest d’Annecy, petit tour de Chambord, chemins en campagne de l’île de Ré, Coulon–Damvix, Carcassonne–Marseillette et Tours–Villandry, ainsi que Cagnes-sur-Mer–Cannes et son format court Golfe-Juan–Cannes. S’y ajoutent Menton–Garavan, le Calavon de Cavaillon à Apt, les canaux de Camargue gardoise, la baie de Somme et Erstein–Strasbourg. Les paysages et leurs points d’intérêt sont décrits sur les fiches et dans le lecteur.
+Le filtre **Balades** et le raccourci **Explorer les 38 balades** ouvrent trente-huit parcours à 1/5 : tour du lac du Der, rive ouest d’Annecy, petit tour de Chambord, chemins en campagne de l’île de Ré, Coulon–Damvix, Carcassonne–Marseillette et Tours–Villandry, ainsi que Cagnes-sur-Mer–Cannes et son format court Golfe-Juan–Cannes. S’y ajoutent Menton–Garavan, le Calavon de Cavaillon à Apt, les canaux de Camargue gardoise, la baie de Somme et Erstein–Strasbourg. Les paysages et leurs points d’intérêt sont décrits sur les fiches et dans le lecteur.
 
 Les nouveaux profils à 2–5/5 complètent les cinq étapes historiques : Les Baux, Sainte-Croix et le plateau de Valensole, Castellane et ses deux lacs, Route des Crêtes du Verdon, Èze-sur-Mer–Menton, Nice–Menton par la Grande Corniche, Turini et Bonette, Roscoff–Morlaix et Blois–Chaumont. **Thème** combine paysages et difficultés ; **Campagnes et carnets** se déplie pour choisir un objectif de découverte ou sportif. Les lieux et leurs repères restent visibles avant le départ et pendant la séance.
 
@@ -139,6 +151,9 @@ Le projet Vercel **programme-velo** est relié au dépôt : les branches créent
 La version est visible dans **Plus** et dans [l'endpoint de version](https://programme-velo.vercel.app/api/version), sans cache. Comparer ce SHA avec `main` et les métadonnées du déploiement Vercel ; une CI verte seule ne prouve pas la publication. Recharger l'application en ligne après une mise à jour, puis vérifier la conservation de l'historique.
 
 ## Guides
+
+- [Présentation commerciale illustrée — toutes les fonctionnalités](docs/PRESENTATION.md)
+- [Catalogue complet — séances, parcours, campagnes et badges](docs/CATALOGUE.md)
 
 - [Guide utilisateur](docs/USER-GUIDE.md)
 - [Compatibilité matérielle : diagnostic BLE privé et recette TOPUTURE](docs/HARDWARE-COMPATIBILITY.md)

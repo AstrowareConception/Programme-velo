@@ -1,5 +1,14 @@
 # État de reprise VéloQuest — actualisé le 5 octobre 2026
 
+## 7 octobre 2026 — présentation commerciale illustrée
+
+Lot documentaire préparé depuis main `1147628`, également observé dans Plus sur l’application publique. `docs/PRESENTATION.md` présente toutes les familles de fonctionnalités avec 24 captures authentiques ; `docs/CATALOGUE.md` répertorie 44 séances, 84 parcours (38 balades, 38 étapes, 8 cols), 22 campagnes, six programmes et 77 badges. Le README donne un accès direct, une image d’aperçu et les chiffres actualisés.
+
+Les JPEG sont versionnés dans `docs/images/presentation/`, avec provenance, crédits et profil de démonstration entièrement fictif. Aucune donnée personnelle de l’utilisateur n’est publiée. Les limites de simulation, de connexion matérielle, de reconnaissance vocale, de hors connexion et de transfert sont explicites. Aucun changement du code applicatif ou du stockage.
+
+Validation documentaire : inventaire exécuté depuis les modules TypeScript, parcours de l’interface publiée, inspection visuelle des 24 captures, intégrité JPEG, contrôle des liens et ancres locaux, `git diff --check`. La CI du commit proposé est suivie dans la PR de ce lot avant intégration.
+
+
 ## 6 octobre 2026 — résistance et fréquence cardiaque après connexion Bluefy
 
 La PR 38 a été fusionnée et publiée dans main `39af4b93c5b69c5692e52be2a2969eebce40ffef`, vérifié via /api/version. L’utilisateur confirme maintenant la connexion Toputure TBE5 et la télémétrie dans VéloQuest/Bluefy. Capture : 69 rpm, 17,8 km/h, puissance diffusée 13 W, niveau affiché 0,6 alors que le vélo est au niveau 6, BPM 0. La console physique affiche pourtant 93, 95, 88 BPM lorsque les poignées sont tenues. Cela ne prouve pas encore que le service 180D émet ces valeurs, ni la commande physique depuis VéloQuest.
