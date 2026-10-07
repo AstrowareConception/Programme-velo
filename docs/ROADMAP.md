@@ -1,12 +1,12 @@
 # Roadmap VéloQuest
 
-Actualisée le **7 octobre 2026** à partir de `main` `36633cd504969acefb9547673afba6960c5ec64c`. Orientation vers une distribution grand public validée par l’utilisateur. Les jalons ci-dessous pilotent désormais l’exécution ; le backlog détaillé reste conservé.
+Actualisée le **7 octobre 2026** à partir de `main` `e65bf33dc016212078516760e1f18a91df6d8ca9`. Orientation vers une distribution grand public validée par l’utilisateur. Les jalons ci-dessous pilotent désormais l’exécution ; le backlog détaillé reste conservé.
 
 Cette roadmap remplace les listes historiques devenues obsolètes. Le produit dispose déjà d'un socle très riche : 44 séances, 84 parcours natifs, 38 balades faciles, 12 thèmes, 6 programmes, 22 campagnes/carnets et 77 badges. L'objectif n'est plus d'empiler les fonctionnalités, mais de consolider le produit, fiabiliser son usage réel, prolonger le programme au-delà de douze semaines et rendre le matériel connecté extensible à plusieurs vélos.
 
 ## Cap produit — de l’usage personnel à la distribution
 
-### Jalon A — Première séance impeccable · lot actif
+### Jalon A — Première séance impeccable · socle livré, essais utilisateurs restants
 
 Objectif : un nouveau venu comprend la préparation, démarre, retrouve les commandes et enregistre sa première séance sans assistance.
 
@@ -14,17 +14,19 @@ Objectif : un nouveau venu comprend la préparation, démarre, retrouve les comm
 - ✅ PR 57 publiée : mise à jour visible depuis les écrans principaux, avec les protections existantes pendant séance, saisie, connexion vélo et entre onglets.
 - ✅ PR 57 publiée : préparation en deux colonnes sur tablette paysage : programme et profil d’effort, réglages avant départ, bouton de lancement toujours accessible.
 - ✅ PR 57 publiée : bilan cohérent : récapitulatif, mesures à vérifier, confirmation explicite avant sauvegarde ; champs conservés lors des rotations.
-- ⏳ Lot découverte : actualités éditoriales dans Plus, annonce discrète mémorisée par version importante, repères du lecteur avant le départ et lexique débutant (D+, BPM, RPM, watts, RPE, etc.) avec exemples.
+- ✅ PR 58 publiée : actualités éditoriales dans Plus, annonce discrète mémorisée par version importante, repères du lecteur avant le départ et lexique débutant (D+, BPM, RPM, watts, RPE, etc.) avec exemples.
 - À suivre : évaluation du parcours de démarrage existant auprès de nouveaux utilisateurs.
 - À suivre : adaptation progressive aux petits formats paysage, choix des mesures principales et accessibilité avec texte agrandi.
 
 La PR 57 est publiée sur `36633cd` : 224 tests unitaires, 278 scénarios navigateur réussis et CI de main/vérification production vertes. Départ et confirmation visibles à 1024×768 et 960×600, saisies conservées après rotation, enregistrement/rechargement et protections PWA vérifiés.
 
-Le lot actif poursuit la découverte : aucune ouverture automatique de modale, annonce masquée pendant une séance ou une reprise en attente, priorité au démarrage accompagné jusqu’aux trois premières séances complètes. Les notes restent consultables dans Plus. Critères : mémorisation après rechargement et entre onglets, historique préservé, aide utilisable au clavier, réglages conservés après rotation et bouton de départ accessible en paysage. Le ressenti des nouveaux utilisateurs reste à recueillir.
+La PR 58 est publiée sur `e65bf33` : 224 unités, 288 scénarios navigateur sans échec ni retry ; CI main et vérification production réussies. Nouveautés et lexique sont consultables dans Plus, aide et lexique avant le départ. Les essais de découverte avec de nouveaux utilisateurs restent à réaliser.
 
-### Jalon B — Bêta privée fiable
 
-- Terminer le découpage technique commencé (PR 55 de finalisation de séance encore ouverte, distincte de ce lot).
+### Jalon B — Bêta privée fiable · lot actif
+
+- ⏳ PR 55 remise à jour sur `e65bf33` : finalisation métier isolée et écriture locale confirmée avant fermeture du bilan/suppression de la reprise. En cas de refus, conserver le formulaire ouvert et permettre une nouvelle tentative.
+- ✅ Protocole de [recette bêta](BETA-TEST.md) préparé ; essais physiques et retours utilisateurs à recueillir.
 - Qualifier plusieurs combinaisons vélo/appareil/navigateur et afficher les capacités réellement disponibles.
 - Éprouver interruption, reprise, reconnexion, enregistrement, export et restauration avec des utilisateurs extérieurs.
 - Rendre explicites mesures reçues, données manquantes et simulations ; préparer un diagnostic prévisualisable sans données personnelles par défaut.
@@ -99,7 +101,7 @@ Voir [Architecture des vélos connectés](CONNECTED-BIKES-ARCHITECTURE.md).
 
 ### P0.3 — Dette de `VeloQuestApp.tsx`
 
-**État : engagé — vélo connecté, reprise et persistance locale extraits (PR 54 fusionnée). La PR 55 de finalisation des séances reste ouverte. Les écrans restent à découpler.**
+**État : engagé — vélo connecté, reprise et persistance locale extraits (PR 54 fusionnée). La PR 55 de finalisation des séances est le lot actif, actualisé avec la protection contre les refus de stockage. Les écrans restent à découpler.**
 
 Après la PR 52, le composant principal est descendu à environ 2 160 lignes. Le lot de persistance locale le ramène à environ 2 135 lignes en retirant l’hydratation et les écritures directes de `localStorage` du composant principal.
 
@@ -107,7 +109,7 @@ Ordre de découpage proposé :
 
 1. ✅ contrôleur/hook de vélo connecté (`useBikeController`) ;
 2. ✅ contrôleur de reprise et instantané de séance (`useSessionSnapshotController`) ;
-3. ⏳ enregistrement et persistance : `useLocalPersistenceController` couvre l’état principal et les parcours personnels ; l’enregistrement final de séance, l’import/export et leurs dépendances restent à extraire ;
+3. ⏳ enregistrement et persistance : `useLocalPersistenceController` couvre l’état principal et les parcours personnels ; la finalisation est isolée dans le lot actif PR 55 ; l’import/export et leurs dépendances restent à extraire ;
 4. écrans Quête / Séances / Parcours / Suivi / Plus ;
 5. lecteur de séance et panneau Bluetooth ;
 6. suppression des dépendances croisées restantes.

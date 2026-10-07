@@ -92,3 +92,10 @@ Maintenance : ajouter un jalon en tête de `lib/releases.ts` avec un nouvel iden
 
 
 Le lexique du vélo est accessible dans Plus → Guide rapide et avant chaque séance. Trois familles regroupent D+/D−, altitude, pente/profil ; RPM, BPM, watts, vitesse, kcal, RPE et résistance ; XP, segments/secteurs, contre-la-montre, FTMS et PWA. Chaque mot s’ouvre individuellement au toucher ou au clavier, avec une définition et un exemple. Ce contenu est disponible avec l’application hors connexion ; aucune recherche distante n’est nécessaire. Il n’ajoute pas de panneau au lecteur actif et ne change aucun réglage.
+
+
+## Si l’enregistrement est refusé
+
+La validation du bilan écrit d’abord l’historique local. Le lecteur se ferme et la reprise est supprimée uniquement après la réussite de cette écriture. Si le stockage est indisponible ou plein, un message apparaît et le bouton devient « Réessayer l’enregistrement ». Le bilan et les champs restent ouverts ; libère de l’espace puis réessaie.
+
+Les nouvelles saisies du bilan sont conservées en mémoire, pas dans une sauvegarde automatique : ne ferme pas et ne recharge pas cet écran avant la réussite. La reprise de séance existante est conservée lors du refus, mais elle ne contient pas les dernières saisies manuelles du bilan. Après réussite, contrôle la séance dans Suivi.

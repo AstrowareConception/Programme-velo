@@ -8,6 +8,7 @@ export const releases = [
     title: "Tes repères, au bon moment",
     summary: "Des explications avant de pédaler et un espace pour retrouver ce qui change.",
     changes: [
+      { title: "Un bilan protégé", text: "Si le stockage refuse l’enregistrement, le bilan reste ouvert avec tes saisies et un bouton pour réessayer. Ferme-le seulement après une sauvegarde réussie." },
       { title: "Comprendre le lecteur", text: "Avant le départ, ouvre « Les repères du lecteur » pour distinguer niveau, cadence, ressenti et mesures reçues." },
       { title: "Les mots du vélo, simplement", text: "D+, BPM, RPM, watts… Un lexique avec des exemples concrets t’attend dans Plus → Guide rapide et avant chaque séance." },
       { title: "Retrouver les nouveautés", text: "Les évolutions importantes sont regroupées ici, dans Plus. Tu peux masquer l’annonce sur Quête et revenir les consulter à tout moment." }

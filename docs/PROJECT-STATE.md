@@ -2,23 +2,27 @@
 
 ## État courant de référence — 7 octobre 2026
 
-Base live vérifiée : `main` `36633cd504969acefb9547673afba6960c5ec64c`, fusion de la [PR 57](https://github.com/AstrowareConception/Programme-velo/pull/57). Vercel READY (`dpl_9tf58L34KfpST4aMAaY5x8VdAhFf`) sert cette version. La CI de main [37680066990](https://github.com/AstrowareConception/Programme-velo/actions/runs/37680066990) et la vérification production [37681148993](https://github.com/AstrowareConception/Programme-velo/actions/runs/37681148993) ont réussi. Avant fusion : 224 tests unitaires et 278 scénarios navigateur réussis sans retry, CI [37678716366](https://github.com/AstrowareConception/Programme-velo/actions/runs/37678716366), head `73f05ba7e6db0d501178e945b5d0c2b2a56f75a6`.
+Base live vérifiée : `main` `e65bf33dc016212078516760e1f18a91df6d8ca9`, fusion de la [PR 58](https://github.com/AstrowareConception/Programme-velo/pull/58). Vercel READY (`dpl_5QuZbTrPfmw1yjryfRW3MoRcQZB5`) et `/api/version` concordants. La CI de main [37687903225](https://github.com/AstrowareConception/Programme-velo/actions/runs/37687903225) et la vérification production [37688875817](https://github.com/AstrowareConception/Programme-velo/actions/runs/37688875817) ont réussi. Avant fusion : 224 unités et 288 scénarios navigateur sans échec ni retry, CI [37686874610](https://github.com/AstrowareConception/Programme-velo/actions/runs/37686874610), head `e676e888af4ce0a19790126923f5f914c9de3eec`.
 
-Livré : lecteur paysage (PR 56, essai utilisateur concluant), préparation et bilan en deux colonnes paysage, actions principales accessibles, étapes Préparer/Pédaler/Enregistrer, alerte de mise à jour sur les écrans principaux. La PR 57 conserve les champs lors des rotations et les protections PWA pendant une séance ou entre onglets. Les captures navigateur de la PR illustrent préparation et bilan à 1024×768 et 960×600.
+Livré : lecteur paysage (PR 56, essai utilisateur concluant), préparation/bilan et mises à jour visibles (PR 57), nouveautés et lexique débutant (PR 58). Le marqueur de lecture des nouveautés reste une préférence locale facultative, hors sauvegarde sportive. Les essais avec de nouveaux utilisateurs restent à recueillir.
 
-PR 54 (persistance locale) fusionnée. [PR 55](https://github.com/AstrowareConception/Programme-velo/pull/55) (finalisation métier des séances) reste ouverte, head `e0db73b8a3c4fac68a881348afa217715f3d0eee`, CI [37613584600](https://github.com/AstrowareConception/Programme-velo/actions/runs/37613584600) réussie ; sa compatibilité avec les changements récents devra être revue avant fusion.
+## Lot actif — Fiabilité de l’enregistrement et préparation de la bêta
 
-## Lot actif — Découverte et nouveautés
+[PR 55](https://github.com/AstrowareConception/Programme-velo/pull/55), branche distante `refactor/session-completion`. Reprise depuis son ancien head `e0db73b8a3c4fac68a881348afa217715f3d0eee` (CI 37613584600 réussie), avec intégration de main `e65bf33`. Les conflits documentaires sont résolus en conservant les dernières livraisons. Les nouveaux écrans, le lexique et la PWA sont conservés.
 
-Branche `feat/discovery-release-notes`, depuis `36633cd`, [PR 58](https://github.com/AstrowareConception/Programme-velo/pull/58). Autorisation : poursuivre la roadmap et les livraisons. Réalisé dans ce lot : notes éditoriales dans Plus, annonce sur Quête mémorisée par jalon avec synchronisation entre onglets, aide facultative avant le départ et dans le guide rapide, lexique débutant demandé par l’utilisateur (relief, mesures et vocabulaire de l’application) avec définitions et exemples. Aucun dialogue automatique. Le démarrage accompagné reste prioritaire jusqu’à trois séances complètes ; une séance active, la configuration et une reprise en attente masquent l’annonce.
+Changements :
+- `buildSessionCompletion` isole la finalisation des séances, parcours, secteurs, défis, calories, records et Voyage ; règles de récompense inchangées ;
+- correction d’un risque de perte : le bilan se fermait et la reprise était effacée avant la vérification de l’écriture de l’historique ; désormais `saveCompletedSession` doit réussir avant ces actions ;
+- en cas de refus du stockage, conserver le bilan et ses saisies, afficher l’échec et proposer « Réessayer l’enregistrement » ; le formulaire utilise un submit contrôlé pour éviter la remise à zéro automatique des champs après un échec ;
+- suppression de la double écriture du même état après confirmation synchrone ; aucune nouvelle clé ou migration ;
+- garde-fou principal abaissé à 2 150 lignes ; huit tests unitaires de finalisation et scénario navigateur de refus/réessai/rechargement ;
+- [protocole bêta](BETA-TEST.md) pour la découverte, les interruptions, le matériel et les sauvegardes, avec résultats physiques séparés des simulations.
 
-Le marqueur `veloquest:release-seen:v1` est une préférence d’affichage indépendante de la sauvegarde sportive. Une écriture refusée ne bloque ni la navigation ni les données : l’annonce pourra réapparaître après rechargement. Le contenu vient du bundle installé, sans appel réseau ni suivi de lecture. Les règles de séance, récompenses, Bluetooth et sauvegardes v3 ne changent pas.
+Validation locale : TypeScript, architecture/documentation et 232 tests unitaires réussis. Build et CI navigateur complète requis avant fusion ; les références exactes et résultats seront consignés dans la PR, puis complétés par le SHA publié. À ce checkpoint : lot non fusionné/non publié, production `e65bf33`.
 
-Validation : résultats locaux et CI, head exact, numéro de PR puis état de publication à consigner dans la PR de ce lot avant/après fusion. À ce checkpoint : lot non fusionné, non publié ; la production vérifiée reste `36633cd`. Tests navigateur ajoutés : mémorisation/rechargement, synchronisation entre onglets, anciennes données préservées, onboarding prioritaire, échec du stockage optionnel, aide au clavier et rotation tablette.
+Limites : les saisies manuelles non enregistrées restent en mémoire tant que le bilan reste ouvert ; elles ne sont pas sauvegardées automatiquement après fermeture ou rechargement. La reprise garde l’instantané disponible, pas ces nouvelles saisies. Ce lot ne résout pas les conflits d’édition simultanée entre onglets et n’ajoute pas de sauvegarde distante. Les tests FTMS simulés ne constituent pas une qualification matérielle.
 
-Prochaine action : valider et publier ce lot en une PR regroupée, puis confronter le parcours complet à de nouveaux utilisateurs et reprendre la consolidation technique du jalon B. Voir [la roadmap](ROADMAP.md).
-
-Limites : les tests navigateur ne qualifient pas tous les appareils physiques. Les longs formulaires et détails peuvent défiler ; seul le lecteur actif vise l’affichage sans défilement aux dimensions prises en charge. La sauvegarde distante et la distribution publique restent à réaliser.
+Prochaine action : vérifier et publier la PR 55, puis recueillir la recette bêta et préparer le diagnostic prévisualisable destiné au support. Voir [la roadmap](ROADMAP.md).
 
 Les sections suivantes sont des checkpoints historiques, à confronter à l’état live du dépôt.
 

@@ -5,6 +5,7 @@ const root = process.cwd();
 const appPath = path.join(root, "components", "VeloQuestApp.tsx");
 const controllerPath = path.join(root, "components", "useBikeController.ts");
 const persistencePath = path.join(root, "components", "useLocalPersistenceController.ts");
+const completionPath = path.join(root, "lib", "session-completion.ts");
 const adapterPath = path.join(root, "lib", "bike-adapters.ts");
 const qualificationPath = path.join(root, "lib", "bike-qualification.ts");
 
@@ -12,13 +13,14 @@ const read = (file) => fs.readFileSync(file, "utf8");
 const app = read(appPath);
 const controller = read(controllerPath);
 const persistence = read(persistencePath);
+const completion = read(completionPath);
 const adapters = read(adapterPath);
 const qualification = read(qualificationPath);
 const failures = [];
 
 const appLines = app.split(/\r?\n/).length;
-if (appLines > 2200) {
-  failures.push(`VeloQuestApp.tsx repasse à ${appLines} lignes (limite de consolidation : 2200).`);
+if (appLines > 2150) {
+  failures.push(`VeloQuestApp.tsx repasse à ${appLines} lignes (limite de consolidation : 2150).`);
 }
 
 for (const forbidden of [
@@ -43,6 +45,12 @@ if (/\blocalStorage\b/.test(app)) {
 if (!persistence.includes("STORAGE_KEY") || !persistence.includes("veloquest:custom-routes:v1")) {
   failures.push("useLocalPersistenceController doit conserver les clés persistantes historiques.");
 }
+if (!app.includes("buildSessionCompletion")) {
+  failures.push("VeloQuestApp.tsx doit déléguer les règles de finalisation à buildSessionCompletion.");
+}
+if (!completion.includes("evaluateRouteChallenge") || !completion.includes("personalBest") || !completion.includes("voyageProgress")) {
+  failures.push("session-completion.ts doit conserver les règles de défis, records et Voyage hors du composant principal.");
+}
 if (!controller.includes('@/lib/bike-adapters')) {
   failures.push("useBikeController doit passer par le registre des adaptateurs.");
 }
@@ -62,4 +70,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log(`Architecture VéloQuest : OK · VeloQuestApp ${appLines}/2200 lignes · vélo et persistance séparés.`);
+console.log(`Architecture VéloQuest : OK · VeloQuestApp ${appLines}/2150 lignes · vélo, persistance et finalisation séparés.`);
