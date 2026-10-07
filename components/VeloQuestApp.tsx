@@ -79,13 +79,8 @@ import { cueCoach, adjustedResistance, cueSegment, prepareCueAudio, releaseCueAu
 import { createBackup, estimateLocalBytes, normalizeState, parseBackup, safeLocalStorageWrite } from "@/lib/storage";
 import { captureSplits, checkpointKilometers, formatRaceTime, ghostDeltaSeconds, ghostDistanceAtElapsed, personalBest, routeAttempts, segmentAttempts, segmentBounds, segmentPersonalBest } from "@/lib/time-attack";
 import { challengesForRoute, evaluateRouteChallenge, routeChallenges, type RouteChallenge } from "@/lib/challenges";
-import {
-  clearActiveSessionSnapshot,
-  readActiveSessionSnapshot,
-  restoreSessionSnapshot,
-  writeActiveSessionSnapshot,
-  type ActiveSessionSnapshot
-} from "@/lib/session-recovery";
+import { restoreSessionSnapshot } from "@/lib/session-recovery";
+import { useSessionSnapshotController } from "@/components/useSessionSnapshotController";
 
 type Tab = "dashboard" | "sessions" | "climbs" | "progress" | "more";
 type Energy = "easy" | "normal" | "hard";
@@ -239,15 +234,43 @@ export function VeloQuestApp() {
   const [routeFavoritesOnly, setRouteFavoritesOnly] = useState(false);
   const [routeSort, setRouteSort] = useState<"featured" | "distance" | "elevation" | "difficulty" | "pb">("featured");
   const [routeDuration, setRouteDuration] = useState<"all" | "30" | "60" | "long">("all");
-  const [resumeSnapshot, setResumeSnapshot] = useState<ActiveSessionSnapshot | null>(null);
   const lastSampleAt = useRef(0);
-  const activeSnapshotRef = useRef<ActiveSessionSnapshot | null>(null);
   const segmentDeadlineRef = useRef(0);
   const timeAttackStartedAtRef = useRef(0);
   const cuePreferencesRef = useRef<Preferences>(defaultPreferences);
   const upcomingCueRef = useRef("");
   const readerRef = useRef<HTMLDivElement>(null);
   const [foregroundNotice, setForegroundNotice] = useState(false);
+  const {
+    resumeSnapshot,
+    dismissResumeSnapshot,
+    clearResumeSnapshot,
+    saveForLater
+  } = useSessionSnapshotController({
+    active,
+    activeClimbId: activeClimb?.id,
+    routeMode,
+    activeVoyage,
+    activeChallengeId: activeChallenge?.id,
+    segmentAttackIndex,
+    segmentIndex,
+    secondsLeft,
+    running,
+    sessionStarted,
+    showFinish,
+    timeAttackElapsedSeconds,
+    timeAttackSplits,
+    pauseCount,
+    sessionResistanceDelta,
+    climbStartDistanceM,
+    telemetrySamples,
+    cadenceOffset: sessionCadenceOffset,
+    cadenceScore,
+    cadenceSettingsKey,
+    cadenceSettingsChanged,
+    hadBikeConnection: Boolean(bike),
+    onForeground: () => setForegroundNotice(true)
+  });
   const preferences: Preferences = { ...defaultPreferences, ...(state.preferences ?? {}) };
   useEffect(() => { pwa.setBusy(!hydrated || Boolean(active) || Boolean(bike) || connectingBike || diagnosingBike || showSetup || stateSaveFailed || routesSaveFailed); }, [hydrated, active, bike, connectingBike, diagnosingBike, showSetup, stateSaveFailed, routesSaveFailed, pwa.setBusy]);
   const screenWake = useScreenWakeLock(running && sessionStarted && preferences.keepScreenAwake);
@@ -300,7 +323,6 @@ export function VeloQuestApp() {
     if (savedRoutes) {
       try { setCustomClimbs(JSON.parse(savedRoutes)); } catch { /* ignore corrupted custom routes */ }
     }
-    setResumeSnapshot(readActiveSessionSnapshot());
     setOnline(navigator.onLine);
     const goOnline = () => setOnline(true);
     const goOffline = () => setOnline(false);
@@ -326,64 +348,6 @@ export function VeloQuestApp() {
       if (!saved) setToast("Impossible d’enregistrer les parcours : stockage local insuffisant.");
     }
   }, [customClimbs, hydrated]);
-
-  useEffect(() => {
-    if (!active || !sessionStarted) {
-      activeSnapshotRef.current = null;
-      return;
-    }
-    activeSnapshotRef.current = {
-      version: 1,
-      savedAt: Date.now(),
-      workoutId: active.id,
-      routeId: activeClimb?.id,
-      routeMode,
-      voyage: activeVoyage ?? undefined,
-      challengeId: activeChallenge?.id,
-      segmentAttackIndex: segmentAttackIndex ?? undefined,
-      segmentIndex,
-      secondsLeft,
-      running,
-      sessionStarted,
-      showFinish,
-      timeAttackElapsedSeconds,
-      timeAttackSplits,
-      pauseCount,
-      sessionResistanceDelta,
-      climbStartDistanceM,
-      telemetrySamples: compactTelemetry(telemetrySamples, 180),
-      cadenceOffset: sessionCadenceOffset,
-      cadenceScore, cadenceSettingsKey, cadenceSettingsChanged,
-      hadBikeConnection: Boolean(bike)
-    };
-  }, [active, activeClimb, routeMode, activeVoyage, activeChallenge, segmentAttackIndex, segmentIndex, secondsLeft, running, sessionStarted, showFinish, timeAttackElapsedSeconds, timeAttackSplits, pauseCount, sessionResistanceDelta, climbStartDistanceM, telemetrySamples, cadenceScore, cadenceSettingsKey, cadenceSettingsChanged, bike, sessionCadenceOffset]);
-
-  useEffect(() => {
-    if (!active || !sessionStarted) return;
-    const save = () => {
-      if (!activeSnapshotRef.current) return;
-      const snapshot = { ...activeSnapshotRef.current, savedAt: Date.now() };
-      activeSnapshotRef.current = snapshot;
-      writeActiveSessionSnapshot(snapshot);
-    };
-
-    save();
-    const timer = window.setInterval(save, 5000);
-    const onPageHide = () => save();
-    let wasHidden = false;
-    const onVisibility = () => {
-      if (document.visibilityState === "hidden") { wasHidden = true; save(); }
-      else if (wasHidden) { setForegroundNotice(true); wasHidden = false; }
-    };
-    window.addEventListener("pagehide", onPageHide);
-    document.addEventListener("visibilitychange", onVisibility);
-
-    return () => {
-      window.clearInterval(timer);
-      window.removeEventListener("pagehide", onPageHide);
-      document.removeEventListener("visibilitychange", onVisibility);
-    };
-  }, [active?.id, sessionStarted]);
 
   useEffect(() => {
     if (!running || !active || !sessionStarted) return;
@@ -765,8 +729,7 @@ export function VeloQuestApp() {
           : climbToWorkout(route))
       : workouts.find((item) => item.id === resumeSnapshot.workoutId);
     if (!workout) {
-      clearActiveSessionSnapshot();
-      setResumeSnapshot(null);
+      clearResumeSnapshot();
       setToast("La séance interrompue ne peut plus être restaurée.");
       return;
     }
@@ -805,23 +768,18 @@ export function VeloQuestApp() {
       ? Date.now() - restored.timeAttackElapsedSeconds * 1000
       : 0;
     segmentDeadlineRef.current = Date.now() + restored.secondsLeft * 1000;
-    setResumeSnapshot(null);
+    dismissResumeSnapshot();
     if (restored.hadBikeConnection) setToast("Séance restaurée. Reconnecte le vélo pour reprendre la télémétrie FTMS.");
     else setToast("Séance restaurée.");
   }
 
   function discardInterruptedSession() {
-    clearActiveSessionSnapshot();
-    setResumeSnapshot(null);
+    clearResumeSnapshot();
     setToast("Séance interrompue abandonnée.");
   }
 
   function parkActiveSession() {
-    if (activeSnapshotRef.current) {
-      const snapshot = { ...activeSnapshotRef.current, savedAt: Date.now() };
-      if (!writeActiveSessionSnapshot(snapshot)) { setToast("La reprise n’a pas pu être enregistrée. Garde le lecteur ouvert et libère du stockage avant une mise à jour."); return; }
-      setResumeSnapshot(snapshot);
-    }
+    if (!saveForLater()) { setToast("La reprise n’a pas pu être enregistrée. Garde le lecteur ouvert et libère du stockage avant une mise à jour."); return; }
     calorieTracker.current = undefined;
     setActive(null);
     setActiveClimb(null);
@@ -999,9 +957,7 @@ export function VeloQuestApp() {
     setCadenceScore(emptyCadenceScore());
     setCadenceSettingsKey(undefined);
     setCadenceSettingsChanged(false);
-    clearActiveSessionSnapshot();
-    setResumeSnapshot(null);
-    activeSnapshotRef.current = null;
+    clearResumeSnapshot();
     setTimeAttackElapsedSeconds(0);
     setTimeAttackSplits([]);
     timeAttackStartedAtRef.current = 0;
@@ -1245,13 +1201,12 @@ export function VeloQuestApp() {
     if (!window.confirm("Effacer le profil, l’historique, les mesures et les parcours personnels de cet appareil ?")) return;
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem(CUSTOM_ROUTES_KEY);
-    clearActiveSessionSnapshot();
+    clearResumeSnapshot();
     setState(emptyState());
     setCustomClimbs([]);
     setSelectedSessionId(null);
     setTab("dashboard");
     setShowSetup(false);
-    setResumeSnapshot(null);
     setAvailableMinutes(15);
     setToast("Données locales réinitialisées.");
   }
