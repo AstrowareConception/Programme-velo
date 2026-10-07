@@ -120,6 +120,8 @@ function n(form: FormData, key: string) {
 
 export function VeloQuestApp() {
   const pwa = usePwa();
+  const [availableMinutes, setAvailableMinutes] = useState(35);
+  const [toast, setToast] = useState<string | null>(null);
   const {
     state,
     setState,
@@ -157,11 +159,9 @@ export function VeloQuestApp() {
   const lastAutoTarget = useRef<number | undefined>(undefined);
   const [sessionStarted, setSessionStarted] = useState(false);
   const [showSetup, setShowSetup] = useState(false);
-  const [availableMinutes, setAvailableMinutes] = useState(35);
   const [energy, setEnergy] = useState<Energy>("normal");
   const [sessionResistanceDelta, setSessionResistanceDelta] = useState(0);
   const [backupExport, setBackupExport] = useState<ReturnType<typeof createBackup> | null>(null);
-  const [toast, setToast] = useState<string | null>(null);
   const [online, setOnline] = useState(true);
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
   const [telemetrySamples, setTelemetrySamples] = useState<TelemetrySample[]>([]);
