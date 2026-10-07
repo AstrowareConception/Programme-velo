@@ -1,6 +1,8 @@
+import { CyclingGlossary } from "@/components/CyclingGlossary";
+
 /** Native disclosure stays optional and keyboard accessible, with no overlay. */
 export function ReaderHelp() {
-  return <details className="readerHelp">
+  return <><details className="readerHelp readerEssentials">
     <summary>Les repères du lecteur</summary>
     <dl>
       <div><dt>Niveau · la résistance visée</dt><dd>La consigne utilise une échelle de 1 à 32. En mode manuel, règle le vélo toi-même. Avec un vélo connecté, une mesure reçue et une consigne peuvent différer ; le pilotage dépend des capacités et du contrôle autorisé.</dd></div>
@@ -8,7 +10,7 @@ export function ReaderHelp() {
       <div><dt>RPE · ton ressenti sur 10</dt><dd>C’est une estimation de ton effort, pas une mesure du vélo. La cible est un repère ; au bilan, indique ce que tu as ressenti si tu le souhaites.</dd></div>
       <div><dt>Un tiret · une mesure indisponible</dt><dd>« — » ne signifie pas zéro. Au bilan, laisse vide une valeur inconnue. La progression d’un parcours peut être simulée : elle ne remplace pas les kilomètres mesurés par ton vélo.</dd></div>
     </dl>
-  </details>;
+  </details><CyclingGlossary /></>;
 }
 
 export function QuickGuideCard() {

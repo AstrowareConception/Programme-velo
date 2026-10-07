@@ -10,7 +10,7 @@ PR 54 (persistance locale) fusionnée. [PR 55](https://github.com/AstrowareConce
 
 ## Lot actif — Découverte et nouveautés
 
-Branche `feat/discovery-release-notes`, depuis `36633cd`. Autorisation : poursuivre la roadmap et les livraisons. Réalisé dans ce lot : notes éditoriales dans Plus, annonce sur Quête mémorisée par jalon avec synchronisation entre onglets, aide facultative avant le départ et dans le guide rapide. Aucun dialogue automatique. Le démarrage accompagné reste prioritaire jusqu’à trois séances complètes ; une séance active, la configuration et une reprise en attente masquent l’annonce.
+Branche `feat/discovery-release-notes`, depuis `36633cd`, [PR 58](https://github.com/AstrowareConception/Programme-velo/pull/58). Autorisation : poursuivre la roadmap et les livraisons. Réalisé dans ce lot : notes éditoriales dans Plus, annonce sur Quête mémorisée par jalon avec synchronisation entre onglets, aide facultative avant le départ et dans le guide rapide, lexique débutant demandé par l’utilisateur (relief, mesures et vocabulaire de l’application) avec définitions et exemples. Aucun dialogue automatique. Le démarrage accompagné reste prioritaire jusqu’à trois séances complètes ; une séance active, la configuration et une reprise en attente masquent l’annonce.
 
 Le marqueur `veloquest:release-seen:v1` est une préférence d’affichage indépendante de la sauvegarde sportive. Une écriture refusée ne bloque ni la navigation ni les données : l’annonce pourra réapparaître après rechargement. Le contenu vient du bundle installé, sans appel réseau ni suivi de lecture. Les règles de séance, récompenses, Bluetooth et sauvegardes v3 ne changent pas.
 

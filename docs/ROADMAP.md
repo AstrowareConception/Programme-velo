@@ -14,7 +14,7 @@ Objectif : un nouveau venu comprend la préparation, démarre, retrouve les comm
 - ✅ PR 57 publiée : mise à jour visible depuis les écrans principaux, avec les protections existantes pendant séance, saisie, connexion vélo et entre onglets.
 - ✅ PR 57 publiée : préparation en deux colonnes sur tablette paysage : programme et profil d’effort, réglages avant départ, bouton de lancement toujours accessible.
 - ✅ PR 57 publiée : bilan cohérent : récapitulatif, mesures à vérifier, confirmation explicite avant sauvegarde ; champs conservés lors des rotations.
-- ⏳ Lot découverte : actualités éditoriales dans Plus, annonce discrète mémorisée par version importante, repères du lecteur avant le départ.
+- ⏳ Lot découverte : actualités éditoriales dans Plus, annonce discrète mémorisée par version importante, repères du lecteur avant le départ et lexique débutant (D+, BPM, RPM, watts, RPE, etc.) avec exemples.
 - À suivre : évaluation du parcours de démarrage existant auprès de nouveaux utilisateurs.
 - À suivre : adaptation progressive aux petits formats paysage, choix des mesures principales et accessibilité avec texte agrandi.
 

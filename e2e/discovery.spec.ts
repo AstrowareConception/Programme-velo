@@ -60,7 +60,7 @@ test("help is optional, keeps preparation settings and leaves the landscape star
   await page.getByRole("heading", { name: "Décrassage", exact: true }).locator("xpath=ancestor::article").getByRole("button", { name: "Voir / démarrer" }).click();
   await expect(announcement(page)).toHaveCount(0);
   const modal = page.locator(".sessionJourneyModal");
-  const help = modal.locator(".readerHelp");
+  const help = modal.locator(".readerEssentials");
   await expect(help).not.toHaveAttribute("open");
   await modal.getByLabel("Rythme de pédalage").selectOption("10");
   await help.locator("summary").focus();
@@ -102,4 +102,32 @@ test("new users keep their first action and optional storage failure cannot bloc
   await expect(page.getByRole("heading", { name: "Quoi de neuf ?" })).toBeFocused();
   await page.getByRole("button", { name: /⌂ Quête/ }).click();
   await expect(announcement(page)).toHaveCount(0);
+});
+
+
+test("novice glossary opens by keyboard in Plus and during preparation without changing settings", async ({ page }, info) => {
+  await seed(page);
+  await page.getByRole("button", { name: /••• Plus/ }).click();
+  const glossary = page.locator(".cyclingGlossary");
+  await glossary.locator(":scope > summary").focus();
+  await page.keyboard.press("Enter");
+  await glossary.getByText("D+ · dénivelé positif", { exact: true }).click();
+  await expect(glossary.getByText(/le D\+ est de 180 m/)).toBeVisible();
+  await glossary.getByText("RPM / tr/min · cadence", { exact: true }).click();
+  await expect(glossary.getByText(/un tour de pédale par seconde/)).toBeVisible();
+  await glossary.getByText("BPM · fréquence cardiaque", { exact: true }).click();
+  await expect(glossary.getByText(/90 battements en une minute/)).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.getByRole("button", { name: /⚡ Séances/ }).click();
+  await page.getByRole("heading", { name: "Décrassage", exact: true }).locator("xpath=ancestor::article").getByRole("button", { name: "Voir / démarrer" }).click();
+  await page.setViewportSize({ width: 1024, height: 768 });
+  await page.getByLabel("Rythme de pédalage").selectOption("10");
+  await glossary.locator(":scope > summary").click();
+  await glossary.getByText("D+ · dénivelé positif", { exact: true }).click();
+  await expect(page.getByRole("button", { name: "Démarrer la séance", exact: true })).toBeInViewport({ ratio: 1 });
+  await page.screenshot({ path: info.outputPath("lexique-tablette.png") });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(glossary.getByText(/le D\+ est de 180 m/)).toBeVisible();
+  await expect(page.getByLabel("Rythme de pédalage")).toHaveValue("10");
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });

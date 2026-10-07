@@ -9,6 +9,7 @@ export const releases = [
     summary: "Des explications avant de pédaler et un espace pour retrouver ce qui change.",
     changes: [
       { title: "Comprendre le lecteur", text: "Avant le départ, ouvre « Les repères du lecteur » pour distinguer niveau, cadence, ressenti et mesures reçues." },
+      { title: "Les mots du vélo, simplement", text: "D+, BPM, RPM, watts… Un lexique avec des exemples concrets t’attend dans Plus → Guide rapide et avant chaque séance." },
       { title: "Retrouver les nouveautés", text: "Les évolutions importantes sont regroupées ici, dans Plus. Tu peux masquer l’annonce sur Quête et revenir les consulter à tout moment." }
     ]
   },

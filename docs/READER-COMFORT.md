@@ -89,3 +89,6 @@ Plus → Quoi de neuf regroupe les jalons éditoriaux. L’annonce sur Quête es
 L’annonce ne s’affiche pas pendant une séance, la configuration ou une reprise en attente, ni avant les trois premières séances complètes du démarrage accompagné. Il n’y a pas de pop-up automatique. Le contenu correspond à la version actuellement ouverte, pas à une version distante en attente d’installation.
 
 Maintenance : ajouter un jalon en tête de `lib/releases.ts` avec un nouvel identifiant stable, une date et des changements réellement livrés. Un simple rebuild ne doit pas changer cet identifiant. Garder les précédents jalons pour la consultation dans Plus ; ne pas annoncer les éléments futurs de la roadmap comme disponibles.
+
+
+Le lexique du vélo est accessible dans Plus → Guide rapide et avant chaque séance. Trois familles regroupent D+/D−, altitude, pente/profil ; RPM, BPM, watts, vitesse, kcal, RPE et résistance ; XP, segments/secteurs, contre-la-montre, FTMS et PWA. Chaque mot s’ouvre individuellement au toucher ou au clavier, avec une définition et un exemple. Ce contenu est disponible avec l’application hors connexion ; aucune recherche distante n’est nécessaire. Il n’ajoute pas de panneau au lecteur actif et ne change aucun réglage.

@@ -1255,3 +1255,12 @@ button:focus-visible, input:focus-visible, .fileButton:focus-within { outline: 2
   .releaseAnnouncement { align-items:stretch; flex-direction:column; padding:20px; gap:16px; }
   .releaseChanges { grid-template-columns:1fr; }
 }
+
+.cyclingGlossary > p { line-height:1.65; }
+.cyclingGlossary h3 { font-size:.85rem; margin:20px 0 10px; color:var(--text); }
+.glossaryTerms { display:grid; gap:8px; }
+.glossaryTerms > details { border:1px solid var(--line); border-radius:10px; padding:0 12px; background:rgba(255,255,255,.02); }
+.glossaryTerms summary { color:var(--text); font-size:.8rem; }
+.glossaryTerms p { color:var(--muted); line-height:1.7; margin:8px 0 14px; }
+.glossaryExample { border-left:2px solid var(--cyan); padding-left:12px; }
+.glossaryExample strong { display:block; color:var(--cyan); font-size:.7rem; margin-bottom:3px; }
