@@ -1,5 +1,17 @@
 # État de reprise VéloQuest — actualisé le 7 octobre 2026
 
+## 7 octobre 2026 — lecteur de séance pour tablette paysage
+
+Base observée en direct : `main` `646b2bcc030a42d6c918118a6cd314ec47961638` (PR 54 fusionnée). La PR 55 de finalisation métier reste distincte, intégrable et validée par sa CI sur `e0db73b8a3c4fac68a881348afa217715f3d0eee` lors de la reprise. Ce lot répond à une nouvelle demande d’ergonomie, sans reprendre les anciens chantiers décrits plus bas.
+
+PR [56](https://github.com/AstrowareConception/Programme-velo/pull/56), branche `feat/tablet-session-dashboard`. Premier head publié : `41230fd058ea3b263695cf67a1479a4928952f15`. Tableau de bord occupant la fenêtre en paysage tablette, consignes à gauche, visualisation à droite, commandes en bas, panneau de détails ; un seul lecteur conserve le chrono et l’état lors des rotations. `SessionDashboard` porte uniquement le layout. La carte recalcule ses dimensions via `ResizeObserver`.
+
+Validation locale : TypeScript, 224 tests unitaires et build ; navigateur local bloqué au lancement par une restriction système de sockets. La CI de la PR doit donc fournir la recette navigateur et ses captures avant intégration. Scénarios ajoutés : quatre dimensions tablette, retour portrait, vues, réglages, restauration et enregistrement ; carte en entraînement et modes chronométrés ; affichage FTMS simulé. Aucun stockage ni protocole Bluetooth modifié.
+
+Premier cycle CI 37668946122 : 257 scénarios réussis, trois instables et dix échecs. Les contrôles de place tablette et FTMS passent. Correction apportée au chrono en Voyage essentiel sur téléphone (ancien ordre flex prioritaire). Les nouveaux tests ciblent désormais le graphique du lecteur et attendent la confirmation de sauvegarde avant rechargement. Captures de séance et de parcours examinées visuellement ; second cycle requis sur le correctif. Publication de branche/PR autorisée ; aucune fusion ni livraison en production. Les dimensions sont exprimées en pixels CSS utiles ; zoom, fenêtre réduite et réglages/bilan longs conservent un défilement accessible. L’essai sur la tablette physique de l’utilisateur reste distinct des tests Chromium.
+
+Prochaine action : publier cette branche autorisée, examiner la CI et les captures, corriger les débordements observés, puis consigner le head validé et la PR.
+
 ## État courant de référence
 
 `main` pointe sur `8f59b5cfd149d578479c307b64c82e61e52003d8`, fusion de la PR 52 **« Extraire la sauvegarde et la reprise de séance du composant principal »**. La CI du commit final de `main` a réussi : garde-fous statiques, TypeScript, tests unitaires, Playwright mobile/ordinateur et build. Le déploiement Vercel correspondant est observé en succès.

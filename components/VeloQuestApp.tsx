@@ -35,6 +35,7 @@ import { firstGuidedWorkout, guidanceCandidates, guidanceSessions, initialGuidan
 import { MetricChart } from "@/components/MetricChart";
 import { InstallCard } from "@/components/InstallCard";
 import { PwaStatusCard, usePwa } from "@/components/PwaProvider";
+import { SessionDashboard } from "@/components/SessionDashboard";
 import { ReaderViewChoice, SessionComfort } from "@/components/SessionComfort";
 import { screenWakeLabel, useScreenWakeLock } from "@/components/useScreenWakeLock";
 import { PerformanceRecords, SectorAnalysis } from "@/components/PerformancePanel";
@@ -1818,8 +1819,8 @@ export function VeloQuestApp() {
       {voyagePickerOpen && !active && <div className="modalBackdrop"><section className="sessionModal voyagePicker" role="dialog" aria-label="Préparer mon voyage"><button className="close" aria-label="Fermer le voyage" onClick={() => setVoyagePickerOpen(false)}>×</button>{voyageCard}</section></div>}
 
       {active && (
-        <div className="modalBackdrop">
-          <div ref={readerRef} className={`sessionModal ${activeClimb ? "climbSession" : ""} ${activeVoyage ? "voyageSession" : ""} ${sessionStarted && !showFinish && preferences.readerView === "essential" ? "essentialSession" : ""}`}>
+        <div className={`modalBackdrop ${sessionStarted && !showFinish ? "activeSessionBackdrop" : ""}`}>
+          <div ref={readerRef} className={`sessionModal ${sessionStarted && !showFinish ? "activeSessionModal" : ""} ${activeClimb ? "climbSession" : ""} ${activeVoyage ? "voyageSession" : ""} ${sessionStarted && !showFinish && preferences.readerView === "essential" ? "essentialSession" : ""}`}>
             <button className="close" aria-label="Mettre la séance de côté" onClick={parkActiveSession}>×</button>
 
             {showFinish ? (
@@ -1923,13 +1924,32 @@ export function VeloQuestApp() {
                 </div>
               </div>
             ) : (
-              <>
+              <SessionDashboard
+                header={<>
                 <p className="eyebrow">{activeVoyage ? "VOYAGE · PORTION" : activeClimb ? routeCategory(activeClimb) === "scenic" ? "BALADE · RYTHME DOUX" : routeCategory(activeClimb) === "stage" ? "ÉTAPE" : "COL DE LÉGENDE" : active.name.toUpperCase()}</p>
                 <ReaderViewChoice preferences={preferences} onChange={updatePreference} />
                 <div className="sessionScreenStatus"><span role="status">{sessionStarted && !running && preferences.keepScreenAwake ? "Maintien de l’écran en pause" : screenWakeLabel(screenWake.status, preferences.keepScreenAwake)}</span>{preferences.keepScreenAwake && ["refused", "released"].includes(screenWake.status) && <button type="button" className="secondary miniButton" onClick={screenWake.retry}>Réessayer le maintien</button>}</div>
-                {foregroundNotice && <div className="foregroundNotice" role="status"><p>De retour dans VéloQuest. Vérifie la consigne actuelle et la connexion du vélo : les alertes peuvent avoir été interrompues en arrière-plan.</p><button type="button" className="secondary miniButton" onClick={() => setForegroundNotice(false)}>Compris</button></div>}
                 <h2>{active.segments[segmentIndex].label}</h2>
 
+                </>}
+                notice={<>
+                {foregroundNotice && <div className="foregroundNotice" role="status"><p>De retour dans VéloQuest. Vérifie la consigne actuelle et la connexion du vélo : les alertes peuvent avoir été interrompues en arrière-plan.</p><button type="button" className="secondary miniButton" onClick={() => setForegroundNotice(false)}>Compris</button></div>}
+                </>}
+                focus={<>
+                <div className="sessionEssentials"><div className="resistance">
+                  <small>RÉSISTANCE CIBLE</small>
+                  <strong>{currentTarget ?? "Libre"}</strong>
+                  <span>{resistanceDirection} · plage {adjustedResistance(active.segments[segmentIndex].resistance, preferences.resistanceOffset + sessionResistanceDelta)}</span>
+                </div>
+                <div className="timer" aria-live="off"><small>RESTE DANS CE SEGMENT</small>{" "}<strong>{formatClock(secondsLeft)}</strong></div></div>
+                <div className="actualResistance"><span>Résistance reçue du vélo</span><strong>{bike ? telemetry.resistance?.toFixed(0) ?? "—" : "—"}</strong><small>{autoResistanceControl && controlGranted ? "Pilotage auto · réponse du vélo différée" : "Réglage manuel · suis la cible"}</small></div>
+                <div className="effortAdjustments" role="group" aria-label="Adapter l’effort">
+                  <button type="button" className="secondary" disabled={calorieMode ? (calorieLevel ?? telemetry.resistance ?? 1) <= 1 : sessionResistanceDelta <= -4} onClick={() => changeEffort(-1)}>Alléger −1</button>
+                  <button type="button" className="secondary" disabled={calorieMode ? (calorieLevel ?? telemetry.resistance ?? 1) >= 32 : sessionResistanceDelta >= 4} onClick={() => changeEffort(1)}>Renforcer +1</button>
+                </div>
+                {!calorieMode && <div className="segmentMeta"><span>Effort visé {active.segments[segmentIndex].rpe}/10</span>{active.segments[segmentIndex].cadence && <span>Cible {active.segments[segmentIndex].cadence} tr/min</span>}</div>}
+                </>}
+                visual={<>
                 {activeClimb && (
                   <>
                     <div className="climbLiveTitle"><strong>{activeClimb.name}</strong><span>{routeMode === "segmentAttack" ? `${raceCurrentKm.toFixed(1)} / ${raceDistanceKm.toFixed(1)} km` : `${currentRouteKm.toFixed(1)} / ${activeClimb.distanceKm.toFixed(1)} km`}</span></div>
@@ -1941,10 +1961,9 @@ export function VeloQuestApp() {
                         <span><small>PB</small><strong>{activeRaceBest?.metrics?.elapsedSeconds !== undefined ? formatRaceTime(activeRaceBest.metrics.elapsedSeconds) : "—"}</strong></span>
                       </div>
                     )}
-                    {preferences.readerView !== "essential" && <ClimbProfile climb={activeClimb} progress={climbProgress} ghostProgress={ghostProgress} />}
+                    <div className="dashboardRouteCanvas">{preferences.readerView !== "essential" && <ClimbProfile climb={activeClimb} progress={climbProgress} ghostProgress={ghostProgress} />}
                     {preferences.readerView !== "essential" && <RouteMap climb={activeClimb} progress={climbProgress} ghostProgress={ghostProgress} />}
-                    <RoutePlaces route={activeClimb} currentKm={currentRouteKm} />
-                    {preferences.readerView !== "essential" && activeClimb.scenery && routeMode === "training" && <details className="sceneryDetails"><summary>Ton carnet de paysage</summary><p>{activeClimb.scenery}</p><div className="routeTags">{activeClimb.highlights?.map((highlight) => <span key={highlight}>{highlight}</span>)}</div><small>Pauses libres. La progression affichée reste virtuelle sans distance FTMS.</small></details>}
+                    </div><RoutePlaces route={activeClimb} currentKm={currentRouteKm} />
                     {preferences.readerView !== "essential" && routeMode === "timeAttack" && (
                       <div className="checkpointStrip">
                         {routeCheckpoints.map((km, index) => {
@@ -1955,16 +1974,30 @@ export function VeloQuestApp() {
                     )}
                   </>
                 )}
-
                 {calorieMode && <div className="calorieLive" role="status"><strong>{calorieAttempt?.kcal === undefined ? "—" : calorieAttempt.kcal.toFixed(0)} kcal</strong><span>Sur cette épreuve · estimation du vélo</span><small>{caloriePrevious ? `Record comparable : ${caloriePrevious.metrics!.calorieChallenge!.kcal.toFixed(0)} kcal` : "Premier record à établir"}</small><p>Chrono continu · cadence et résistance libres</p></div>}
                 {!calorieMode && <EffortProfile workout={active} elapsed={sessionElapsedSeconds} offset={preferences.resistanceOffset + sessionResistanceDelta} />}
-                <div className="sessionEssentials"><div className="resistance">
-                  <small>RÉSISTANCE CIBLE</small>
-                  <strong>{currentTarget ?? "Libre"}</strong>
-                  <span>{resistanceDirection} · plage {adjustedResistance(active.segments[segmentIndex].resistance, preferences.resistanceOffset + sessionResistanceDelta)}</span>
+                </>}
+                progress={<>
+                {bike && (
+                  <div className="liveStrip">
+                    <span><small>RPM</small><strong>{telemetry.cadenceRpm?.toFixed(0) ?? "—"}</strong></span>
+                    <span><small>W</small><strong>{telemetry.powerW?.toFixed(0) ?? "—"}</strong></span>
+                    <span><small>KM/H</small><strong>{telemetry.speedKmh?.toFixed(1) ?? "—"}</strong></span>
+                    <span><small>BPM</small><strong>{telemetry.heartRate?.toFixed(0) ?? "—"}</strong></span>
+                  </div>
+                )}
+                {!calorieMode && cadenceLive.percent !== undefined && <p className="liveCadenceScore">Suivi cadence : {cadenceLive.percent.toFixed(1)} % · {cadenceLive.grade} · combo {Math.floor(cadenceScore.comboSeconds)} s ×{Math.min(4, 1 + Math.floor(cadenceScore.comboSeconds / 10))} · {Math.floor(cadenceScore.points)} pts</p>}
+                <div className="sessionOverall">
+                  <div><span>Segment {segmentIndex + 1}/{active.segments.length}</span><strong>{sessionProgressPercent}%</strong></div>
+                  <i><b style={{ width: `${sessionProgressPercent}%` }} /></i>
+                  {autoResistanceControl && controlGranted && <small>AUTO LEVEL ACTIF</small>}
                 </div>
-                <div className="timer" aria-live="off"><small>RESTE DANS CE SEGMENT</small>{" "}<strong>{formatClock(secondsLeft)}</strong></div></div>
-                <div className="actualResistance"><span>Résistance reçue du vélo</span><strong>{bike ? telemetry.resistance?.toFixed(0) ?? "—" : "—"}</strong><small>{autoResistanceControl && controlGranted ? "Pilotage auto · réponse du vélo différée" : "Réglage manuel · suis la cible"}</small></div>
+                {active.segments[segmentIndex + 1] && (
+                  <div className="nextSegment"><small>ENSUITE</small><strong>{active.segments[segmentIndex + 1].label}</strong><span>niveau {adjustedResistance(active.segments[segmentIndex + 1].resistance, preferences.resistanceOffset + sessionResistanceDelta)}</span></div>
+                )}
+                {active.segments.length <= 30 && <div className="segmentProgress">{active.segments.map((_, i) => <i key={i} className={i <= segmentIndex ? "done" : ""} />)}</div>}
+                </>}
+                extras={<>
                 <VoiceCommands onCommand={command => {
                   if (command === "lighter" || command === "harder") {
                     const delta = command === "lighter" ? -1 : 1;
@@ -1975,32 +2008,15 @@ export function VeloQuestApp() {
                   if ((command === "pause" && running) || (command === "resume" && !running)) togglePause();
                   return command === "pause" ? "Séance en pause." : "Séance reprise.";
                 }} />
-                <div className="effortAdjustments" role="group" aria-label="Adapter l’effort">
-                  <button type="button" className="secondary" disabled={calorieMode ? (calorieLevel ?? telemetry.resistance ?? 1) <= 1 : sessionResistanceDelta <= -4} onClick={() => changeEffort(-1)}>Alléger −1</button>
-                  <button type="button" className="secondary" disabled={calorieMode ? (calorieLevel ?? telemetry.resistance ?? 1) >= 32 : sessionResistanceDelta >= 4} onClick={() => changeEffort(1)}>Renforcer +1</button>
-                </div>
                 {bike && !autoResistanceControl && <p className="finePrint">Résistance manuelle : {bluetoothError ?? "pilotage automatique non activé pour cette connexion."}{resistanceMappingVerified && <button type="button" className="secondary" disabled={controlBusy} onClick={() => controlGranted ? setAutoResistanceControl(true) : void requestBikeControl()}>Activer le pilotage automatique</button>}</p>}
-                {!calorieMode && cadenceLive.percent !== undefined && <p className="liveCadenceScore">Suivi cadence : {cadenceLive.percent.toFixed(1)} % · {cadenceLive.grade} · combo {Math.floor(cadenceScore.comboSeconds)} s ×{Math.min(4, 1 + Math.floor(cadenceScore.comboSeconds / 10))} · {Math.floor(cadenceScore.points)} pts</p>}
-                <div className="sessionOverall">
-                  <div><span>Segment {segmentIndex + 1}/{active.segments.length}</span><strong>{sessionProgressPercent}%</strong></div>
-                  <i><b style={{ width: `${sessionProgressPercent}%` }} /></i>
-                  {autoResistanceControl && controlGranted && <small>AUTO LEVEL ACTIF</small>}
-                </div>
-                {!calorieMode && <div className="segmentMeta"><span>Effort visé {active.segments[segmentIndex].rpe}/10</span>{active.segments[segmentIndex].cadence && <span>Cible {active.segments[segmentIndex].cadence} tr/min</span>}</div>}
+                {activeClimb && <>
+                    {preferences.readerView !== "essential" && activeClimb.scenery && routeMode === "training" && <details className="sceneryDetails"><summary>Ton carnet de paysage</summary><p>{activeClimb.scenery}</p><div className="routeTags">{activeClimb.highlights?.map((highlight) => <span key={highlight}>{highlight}</span>)}</div><small>Pauses libres. La progression affichée reste virtuelle sans distance FTMS.</small></details>}
+                  <div className="dashboardLandscapeOnly"><RoutePlaces route={activeClimb} /></div>
+                </>}
                 {activeClimb && preferences.showRoutePhotos && preferences.readerView !== "essential" && <RoutePhotos key={activeClimb.id} route={activeClimb} currentKm={currentRouteKm} />}
-                {bike && (
-                  <div className="liveStrip">
-                    <span><small>RPM</small><strong>{telemetry.cadenceRpm?.toFixed(0) ?? "—"}</strong></span>
-                    <span><small>W</small><strong>{telemetry.powerW?.toFixed(0) ?? "—"}</strong></span>
-                    <span><small>KM/H</small><strong>{telemetry.speedKmh?.toFixed(1) ?? "—"}</strong></span>
-                    <span><small>BPM</small><strong>{telemetry.heartRate?.toFixed(0) ?? "—"}</strong></span>
-                  </div>
-                )}
-                {active.segments[segmentIndex + 1] && (
-                  <div className="nextSegment"><small>ENSUITE</small><strong>{active.segments[segmentIndex + 1].label}</strong><span>niveau {adjustedResistance(active.segments[segmentIndex + 1].resistance, preferences.resistanceOffset + sessionResistanceDelta)}</span></div>
-                )}
-                {active.segments.length <= 30 && <div className="segmentProgress">{active.segments.map((_, i) => <i key={i} className={i <= segmentIndex ? "done" : ""} />)}</div>}
                 <SessionComfort preferences={preferences} onChange={updatePreference} />
+                </>}
+                controls={<>
                 <div className="readerControls"><div className="modalActions three">
                   <button className="secondary" disabled={Boolean(activeVoyage) || segmentIndex === 0} onClick={() => goToSegment(segmentIndex - 1)}>← Précédent</button>
                   {calorieMode || ((routeMode === "timeAttack" || routeMode === "segmentAttack") && activeClimb)
@@ -2010,7 +2026,8 @@ export function VeloQuestApp() {
                 </div>
                 <button className="finish" onClick={() => { if (calorieTracker.current) calorieTracker.current = { ...calorieTracker.current, end: Math.min(calorieTracker.current.end, Date.now()) }; setRunning(false); setShowFinish(true); }}>Terminer et enregistrer</button>
                 </div>
-              </>
+                </>}
+              />
             )}
           </div>
         </div>

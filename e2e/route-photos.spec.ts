@@ -1,3 +1,4 @@
+import { openReaderDetails, closeReaderDetails } from "./reader-layout-helpers";
 import { expect, test as baseTest, type Page, type Locator } from "@playwright/test";
 import { climbs } from "../lib/routes";
 
@@ -71,27 +72,27 @@ test("Voyage photos follow absolute places, free browsing and pause recovery wit
   const completed = { ...old, id: "portion", templateId: "voyage", routeId: route.id, duration: 48, points: 0, xp: 0, metrics: { completedRoute: false, voyage: { version: 1, startKm: 0, endKm: 12, routeDistanceKm: route.distanceKm, routeXp: route.xp, completedPortion: true, positionSource: "simulation" } } };
   await seed(page, { ...state, sessions: [old, completed] }); await page.clock.install();
   await page.getByRole("region", { name: "Mon voyage" }).getByRole("button", { name: "Continuer mon voyage", exact: true }).click();
-  let photos = await openPhotos(reader(page)); await loaded(photos, "antibes");
+  await openReaderDetails(page); let photos = await openPhotos(reader(page)); await loaded(photos, "antibes");
   await reader(page).getByRole("button", { name: "Démarrer la séance", exact: true }).click();
-  photos = await openPhotos(reader(page)); await loaded(photos, "antibes");
+  await openReaderDetails(page); photos = await openPhotos(reader(page)); await loaded(photos, "antibes");
   await expect(photos).toContainText("Dernier repère illustré · Antibes");
   await photos.getByRole("button", { name: "Photo suivante", exact: true }).click(); await loaded(photos, "golfe-juan");
   await expect(photos).toContainText("Aperçu du parcours · Golfe-Juan");
   await photos.getByRole("button", { name: "Suivre les repères", exact: true }).click(); await loaded(photos, "antibes");
-  await page.clock.fastForward(20_000); await reader(page).getByRole("button", { name: "Pause", exact: true }).click();
+  await closeReaderDetails(page); await page.clock.fastForward(20_000); await reader(page).getByRole("button", { name: "Pause", exact: true }).click();
   const timer = await reader(page).locator(".timer").innerText();
   await reader(page).getByRole("button", { name: "Vue essentielle", exact: true }).click(); await expect(gallery(reader(page))).toHaveCount(0);
   if (info.project.name === "mobile-chromium") { await page.setViewportSize({ width: 844, height: 390 }); await expect(reader(page).locator(".timer")).toBeInViewport(); await page.setViewportSize({ width: 390, height: 844 }); }
   await reader(page).getByRole("button", { name: "Mettre la séance de côté", exact: true }).click(); await page.reload();
   await page.getByRole("button", { name: "Reprendre", exact: true }).click(); await expect(reader(page).locator(".timer")).toHaveText(timer);
-  await reader(page).getByRole("button", { name: "Vue complète", exact: true }).click(); photos = await openPhotos(reader(page)); await loaded(photos, "antibes");
+  await reader(page).getByRole("button", { name: "Vue complète", exact: true }).click(); await openReaderDetails(page); photos = await openPhotos(reader(page)); await loaded(photos, "antibes");
   await noOverflow(page); const data = await stored(page); expect(data.sessions).toEqual([old, completed]);
 });
 
 test("an unavailable photo keeps credits and workout controls and can be retried", async ({ page }) => {
   await page.route("**/landscapes/cagnes.webp", r => r.abort());
   await seed(page); const card = await findRoute(page); await card.getByRole("button", { name: "Partir en balade", exact: true }).click();
-  const photos = await openPhotos(reader(page));
+  await openReaderDetails(page); const photos = await openPhotos(reader(page));
   await expect(photos.getByText(/Photo indisponible\./)).toBeVisible(); await expect(photos).toContainText("Olivier Cleynen");
   await page.unroute("**/landscapes/cagnes.webp"); await photos.getByRole("button", { name: "Réessayer la photo", exact: true }).click(); await loaded(photos, "cagnes");
   await reader(page).getByRole("button", { name: "Démarrer la séance", exact: true }).click(); await expect(reader(page).getByRole("button", { name: "Pause", exact: true })).toBeVisible();
