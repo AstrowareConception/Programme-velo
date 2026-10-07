@@ -162,3 +162,26 @@ test('failed snapshot storage keeps the paused reader open and blocks a cross-ta
   await replacement(page, pwaServer); await panel(page).getByRole('button', { name: 'Mettre à jour maintenant', exact: true }).click();
   await expect(panel(page)).toContainText('Mise à jour différée'); expect((await stored(page)).sessions).toEqual(state.sessions);
 });
+
+test('home exposes a waiting update, defers it during preparation and preserves a parked session', async ({ page, pwaServer }) => {
+  await boot(page, pwaServer); await replacement(page, pwaServer);
+  await page.getByRole('button', { name: /⌂ Quête/ }).click();
+  const banner = page.getByRole('region', { name: 'Mise à jour de VéloQuest', exact: true });
+  await expect(banner).toContainText('Une mise à jour est prête');
+  await expect(banner.getByRole('button', { name: 'Mettre à jour maintenant' })).toBeEnabled();
+  await page.getByRole('button', { name: /⚡ Séances/ }).click();
+  await page.getByRole('heading', { name: 'Décrassage', exact: true }).locator('xpath=ancestor::article').getByRole('button', { name: 'Voir / démarrer' }).click();
+  await expect(banner).toHaveCount(0);
+  await page.getByRole('button', { name: 'Démarrer la séance', exact: true }).click();
+  await expect(banner).toHaveCount(0);
+  await page.getByRole('button', { name: 'Pause', exact: true }).click();
+  await page.getByRole('button', { name: 'Mettre la séance de côté' }).click();
+  const snapshot = await page.evaluate(() => localStorage.getItem('veloquest:active-session:v1'));
+  const before = await stored(page);
+  const reload = page.waitForNavigation({ waitUntil: 'domcontentloaded' });
+  await banner.getByRole('button', { name: 'Mettre à jour maintenant' }).click(); await reload;
+  await expect(page.getByRole('heading', { name: 'Reprendre là où tu t’es arrêté ?' })).toBeVisible();
+  expect(await page.evaluate(() => localStorage.getItem('veloquest:active-session:v1'))).toBe(snapshot);
+  expect(await stored(page)).toEqual(before);
+  await expect(banner).toHaveCount(0);
+});

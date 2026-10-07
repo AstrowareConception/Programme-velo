@@ -1,8 +1,51 @@
 # Roadmap VéloQuest
 
-Actualisée le **7 octobre 2026** à partir de `main` `0c7077970a012bcf9af25072f397ccbd56518a2a`.
+Actualisée le **7 octobre 2026** à partir de `main` `78b7877b85ff5e85c20b72a95b9807e52a06e85f`. Orientation vers une distribution grand public validée par l’utilisateur. Les jalons ci-dessous pilotent désormais l’exécution ; le backlog détaillé reste conservé.
 
 Cette roadmap remplace les listes historiques devenues obsolètes. Le produit dispose déjà d'un socle très riche : 44 séances, 84 parcours natifs, 38 balades faciles, 12 thèmes, 6 programmes, 22 campagnes/carnets et 77 badges. L'objectif n'est plus d'empiler les fonctionnalités, mais de consolider le produit, fiabiliser son usage réel, prolonger le programme au-delà de douze semaines et rendre le matériel connecté extensible à plusieurs vélos.
+
+## Cap produit — de l’usage personnel à la distribution
+
+### Jalon A — Première séance impeccable · lot actif
+
+Objectif : un nouveau venu comprend la préparation, démarre, retrouve les commandes et enregistre sa première séance sans assistance.
+
+- ✅ Lecteur paysage livré par la PR 56 ; production `78b7877`, CI et vérification de publication réussies. Essai utilisateur sur tablette concluant le 7 octobre.
+- ⏳ Mise à jour visible depuis les écrans principaux, avec les protections existantes pendant séance, saisie, connexion vélo et entre onglets.
+- ⏳ Préparation en deux colonnes sur tablette paysage : programme et profil d’effort, réglages avant départ, bouton de lancement toujours accessible.
+- ⏳ Bilan cohérent : récapitulatif, mesures à vérifier, confirmation explicite avant sauvegarde ; champs conservés lors des rotations.
+- À suivre : actualités de version, aide contextuelle, évaluation du parcours de démarrage existant auprès de nouveaux utilisateurs.
+- À suivre : adaptation progressive aux petits formats paysage, choix des mesures principales et accessibilité avec texte agrandi.
+
+Le lot actif porte sur les trois lignes ⏳ : implémentation en cours, non publiée à ce checkpoint. Il réutilise l’onboarding, les contrôleurs métier et le stockage existants. Critères : départ et confirmation visibles à 1024×768 et 960×600 ; saisies conservées après rotation ; enregistrement et rechargement réussis ; mise à jour accessible depuis l’accueil et bloquée pendant une séance ou par un onglet protégé.
+
+### Jalon B — Bêta privée fiable
+
+- Terminer le découpage technique commencé (PR 55 de finalisation de séance encore ouverte, distincte de ce lot).
+- Qualifier plusieurs combinaisons vélo/appareil/navigateur et afficher les capacités réellement disponibles.
+- Éprouver interruption, reprise, reconnexion, enregistrement, export et restauration avec des utilisateurs extérieurs.
+- Rendre explicites mesures reçues, données manquantes et simulations ; préparer un diagnostic prévisualisable sans données personnelles par défaut.
+- Renforcer accessibilité, tests WebKit et qualité ; regrouper les changements avant publication pour éviter les cycles de CI inutiles.
+
+Passage au jalon suivant : plusieurs séances terminées par les testeurs, aucun blocage critique ni perte de données connue non corrigée. La CI ne remplace pas la recette physique.
+
+### Jalon C — Usage durable
+
+- Programme renouvelable après douze semaines et reprise après interruption, historique conservé.
+- Bilans mensuels et de cycle ; enrichir le bilan hebdomadaire et les repères de ressenti déjà présents.
+- Voyage V2 : continuité des carnets, étape suivante, reprise facile.
+- Défis axés sur régularité, variété et maîtrise ; revue des programmes et règles de progression par un professionnel qualifié avant diffusion large.
+
+Passage au jalon suivant : le produit accompagne plusieurs cycles et les retours après interruption sans remise à zéro ni accumulation de séances manquées.
+
+### Jalon D — Ouverture publique
+
+- Sauvegarde distante facultative d’abord ; compte facultatif puis synchronisation avec gestion des conflits et récupération.
+- Présentation publique, démonstration, compatibilités, aide, historique des versions et canal de retours.
+- Revue sécurité, confidentialité et droits des contenus ; modalités de support et modèle économique à décider.
+- Évaluer une enveloppe native selon les limites constatées de Bluetooth, installation et arrière-plan.
+
+L’ouverture publique reste un objectif, pas une annonce de disponibilité générale ni une promesse de compatibilité universelle. Aucun service cloud, paiement ou nouveau traitement de données n’est mis en place par le lot A.
 
 ## Principes de priorité
 
@@ -53,7 +96,7 @@ Voir [Architecture des vélos connectés](CONNECTED-BIKES-ARCHITECTURE.md).
 
 ### P0.3 — Dette de `VeloQuestApp.tsx`
 
-**État : engagé — vélo connecté et reprise de séance extraits ; la PR 54 extrait maintenant la persistance locale. L’enregistrement final des séances et les écrans restent à découpler.**
+**État : engagé — vélo connecté, reprise et persistance locale extraits (PR 54 fusionnée). La PR 55 de finalisation des séances reste ouverte. Les écrans restent à découpler.**
 
 Après la PR 52, le composant principal est descendu à environ 2 160 lignes. Le lot de persistance locale le ramène à environ 2 135 lignes en retirant l’hydratation et les écritures directes de `localStorage` du composant principal.
 
@@ -106,7 +149,7 @@ Conserver les contrôles actuels puis ajouter progressivement :
 
 ## Lot ergonomie demandé — tablette paysage
 
-**État : implémenté localement sur `feat/tablet-session-dashboard` ; publication de la branche/PR autorisée explicitement le 7 octobre. Validation navigateur en cours.**
+**État : livré — PR 56 fusionnée, production `78b7877` vérifiée, CI réussie et essai réel utilisateur concluant.**
 
 Tableau de bord de séance sur toute la fenêtre, consignes et parcours en colonnes, mesures et commandes en bas, détails secondaires sur demande. Portrait et petites fenêtres restent défilants. Le layout est isolé dans `SessionDashboard` et la carte observe ses dimensions ; aucune migration de données. Recette : 1024×768, 1180×820, 1280×800 et 960×600, rotation, vues, pause/reprise, sauvegarde, courses et télémétrie simulée. Voir [le guide du lecteur](READER-COMFORT.md).
 
@@ -144,7 +187,7 @@ Ces indicateurs restent des outils d'entraînement et non un diagnostic médical
 
 ### P1.3 — Bilans de progression
 
-Créer :
+Le bilan hebdomadaire, les habitudes et le débrief de séance existent déjà. Compléter avec :
 
 - bilan mensuel ;
 - bilan de cycle ;
@@ -245,11 +288,15 @@ La PWA et le mode manuel restent le socle.
 
 ### Compte et produit multi-utilisateur
 
-Authentification, profils distants et partage ne deviennent prioritaires que si VéloQuest évolue d'un outil personnel vers un produit réellement distribué.
+L’objectif de distribution est validé. Authentification et profils distants appartiennent au jalon D, après validation de la bêta privée ; le partage reste à spécifier.
 
 ---
 
-## Matrice d'exécution
+## Backlog technique et contenu
+
+Les jalons A à D ci-dessus déterminent l’ordre de livraison ; cette matrice conserve le détail des chantiers.
+
+### Matrice historique
 
 | Ordre | Lot | Résultat attendu |
 | --- | --- | --- |

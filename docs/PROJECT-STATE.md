@@ -1,33 +1,24 @@
 # État de reprise VéloQuest — actualisé le 7 octobre 2026
 
-## 7 octobre 2026 — lecteur de séance pour tablette paysage
+## État courant de référence — 7 octobre 2026
 
-Base observée en direct : `main` `646b2bcc030a42d6c918118a6cd314ec47961638` (PR 54 fusionnée). La PR 55 de finalisation métier reste distincte, intégrable et validée par sa CI sur `e0db73b8a3c4fac68a881348afa217715f3d0eee` lors de la reprise. Ce lot répond à une nouvelle demande d’ergonomie, sans reprendre les anciens chantiers décrits plus bas.
+Base live vérifiée : `main` `78b7877b85ff5e85c20b72a95b9807e52a06e85f`, fusion de la [PR 56](https://github.com/AstrowareConception/Programme-velo/pull/56). Le lecteur paysage est publié sur Vercel et `/api/version` confirme ce SHA. La CI de main [37672313552](https://github.com/AstrowareConception/Programme-velo/actions/runs/37672313552) et la vérification production [37673188538](https://github.com/AstrowareConception/Programme-velo/actions/runs/37673188538) ont réussi. Avant fusion : 224 tests unitaires et 270 scénarios navigateur réussis sans retry sur le head `92ef9e9`.
 
-PR [56](https://github.com/AstrowareConception/Programme-velo/pull/56), branche `feat/tablet-session-dashboard`. Premier head publié : `41230fd058ea3b263695cf67a1479a4928952f15`. Tableau de bord occupant la fenêtre en paysage tablette, consignes à gauche, visualisation à droite, commandes en bas, panneau de détails ; un seul lecteur conserve le chrono et l’état lors des rotations. `SessionDashboard` porte uniquement le layout. La carte recalcule ses dimensions via `ResizeObserver`.
+L’utilisateur a confirmé le 7 octobre que l’écran fonctionne sur sa tablette et validé l’orientation grand public. Une ancienne version PWA a masqué la nouveauté jusqu’à application de la mise à jour dans Plus : ce constat motive la notification sur les écrans principaux.
 
-Validation locale : TypeScript, 224 tests unitaires et build ; navigateur local bloqué au lancement par une restriction système de sockets. La CI de la PR doit donc fournir la recette navigateur et ses captures avant intégration. Scénarios ajoutés : quatre dimensions tablette, retour portrait, vues, réglages, restauration et enregistrement ; carte en entraînement et modes chronométrés ; affichage FTMS simulé. Aucun stockage ni protocole Bluetooth modifié.
+PR 54 (persistance locale) fusionnée. [PR 55](https://github.com/AstrowareConception/Programme-velo/pull/55) (finalisation métier des séances) toujours ouverte, head `e0db73b8a3c4fac68a881348afa217715f3d0eee`, CI réussie ; sa compatibilité avec les changements récents devra être revue avant fusion. Aucun travail de cette PR n’est incorporé implicitement au lot ergonomie.
 
-Premier cycle CI 37668946122 : 257 scénarios réussis, trois instables et dix échecs. Les contrôles de place tablette et FTMS passent. Correction apportée au chrono en Voyage essentiel sur téléphone (ancien ordre flex prioritaire). Les nouveaux tests ciblent désormais le graphique du lecteur et attendent la confirmation de sauvegarde avant rechargement. Captures de séance et de parcours examinées visuellement ; second cycle requis sur le correctif. Publication de branche/PR autorisée ; aucune fusion ni livraison en production. Les dimensions sont exprimées en pixels CSS utiles ; zoom, fenêtre réduite et réglages/bilan longs conservent un défilement accessible. L’essai sur la tablette physique de l’utilisateur reste distinct des tests Chromium.
+## Lot actif — Première séance impeccable
 
-Prochaine action : publier cette branche autorisée, examiner la CI et les captures, corriger les débordements observés, puis consigner le head validé et la PR.
+Branche `feat/first-session-experience`, depuis `78b7877`. Autorisation : tenir la roadmap à jour et avancer sur le lot proposé. Réalisations en cours : alerte de mise à jour hors séance, préparation et bilan en deux colonnes paysage avec actions accessibles, étapes Préparer/Pédaler/Enregistrer et aide au mode manuel. Le stockage, le protocole Bluetooth et les règles de récompense restent ceux de main.
 
-## État courant de référence
+Validation locale réussie : TypeScript, garde-fous architecture/documentation, 224 tests unitaires et build de production. Validation navigateur requise : scénario préparation → lecture → bilan → sauvegarde/rechargement avec rotation, protections PWA entre onglets et captures navigateur. Les résultats et SHA exacts seront consignés dans la PR avant intégration. À ce checkpoint : lot non fusionné, non publié ; la production reste `78b7877`.
 
-`main` pointe sur `8f59b5cfd149d578479c307b64c82e61e52003d8`, fusion de la PR 52 **« Extraire la sauvegarde et la reprise de séance du composant principal »**. La CI du commit final de `main` a réussi : garde-fous statiques, TypeScript, tests unitaires, Playwright mobile/ordinateur et build. Le déploiement Vercel correspondant est observé en succès.
+Prochaine action : terminer et vérifier ce lot A, le publier en une PR regroupée, contrôler la CI et le déploiement. Puis recueillir les retours de nouveaux utilisateurs avant d’élargir au jalon B. Voir [la roadmap](ROADMAP.md) pour les jalons, critères et backlog conservé.
 
-La PR 53 a installé le protocole de continuité du projet dans `docs/CONTINUITY.md`, le modèle de PR et `AGENTS.md`. La PR 52 a ensuite extrait la construction, l’écriture périodique et la gestion de `veloquest:active-session:v1` vers `useSessionSnapshotController`, sans migration du snapshot existant.
+Limites : un test navigateur ne qualifie pas tous les appareils physiques. Les longs formulaires et détails peuvent défiler ; seul le lecteur actif vise l’affichage sans défilement sur les dimensions prises en charge. La sauvegarde distante et la distribution publique ne sont pas encore réalisées.
 
-Le lot actif est la PR 54 **« Extraire la persistance locale de VeloQuestApp »**, branche `refactor/local-persistence-controller`. Son premier code validé par TypeScript centralise le chargement et les écritures de `veloquest:v1` et `veloquest:custom-routes:v1` dans `useLocalPersistenceController`, sans changer les clés ni les formats. Les scénarios de rechargement, import de sauvegarde, opérations quotidiennes et reprise restent les critères de non-régression avant fusion.
-
-Le produit courant recense 44 séances, 84 parcours natifs dont 38 balades, 12 thèmes, 6 programmes, 22 campagnes/carnets et 77 badges. Le TOPUTURE TEB5 utilisé par l’utilisateur a confirmé sur Bluefy/iPhone connexion, télémétrie, transfert JSON et effet physique de résistance ; cela ne qualifie pas automatiquement un autre matériel, firmware ou navigateur.
-
-La priorité immédiate reste la consolidation P0 : terminer la PR 54, puis extraire l’enregistrement final de séance et poursuivre le découpage de `VeloQuestApp.tsx`. Le renouvellement du programme après la semaine 12 demeure la prochaine grande priorité métier.
-
-La reprise ne dépend pas d’un fil de conversation : suivre `docs/CONTINUITY.md` et toujours vérifier l’état live de GitHub, les PR, les CI et, si nécessaire, Vercel avant de se fier à ce checkpoint daté.
-
-Les sections datées ci-dessous constituent l'historique des lots successifs. Lorsqu'une entrée ancienne indique qu'une fonction « reste à qualifier » ou « reste à développer », l'état courant ci-dessus et la roadmap active priment.
-
+Les sections suivantes sont des checkpoints historiques, à confronter à l’état live du dépôt.
 
 ## 7 octobre 2026 — présentation commerciale illustrée
 

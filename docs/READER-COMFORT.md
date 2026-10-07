@@ -68,3 +68,13 @@ Les tests unitaires couvrent préférences, sauvegardes, calibration, filtrage d
 - [MDN : Page Visibility API](https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API) — limitations des tâches en arrière-plan.
 
 Références consultées le 5 octobre 2026. Les essais physiques restent à réaliser.
+
+## Préparer et enregistrer sa séance
+
+La préparation et le bilan affichent les étapes **Préparer → Pédaler → Enregistrer**. En paysage à partir de 960×560 pixels CSS utiles, ils occupent une fenêtre large : le programme ou le récapitulatif à gauche, les réglages ou les mesures à droite. Les zones longues défilent séparément ; le lancement et la confirmation restent accessibles en bas. Sur téléphone, les informations s’empilent avec un défilement normal.
+
+Avant le départ, le profil de résistance complète la durée, l’intensité et les segments. Le mode manuel est expliqué lorsqu’aucun vélo n’est connecté. Les modes chronométrés rappellent que le chrono continue pendant les interruptions. Les réglages de cadence, de son, de voix et de vue restent disponibles.
+
+Le bilan conserve tous les champs et la case de vérification obligatoire. Une rotation ne réinitialise pas les valeurs saisies. Le récapitulatif ne prétend pas que la séance est enregistrée : il faut confirmer, puis retrouver le résultat dans **Suivi**.
+
+Lorsqu’une mise à jour PWA est prête, une annonce apparaît sur les écrans principaux, en dehors du lecteur et de sa préparation/bilan. **Plus** conserve son panneau détaillé. La mise à jour demande une action explicite ; elle reste protégée pendant une séance, une saisie, une connexion vélo ou lorsqu’un autre onglet est occupé. Il n’est pas nécessaire d’effacer les données pour mettre l’application à jour.
