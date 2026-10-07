@@ -8,7 +8,10 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "test": "vitest run tests",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "check:architecture": "node scripts/check-architecture.mjs",
+    "check:docs": "node scripts/check-doc-links.mjs",
+    "check:static": "npm run check:architecture && npm run check:docs"
   },
   "dependencies": {
     "next": "^16.0.0",
