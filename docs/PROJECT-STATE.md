@@ -2,15 +2,15 @@
 
 ## État courant de référence
 
-`main` pointe sur `8f59b5cfd149d578479c307b64c82e61e52003d8`, fusion de la PR 52 **« Extraire la sauvegarde et la reprise de séance du composant principal »**. La CI du commit final de `main` a réussi : garde-fous statiques, TypeScript, tests unitaires, Playwright mobile/ordinateur et build. Le déploiement Vercel correspondant est observé en succès.
+`main` pointe sur `646b2bcc030a42d6c918118a6cd314ec47961638`, fusion de la PR 54 **« Extraire la persistance locale de VeloQuestApp »**. La CI du commit final de `main` a réussi : garde-fous statiques, TypeScript, tests unitaires, Playwright mobile/ordinateur et build. Le déploiement Vercel du lot est observé en succès.
 
-La PR 53 a installé le protocole de continuité du projet dans `docs/CONTINUITY.md`, le modèle de PR et `AGENTS.md`. La PR 52 a ensuite extrait la construction, l’écriture périodique et la gestion de `veloquest:active-session:v1` vers `useSessionSnapshotController`, sans migration du snapshot existant.
+La consolidation P0.3 dispose maintenant de trois séparations effectives : `useBikeController` pour le vélo connecté, `useSessionSnapshotController` pour la reprise active et `useLocalPersistenceController` pour l’hydratation/écriture de `veloquest:v1` et `veloquest:custom-routes:v1`. `VeloQuestApp.tsx` ne manipule plus directement `localStorage` et le garde-fou d’architecture limite sa croissance à 2 200 lignes sur ce main.
 
-Le lot actif est la PR 54 **« Extraire la persistance locale de VeloQuestApp »**, branche `refactor/local-persistence-controller`. Son premier code validé par TypeScript centralise le chargement et les écritures de `veloquest:v1` et `veloquest:custom-routes:v1` dans `useLocalPersistenceController`, sans changer les clés ni les formats. Les scénarios de rechargement, import de sauvegarde, opérations quotidiennes et reprise restent les critères de non-régression avant fusion.
+Le lot actif est la PR 55 **« Extraire la finalisation des séances de VeloQuestApp »**, branche `refactor/session-completion`. Le module pur `lib/session-completion.ts` reprend les règles de durée, source de métriques, achèvement, records, défis, XP, Voyage, calories et score cadence. Quatre tests unitaires ciblés couvrent séance manuelle, PB Time Attack, secteur incomplet et portion Voyage inachevée. Le composant principal descend à environ 2 083 lignes et le garde-fou proposé passe à 2 150 lignes.
 
 Le produit courant recense 44 séances, 84 parcours natifs dont 38 balades, 12 thèmes, 6 programmes, 22 campagnes/carnets et 77 badges. Le TOPUTURE TEB5 utilisé par l’utilisateur a confirmé sur Bluefy/iPhone connexion, télémétrie, transfert JSON et effet physique de résistance ; cela ne qualifie pas automatiquement un autre matériel, firmware ou navigateur.
 
-La priorité immédiate reste la consolidation P0 : terminer la PR 54, puis extraire l’enregistrement final de séance et poursuivre le découpage de `VeloQuestApp.tsx`. Le renouvellement du programme après la semaine 12 demeure la prochaine grande priorité métier.
+La priorité immédiate reste la consolidation P0 : terminer la PR 55, puis décider si l’extraction de l’import/export apporte encore un gain avant de commencer le découpage des écrans. Le renouvellement du programme après la semaine 12 demeure la prochaine grande priorité métier.
 
 La reprise ne dépend pas d’un fil de conversation : suivre `docs/CONTINUITY.md` et toujours vérifier l’état live de GitHub, les PR, les CI et, si nécessaire, Vercel avant de se fier à ce checkpoint daté.
 
