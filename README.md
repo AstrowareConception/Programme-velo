@@ -4,7 +4,7 @@
 
 Application : [programme-velo.vercel.app](https://programme-velo.vercel.app/) · Dépôt : [AstrowareConception/Programme-velo](https://github.com/AstrowareConception/Programme-velo)
 
-VéloQuest est une PWA personnelle Next.js / React / TypeScript. Elle associe un programme souple de douze semaines, des séances guidées, des parcours variés et un suivi local. Les consignes utilisent une échelle **1–32**. Le Toputure TBE5 a été testé physiquement par l’utilisateur le 6 octobre 2026 avec Bluefy sur iPhone : télémétrie, résistance effective et transfert JSON confirmés. Cette qualification ne s’étend pas automatiquement aux autres appareils ou navigateurs. Le mode manuel permet de suivre les consignes et de saisir les valeurs du vélo sans connexion Bluetooth.
+VéloQuest est une PWA personnelle Next.js / React / TypeScript. Elle associe un programme souple de douze semaines, des séances guidées, des parcours variés et un suivi local. Les consignes utilisent une échelle **1–32**. Le TOPUTURE TEB5 a été testé physiquement par l’utilisateur le 6 octobre 2026 avec Bluefy sur iPhone : télémétrie, résistance effective et transfert JSON confirmés. Cette qualification ne s’étend pas automatiquement aux autres appareils ou navigateurs. Le mode manuel permet de suivre les consignes et de saisir les valeurs du vélo sans connexion Bluetooth.
 
 ## Découvrir VéloQuest en images
 
@@ -109,7 +109,7 @@ Lance ton média séparément et garde VéloQuest visible : podcast en arrière-
 
 Les calories de séance préremplies depuis FTMS sont la variation du compteur d'énergie sur les échantillons conservés, avec gestion des remises à zéro. « KCAL VÉLO » affiche le compteur du vélo. Une saisie manuelle permet de corriger la valeur de séance. Les watts et calories affichés par le matériel peuvent eux-mêmes être estimés.
 
-Les tests FTMS simulés vérifient le protocole logiciel et l'interface. **Ils ne prouvent pas le fonctionnement du TEB5 physique**, notamment le changement effectif de résistance. Voir le [diagnostic et la recette TOPUTURE](docs/HARDWARE-COMPATIBILITY.md). Sur un appareil sans Web Bluetooth, le mode manuel reste disponible ; aucune enveloppe native iOS n'est livrée.
+Les tests FTMS simulés vérifient le protocole logiciel et l'interface. Ils ne remplacent pas la qualification physique : l'exemplaire TOPUTURE TEB5 utilisé a confirmé télémétrie et effet de résistance, sans que ce résultat puisse être généralisé à un autre modèle, navigateur ou firmware. Voir le [diagnostic et la recette TOPUTURE](docs/HARDWARE-COMPATIBILITY.md) et l'[architecture multi-vélos](docs/CONNECTED-BIKES-ARCHITECTURE.md). Sur un appareil sans Web Bluetooth, le mode manuel reste disponible ; aucune enveloppe native iOS n'est livrée.
 
 ## Données et PWA
 
@@ -157,6 +157,7 @@ La version est visible dans **Plus** et dans [l'endpoint de version](https://pro
 
 - [Guide utilisateur](docs/USER-GUIDE.md)
 - [Compatibilité matérielle : diagnostic BLE privé et recette TOPUTURE](docs/HARDWARE-COMPATIBILITY.md)
+- [Architecture multi-vélos : FTMS, adaptateurs et qualification](docs/CONNECTED-BIKES-ARCHITECTURE.md)
 - [Ancien protocole TEB5, contexte historique](docs/TEB5-BLUETOOTH-VALIDATION.md)
 - [État technique de reprise](docs/PROJECT-STATE.md)
 - [Sources des balades et méthode des profils](docs/SCENIC-ROUTES.md)

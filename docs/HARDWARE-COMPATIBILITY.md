@@ -1,12 +1,18 @@
-# Compatibilité matérielle — TOPUTURE à qualifier
+# Compatibilité matérielle — TOPUTURE TEB5 et socle multi-vélos
 
-## État des preuves
+## État courant des preuves — 7 octobre 2026
 
-Le 4 octobre 2026, la commande Amazon rapportée par Térence décrit un vélo TOPUTURE à résistance magnétique électrique, 32 niveaux, écran tactile, application et capteur cardiaque ; initialement annoncée jeudi 8 octobre, livraison réelle confirmée par Térence le 6 octobre 2026. La référence exacte et le firmware de l’exemplaire restent à relever. Ces indications commerciales ne démontrent ni BLE, ni FTMS, ni le contrôle de résistance par FTMS. Ne pas assimiler automatiquement cet exemplaire au TEB5 précédemment évoqué.
+L'exemplaire TOPUTURE TEB5 utilisé par Térence a désormais fourni des preuves physiques qui n'existaient pas lors des premiers diagnostics : connexion via Bluefy sur iPhone, télémétrie reçue, transfert JSON et effet réel de commandes de résistance confirmés par l'utilisateur. Des essais ultérieurs ont également servi à corriger l'échelle de résistance et la lecture cardiaque facultative.
+
+Cette qualification reste **partielle et locale à l'exemplaire testé**. Elle ne certifie pas tous les TOPUTURE, tous les firmwares ni les autres navigateurs. Restent notamment à éprouver ensemble sur la version courante : reconnexion longue durée, commandes Alléger/Renforcer, fréquence cardiaque sur une séance complète, commande vocale réelle, écran éveillé et coexistence avec podcast/vidéo.
+
+Le support futur ne doit pas dépendre d'un nom de marque. VéloQuest s'oriente vers un socle fondé sur les capacités et des adaptateurs, FTMS étant la voie principale. Voir [Architecture des vélos connectés](CONNECTED-BIKES-ARCHITECTURE.md).
+
+### Historique des premières preuves
 
 - [PR #16](https://github.com/AstrowareConception/Programme-velo/pull/16) : simulateur logiciel FTMS 1–32, anciennement nommé « Fake TEB5 ». Ce nom n’était pas une qualification constructeur.
-- [PR #28](https://github.com/AstrowareConception/Programme-velo/pull/28) : aucun vélo physique qualifié.
-- Premier essai réel transmis par Térence le 6 octobre : inventaire interrompu par un délai et laboratoire FTMS inaccessible. La version `9208763` pouvait afficher « service présent » prématurément ; ce premier essai ne confirmait ni caractéristique FTMS ni télémétrie. Un essai ultérieur sur l’appareil sélectionné sous Sport02 a permis la réception de télémétrie et l’inventaire ci-dessous. **Qualification physique non établie.**
+- [PR #28](https://github.com/AstrowareConception/Programme-velo/pull/28) : à cette date, aucun vélo physique n'était encore qualifié.
+- Premier essai réel transmis le 6 octobre : inventaire interrompu par un délai et laboratoire FTMS inaccessible. La version `9208763` pouvait afficher « service présent » prématurément ; ce premier essai, à lui seul, ne confirmait ni caractéristique FTMS ni télémétrie. Les essais suivants ont apporté les preuves physiques décrites ci-dessus.
 
 ## Audit des hypothèses
 

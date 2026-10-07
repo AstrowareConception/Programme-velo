@@ -1,4 +1,17 @@
-# État de reprise VéloQuest — actualisé le 5 octobre 2026
+# État de reprise VéloQuest — actualisé le 7 octobre 2026
+
+## État courant de référence
+
+Avant le présent lot de consolidation, `main` pointe sur `0c7077970a012bcf9af25072f397ccbd56518a2a`, fusion de la présentation commerciale illustrée. Ce même SHA a été observé dans le dernier déploiement Vercel de production en état `READY`. Au départ du lot, aucune PR ni issue n'est ouverte.
+
+Le produit courant recense 44 séances, 84 parcours natifs dont 38 balades, 12 thèmes, 6 programmes, 22 campagnes/carnets et 77 badges. La PR 46 a livré le programme personnel, les bilans, les défis de maîtrise, les carnets composés et le premier lot du canal de Nantes à Brest ; la PR 47 a ensuite aligné la présentation commerciale et le catalogue.
+
+Le TOPUTURE TEB5 utilisé par l'utilisateur a confirmé sur le chemin Bluefy/iPhone la connexion, la télémétrie, le transfert JSON et un effet physique de résistance. Ces preuves ne qualifient pas automatiquement un autre modèle, firmware ou navigateur. La recette globale restant à faire porte notamment sur reconnexion longue durée, contrôle automatique sur plusieurs paliers, Alléger/Renforcer, fréquence cardiaque en séance, commandes vocales réelles, écran éveillé et coexistence avec un média.
+
+La roadmap active est désormais `docs/ROADMAP.md`. Le chantier suivant est la consolidation technique : architecture multi-vélos par capacités/adaptateurs, réduction de la responsabilité de `VeloQuestApp.tsx`, puis durcissement de la CI. Le renouvellement du programme après la semaine 12 vient ensuite comme priorité métier. Voir `docs/CONNECTED-BIKES-ARCHITECTURE.md`.
+
+Les sections datées ci-dessous constituent l'historique des lots successifs. Lorsqu'une entrée ancienne indique qu'une fonction « reste à qualifier » ou « reste à développer », l'état courant ci-dessus et la roadmap active priment.
+
 
 ## 7 octobre 2026 — présentation commerciale illustrée
 
@@ -11,7 +24,7 @@ Validation documentaire : inventaire exécuté depuis les modules TypeScript, pa
 
 ## 6 octobre 2026 — résistance et fréquence cardiaque après connexion Bluefy
 
-La PR 38 a été fusionnée et publiée dans main `39af4b93c5b69c5692e52be2a2969eebce40ffef`, vérifié via /api/version. L’utilisateur confirme maintenant la connexion Toputure TBE5 et la télémétrie dans VéloQuest/Bluefy. Capture : 69 rpm, 17,8 km/h, puissance diffusée 13 W, niveau affiché 0,6 alors que le vélo est au niveau 6, BPM 0. La console physique affiche pourtant 93, 95, 88 BPM lorsque les poignées sont tenues. Cela ne prouve pas encore que le service 180D émet ces valeurs, ni la commande physique depuis VéloQuest.
+La PR 38 a été fusionnée et publiée dans main `39af4b93c5b69c5692e52be2a2969eebce40ffef`, vérifié via /api/version. L’utilisateur confirme maintenant la connexion Toputure TEB5 et la télémétrie dans VéloQuest/Bluefy. Capture : 69 rpm, 17,8 km/h, puissance diffusée 13 W, niveau affiché 0,6 alors que le vélo est au niveau 6, BPM 0. La console physique affiche pourtant 93, 95, 88 BPM lorsque les poignées sont tenues. Cela ne prouve pas encore que le service 180D émet ces valeurs, ni la commande physique depuis VéloQuest.
 
 Ce lot corrige la division par dix dans Indoor Bike Data (la plage et les commandes de résistance gardent leur encodage distinct). Ajout d’une souscription facultative au service Heart Rate 180D / mesure 2A37 avec UUID canoniques, formats 8/16 bits, prise en compte de la perte de contact, expiration après dix secondes, nettoyage à la déconnexion. L’échec ou le délai du service cardiaque n’interrompt pas FTMS. Les zéros FTMS ne remplacent pas une mesure cardiaque séparée récente ; zéro sans mesure est affiché comme indisponible. Aucun facteur n’est appliqué aux watts transmis.
 
@@ -184,7 +197,7 @@ Aucun exemplaire physique n’a encore été qualifié par cette préparation. [
 ## 6 octobre 2026 — première séance physique et lecteur avec score coach
 
 Base du lot : main dd248938bd44f7743cd0cdfe65d48d0c66733c93 (PR 39, après PR 38).
-Térence confirme sur Toputure TBE5 avec Bluefy : télémétrie, BPM, résistance commandée à la volée (environ deux secondes), première séance enregistrée. Windows/Sport02 ne deviennent pas qualifiés par ce résultat. La précision physiologique des poignées n'est pas établie.
+Térence confirme sur Toputure TEB5 avec Bluefy : télémétrie, BPM, résistance commandée à la volée (environ deux secondes), première séance enregistrée. Windows/Sport02 ne deviennent pas qualifiés par ce résultat. La précision physiologique des poignées n'est pas établie.
 
 Évolution demandée : lecteur mobile compact, profil de résistance (explicitement distinct de l'altitude), cible instantanée et niveau reçu ; une montée/descente dans chaque plage avec paliers d'au moins cinq secondes. Bilan protégé de l'envoi implicite par le clavier et case de relecture explicite. BPM non plafonnés à 95 : tests de décodage 8/16 bits et sauvegarde simulée à 148 ; moyenne/max historiques issus des échantillons espacés de dix secondes.
 
@@ -200,7 +213,7 @@ Objectifs hebdomadaires : les 240 minutes venaient de la table initiale (5 séan
 
 ## 6 octobre 2026 — retour de la séance bonus
 
-Après PR 40 (main 7ee7f4c), Térence signale résistance manuelle inattendue, cadence 80–90 difficile et RPE vécu supérieur à la cible. Cause : le verrou du laboratoire était réinitialisé à chaque connexion. Le Toputure TBE5/TEB5 déjà validé physiquement demande désormais le contrôle à la connexion si plage 1–32/pas1 et capacités de commande présentes ; aucune consigne avant le départ. Un refus garde la télémétrie et affiche le problème, avec relance depuis le lecteur. Les autres appareils gardent la validation manuelle, Sport02 n'est pas assimilé au Toputure.
+Après PR 40 (main 7ee7f4c), Térence signale résistance manuelle inattendue, cadence 80–90 difficile et RPE vécu supérieur à la cible. Cause : le verrou du laboratoire était réinitialisé à chaque connexion. Le Toputure TEB5/TEB5 déjà validé physiquement demande désormais le contrôle à la connexion si plage 1–32/pas1 et capacités de commande présentes ; aucune consigne avant le départ. Un refus garde la télémétrie et affiche le problème, avec relance depuis le lecteur. Les autres appareils gardent la validation manuelle, Sport02 n'est pas assimilé au Toputure.
 
 Cadence douce par défaut −15 tr/min (80–90 devient65–75), classique0 ou soutenue+10 réglables avant départ et mémorisées ; bornes minimales40. Cibles ajustées utilisées dans le score et la clé de record, décalage sauvegardé pour la reprise ; anciennes reprises gardent leurs anciennes cibles. Boutons Alléger/Renforcer pendant la séance, comparaison de record invalidée si réglages changés. Le RPE affiché est nommé effort visé, pas mesuré. Coach vocal : cadence aux transitions, cible de résistance aux paliers, conseil après15s sous cible avec télémétrie fraîche et espacement45s, rappel de gestion toutes90s. Annonces supplémentaires sans interrompre la voix en cours, ni en pause, bilan ou arrière-plan. La voix demeure facultative.
 

@@ -229,7 +229,7 @@ Le thème **Vignoble d’Alsace** regroupe six étapes continues de Marlenheim �
 
 ### Identifier un nouveau vélo
 
-Dans **Plus → Explorer les services Bluetooth**, lancer l’inventaire sans commande de résistance et exporter le rapport technique local si nécessaire. Le TOPUTURE reçu le 6 octobre 2026 reste à qualifier : ni son nom ni ses 32 niveaux ne prouvent FTMS. Le diagnostic ne contient aucune mesure personnelle. Voir [la recette matérielle](HARDWARE-COMPATIBILITY.md) avant tout test de contrôle.
+Dans **Plus → Explorer les services Bluetooth**, lancer l’inventaire sans commande de résistance et exporter le rapport technique local si nécessaire. Le TOPUTURE TEB5 utilisé a depuis confirmé une connexion Bluefy, de la télémétrie et un effet physique de résistance. Cette qualification reste propre à l'exemplaire et au chemin testés : ni un nom commercial ni 32 niveaux ne suffisent à qualifier un autre vélo. Le diagnostic ne contient aucune mesure personnelle. Voir [la recette matérielle](HARDWARE-COMPATIBILITY.md) avant tout test de contrôle.
 
 La rubrique **Premier test du vélo · 10 à 15 minutes** guide le premier essai dans Plus. Le laboratoire affiche vitesse, distance et heure du dernier paquet ; « Choisir le minimum » ou « Choisir un pas au-dessus » prépare une consigne, puis « Envoyer ce niveau au vélo » effectue la commande. Reviens au minimum puis déconnecte. Les mises à jour attendent aussi la fin du diagnostic ou la déconnexion Bluetooth. [Fiche vierge de résultats](HARDWARE-TEST-RESULTS.md).
 
@@ -246,7 +246,7 @@ Le bilan présente la note, les points, le meilleur combo et le détail des segm
 Dans Quête, « Régler mes objectifs » ouvre le formulaire de Plus. Choisis le nombre de séances et la durée habituelle : 4×30 donne 120 minutes, 5×25 donne 125 minutes. La base est désormais 120 minutes et ne monte plus automatiquement. Charge et variété suivent ce réglage ; le nombre maximal de séances dures demeure une limite, pas une mission à remplir. Les changements portent sur la semaine courante et les suivantes, sans recalculer les objectifs des semaines passées. Tes séances déjà enregistrées restent comptabilisées.
 
 ### Après connexion et choix du rythme
-Le Toputure TBE5 validé demande automatiquement le contrôle quand ses capacités1–32 sont disponibles. Avant le départ, vérifie « résistance automatique activée » ; les consignes commencent au démarrage. Si le vélo refuse, le lecteur montre le problème et permet de relancer le pilotage. Les autres modèles conservent leur vérification matérielle.
+Le TOPUTURE TEB5 validé demande automatiquement le contrôle quand ses capacités 1–32 sont disponibles. Avant le départ, vérifie « résistance automatique activée » ; les consignes commencent au démarrage. Si le vélo refuse, le lecteur montre le problème et permet de relancer le pilotage. Les autres modèles conservent leur vérification matérielle.
 
 Avant la séance, « Rythme de pédalage » propose Doux (défaut, −15tr/min), Classique ou Soutenu (+10). Le score suit ces cibles et les records restent comparés à réglages identiques. Pendant la séance, Alléger−1/Renforcer+1 adapte la résistance ; une modification en cours exclut le record comparable mais conserve ton résultat. L'effort visé sur10 est un repère : saisis ton véritable ressenti au bilan.
 
