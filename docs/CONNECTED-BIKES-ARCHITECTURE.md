@@ -2,7 +2,7 @@
 
 Document de conception initial — 7 octobre 2026.
 
-**Phase A démarrée** : un registre `BikeAdapter` expose désormais FTMS comme premier adaptateur, et la qualification TOPUTURE 1–32 est centralisée dans un module dédié plutôt que dans l'interface principale. La persistance des qualifications et l'extraction complète du contrôleur Bluetooth restent les étapes suivantes.
+**Phase A avancée** : un registre `BikeAdapter` expose désormais FTMS comme premier adaptateur, la qualification TOPUTURE 1–32 est centralisée, et le cycle de connexion/contrôle/télémétrie vit dans `useBikeController` au lieu de `VeloQuestApp.tsx`. La persistance des qualifications et la séparation progressive des types protocolaires restent les étapes suivantes.
 
 ## Objectif
 
@@ -164,7 +164,7 @@ Une simple expression régulière sur le nom Bluetooth ne doit plus être la sou
 1. ✅ déplacer la décision de qualification TOPUTURE dans un module dédié ;
 2. ✅ introduire un registre `BikeAdapter` et identifier la connexion par `adapterId` ;
 3. ✅ faire de l'implémentation FTMS actuelle le premier adaptateur sans modifier son protocole ;
-4. ⏳ extraire la logique de connexion/état de `VeloQuestApp.tsx` dans un hook/contrôleur ;
+4. ✅ extraire la logique de connexion/état de `VeloQuestApp.tsx` dans `useBikeController` ;
 5. ⏳ déplacer progressivement les types protocolaires génériques hors de `ftms.ts` ;
 6. conserver exactement le comportement utilisateur actuel à chaque étape.
 
