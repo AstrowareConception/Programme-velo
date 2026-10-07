@@ -22,8 +22,7 @@ import type { AppState, CompletedSession, Measurement, Preferences, TelemetrySam
 import { VoyagePanel } from "@/components/VoyagePanel";
 import { voyagePlan, voyageProgress, voyageWorkout } from "@/lib/voyage";
 import { validVoyagePortion } from "@/lib/voyage-progress";
-import { connectBike as connectBikeAdapter, hasWebBluetooth, type BikeConnection, type BikeTelemetry, webBluetoothHint } from "@/lib/bike-adapters";
-import { resistanceQualificationFor } from "@/lib/bike-qualification";
+import { useBikeController } from "@/components/useBikeController";
 import { ClimbProfile } from "@/components/ClimbProfile";
 import { RouteMap } from "@/components/RouteMap";
 import { RoutePlaces } from "@/components/RoutePlaces";
@@ -164,18 +163,8 @@ export function VeloQuestApp() {
   const [toast, setToast] = useState<string | null>(null);
   const [online, setOnline] = useState(true);
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
-  const [bike, setBike] = useState<BikeConnection | null>(null);
-  const [telemetry, setTelemetry] = useState<BikeTelemetry>({});
-  const [lastTelemetryAt, setLastTelemetryAt] = useState<number | null>(null);
   const [telemetrySamples, setTelemetrySamples] = useState<TelemetrySample[]>([]);
-  const [bluetoothError, setBluetoothError] = useState<string | null>(null);
-  const [connectingBike, setConnectingBike] = useState(false);
-  const [controlGranted, setControlGranted] = useState(false);
-  const [controlBusy, setControlBusy] = useState(false);
-  const controlBusyRef = useRef(false);
-  const [testResistanceLevel, setTestResistanceLevel] = useState(1);
   const [diagnosingBike, setDiagnosingBike] = useState(false);
-  const [resistanceMappingVerified, setResistanceMappingVerified] = useState(false);
   const cadenceBase = useRef<WorkoutTemplate | null>(null);
   const [sessionCadenceOffset, setSessionCadenceOffset] = useState(0);
   const coachFeedback = useRef({ belowSince: 0, lastAt: 0, lastAdviceAt: 0, lastLevel: undefined as number | undefined });
@@ -188,7 +177,57 @@ export function VeloQuestApp() {
   const [caloriesOnly, setCaloriesOnly] = useState(false);
   const [expressOnly, setExpressOnly] = useState(false);
   const [sessionIntensityFilter, setSessionIntensityFilter] = useState("all");
-  const [autoResistanceControl, setAutoResistanceControl] = useState(false);
+  const {
+    bike,
+    telemetry,
+    lastTelemetryAt,
+    bluetoothError,
+    connectingBike,
+    controlGranted,
+    controlBusy,
+    testResistanceLevel,
+    resistanceMappingVerified,
+    autoResistanceControl,
+    connectBike,
+    disconnectBike,
+    requestBikeControl,
+    sendTestResistance,
+    failAutomaticControl,
+    setTestResistanceLevel,
+    setResistanceMappingVerified,
+    setAutoResistanceControl
+  } = useBikeController({
+    diagnosing: diagnosingBike,
+    isLocked: () => pwa.locked(),
+    onBeforeConnect: () => {
+      if (calorieTracker.current) {
+        calorieTracker.current = { ...calorieTracker.current, valid: false };
+        setCalorieAttempt(calorieTracker.current);
+      }
+      calorieReading.current = undefined;
+    },
+    onTelemetry: (next) => {
+      if (next.totalEnergyKcal !== undefined) {
+        const now = Date.now();
+        calorieReading.current = { kcal: next.totalEnergyKcal, at: now };
+        if (calorieTracker.current) {
+          calorieTracker.current = sampleCalories(calorieTracker.current, next.totalEnergyKcal, now);
+          setCalorieAttempt(calorieTracker.current);
+        }
+      }
+      if (Object.prototype.hasOwnProperty.call(next, "cadenceRpm")) {
+        cadenceReading.current = { at: Date.now(), rpm: next.cadenceRpm };
+      }
+    },
+    onDisconnected: () => {
+      if (calorieTracker.current) {
+        calorieTracker.current = { ...calorieTracker.current, valid: false };
+        setCalorieAttempt(calorieTracker.current);
+      }
+      calorieReading.current = undefined;
+    },
+    onToast: setToast
+  });
   const [climbStartDistanceM, setClimbStartDistanceM] = useState<number | null>(null);
   const [customClimbs, setCustomClimbs] = useState<ClimbChallenge[]>([]);
   const [gpxError, setGpxError] = useState<string | null>(null);
@@ -670,9 +709,7 @@ export function VeloQuestApp() {
     autoWriteBusy.current = true;
     lastAutoTarget.current = currentTarget;
     bike.setResistance(currentTarget).catch((error) => {
-      setAutoResistanceControl(false);
-      setControlGranted(false);
-      setBluetoothError(error instanceof Error ? error.message : "Pilotage automatique interrompu.");
+      failAutomaticControl(error);
     }).finally(() => { autoWriteBusy.current = false; });
   }, [autoResistanceControl, controlGranted, running, sessionStarted, active, segmentIndex, bike, currentTarget, secondsLeft]);
 
@@ -791,102 +828,6 @@ export function VeloQuestApp() {
     setSegmentAttackRoute(null);
     setRunning(false);
     setSessionStarted(false);
-  }
-
-  async function connectBike() {
-    if (pwa.locked() || diagnosingBike || connectingBike) return;
-    if (calorieTracker.current) { calorieTracker.current = { ...calorieTracker.current, valid: false }; setCalorieAttempt(calorieTracker.current); }
-    calorieReading.current = undefined;
-    setResistanceMappingVerified(false);
-    setLastTelemetryAt(null);
-    if (!hasWebBluetooth()) {
-      setBluetoothError(webBluetoothHint() === "ios"
-        ? "Sur iPhone/iPad, les navigateurs actuels n’exposent pas Web Bluetooth à la PWA. Le mode guidé et la saisie manuelle restent disponibles."
-        : "Web Bluetooth n’est pas disponible dans ce navigateur.");
-      return;
-    }
-    pwa.setBusy(true);
-    setConnectingBike(true);
-    setBluetoothError(null);
-    try {
-      const connection = await connectBikeAdapter(
-        (next) => {
-          if (next.totalEnergyKcal !== undefined) {
-            const now = Date.now(); calorieReading.current = { kcal: next.totalEnergyKcal, at: now };
-            if (calorieTracker.current) { calorieTracker.current = sampleCalories(calorieTracker.current, next.totalEnergyKcal, now); setCalorieAttempt(calorieTracker.current); }
-          }
-          if (Object.prototype.hasOwnProperty.call(next, "cadenceRpm")) cadenceReading.current = { at: Date.now(), rpm: next.cadenceRpm };
-          setLastTelemetryAt(Date.now()); setTelemetry((prev) => ({ ...prev, ...next }));
-        },
-        () => {
-          if (calorieTracker.current) { calorieTracker.current = { ...calorieTracker.current, valid: false }; setCalorieAttempt(calorieTracker.current); }
-          calorieReading.current = undefined;
-          setBike(null);
-          setTelemetry({});
-          setControlGranted(false);
-          setAutoResistanceControl(false);
-        }
-      );
-      setBike(connection);
-      setControlGranted(false);
-      setAutoResistanceControl(false);
-      const range = connection.capabilities.resistanceRange;
-      setTestResistanceLevel(range?.min ?? 1);
-      const qualification = resistanceQualificationFor(connection);
-      if (qualification.mappingVerified) setResistanceMappingVerified(true);
-      if (qualification.autoRequestControl && connection.requestControl && connection.setResistance) {
-        try {
-          await connection.requestControl();
-          setControlGranted(true);
-          setAutoResistanceControl(true);
-        } catch (error) {
-          setBluetoothError(`Pilotage automatique indisponible : ${error instanceof Error ? error.message : "contrôle refusé"}`);
-        }
-      }
-      setToast(range ? `${connection.deviceName} connecté · résistance ${range.min}–${range.max}` : `${connection.deviceName} connecté`);
-    } catch (error) {
-      setBluetoothError(error instanceof Error ? error.message : "Connexion Bluetooth impossible.");
-    } finally {
-      setConnectingBike(false);
-    }
-  }
-
-  async function requestBikeControl() {
-    if (!bike?.requestControl || controlBusyRef.current) return;
-    controlBusyRef.current = true;
-    setControlBusy(true);
-    setBluetoothError(null);
-    try {
-      await bike.requestControl();
-      setControlGranted(true);
-      if (resistanceMappingVerified) setAutoResistanceControl(true);
-      setToast("Contrôle FTMS accordé par le vélo.");
-    } catch (error) {
-      setControlGranted(false);
-      setBluetoothError(error instanceof Error ? error.message : "Contrôle FTMS refusé.");
-      setAutoResistanceControl(false);
-    } finally {
-      controlBusyRef.current = false;
-      setControlBusy(false);
-    }
-  }
-
-  async function sendTestResistance() {
-    if (!bike?.setResistance || !controlGranted || active || controlBusyRef.current) return;
-    controlBusyRef.current = true;
-    setControlBusy(true);
-    setBluetoothError(null);
-    try {
-      await bike.setResistance(testResistanceLevel);
-      setToast(`Commande ${testResistanceLevel} acquittée ; effet physique à vérifier.`);
-    } catch (error) {
-      setControlGranted(false);
-      setAutoResistanceControl(false);
-      setBluetoothError(error instanceof Error ? error.message : "Commande de résistance refusée.");
-    } finally {
-      controlBusyRef.current = false;
-      setControlBusy(false);
-    }
   }
 
   function openManualLog() {
@@ -1350,7 +1291,7 @@ export function VeloQuestApp() {
           <div><strong>VeloQuest</strong><span>Ride · Level up · Repeat</span></div>
         </div>
         <div className="topActions">
-          <button disabled={diagnosingBike || connectingBike} className={`bikePill ${bike ? "connected" : ""}`} onClick={bike ? () => { bike.disconnect(); setBike(null); setTelemetry({}); setControlGranted(false); setAutoResistanceControl(false); } : connectBike}>
+          <button disabled={diagnosingBike || connectingBike} className={`bikePill ${bike ? "connected" : ""}`} onClick={bike ? () => disconnectBike() : connectBike}>
             <span>{bike ? "●" : "◌"}</span>{bike ? bike.deviceName : connectingBike ? "Connexion…" : "Vélo Bluetooth"}
           </button>
           <div className="levelPill"><span>Niv. {level}</span><strong>{xp} XP</strong></div>
@@ -1833,21 +1774,21 @@ export function VeloQuestApp() {
                     ) : (
                       <>
                         <label>Résistance FTMS de test <strong>{testResistanceLevel}</strong><input type="range" min={bike.capabilities.resistanceRange?.min} max={bike.capabilities.resistanceRange?.max} step={bike.capabilities.resistanceRange?.increment} disabled={controlBusy || Boolean(active)} value={testResistanceLevel} onChange={(e) => setTestResistanceLevel(Number(e.target.value))} /></label>
-                        <button className="secondary" disabled={controlBusy || Boolean(active)} onClick={sendTestResistance}>Envoyer ce niveau au vélo</button>
+                        <button className="secondary" disabled={controlBusy || Boolean(active)} onClick={() => void sendTestResistance(Boolean(active))}>Envoyer ce niveau au vélo</button>
                         <div className="modalActions">
                           <button className="secondary" disabled={controlBusy || Boolean(active)} onClick={() => setTestResistanceLevel(bike.capabilities.resistanceRange!.min)}>Choisir le minimum</button>
                           <button className="secondary" disabled={controlBusy || Boolean(active)} onClick={() => { const range = bike.capabilities.resistanceRange!; setTestResistanceLevel(Math.min(range.max, Math.round((range.min + range.increment) * 10) / 10)); }}>Choisir un pas au-dessus</button>
                         </div>
                         <p className="finePrint">Choisir prépare la consigne. Seul « Envoyer ce niveau au vélo » l’applique. Un acquittement ne confirme pas l’effet physique.</p>
                         {bike.capabilities.resistanceRange?.min === 1 && bike.capabilities.resistanceRange.max === 32 && bike.capabilities.resistanceRange.increment === 1 ? <>
-                          <Toggle label="Correspondance physique 1–32 vérifiée pour cette connexion" description="À cocher seulement après avoir comparé les commandes manuelles avec l’écran et la résistance effective du vélo." checked={resistanceMappingVerified} onChange={(verified) => { setResistanceMappingVerified(verified); setAutoResistanceControl(false); }} />
+                          <Toggle label="Correspondance physique 1–32 vérifiée pour cette connexion" description="À cocher seulement après avoir comparé les commandes manuelles avec l’écran et la résistance effective du vélo." checked={resistanceMappingVerified} onChange={setResistanceMappingVerified} />
                           {resistanceMappingVerified && <Toggle label="Auto-résistance pour cette connexion" description="À chaque changement de segment, VeloQuest envoie le niveau cible au vélo. Désactivé automatiquement en cas d’erreur." checked={autoResistanceControl} onChange={setAutoResistanceControl} />}
                         </> : <p>Auto-résistance indisponible : la plage annoncée ne correspond pas aux consignes 1–32. Aucune conversion matérielle n’est supposée.</p>}
                       </>
                     )}
                   </div>
                 )}
-                <button className="secondary" onClick={() => { bike.disconnect(); setBike(null); setTelemetry({}); setControlGranted(false); setAutoResistanceControl(false); setResistanceMappingVerified(false); }}>Déconnecter le vélo après le test</button>
+                <button className="secondary" onClick={() => disconnectBike(true)}>Déconnecter le vélo après le test</button>
               </>
             ) : (
               <>
