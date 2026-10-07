@@ -34,7 +34,8 @@ import { GettingStartedCard } from "@/components/GettingStartedCard";
 import { firstGuidedWorkout, guidanceCandidates, guidanceSessions, initialGuidance } from "@/lib/onboarding";
 import { MetricChart } from "@/components/MetricChart";
 import { InstallCard } from "@/components/InstallCard";
-import { PwaStatusCard, usePwa } from "@/components/PwaProvider";
+import { PwaStatusCard, PwaUpdateBanner, usePwa } from "@/components/PwaProvider";
+import { SessionJourneySteps, SessionReviewSummary } from "@/components/SessionJourney";
 import { SessionDashboard } from "@/components/SessionDashboard";
 import { ReaderViewChoice, SessionComfort } from "@/components/SessionComfort";
 import { screenWakeLabel, useScreenWakeLock } from "@/components/useScreenWakeLock";
@@ -1229,6 +1230,8 @@ export function VeloQuestApp() {
         </div>
       </header>
 
+      {tab !== "more" && !active && <PwaUpdateBanner />}
+
       <section className={guidedView ? "hero guidedHero" : "hero"}>
         <div>
           <p className="eyebrow">{guidedView ? "TON PARCOURS DE DÉMARRAGE" : `SEMAINE ${week} / 12`}</p>
@@ -1820,16 +1823,21 @@ export function VeloQuestApp() {
 
       {active && (
         <div className={`modalBackdrop ${sessionStarted && !showFinish ? "activeSessionBackdrop" : ""}`}>
-          <div ref={readerRef} className={`sessionModal ${sessionStarted && !showFinish ? "activeSessionModal" : ""} ${activeClimb ? "climbSession" : ""} ${activeVoyage ? "voyageSession" : ""} ${sessionStarted && !showFinish && preferences.readerView === "essential" ? "essentialSession" : ""}`}>
+          <div ref={readerRef} className={`sessionModal ${sessionStarted && !showFinish ? "activeSessionModal" : "sessionJourneyModal"} ${activeClimb ? "climbSession" : ""} ${activeVoyage ? "voyageSession" : ""} ${sessionStarted && !showFinish && preferences.readerView === "essential" ? "essentialSession" : ""}`}>
             <button className="close" aria-label="Mettre la séance de côté" onClick={parkActiveSession}>×</button>
 
             {showFinish ? (
               <form action={finishActive} className="finishForm" onKeyDown={event => {
                 if (event.key === "Enter" && event.target instanceof HTMLInputElement) { event.preventDefault(); event.target.blur(); }
               }}>
+                <header className="journeyHeader"><SessionJourneySteps phase="review" />
                 <p className="eyebrow">JOURNAL DE SÉANCE</p>
                 <h2>Enregistre ta performance</h2>
                 <p>Vérifie les mesures ci-dessous, puis confirme l’enregistrement. Les champs vides restent facultatifs.</p>
+                </header>
+                <div className="journeyBody">
+                <section className="journeyOverview" aria-label="Récapitulatif de la séance">
+                <SessionReviewSummary workout={active} />
                 {calorieMode ? <CalorieResult result={calorieResult} previous={caloriePrevious?.metrics?.calorieChallenge} /> : <><CadenceResult score={cadenceScore} /><CoachComparison score={cadenceScore} previous={previousCadenceBest?.metrics?.cadenceScore} eligible={cadenceRecordEligible} /></>}
                 {activeVoyage && <p className="voyageNext">{sessionElapsedSeconds >= totalSessionSeconds - .01 ? `Portion achevée : ${activeVoyage.startKm.toFixed(2)} → ${activeVoyage.endKm.toFixed(2)} km. Enregistre-la pour avancer dans ton voyage.` : "Portion inachevée : la séance reste dans ton journal, mais ce passage sera à refaire. Tu peux aussi fermer pour conserver la séance et la reprendre."} La distance du Voyage est simulée ; les champs ci-dessous décrivent les mesures du vélo.</p>}
                 {activeVoyage && sessionElapsedSeconds < totalSessionSeconds - .01 && <button type="button" className="secondary" onClick={() => setShowFinish(false)}>Continuer cette portion</button>}
@@ -1840,7 +1848,9 @@ export function VeloQuestApp() {
                   </div>
                 )}
                 {telemetrySamples.length > 0 && <p className="connectedNotice">✓ {telemetrySamples.length} échantillons FTMS récupérés. Les champs connus sont préremplis.</p>}
-                <div className="form">
+                </section>
+                <section className="form journeyFields" aria-label="Mesures à vérifier">
+                  <h3>Ton journal</h3>
                   <label>Date et heure de la séance<input name="loggedAt" type="datetime-local" defaultValue={localInputDateTime()} required /></label>
                   <div className="formRow">
                     {(routeMode === "timeAttack" || routeMode === "segmentAttack") && activeClimb
@@ -1862,25 +1872,38 @@ export function VeloQuestApp() {
                     <label>FC moyenne (bpm)<input name="avgHeartRate" type="number" step="1" defaultValue={autoMetrics.avgHeartRate?.toFixed(0)} /></label>
                   </div>
                   <label>Note<input name="note" placeholder="Jambes, sommeil, difficulté, réglage…" /></label>
+                </section>
+                </div>
+                <footer className="journeyFooter">
                   <label className="finishReview"><input type="checkbox" checked={finishReviewed} onChange={event => setFinishReviewed(event.target.checked)} />J’ai vérifié le bilan et les champs facultatifs.</label>
                   <button className="primary" type="submit" disabled={!finishReviewed}>{activeVoyage ? "Enregistrer ma portion" : `Valider la quête · +${active.xp} XP`}</button>
-                </div>
+                </footer>
               </form>
             ) : !sessionStarted ? (
               <div className="sessionPreview">
+                <header className="journeyHeader"><SessionJourneySteps phase="prepare" />
                 <p className="eyebrow">{activeVoyage ? "VOYAGE · PORTION" : activeClimb ? (routeMode === "timeAttack" ? "TIME ATTACK" : routeMode === "segmentAttack" ? "SEGMENT ATTACK" : routeCategory(activeClimb) === "scenic" ? "BALADE · 1/5" : "PARCOURS") : "PRÉPARATION"}</p>
                 <h2>{active.name}</h2>
+                </header>
+                <div className="journeyBody">
+                <section className="journeyOverview" aria-label="Programme de la séance">
                 {previousCadenceBest && <p className="cadenceBest">Meilleur suivi à ces réglages : {cadenceSummary(previousCadenceBest.metrics?.cadenceScore).grade} · {cadenceSummary(previousCadenceBest.metrics?.cadenceScore).percent?.toFixed(1)} %</p>}
                 <p className="previewDescription">{activeVoyage ? `${active.tagline} · ≈ ${active.duration.toFixed(1)} min. Position simulée à 15 km/h, pauses libres. Les mesures FTMS sont enregistrées séparément et ne pilotent pas ce mode.` : scenicSession ? "RPE 2–4, résistance douce et pauses libres. Parcours entier, sans objectif de chrono : choisis selon la durée estimée et ton énergie." : activeClimb?.subtitle ?? active.description}</p>
-                {activeClimb?.scenery && <details className="sceneryDetails"><summary>Découvrir le paysage et son profil</summary><p>{activeClimb.scenery}</p><small>{activeClimb.note}</small></details>}
-                {activeClimb && <RoutePlaces route={activeClimb} />}
-                {activeClimb && preferences.showRoutePhotos && <RoutePhotos key={activeClimb.id} route={activeClimb} currentKm={activeVoyage?.startKm} />}
                 <div className="previewStats">
                   <span><small>{(routeMode === "timeAttack" || routeMode === "segmentAttack") && activeClimb ? "Record" : "Durée"}</small><strong>{(routeMode === "timeAttack" || routeMode === "segmentAttack") && activeClimb ? (activeRaceBest?.metrics?.elapsedSeconds !== undefined ? formatRaceTime(activeRaceBest.metrics.elapsedSeconds) : "à établir") : `${activeVoyage ? active.duration.toFixed(1) : active.duration} min`}</strong></span>
                   <span><small>Intensité</small><strong>{active.intensity === "hard" ? "dure" : active.intensity === "moderate" ? "soutenue" : "facile"}</strong></span>
                   <span><small>Récompense</small><strong>{activeVoyage ? `${activeClimb?.xp} XP au bout du voyage` : `+${active.xp} XP`}</strong></span>
                   <span><small>Segments</small><strong>{active.segments.length}</strong></span>
                 </div>
+                {!calorieMode && <EffortProfile workout={active} elapsed={0} offset={preferences.resistanceOffset + sessionResistanceDelta} />}
+                {activeClimb?.scenery && <details className="sceneryDetails"><summary>Découvrir le paysage et son profil</summary><p>{activeClimb.scenery}</p><small>{activeClimb.note}</small></details>}
+                {activeClimb && <RoutePlaces route={activeClimb} />}
+                {activeClimb && preferences.showRoutePhotos && <RoutePhotos key={activeClimb.id} route={activeClimb} currentKm={activeVoyage?.startKm} />}
+                <div className="journeyHint"><strong>À ton rythme</strong><p>{(routeMode === "timeAttack" || routeMode === "segmentAttack") && activeClimb ? "Le chrono continue pendant les interruptions. Choisis ce mode lorsque tu es prêt à partir." : "Tu peux faire une pause ou mettre la séance de côté pour la reprendre plus tard."}</p></div>
+                </section>
+                <section className="journeySettings" aria-label="Réglages avant le départ">
+                <h3>Prêt à partir ?</h3>
+                {!bike && <div className="journeyConnection"><strong>Mode manuel</strong><p>Suis les consignes et règle la résistance sur ton vélo. Tu pourras saisir ses mesures au bilan.</p></div>}
                 {bike && <div className="connectedNotice">✓ {bike.deviceName} connecté · {autoResistanceControl && controlGranted ? "résistance automatique activée" : "télémétrie active · résistance manuelle"}
                   {resistanceMappingVerified && !autoResistanceControl && <button type="button" className="secondary" disabled={controlBusy} onClick={() => controlGranted ? setAutoResistanceControl(true) : void requestBikeControl()}>Activer le pilotage automatique</button>}
                   {bluetoothError && <p role="status">{bluetoothError}</p>}
@@ -1918,7 +1941,9 @@ export function VeloQuestApp() {
                   ))}
                   </div>
                 </details>
-                <div className="previewFooter">
+                </section>
+                </div>
+                <div className="previewFooter journeyFooter">
                   <span>{screenWakeLabel(screenWake.status, preferences.keepScreenAwake)} · {preferences.voiceCues ? "voix activée" : preferences.soundCues ? "bips activés" : "silencieux"}{sessionResistanceDelta ? ` · coach ${sessionResistanceDelta > 0 ? "+" : ""}${sessionResistanceDelta}` : ""}</span>
                   <button className="primary bigStart" onClick={beginSession}>{(routeMode === "timeAttack" || routeMode === "segmentAttack") && activeClimb ? "Lancer le chrono" : "Démarrer la séance"}</button>
                 </div>
