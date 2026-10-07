@@ -18,9 +18,9 @@ import { CadenceResult } from "@/components/CadenceResult";
 import { withCadenceOffset, addCadenceInterval, bestCadenceAttempt, cadenceSummary, effortSettingsKey, emptyCadenceScore, numericRange, resistanceTarget } from "@/lib/effort";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { CompletedSession, Measurement, Preferences, TelemetrySample, TimeAttackSplit, VoyagePortion, WorkoutTemplate } from "@/lib/types";
+import type { Measurement, Preferences, TelemetrySample, TimeAttackSplit, VoyagePortion, WorkoutTemplate } from "@/lib/types";
 import { VoyagePanel } from "@/components/VoyagePanel";
-import { voyagePlan, voyageProgress, voyageWorkout } from "@/lib/voyage";
+import { voyagePlan, voyageWorkout } from "@/lib/voyage";
 import { validVoyagePortion } from "@/lib/voyage-progress";
 import { useBikeController } from "@/components/useBikeController";
 import { webBluetoothHint } from "@/lib/bike-adapters";
@@ -71,15 +71,15 @@ import {
   levelTitle
 } from "@/lib/data";
 import { localInputDate, localInputDateTime, localDateToIso } from "@/lib/dates";
-import { counterDelta } from "@/lib/session";
-import { compactTelemetry, formatClock } from "@/lib/session";
+import { counterDelta, formatClock } from "@/lib/session";
 import { cueCoach, adjustedResistance, cueSegment, prepareCueAudio, releaseCueAudio } from "@/lib/session-cues";
 import { createBackup, estimateLocalBytes, parseBackup } from "@/lib/storage";
 import { captureSplits, checkpointKilometers, formatRaceTime, ghostDeltaSeconds, ghostDistanceAtElapsed, personalBest, routeAttempts, segmentAttempts, segmentBounds, segmentPersonalBest } from "@/lib/time-attack";
-import { challengesForRoute, evaluateRouteChallenge, routeChallenges, type RouteChallenge } from "@/lib/challenges";
+import { challengesForRoute, routeChallenges, type RouteChallenge } from "@/lib/challenges";
 import { restoreSessionSnapshot } from "@/lib/session-recovery";
 import { useSessionSnapshotController } from "@/components/useSessionSnapshotController";
 import { useLocalPersistenceController } from "@/components/useLocalPersistenceController";
+import { buildSessionCompletion } from "@/lib/session-completion";
 
 type Tab = "dashboard" | "sessions" | "climbs" | "progress" | "more";
 type Energy = "easy" | "normal" | "hard";
@@ -829,102 +829,54 @@ export function VeloQuestApp() {
     const loggedAt = String(form.get("loggedAt") ?? "").trim();
     const date = loggedAt ? localDateToIso(loggedAt) : new Date().toISOString();
     if (!date) { setToast("Date ou heure de séance invalide."); return; }
+
     const manualUsed = ["distance", "calories", "avgCadence", "avgPower", "avgHeartRate", "rpe", "note"]
       .some((key) => String(form.get(key) ?? "").trim().length > 0);
-    const hasFtms = telemetrySamples.length > 0;
-    const isTimeAttack = routeMode === "timeAttack" && Boolean(activeClimb);
-    const isSegmentAttack = routeMode === "segmentAttack" && Boolean(activeClimb) && segmentAttackIndex !== null;
-    const isRaceMode = isTimeAttack || isSegmentAttack;
-    const isVoyage = routeMode === "voyage" && Boolean(activeVoyage);
-    const completedPortion = isVoyage && sessionStarted && sessionElapsedSeconds >= totalSessionSeconds - .01;
-    const elapsedSeconds = isRaceMode
-      ? (n(form, "elapsedSeconds") ?? timeAttackElapsedSeconds)
-      : undefined;
-    const duration = calorieMode ? sessionElapsedSeconds / 60 : isVoyage ? sessionElapsedSeconds / 60 : isRaceMode && elapsedSeconds !== undefined
-      ? elapsedSeconds / 60
-      : (n(form, "duration") ?? active.duration);
-    const previousBest = isTimeAttack && activeClimb
-      ? personalBest(state.sessions, activeClimb.id)
-      : isSegmentAttack && activeClimb && segmentAttackIndex !== null
-        ? segmentPersonalBest(state.sessions, activeClimb.id, segmentAttackIndex)
-        : undefined;
-    const candidatePersonalBest = Boolean(
-      isRaceMode &&
-      elapsedSeconds !== undefined &&
-      (!previousBest?.metrics?.elapsedSeconds || elapsedSeconds < previousBest.metrics.elapsedSeconds)
-    );
-    const completedRoute = activeClimb
-      ? (isSegmentAttack || isVoyage
-          ? false
-          : bike && telemetry.distanceM !== undefined && climbStartDistanceM !== null
-            ? currentRouteKm >= activeClimb.distanceKm * 0.98
-            : sessionProgressPercent >= 98 || (isTimeAttack && timeAttackSplits.some((split) => split.km >= activeClimb.distanceKm * .98)))
-      : true;
-    const completedSegment = isSegmentAttack && activeSegmentBounds
-      ? (bike && telemetry.distanceM !== undefined && climbStartDistanceM !== null
-          ? raceCurrentKm >= activeSegmentBounds.distanceKm * .98
-          : sessionProgressPercent >= 98)
-      : undefined;
-    const isPersonalBest = candidatePersonalBest && (isSegmentAttack ? completedSegment : completedRoute) && (elapsedSeconds ?? 0) > 0;
-    const formCadence = n(form, "avgCadence");
-    const challengeResult = activeChallenge && activeClimb
-      ? evaluateRouteChallenge(activeChallenge, {
-          route: activeClimb,
-          completedRoute,
-          pauseCount,
-          avgCadenceRpm: formCadence ?? autoMetrics.avgCadenceRpm,
-          elapsedSeconds,
-          pbBeforeSeconds: previousBest?.metrics?.elapsedSeconds,
-          checkpointSplits: timeAttackSplits
-        })
-      : undefined;
-    const awardedXp = active.xp + (isPersonalBest ? 50 : 0) + (challengeResult?.xpBonus ?? 0);
+    const result = buildSessionCompletion({
+      id: uid(),
+      date,
+      state,
+      active,
+      activeClimb,
+      routeMode,
+      activeVoyage,
+      activeChallenge,
+      segmentAttackIndex,
+      sessionStarted,
+      sessionElapsedSeconds,
+      totalSessionSeconds,
+      timeAttackElapsedSeconds,
+      timeAttackSplits,
+      pauseCount,
+      distanceMeasuredByBike: Boolean(bike && telemetry.distanceM !== undefined && climbStartDistanceM !== null),
+      currentRouteKm,
+      raceCurrentKm,
+      sessionProgressPercent,
+      activeSegmentBounds,
+      form: {
+        manualUsed,
+        elapsedSeconds: n(form, "elapsedSeconds"),
+        duration: n(form, "duration"),
+        distanceKm: n(form, "distance"),
+        calories: n(form, "calories"),
+        avgSpeedKmh: n(form, "avgSpeed"),
+        avgCadenceRpm: n(form, "avgCadence"),
+        avgPowerW: n(form, "avgPower"),
+        avgHeartRate: n(form, "avgHeartRate"),
+        rpe: n(form, "rpe"),
+        note: String(form.get("note") ?? "").trim() || undefined
+      },
+      telemetrySamples,
+      autoMetrics,
+      calorieMode,
+      calorieResult,
+      cadenceScore,
+      comparisonKey,
+      cadenceRecordEligible,
+      keepTelemetryTrace: preferences.keepTelemetryTrace
+    });
 
-    const session: CompletedSession = {
-          id: uid(),
-          templateId: active.id,
-          routeId: activeClimb?.id,
-          date,
-          duration,
-          points: isVoyage && !completedPortion ? 0 : active.points,
-          xp: awardedXp,
-          intensity: active.intensity,
-          kind: active.kind,
-          bonus: Boolean(active.bonus),
-          rpe: n(form, "rpe"),
-          note: String(form.get("note") ?? "").trim() || undefined,
-          metrics: {
-            voyage: isVoyage && activeVoyage ? { ...activeVoyage, completedPortion } : undefined,
-            source: hasFtms && manualUsed ? "mixed" : hasFtms ? "ftms" : "manual",
-            completedWorkout: activeClimb ? undefined : sessionStarted ? sessionProgressPercent >= 98 : true,
-            elapsedSeconds,
-            timeAttack: isTimeAttack || undefined,
-            segmentAttackIndex: isSegmentAttack && segmentAttackIndex !== null ? segmentAttackIndex : undefined,
-            checkpointSplits: isTimeAttack ? timeAttackSplits : undefined,
-            challenge: challengeResult,
-            completedRoute: activeClimb ? completedRoute : undefined,
-            completedSegment,
-            distanceKm: n(form, "distance") ?? autoMetrics.distanceKm ?? (isVoyage ? undefined : activeClimb ? (isSegmentAttack ? raceCurrentKm : currentRouteKm) : undefined),
-            calories: calorieMode ? calorieResult?.kcal : n(form, "calories") ?? autoMetrics.calories,
-            calorieChallenge: calorieResult,
-            avgSpeedKmh: n(form, "avgSpeed") ?? autoMetrics.avgSpeedKmh,
-            avgCadenceRpm: n(form, "avgCadence") ?? autoMetrics.avgCadenceRpm,
-            maxCadenceRpm: autoMetrics.maxCadenceRpm,
-            avgPowerW: n(form, "avgPower") ?? autoMetrics.avgPowerW,
-            maxPowerW: autoMetrics.maxPowerW,
-            avgHeartRate: n(form, "avgHeartRate") ?? autoMetrics.avgHeartRate,
-            maxHeartRate: autoMetrics.maxHeartRate,
-            avgResistance: autoMetrics.avgResistance,
-            cadenceScore: calorieMode ? undefined : cadenceScore,
-            cadenceSettingsKey: calorieMode ? undefined : comparisonKey,
-            cadenceRecordEligible: !calorieMode && cadenceRecordEligible,
-            samples: hasFtms && preferences.keepTelemetryTrace ? compactTelemetry(telemetrySamples) : undefined
-          }
-        };
-    const nextSessions = [...state.sessions, session];
-    const voyageXpEarned = isVoyage ? totalXp({ ...state, sessions: nextSessions }) - totalXp(state) : 0;
-    const voyageComplete = isVoyage && activeClimb ? voyageProgress(activeClimb, nextSessions).complete : false;
-    setState(prev => ({ ...prev, sessions: [...prev.sessions, session] }));
+    setState(prev => ({ ...prev, sessions: [...prev.sessions, result.session] }));
     calorieTracker.current = undefined;
     setActive(null);
     setActiveClimb(null);
@@ -942,11 +894,7 @@ export function VeloQuestApp() {
     setActiveChallenge(null);
     setSegmentAttackIndex(null);
     setActiveVoyage(null);
-    setToast(isVoyage ? (completedPortion ? `${voyageComplete ? "Voyage achevé" : "Portion enregistrée · la suite t’attend dans Quête"}${voyageXpEarned ? ` · +${voyageXpEarned} XP` : ""}` : "Séance enregistrée. Portion inachevée : aucun kilomètre validé dans le Voyage.") : challengeResult
-      ? (challengeResult.success ? `Défi réussi · +${awardedXp} XP` : `Défi manqué · ${challengeResult.summary}`)
-      : isPersonalBest
-        ? `${isSegmentAttack ? "Nouveau record de secteur" : "Nouveau record personnel"} · +${awardedXp} XP`
-        : `Quête validée · +${awardedXp} XP`);
+    setToast(result.message);
   }
 
   function beginSession() {
