@@ -7,6 +7,7 @@ import { compactTelemetry } from "./session";
 import { personalBest, segmentPersonalBest } from "./time-attack";
 import type {
   AppState,
+  ChallengeResult,
   CompletedSession,
   TelemetrySample,
   TimeAttackSplit,
@@ -83,9 +84,7 @@ export type SessionCompletionResult = {
   completedPortion: boolean;
   voyageComplete: boolean;
   voyageXpEarned: number;
-  challengeResult?: CompletedSession["metrics"] extends infer M
-    ? M extends { challenge?: infer C } ? C : never
-    : never;
+  challengeResult?: ChallengeResult;
   message: string;
 };
 
