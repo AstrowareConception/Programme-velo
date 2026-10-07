@@ -1,80 +1,279 @@
 # Roadmap VéloQuest
 
-## 6 octobre 2026 — programme personnel, maîtrise et carnets
+Actualisée le **7 octobre 2026** à partir de `main` `0c7077970a012bcf9af25072f397ccbd56518a2a`.
 
-Lot de mise à jour en cours de validation : planning hebdomadaire adapté, bilans, habitudes, débrief, repères de cadence, dix nouvelles séances et trois programmes, défis de maîtrise, carnets personnels et quatre parcours du canal. Voir [fonctionnement et limites](PROGRAMME-PERSONNEL.md) et [sources du canal](CANAL-NANTES-BREST.md).
+Cette roadmap remplace les listes historiques devenues obsolètes. Le produit dispose déjà d'un socle très riche : 44 séances, 84 parcours natifs, 38 balades faciles, 12 thèmes, 6 programmes, 22 campagnes/carnets et 77 badges. L'objectif n'est plus d'empiler les fonctionnalités, mais de consolider le produit, fiabiliser son usage réel, prolonger le programme au-delà de douze semaines et rendre le matériel connecté extensible à plusieurs vélos.
 
-La synchronisation distante, les nouveaux packs Grandes Alpes/Ardèche et les essais vocaux physiques restent ouverts. Les descriptions matérielles anciennes ci-dessous sont historiques : Bluefy + Toputure TBE5, résistance effective et transfert JSON ont depuis été confirmés par l’utilisateur. Les références de publication de ce lot sont à vérifier dans PROJECT-STATE.
+## Principes de priorité
 
+1. **Fiabilité avant volume** : aucun nouveau pack de contenu ne doit passer devant une régression de séance, de sauvegarde, de PWA ou de vélo connecté.
+2. **Capacités avant marques** : le support matériel doit d'abord s'appuyer sur FTMS et les capacités réellement exposées, sans supposer qu'un nom commercial garantit un protocole.
+3. **Compatibilité conservée** : les sauvegardes v3, historiques, parcours personnels, carnets et identifiants de récompenses existants restent lisibles.
+4. **Validation réelle séparée de la simulation** : un test Playwright FTMS ne qualifie jamais un vélo physique, un navigateur mobile ou un comportement en arrière-plan.
+5. **Progression durable** : le jeu ne doit pas pousser artificiellement la charge pour distribuer plus de points.
 
-## 6 octobre 2026 — vignoble d’Alsace et extension des photos
+---
 
-Lot préparé depuis main `58a8769bab262903918757bdbe9c29306476d389` (correctif PWA de la PR 34 livré et vérifié en production). Neuf parcours alsaciens : six étapes continues et trois courts formats distincts, deux carnets (770 XP uniques au total) et deux trophées. Catalogue : 80 parcours, 35 balades, 11 thèmes, 22 carnets et 74 badges. Les anciens parcours et objectifs restent identiques. [Trace, relief et règles](ALSACE-VIGNOBLE.md).
+## P0 — Consolidation du produit
 
-Cinq nouvelles photos créditées : Ventoux, Galibier, Estérel, Obernai et Eguisheim. Dix images, dix-sept parcours illustrés, 574 734 octets facultatifs ; compteur PWA et bouton de préparation suivent le manifeste. [Sources et points de vue](LANDSCAPE-PHOTOS.md). Les contrôles exacts, PR, fusion et version publique seront portés dans l’état de reprise externe après observation. La PR 29 matérielle reste séparée. Nantes constitue la prochaine piste de contenu, sans lot engagé ici.
+### P0.1 — Documentation et état de référence
 
+**État : en cours dans le lot de consolidation du 7 octobre.**
 
-Actualisée le 6 octobre 2026. Le catalogue Estérel est intégré ; le confort du lecteur et le Voyage par portions sont décrits ci-dessous avec les prochaines fonctions. Les références exactes de contrôle, fusion et déploiement figurent dans le document externe d’état de reprise après vérification.
+- réécrire cette roadmap sur l'état réel du produit ;
+- simplifier `PROJECT-STATE.md` en séparant l'état courant de l'historique ;
+- harmoniser la référence matérielle TOPUTURE/TEB5 dans les textes utilisateurs ;
+- enlever les mentions « à qualifier » devenues fausses tout en conservant les limites réellement non vérifiées ;
+- conserver une distinction stricte entre télémétrie, pilotage, fréquence cardiaque, commandes vocales et fonctionnement en arrière-plan ;
+- documenter les travaux ouverts et leurs critères de fin.
 
-## Socle disponible
+**Terminé quand** README, roadmap, état de reprise, guide utilisateur et guide matériel ne se contredisent plus.
 
-Programme souple de douze semaines, trois programmes découverte, onboarding progressif, lecteur manuel 32 niveaux et reprise locale ; GPX, parcours et thèmes, campagnes uniques, défis, Time Attack et Segment Attack ; historique, saisie rétroactive et suppression, mesures, sauvegardes ; installation active quand le navigateur propose le dialogue. Les 14 grandes étapes Napoléon vont de Golfe-Juan à Grenoble, avec deux carnets indépendants.
+### P0.2 — Architecture multi-vélos
 
-## Lot Estérel et petites escales
+**État : conception démarrée.**
 
-Dix nouvelles destinations, un thème Estérel, trois carnets, deux trophées de découverte. Catalogue intégré par la PR 28 : 71 parcours, 29 balades 1/5, 10 thèmes, 20 carnets et 67 badges. [Contenu, sources et règles](ESTEREL-ESCALES.md). Pas de changement de stockage ni de raccourcissement artificiel des grandes étapes.
+VéloQuest doit pouvoir accueillir plusieurs marques et modèles **lorsque leurs protocoles sont accessibles**. La voie principale est Bluetooth FTMS ; les protocoles propriétaires éventuels sont des adaptateurs optionnels et ne doivent jamais être devinés.
 
-## Confort du lecteur et usage avec un média
+Le socle visé :
 
-Vue essentielle ou complète, commandes accessibles, volume et fréquence des alertes, test audio avant le départ, voix calibrée et préavis facultatif sur les segments minutés. État réel du maintien de l’écran, relance après refus/interruption et rappel au retour d’arrière-plan. Préférences sauvegardées ; chronos, défis et reprise conservés. [Guide pratique](READER-COMFORT.md). Lot livré par la PR 30, contrôlé et déployé sur main `f1eea5a`.
+- un contrat `BikeAdapter` indépendant de l'interface ;
+- découverte, connexion, télémétrie et contrôle séparés ;
+- description normalisée des capacités : vitesse, cadence, distance, puissance, calories, fréquence cardiaque, résistance, contrôle ;
+- profil de mappage entre l'échelle VéloQuest 1–32 et l'échelle réelle du vélo ;
+- qualification enregistrée par **adaptateur + modèle/capacités**, pas par simple expression régulière sur le nom Bluetooth ;
+- FTMS générique comme premier adaptateur ;
+- possibilité ultérieure d'ajouter des adaptateurs documentés pour des appareils non conformes ou partiellement conformes ;
+- mode manuel toujours disponible.
 
-L’installation active existe déjà. Restent à éprouver sur appareils réels : installation, veille/reprise, casque et coexistence avec podcast/vidéo. Le lot PWA décrit ci-dessous accompagne les mises à jour et vérifie la disponibilité des fichiers essentiels. Le cache actuel n’assure pas les cartes externes hors connexion.
+Voir [Architecture des vélos connectés](CONNECTED-BIKES-ARCHITECTURE.md).
 
-## Voyage par portions
+**Limite importante** : cette architecture peut supporter plusieurs modèles compatibles FTMS ou documentés. Elle ne garantit pas la compatibilité avec un appareil utilisant un protocole propriétaire inconnu ou inaccessible depuis le navigateur.
 
-Première version : un parcours natif ou GPX en portions de 15/30/45/60 minutes, progression retrouvée dans Quête et reprise de la portion en cours. Position simulée à 15 km/h, géométrie entière conservée et mesures du vélo distinctes. Une portion inachevée ne valide pas de kilomètres ; l’union des portions achevées valide la route, ses campagnes et une récompense unique. Recalcul après suppression, sauvegardes compatibles et trois trophées ajoutés. [Guide et limites](VOYAGE.md).
+### P0.3 — Dette de `VeloQuestApp.tsx`
 
-Le catalogue reste à 71 parcours, avec 70 badges. Les références exactes de contrôle et de livraison seront portées dans l’état de reprise externe après observation. Les carnets Napoléon et Estérel restent libres ; ce mode ne lance pas automatiquement la prochaine étape et n’invente aucune liaison à Gap.
+**État : à engager après consolidation documentaire.**
 
-## Premier lot de photos documentées
+Le composant principal dépasse désormais 2 200 lignes et concentre navigation, séance, Bluetooth, persistance, lecteur et plusieurs écrans.
 
-Cinq photos azuréennes sur huit parcours existants : galeries fermées au départ, une image locale à la fois, légendes et droits, navigation libre ou suivi des repères, masquage sauvegardé et vue essentielle conservée. Intégration dans les fiches, la préparation et le lecteur, y compris Voyage à mi-parcours. [Sélection et limites](LANDSCAPE-PHOTOS.md). Les 71 parcours et 70 badges sont conservés. Les références de validation et publication de ce lot sont consignées dans l’état de reprise externe après observation.
+Ordre de découpage proposé :
 
-## Expérience PWA
+1. contrôleur/hook de vélo connecté ;
+2. contrôleur de séance active et reprise ;
+3. contrôleur d'enregistrement et de persistance ;
+4. écrans Quête / Séances / Parcours / Suivi / Plus ;
+5. lecteur de séance et panneau Bluetooth ;
+6. suppression des dépendances croisées restantes.
 
-Paquet du build vérifié, compteur de photos et préparation facultative dans Plus ; nouvelle version en attente, consentement des onglets au repos et rechargement accompagné, reprise sauvegardée conservée. [Guide et limites](PWA-OFFLINE.md). Cartes externes et médias exclus ; stockage du navigateur révocable. Références de livraison consignées dans l’état externe après contrôle du commit exact et de la production.
+Les règles métier doivent continuer à vivre dans `lib/`, pas dans les composants visuels.
 
-## Prochaine priorité : canal de Nantes à Brest
+### P0.4 — Recette physique complète TOPUTURE
 
-Le Vignoble d’Alsace et l’extension aux grands cols sont intégrés dans le lot décrit en tête. Préparer les étapes du canal avec les mêmes contrôles de trace, relief et formats courts ; continuer les sélections photographiques documentées au fil des nouveaux packs. L’enchaînement de plusieurs étapes et le carnet personnel viendront ensuite.
+**État : partiellement qualifié, recette globale restante.**
 
-## Packs de parcours suivants
+Déjà observé par l'utilisateur : connexion Bluefy, télémétrie, transfert de sauvegarde et effet physique de commandes de résistance sur l'exemplaire utilisé.
 
-| Priorité | Ensemble | Apport attendu | État |
-| --- | --- | --- | --- |
-| 1 | Canal de Nantes à Brest | Pontivy, Rohan, Josselin et écluses ; balades douces | GPX d’étapes publiés ; géométrie et relief à traiter |
-| 2 | Route des Grandes Alpes | Roselend, Izoard et regroupement avec les cols existants | Traces officielles repérées ; préserver tous les IDs précédents |
-| 3 | Ardèche | Balazuc, villages, gorges et reliefs variés | Parcours touristiques repérés ; sélection exacte à établir |
+Reste à éprouver ensemble sur la version courante :
 
-Chaque pack devra proposer les mêmes informations locales : paysages, lieux réellement traversés ou proches clairement distingués, sources, distance, relief et limites. Difficultés fixées après analyse, pas avant. Les objectifs nouveaux doivent avoir une liste et un seuil stables ; les ajouts ne doivent pas déplacer un ancien trophée.
+- reconnexion et récupération après interruption ;
+- niveau reçu et niveau demandé sur plusieurs paliers ;
+- activation automatique du contrôle qualifié ;
+- boutons Alléger / Renforcer ;
+- fréquence cardiaque lorsqu'elle est réellement transmise ;
+- séance complète puis sauvegarde/rechargement ;
+- commande vocale réelle dans Bluefy ;
+- écran éveillé, arrière-plan, podcast et vidéo flottante.
 
-## Immersion après le mode Voyage
+Aucun de ces essais ne doit être généralisé à un autre modèle sans nouvelle qualification.
 
-Le premier lot de photos azuréennes est décrit ci-dessus. Étendre les sélections avec les mêmes droits, légendes et limites, sans créer une association trompeuse avec le tracé. Sons d’ambiance facultatifs, sans masquer les consignes. Un lecteur vidéo intégré est à étudier après les essais pratiques : disponibilité réseau, consommation, mode flottant et contraintes de la plateforme. Les photos ne constituent ni une restitution continue du trajet ni un relevé géographique.
+### P0.5 — Durcissement qualité
 
-## Puis : carnet personnel
+**État : à faire.**
 
-Composer un voyage à partir du catalogue et des GPX personnels, choisir l’ordre et suivre ses réalisations. Sauvegarde locale et export/import nécessaires. Les objectifs personnels ne doivent pas devenir une source illimitée d’XP par duplication de traces ou création répétée de carnets. Prévoir l’effet d’une suppression de GPX et la persistance des séances historiques.
+Conserver les quatre contrôles actuels puis ajouter progressivement :
 
-## Validation matérielle à l’arrivée du vélo
+- ESLint / règles React et TypeScript ;
+- contrôle d'accessibilité automatisé sur les écrans principaux ;
+- couverture de tests et seuils raisonnables sur les modules métier critiques ;
+- scénario de restauration d'une sauvegarde ancienne dans chaque migration ;
+- vérification des liens/documentation catalogue ;
+- audit de dépendances automatisé ;
+- si stable, tests du parcours manuel sous WebKit en complément de Chromium.
 
-Suivre le [protocole TEB5](TEB5-BLUETOOTH-VALIDATION.md) : données réellement transmises, précision et évolution des compteurs, éventuel contrôle de résistance, pauses et reprises. Les tests avec un simulateur ne valident pas le matériel physique. Installation réelle et veille sur iPhone/Safari restent aussi à vérifier.
+---
 
-## Contrôles avant chaque publication
+## P1 — Programme longue durée
 
-Sur le commit exact proposé : `npm run typecheck`, `npm test`, `npm run test:e2e`, `npm run build`, parcours utilisateur sur mobile et ordinateur. Aucun contrôle obligatoire en échec. Vérifier ensuite le SHA effectivement publié par Vercel et `/api/version`, puis actualiser README, guides et état de reprise.
+### P1.1 — Cycle après la semaine 12
 
+**Priorité métier la plus élevée après le P0.**
 
-### Matériel reçu — 6 octobre 2026
+La semaine 12 clôt aujourd'hui le premier cycle. Il faut concevoir une continuité explicite :
 
-Diagnostic BLE, recette intégrée, commandes manuelles min/pas voisin et fiche de résultat préparés dans le lot PR 29, réconcilié avec main c6e5157. À réaliser sur l’exemplaire : identification exacte, export du diagnostic, cohérence de la télémétrie, retour au minimum, déconnexion/reconnexion et effet physique des commandes. Compatibilité réelle encore inconnue.
+- bilan de fin de cycle ;
+- choix d'un nouveau cap : régularité, endurance, paysages, performance mesurée ;
+- nouveau cycle sans effacer l'historique ;
+- semaines de relâche planifiées ;
+- reprise après interruption ;
+- objectifs recalculés à partir des disponibilités actuelles ;
+- conservation des programmes découverte et séances libres.
+
+Aucune progression de charge ne doit être automatique uniquement parce qu'un objectif de points n'est pas atteint.
+
+### P1.2 — Charge et récupération
+
+Ajouter des indicateurs simples et compréhensibles :
+
+- charge basée sur durée et RPE ;
+- tendance courte / moyenne durée ;
+- fréquence des séances difficiles ;
+- alerte de répétition d'efforts élevés ;
+- suggestion de récupération ou séance facile.
+
+Ces indicateurs restent des outils d'entraînement et non un diagnostic médical.
+
+### P1.3 — Bilans de progression
+
+Créer :
+
+- bilan mensuel ;
+- bilan de cycle ;
+- évolution des minutes, séances, régularité et RPE ;
+- records comparables ;
+- distance et dénivelé virtuels ;
+- poids/tours uniquement lorsque l'utilisateur les renseigne ;
+- découvertes, carnets et territoires parcourus.
+
+### P1.4 — Voyage V2
+
+- bouton « étape suivante » à l'arrivée ;
+- enchaînement fluide d'un carnet ;
+- reprise d'un voyage depuis Quête ;
+- bilan final du carnet ;
+- distinction permanente entre distance simulée et distance mesurée.
+
+### P1.5 — Données multi-appareils
+
+Étudier d'abord une **sauvegarde distante facultative**, puis une vraie synchronisation.
+
+Avant toute implémentation :
+
+- choisir authentification et stockage ;
+- définir la source de vérité ;
+- conflits entre deux appareils ;
+- suppression/restauration ;
+- GPX et carnets ;
+- données hors connexion ;
+- chiffrement et confidentialité ;
+- réversibilité vers export JSON.
+
+L'export/import local reste obligatoire même si un cloud apparaît.
+
+---
+
+## P2 — Immersion et contenu
+
+Le produit possède déjà assez de contenu pour que ces ajouts passent après la maturation.
+
+### Route des Grandes Alpes
+
+Roselend, Izoard et étapes de liaison, en réutilisant les cols existants sans dupliquer leurs identifiants.
+
+### Ardèche
+
+Balazuc, villages, gorges et profils vallonnés à difficulté intermédiaire.
+
+### Canal de Nantes à Brest V2
+
+Le premier lot de quatre parcours existe. Étendre progressivement le voyage et ses carnets.
+
+### Photos documentées
+
+Augmenter la couverture des parcours majeurs avec les mêmes règles de droits, crédits et distinction entre trace et point de vue photographique.
+
+### Ambiances sonores facultatives
+
+Étudier mer, forêt, vent ou montagne avec :
+
+- volume séparé ;
+- aucune concurrence avec les consignes ;
+- chargement facultatif ;
+- coupure automatique en vue essentielle si nécessaire ;
+- fonctionnement hors connexion documenté.
+
+### Mode média compagnon
+
+Améliorer l'usage avec podcast, musique et Picture-in-Picture avant d'envisager un lecteur vidéo intégré. Une intégration vidéo n'est justifiée que si elle résout un problème observé lors des essais réels.
+
+### Maîtrise plutôt que multiplication des badges
+
+Les nouveaux systèmes de récompense doivent privilégier :
+
+- précision ;
+- constance ;
+- répétition maîtrisée ;
+- découverte variée ;
+- progression de records comparables.
+
+Éviter d'ajouter des badges uniquement pour augmenter le catalogue.
+
+---
+
+## P3 — Évolutions structurelles possibles
+
+### Enveloppe native
+
+À étudier seulement si l'usage réel le justifie :
+
+- Bluetooth iOS natif ;
+- notifications ;
+- meilleur comportement en arrière-plan ;
+- HealthKit / Health Connect ;
+- partage de fichiers plus fiable.
+
+La PWA et le mode manuel restent le socle.
+
+### Compte et produit multi-utilisateur
+
+Authentification, profils distants et partage ne deviennent prioritaires que si VéloQuest évolue d'un outil personnel vers un produit réellement distribué.
+
+---
+
+## Matrice d'exécution
+
+| Ordre | Lot | Résultat attendu |
+| --- | --- | --- |
+| 1 | Consolidation documentaire | Une seule vérité courante dans le dépôt |
+| 2 | Architecture multi-vélos + découpage technique | Socle extensible, moins de logique de marque dans l'UI |
+| 3 | Recette matérielle/PWA réelle | Liste courte de défauts réels, corrigés avant enrichissement |
+| 4 | Durcissement CI/accessibilité | Régressions détectées plus tôt |
+| 5 | Programme V2 après semaine 12 | Continuité sur plusieurs mois |
+| 6 | Charge, récupération et bilans | Progression mieux expliquée |
+| 7 | Voyage V2 | Carnets réellement continus |
+| 8 | Sauvegarde distante / synchronisation | Passage propre entre appareils |
+| 9 | Grandes Alpes / Ardèche / canal | Nouveau contenu après stabilisation |
+| 10 | Immersion média et éventuel natif | Enrichissement basé sur l'usage réel |
+
+## Contrôles obligatoires avant production
+
+Sur le commit exact proposé :
+
+```bash
+npm run typecheck
+npm test
+npx playwright install --with-deps chromium
+npm run test:e2e
+npm run build
+```
+
+Puis vérifier :
+
+- la version réellement publiée via `/api/version` ;
+- la conservation des données locales après rechargement ;
+- l'import d'une sauvegarde existante ;
+- le parcours utilisateur concerné sur mobile et ordinateur ;
+- lorsque le lot touche Bluetooth, voix, veille ou PWA : un essai physique distinct de la CI.
+
+## Règle de maintenance
+
+Chaque lot terminé doit mettre à jour cette roadmap, `PROJECT-STATE.md` et la documentation utilisateur concernée. Les sections terminées peuvent être résumées dans l'historique ; elles ne doivent pas rester présentées comme des tâches ouvertes.
