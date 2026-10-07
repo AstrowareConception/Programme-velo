@@ -22,7 +22,8 @@ import type { AppState, CompletedSession, Measurement, Preferences, TelemetrySam
 import { VoyagePanel } from "@/components/VoyagePanel";
 import { voyagePlan, voyageProgress, voyageWorkout } from "@/lib/voyage";
 import { validVoyagePortion } from "@/lib/voyage-progress";
-import { connectFtmsBike, hasWebBluetooth, type BikeConnection, type BikeTelemetry, webBluetoothHint } from "@/lib/ftms";
+import { connectBike as connectBikeAdapter, hasWebBluetooth, type BikeConnection, type BikeTelemetry, webBluetoothHint } from "@/lib/bike-adapters";
+import { resistanceQualificationFor } from "@/lib/bike-qualification";
 import { ClimbProfile } from "@/components/ClimbProfile";
 import { RouteMap } from "@/components/RouteMap";
 import { RoutePlaces } from "@/components/RoutePlaces";
@@ -808,7 +809,7 @@ export function VeloQuestApp() {
     setConnectingBike(true);
     setBluetoothError(null);
     try {
-      const connection = await connectFtmsBike(
+      const connection = await connectBikeAdapter(
         (next) => {
           if (next.totalEnergyKcal !== undefined) {
             const now = Date.now(); calorieReading.current = { kcal: next.totalEnergyKcal, at: now };
@@ -831,10 +832,9 @@ export function VeloQuestApp() {
       setAutoResistanceControl(false);
       const range = connection.capabilities.resistanceRange;
       setTestResistanceLevel(range?.min ?? 1);
-      // This model and mapping were physically confirmed by the user on 6 October.
-      const qualified = /^toputure t(?:be|eb)5$/i.test(connection.deviceName.trim()) && range?.min === 1 && range.max === 32 && range.increment === 1 && connection.capabilities.supportsResistanceTarget;
-      if (qualified && connection.requestControl && connection.setResistance) {
-        setResistanceMappingVerified(true);
+      const qualification = resistanceQualificationFor(connection);
+      if (qualification.mappingVerified) setResistanceMappingVerified(true);
+      if (qualification.autoRequestControl && connection.requestControl && connection.setResistance) {
         try {
           await connection.requestControl();
           setControlGranted(true);
