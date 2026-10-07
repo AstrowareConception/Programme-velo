@@ -26,6 +26,7 @@ Cette roadmap remplace les listes historiques devenues obsolètes. Le produit di
 - enlever les mentions « à qualifier » devenues fausses tout en conservant les limites réellement non vérifiées ;
 - conserver une distinction stricte entre télémétrie, pilotage, fréquence cardiaque, commandes vocales et fonctionnement en arrière-plan ;
 - documenter les travaux ouverts et leurs critères de fin.
+- ✅ installer un protocole de continuité indépendant des conversations : reprise depuis GitHub live, checkpoint daté et modèle de PR ;
 
 **Terminé quand** README, roadmap, état de reprise, guide utilisateur et guide matériel ne se contredisent plus.
 
