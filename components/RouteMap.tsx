@@ -20,6 +20,7 @@ export function RouteMap({
 
   useEffect(() => {
     let disposed = false;
+    let resizeObserver: ResizeObserver | undefined;
 
     import("leaflet").then((L) => {
       if (disposed || !el.current || !climb.coordinates.length) return;
@@ -35,6 +36,12 @@ export function RouteMap({
 
       const route = L.polyline(climb.coordinates, { weight: 5, opacity: 0.85 }).addTo(map);
       map.fitBounds(route.getBounds(), { padding: [24, 24] });
+      // CSS can resize the map without a window resize (reader view / orientation).
+      resizeObserver = new ResizeObserver(() => {
+        map.invalidateSize({ pan: false });
+        map.fitBounds(route.getBounds(), { padding: [24, 24], animate: false });
+      });
+      resizeObserver.observe(el.current);
 
       const start = climb.coordinates[0];
       const end = climb.coordinates[climb.coordinates.length - 1];
@@ -58,6 +65,7 @@ export function RouteMap({
 
     return () => {
       disposed = true;
+      resizeObserver?.disconnect();
       riderRef.current = null;
       ghostRef.current = null;
       mapRef.current?.remove?.();

@@ -1,5 +1,17 @@
 # État de reprise VéloQuest — actualisé le 7 octobre 2026
 
+## 7 octobre 2026 — lecteur de séance pour tablette paysage
+
+Base observée en direct : `main` `646b2bcc030a42d6c918118a6cd314ec47961638` (PR 54 fusionnée). La PR 55 de finalisation métier reste distincte, intégrable et validée par sa CI sur `e0db73b8a3c4fac68a881348afa217715f3d0eee` lors de la reprise. Ce lot répond à une nouvelle demande d’ergonomie, sans reprendre les anciens chantiers décrits plus bas.
+
+Branche locale : `feat/tablet-session-dashboard`, commit applicatif `a530f9bc9a329319e41d71fe2c5ddb3d34fdaa20`. Tableau de bord occupant la fenêtre en paysage tablette, consignes à gauche, visualisation à droite, commandes en bas, panneau de détails ; un seul lecteur conserve le chrono et l’état lors des rotations. `SessionDashboard` porte uniquement le layout. La carte recalcule ses dimensions via `ResizeObserver`.
+
+Validation locale : TypeScript, 224 tests unitaires et build ; navigateur local bloqué au lancement par une restriction système de sockets. La CI de la PR doit donc fournir la recette navigateur et ses captures avant intégration. Scénarios ajoutés : quatre dimensions tablette, retour portrait, vues, réglages, restauration et enregistrement ; carte en entraînement et modes chronométrés ; affichage FTMS simulé. Aucun stockage ni protocole Bluetooth modifié.
+
+État de livraison : publication de la branche et ouverture de PR explicitement autorisées par l’utilisateur le 7 octobre 2026. Recette navigateur en cours avant toute intégration ; ne pas la présenter comme réussie avant observation. Les dimensions sont exprimées en pixels CSS utiles ; zoom, fenêtre réduite et réglages/bilan longs conservent un défilement accessible. L’essai sur la tablette physique de l’utilisateur reste distinct des tests Chromium.
+
+Prochaine action : publier cette branche autorisée, examiner la CI et les captures, corriger les débordements observés, puis consigner le head validé et la PR.
+
 ## État courant de référence
 
 `main` pointe sur `8f59b5cfd149d578479c307b64c82e61e52003d8`, fusion de la PR 52 **« Extraire la sauvegarde et la reprise de séance du composant principal »**. La CI du commit final de `main` a réussi : garde-fous statiques, TypeScript, tests unitaires, Playwright mobile/ordinateur et build. Le déploiement Vercel correspondant est observé en succès.

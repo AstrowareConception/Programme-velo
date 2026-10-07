@@ -399,3 +399,24 @@ test("calorie challenge measures only the fixed interval and preserves its devic
   expect(entry.metrics.calorieChallenge).toMatchObject({ source: "ftms", kcal: 60, eligible: true, durationSeconds: 300, deviceName: "Toputure TBE5" });
   expect(entry.metrics.cadenceScore).toBeUndefined();
 });
+
+test("tablet dashboard keeps received telemetry and session controls inside the viewport", async ({ page }, info) => {
+  await page.setViewportSize({ width: 1024, height: 768 });
+  await seed(page); await mockFtms(page, "standard", false, true); await page.goto("/");
+  await page.getByRole("button", { name: "Vélo Bluetooth" }).click();
+  await page.getByRole("button", { name: /Séances/ }).click();
+  await page.getByRole("heading", { name: "Décrassage", exact: true }).locator("xpath=ancestor::article").getByRole("button", { name: "Voir / démarrer" }).click();
+  await page.getByRole("button", { name: "Démarrer la séance" }).click();
+  await expect(page.locator(".liveStrip")).toContainText("142");
+  await expect(page.locator(".actualResistance strong")).toHaveText("18");
+  for (const viewport of [{ width: 1024, height: 768 }, { width: 960, height: 600 }]) {
+    await page.setViewportSize(viewport);
+    await expect.poll(() => page.locator(".activeSessionModal").evaluate(el => el.scrollHeight <= el.clientHeight + 1 && el.scrollWidth <= el.clientWidth + 1)).toBe(true);
+    await expect(page.locator(".liveStrip")).toBeInViewport({ ratio: 1 });
+    await expect(page.locator(".readerControls")).toBeInViewport({ ratio: 1 });
+    await page.screenshot({ path: info.outputPath(`tablet-ftms-${viewport.width}.png`) });
+  }
+  await page.getByRole("button", { name: "Alléger −1" }).click();
+  await page.getByRole("button", { name: "Pause", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Reprendre", exact: true })).toBeVisible();
+});

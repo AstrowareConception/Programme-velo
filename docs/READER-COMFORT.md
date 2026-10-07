@@ -1,12 +1,24 @@
 # Lecteur, alertes et média personnel
 
-Actualisé le 5 octobre 2026.
+Actualisé le 7 octobre 2026.
 
 ## Choisir une vue
 
 **Plus → Ton cockpit**, la préparation et le lecteur proposent **Vue complète** et **Vue essentielle**. La vue essentielle garde niveau manuel 1–32, temps restant, RPE, cadence cible, prochaine consigne et commandes. Pour un parcours, le lieu atteint et le suivant restent affichés ; pour une course, le chrono et le record restent présents. Carte, profil et détails du paysage reviennent en vue complète. Le changement ne remet pas à zéro une séance, Time Attack ou Segment Attack.
 
 Le choix est une préférence locale exportée dans le JSON v3. Les sauvegardes anciennes conservent la vue complète par défaut. Pause, reprise, mise de côté et enregistrement restent disponibles selon les règles du mode : une course chronométrée ne propose pas de pause.
+
+## Tableau de bord sur tablette en paysage
+
+Pendant la séance, à partir de 960 px de largeur et 560 px de hauteur utiles en paysage, le lecteur occupe toute la fenêtre :
+
+- à gauche : compte à rebours, résistance cible, résistance reçue, réglage de l’effort, RPE et cadence cible ;
+- à droite : profil de résistance et, pour un parcours, carte, altitude, position et chronométrage ;
+- en bas : mesures disponibles du vélo, progression, prochaine consigne et commandes permanentes.
+
+**Réglages et détails** ouvre un panneau avec les alertes, commandes vocales, photos, lieux et détails du parcours. **Revenir à la séance** ou Échap le referme. La séance continue selon son état actuel pendant la consultation. Les réglages longs et le bilan final peuvent défiler ; le tableau de bord courant vise à tenir sans défilement aux dimensions tablette normales.
+
+La disposition s’adapte automatiquement à la rotation sans relancer le lecteur, modifier le chrono ni perdre les réglages. La vue essentielle conserve ses fonctions et le profil d’effort, tout en retirant la carte, l’altitude et les photos. Si la fenêtre est trop petite (écran partagé, zoom ou téléphone), une présentation verticale défilante garde toutes les commandes accessibles. Il s’agit de toute la fenêtre disponible, sans obligation d’activer le plein écran système.
 
 ## Régler et vérifier les alertes
 

@@ -104,6 +104,14 @@ Conserver les contrôles actuels puis ajouter progressivement :
 
 ---
 
+## Lot ergonomie demandé — tablette paysage
+
+**État : implémenté localement sur `feat/tablet-session-dashboard` ; publication de la branche/PR autorisée explicitement le 7 octobre. Validation navigateur en cours.**
+
+Tableau de bord de séance sur toute la fenêtre, consignes et parcours en colonnes, mesures et commandes en bas, détails secondaires sur demande. Portrait et petites fenêtres restent défilants. Le layout est isolé dans `SessionDashboard` et la carte observe ses dimensions ; aucune migration de données. Recette : 1024×768, 1180×820, 1280×800 et 960×600, rotation, vues, pause/reprise, sauvegarde, courses et télémétrie simulée. Voir [le guide du lecteur](READER-COMFORT.md).
+
+---
+
 ## P1 — Programme longue durée
 
 ### P1.1 — Cycle après la semaine 12

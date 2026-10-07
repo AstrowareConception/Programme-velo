@@ -1,3 +1,4 @@
+import { openReaderDetails } from "./reader-layout-helpers";
 import { expect, test, type Page } from "@playwright/test";
 import { expressWorkouts } from "../lib/express-workouts";
 import { effortSettingsKey, withCadenceOffset } from "../lib/effort";
@@ -46,7 +47,7 @@ test("voice commands need opt in, final wake phrases and stop at the finish form
   });
   await catalog(page); await page.clock.install(); await launch(page);
   expect(await page.evaluate(() => Boolean((window as any).__recognition))).toBe(false);
-  await page.getByText("Commandes vocales", { exact: true }).click();
+  await openReaderDetails(page); await page.getByText("Commandes vocales", { exact: true }).click();
   await page.getByRole("button", { name: "Activer les commandes vocales" }).click();
   const target = page.locator(".sessionEssentials .resistance strong"); await expect(target).toHaveText("2");
   await speech(page, "allège"); await expect(target).toHaveText("2");
@@ -62,7 +63,7 @@ test("voice commands need opt in, final wake phrases and stop at the finish form
 });
 test("unsupported browsers clearly keep manual buttons available", async ({ page }) => {
   await seed(page); await page.addInitScript(() => { Object.defineProperty(window, "SpeechRecognition", { value: undefined, configurable: true }); Object.defineProperty(window, "webkitSpeechRecognition", { value: undefined, configurable: true }); });
-  await catalog(page); await launch(page); await page.getByText("Commandes vocales", { exact: true }).click();
+  await catalog(page); await launch(page); await openReaderDetails(page); await page.getByText("Commandes vocales", { exact: true }).click();
   await expect(page.getByText(/Commandes vocales indisponibles/)).toBeVisible();
   await expect(page.getByRole("button", { name: "Alléger −1" })).toBeVisible();
 });
@@ -78,7 +79,7 @@ test("microphone refusal stops listening and offers a retry without automatic pe
     }
     Object.defineProperty(window, "SpeechRecognition", { value: Recognition, configurable: true });
   });
-  await catalog(page); await launch(page); await page.getByText("Commandes vocales", { exact: true }).click();
+  await catalog(page); await launch(page); await openReaderDetails(page); await page.getByText("Commandes vocales", { exact: true }).click();
   await page.getByRole("button", { name: "Activer les commandes vocales" }).click();
   await expect(page.getByText(/Micro ou reconnaissance vocale refusés/)).toBeVisible();
   await expect(page.getByRole("button", { name: "Activer les commandes vocales" })).toBeVisible();
