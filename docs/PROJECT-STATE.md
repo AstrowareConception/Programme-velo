@@ -1,21 +1,30 @@
 # État de reprise VéloQuest — actualisé le 7 octobre 2026
 
-## État courant de référence
+## État courant de référence — 7 octobre 2026
 
-`main` pointe sur `646b2bcc030a42d6c918118a6cd314ec47961638`, fusion de la PR 54 **« Extraire la persistance locale de VeloQuestApp »**. La CI du commit final de `main` a réussi : garde-fous statiques, TypeScript, tests unitaires, Playwright mobile/ordinateur et build. Le déploiement Vercel du lot est observé en succès.
+Base live vérifiée : `main` `e65bf33dc016212078516760e1f18a91df6d8ca9`, fusion de la [PR 58](https://github.com/AstrowareConception/Programme-velo/pull/58). Vercel READY (`dpl_5QuZbTrPfmw1yjryfRW3MoRcQZB5`) et `/api/version` concordants. La CI de main [37687903225](https://github.com/AstrowareConception/Programme-velo/actions/runs/37687903225) et la vérification production [37688875817](https://github.com/AstrowareConception/Programme-velo/actions/runs/37688875817) ont réussi. Avant fusion : 224 unités et 288 scénarios navigateur sans échec ni retry, CI [37686874610](https://github.com/AstrowareConception/Programme-velo/actions/runs/37686874610), head `e676e888af4ce0a19790126923f5f914c9de3eec`.
 
-La consolidation P0.3 dispose maintenant de trois séparations effectives : `useBikeController` pour le vélo connecté, `useSessionSnapshotController` pour la reprise active et `useLocalPersistenceController` pour l’hydratation/écriture de `veloquest:v1` et `veloquest:custom-routes:v1`. `VeloQuestApp.tsx` ne manipule plus directement `localStorage` et le garde-fou d’architecture limite sa croissance à 2 200 lignes sur ce main.
+Livré : lecteur paysage (PR 56, essai utilisateur concluant), préparation/bilan et mises à jour visibles (PR 57), nouveautés et lexique débutant (PR 58). Le marqueur de lecture des nouveautés reste une préférence locale facultative, hors sauvegarde sportive. Les essais avec de nouveaux utilisateurs restent à recueillir.
 
-Le lot actif est la PR 55 **« Extraire la finalisation des séances de VeloQuestApp »**, branche `refactor/session-completion`. Le module pur `lib/session-completion.ts` reprend les règles de durée, source de métriques, achèvement, records, défis, XP, Voyage, calories et score cadence. Quatre tests unitaires ciblés couvrent séance manuelle, PB Time Attack, secteur incomplet et portion Voyage inachevée. Le composant principal descend à environ 2 083 lignes et le garde-fou proposé passe à 2 150 lignes.
+## Lot actif — Fiabilité de l’enregistrement et préparation de la bêta
 
-Le produit courant recense 44 séances, 84 parcours natifs dont 38 balades, 12 thèmes, 6 programmes, 22 campagnes/carnets et 77 badges. Le TOPUTURE TEB5 utilisé par l’utilisateur a confirmé sur Bluefy/iPhone connexion, télémétrie, transfert JSON et effet physique de résistance ; cela ne qualifie pas automatiquement un autre matériel, firmware ou navigateur.
+[PR 55](https://github.com/AstrowareConception/Programme-velo/pull/55), branche distante `refactor/session-completion`. Reprise depuis son ancien head `e0db73b8a3c4fac68a881348afa217715f3d0eee` (CI 37613584600 réussie), avec intégration de main `e65bf33`. Les conflits documentaires sont résolus en conservant les dernières livraisons. Les nouveaux écrans, le lexique et la PWA sont conservés.
 
-La priorité immédiate reste la consolidation P0 : terminer la PR 55, puis décider si l’extraction de l’import/export apporte encore un gain avant de commencer le découpage des écrans. Le renouvellement du programme après la semaine 12 demeure la prochaine grande priorité métier.
+Changements :
+- `buildSessionCompletion` isole la finalisation des séances, parcours, secteurs, défis, calories, records et Voyage ; règles de récompense inchangées ;
+- correction d’un risque de perte : le bilan se fermait et la reprise était effacée avant la vérification de l’écriture de l’historique ; désormais `saveCompletedSession` doit réussir avant ces actions ;
+- en cas de refus du stockage, conserver le bilan et ses saisies, afficher l’échec et proposer « Réessayer l’enregistrement » ; le formulaire utilise un submit contrôlé pour éviter la remise à zéro automatique des champs après un échec ;
+- suppression de la double écriture du même état après confirmation synchrone ; aucune nouvelle clé ou migration ;
+- garde-fou principal abaissé à 2 150 lignes ; huit tests unitaires de finalisation et scénario navigateur de refus/réessai/rechargement ;
+- [protocole bêta](BETA-TEST.md) pour la découverte, les interruptions, le matériel et les sauvegardes, avec résultats physiques séparés des simulations.
 
-La reprise ne dépend pas d’un fil de conversation : suivre `docs/CONTINUITY.md` et toujours vérifier l’état live de GitHub, les PR, les CI et, si nécessaire, Vercel avant de se fier à ce checkpoint daté.
+Validation locale : TypeScript, architecture/documentation et 232 tests unitaires réussis. Build et CI navigateur complète requis avant fusion ; les références exactes et résultats seront consignés dans la PR, puis complétés par le SHA publié. À ce checkpoint : lot non fusionné/non publié, production `e65bf33`.
 
-Les sections datées ci-dessous constituent l'historique des lots successifs. Lorsqu'une entrée ancienne indique qu'une fonction « reste à qualifier » ou « reste à développer », l'état courant ci-dessus et la roadmap active priment.
+Limites : les saisies manuelles non enregistrées restent en mémoire tant que le bilan reste ouvert ; elles ne sont pas sauvegardées automatiquement après fermeture ou rechargement. La reprise garde l’instantané disponible, pas ces nouvelles saisies. Ce lot ne résout pas les conflits d’édition simultanée entre onglets et n’ajoute pas de sauvegarde distante. Les tests FTMS simulés ne constituent pas une qualification matérielle.
 
+Prochaine action : vérifier et publier la PR 55, puis recueillir la recette bêta et préparer le diagnostic prévisualisable destiné au support. Voir [la roadmap](ROADMAP.md).
+
+Les sections suivantes sont des checkpoints historiques, à confronter à l’état live du dépôt.
 
 ## 7 octobre 2026 — présentation commerciale illustrée
 

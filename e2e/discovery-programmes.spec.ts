@@ -1,3 +1,4 @@
+import { openReaderDetails } from "./reader-layout-helpers";
 import { expect, test, type Page } from "@playwright/test";
 
 test.use({ timezoneId: "Europe/Paris" });
@@ -116,6 +117,6 @@ test("historic cols expose their landscape and indicative locations before and d
   await page.locator(".sessionPreview").getByText("Découvrir le paysage et son profil", { exact: true }).click();
   await expect(page.locator(".sessionPreview")).toContainText("Chalet Reynard");
   await page.getByRole("button", { name: "Démarrer la séance" }).click(); await expect(page.locator(".routePlaceNow strong")).toHaveText("Bédoin");
-  await page.getByText("Ton carnet de paysage", { exact: true }).click(); await expect(page.locator(".climbSession")).toContainText("Géant de Provence");
+  await openReaderDetails(page); await page.getByText("Ton carnet de paysage", { exact: true }).click(); await expect(page.locator(".climbSession")).toContainText("Géant de Provence");
   expect(await overflow(page)).toBe(false); await page.screenshot({ path: testInfo.outputPath("ventoux-fiche-uniformisee.png") });
 });

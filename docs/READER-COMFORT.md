@@ -1,12 +1,32 @@
 # Lecteur, alertes et média personnel
 
-Actualisé le 5 octobre 2026.
+Actualisé le 7 octobre 2026.
 
 ## Choisir une vue
 
 **Plus → Ton cockpit**, la préparation et le lecteur proposent **Vue complète** et **Vue essentielle**. La vue essentielle garde niveau manuel 1–32, temps restant, RPE, cadence cible, prochaine consigne et commandes. Pour un parcours, le lieu atteint et le suivant restent affichés ; pour une course, le chrono et le record restent présents. Carte, profil et détails du paysage reviennent en vue complète. Le changement ne remet pas à zéro une séance, Time Attack ou Segment Attack.
 
 Le choix est une préférence locale exportée dans le JSON v3. Les sauvegardes anciennes conservent la vue complète par défaut. Pause, reprise, mise de côté et enregistrement restent disponibles selon les règles du mode : une course chronométrée ne propose pas de pause.
+
+## Tableau de bord sur tablette en paysage
+
+Pendant la séance, à partir de 960 px de largeur et 560 px de hauteur utiles en paysage, le lecteur occupe toute la fenêtre :
+
+- à gauche : compte à rebours, résistance cible, résistance reçue, réglage de l’effort, RPE et cadence cible ;
+- à droite : profil de résistance et, pour un parcours, carte, altitude, position et chronométrage ;
+- en bas : mesures disponibles du vélo, progression, prochaine consigne et commandes permanentes.
+
+**Réglages et détails** ouvre un panneau avec les alertes, commandes vocales, photos, lieux et détails du parcours. **Revenir à la séance** ou Échap le referme. La séance continue selon son état actuel pendant la consultation. Les réglages longs et le bilan final peuvent défiler ; le tableau de bord courant vise à tenir sans défilement aux dimensions tablette normales.
+
+La disposition s’adapte automatiquement à la rotation sans relancer le lecteur, modifier le chrono ni perdre les réglages. La vue essentielle conserve ses fonctions et le profil d’effort, tout en retirant la carte, l’altitude et les photos. Si la fenêtre est trop petite (écran partagé, zoom ou téléphone), une présentation verticale défilante garde toutes les commandes accessibles. Il s’agit de toute la fenêtre disponible, sans obligation d’activer le plein écran système.
+
+### Aperçus sur tablette 1024 × 768
+
+![Séance en paysage : chrono, cible, profil et commandes](images/reader-tablet/seance-paysage.png)
+
+![Parcours en paysage : carte, altitude et consignes](images/reader-tablet/parcours-paysage.png)
+
+Captures Chromium du lot PR 56, profil de test fictif ; séance manuelle et parcours simulé. La carte crédite OpenStreetMap. Ces captures illustrent le lecteur, pas une qualification de tablette ou de vélo physique.
 
 ## Régler et vérifier les alertes
 
@@ -48,3 +68,34 @@ Les tests unitaires couvrent préférences, sauvegardes, calibration, filtrage d
 - [MDN : Page Visibility API](https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API) — limitations des tâches en arrière-plan.
 
 Références consultées le 5 octobre 2026. Les essais physiques restent à réaliser.
+
+## Préparer et enregistrer sa séance
+
+La préparation et le bilan affichent les étapes **Préparer → Pédaler → Enregistrer**. En paysage à partir de 960×560 pixels CSS utiles, ils occupent une fenêtre large : le programme ou le récapitulatif à gauche, les réglages ou les mesures à droite. Les zones longues défilent séparément ; le lancement et la confirmation restent accessibles en bas. Sur téléphone, les informations s’empilent avec un défilement normal.
+
+Avant le départ, le profil de résistance complète la durée, l’intensité et les segments. Le mode manuel est expliqué lorsqu’aucun vélo n’est connecté. Les modes chronométrés rappellent que le chrono continue pendant les interruptions. Les réglages de cadence, de son, de voix et de vue restent disponibles.
+
+Le bilan conserve tous les champs et la case de vérification obligatoire. Une rotation ne réinitialise pas les valeurs saisies. Le récapitulatif ne prétend pas que la séance est enregistrée : il faut confirmer, puis retrouver le résultat dans **Suivi**.
+
+Lorsqu’une mise à jour PWA est prête, une annonce apparaît sur les écrans principaux, en dehors du lecteur et de sa préparation/bilan. **Plus** conserve son panneau détaillé. La mise à jour demande une action explicite ; elle reste protégée pendant une séance, une saisie, une connexion vélo ou lorsqu’un autre onglet est occupé. Il n’est pas nécessaire d’effacer les données pour mettre l’application à jour.
+
+
+## Repères et nouveautés
+
+Avant le départ, « Les repères du lecteur » explique niveau de résistance, cadence, RPE et mesure indisponible. Cette aide repliée s’ouvre au clavier ou au toucher, sans démarrer la séance ni changer ses réglages. Elle reste accessible dans Plus → Guide rapide. Les consignes, valeurs reçues et distances simulées y sont distinguées.
+
+Plus → Quoi de neuf regroupe les jalons éditoriaux. L’annonce sur Quête est facultative, disparaît après « Voir les nouveautés » ou « Plus tard » et se synchronise entre onglets du même navigateur. Le marqueur local ne contient qu’un identifiant de version ; il ne fait pas partie de l’export sportif. Si son stockage échoue, la consultation fonctionne mais l’annonce pourra revenir au rechargement. Les notes restent consultables dans Plus.
+
+L’annonce ne s’affiche pas pendant une séance, la configuration ou une reprise en attente, ni avant les trois premières séances complètes du démarrage accompagné. Il n’y a pas de pop-up automatique. Le contenu correspond à la version actuellement ouverte, pas à une version distante en attente d’installation.
+
+Maintenance : ajouter un jalon en tête de `lib/releases.ts` avec un nouvel identifiant stable, une date et des changements réellement livrés. Un simple rebuild ne doit pas changer cet identifiant. Garder les précédents jalons pour la consultation dans Plus ; ne pas annoncer les éléments futurs de la roadmap comme disponibles.
+
+
+Le lexique du vélo est accessible dans Plus → Guide rapide et avant chaque séance. Trois familles regroupent D+/D−, altitude, pente/profil ; RPM, BPM, watts, vitesse, kcal, RPE et résistance ; XP, segments/secteurs, contre-la-montre, FTMS et PWA. Chaque mot s’ouvre individuellement au toucher ou au clavier, avec une définition et un exemple. Ce contenu est disponible avec l’application hors connexion ; aucune recherche distante n’est nécessaire. Il n’ajoute pas de panneau au lecteur actif et ne change aucun réglage.
+
+
+## Si l’enregistrement est refusé
+
+La validation du bilan écrit d’abord l’historique local. Le lecteur se ferme et la reprise est supprimée uniquement après la réussite de cette écriture. Si le stockage est indisponible ou plein, un message apparaît et le bouton devient « Réessayer l’enregistrement ». Le bilan et les champs restent ouverts ; libère de l’espace puis réessaie.
+
+Les nouvelles saisies du bilan sont conservées en mémoire, pas dans une sauvegarde automatique : ne ferme pas et ne recharge pas cet écran avant la réussite. La reprise de séance existante est conservée lors du refus, mais elle ne contient pas les dernières saisies manuelles du bilan. Après réussite, contrôle la séance dans Suivi.

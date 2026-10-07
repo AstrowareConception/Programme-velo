@@ -1,3 +1,4 @@
+import { openReaderDetails } from "./reader-layout-helpers";
 import { expect, test, type Page } from "@playwright/test";
 
 test.use({ timezoneId: "Europe/Paris" });
@@ -132,7 +133,7 @@ test("a paused scenic ride restores the gentle reader and an unfinished ride ear
   await page.reload();
   await page.getByRole("button", { name: "Reprendre", exact: true }).click();
   await expect(page.getByText("BALADE · RYTHME DOUX", { exact: true })).toBeVisible();
-  await page.getByText("Ton carnet de paysage", { exact: true }).click();
+  await openReaderDetails(page); await page.getByText("Ton carnet de paysage", { exact: true }).click();
   await expect(page.locator(".sceneryDetails")).toContainText("Chambord");
   await page.getByRole("button", { name: "Terminer et enregistrer" }).click();
   await page.getByLabel("J’ai vérifié le bilan et les champs facultatifs.").check(); await page.getByRole("button", { name: /Valider la quête/ }).click();

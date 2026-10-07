@@ -41,6 +41,60 @@ function baseInput(active: WorkoutTemplate) {
 }
 
 describe("session completion", () => {
+  it("preserves received measures and opt-in traces without mutating its input", () => {
+    const active = workouts[0];
+    const input = {
+      ...baseInput(active),
+      telemetrySamples: [{ t: 0, powerW: 100 }, { t: 10, powerW: 120 }],
+      autoMetrics: { distanceKm: 2.5, avgPowerW: 110, avgHeartRate: 105 },
+      keepTelemetryTrace: false
+    };
+    const before = structuredClone(input);
+    const result = buildSessionCompletion(input);
+    expect(result.session.metrics).toMatchObject({ source: "ftms", distanceKm: 2.5, avgPowerW: 110, avgHeartRate: 105 });
+    expect(result.session.metrics?.samples).toBeUndefined();
+    expect(buildSessionCompletion({ ...input, keepTelemetryTrace: true }).session.metrics?.samples).toEqual(input.telemetrySamples);
+    expect(input).toEqual(before);
+  });
+
+  it("keeps explicitly entered zeroes and mixed provenance over automatic values", () => {
+    const result = buildSessionCompletion({
+      ...baseInput(workouts[0]),
+      telemetrySamples: [{ t: 0, powerW: 80 }],
+      autoMetrics: { distanceKm: 4, calories: 30, avgPowerW: 80 },
+      form: { manualUsed: true, distanceKm: 0, calories: 0, avgPowerW: 0 }
+    });
+    expect(result.session.metrics).toMatchObject({ source: "mixed", distanceKm: 0, calories: 0, avgPowerW: 0 });
+  });
+
+  it("uses the calorie challenge result and elapsed duration rather than editable fields", () => {
+    const result = buildSessionCompletion({
+      ...baseInput(workouts[0]),
+      calorieMode: true,
+      calorieResult: { version: 1, durationSeconds: 300, source: "manual", kcal: 45, eligible: false },
+      sessionElapsedSeconds: 120,
+      form: { manualUsed: true, duration: 99, calories: 999 },
+      cadenceRecordEligible: true
+    });
+    expect(result.session.duration).toBe(2);
+    expect(result.session.metrics?.calories).toBe(45);
+    expect(result.session.metrics?.calorieChallenge?.eligible).toBe(false);
+    expect(result.session.metrics?.cadenceScore).toBeUndefined();
+    expect(result.session.metrics?.cadenceRecordEligible).toBe(false);
+  });
+
+  it("does not validate a measured route from timer progress alone", () => {
+    const route = climbs[0];
+    const result = buildSessionCompletion({
+      ...baseInput(climbToWorkout(route)), activeClimb: route, routeMode: "timeAttack",
+      distanceMeasuredByBike: true, currentRouteKm: route.distanceKm / 2,
+      timeAttackElapsedSeconds: 100, sessionProgressPercent: 100
+    });
+    expect(result.session.metrics?.completedRoute).toBe(false);
+    expect(result.isPersonalBest).toBe(false);
+    expect(result.session.xp).toBe(climbToWorkout(route).xp);
+  });
+
   it("records a normal manual workout without changing its reward", () => {
     const active = workouts.find((workout) => workout.id === "recovery-30")!;
     const result = buildSessionCompletion({

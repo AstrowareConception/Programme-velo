@@ -121,3 +121,16 @@ export function PwaStatusCard() {
     {pwa.notice && <p role="status">{pwa.notice}</p>}
   </section>;
 }
+
+/** Visible from the main screens; uses the same cross-tab update protections. */
+export function PwaUpdateBanner() {
+  const pwa = usePwa();
+  if (!pwa.waiting) return null;
+  return <section className="pwaUpdateBanner" aria-label="Mise à jour de VéloQuest">
+    <div><p className="eyebrow">VÉLOQUEST ÉVOLUE</p><h2>Une mise à jour est prête</h2>
+      <p>{pwa.busy ? "La mise à jour attendra que tes actions en cours soient terminées. Si le vélo est connecté, déconnecte-le avant de l’appliquer." : "Profite de la nouvelle version avant ta prochaine séance. Tes données locales sont conservées."}</p>
+      {pwa.notice && <p role="status">{pwa.notice}</p>}
+    </div>
+    <button type="button" className="primary" disabled={pwa.busy || pwa.working} onClick={() => void pwa.applyUpdate()}>{pwa.working ? "Mise à jour en cours…" : "Mettre à jour maintenant"}</button>
+  </section>;
+}

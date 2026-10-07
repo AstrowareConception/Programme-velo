@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { STORAGE_KEY, emptyState } from "@/lib/data";
 import type { ClimbChallenge } from "@/lib/routes";
 import { normalizeState, safeLocalStorageWrite } from "@/lib/storage";
-import type { AppState } from "@/lib/types";
+import type { AppState, CompletedSession } from "@/lib/types";
 
 const CUSTOM_ROUTES_KEY = "veloquest:custom-routes:v1";
 
@@ -21,6 +21,7 @@ export function useLocalPersistenceController({
   const [stateSaveFailed, setStateSaveFailed] = useState(false);
   const [routesSaveFailed, setRoutesSaveFailed] = useState(false);
   const [initialSessionMinutes, setInitialSessionMinutes] = useState(35);
+  const persistedStateRef = useRef<AppState | null>(null);
   const onToastRef = useRef(onToast);
   onToastRef.current = onToast;
 
@@ -53,8 +54,9 @@ export function useLocalPersistenceController({
   }, []);
 
   useEffect(() => {
-    if (!hydrated) return;
+    if (!hydrated || persistedStateRef.current === state) return;
     const saved = safeLocalStorageWrite(STORAGE_KEY, state);
+    if (saved) persistedStateRef.current = state;
     setStateSaveFailed(!saved);
     if (!saved) onToastRef.current?.("Stockage local plein : exporte une sauvegarde puis allège l’historique.");
   }, [state, hydrated]);
@@ -65,6 +67,20 @@ export function useLocalPersistenceController({
     setRoutesSaveFailed(!saved);
     if (!saved) onToastRef.current?.("Impossible d’enregistrer les parcours : stockage local insuffisant.");
   }, [customClimbs, hydrated]);
+
+  /** Close the review and discard recovery only after the history is durable. */
+  function saveCompletedSession(session: CompletedSession) {
+    const nextState = { ...state, sessions: [...state.sessions, session] };
+    if (!safeLocalStorageWrite(STORAGE_KEY, nextState)) {
+      setStateSaveFailed(true);
+      onToastRef.current?.("Séance non enregistrée : le bilan reste ouvert. Libère de l’espace puis réessaie.");
+      return false;
+    }
+    persistedStateRef.current = nextState;
+    setState(nextState);
+    setStateSaveFailed(false);
+    return true;
+  }
 
   function clearLocalData() {
     localStorage.removeItem(STORAGE_KEY);
@@ -85,6 +101,7 @@ export function useLocalPersistenceController({
     stateSaveFailed,
     routesSaveFailed,
     initialSessionMinutes,
+    saveCompletedSession,
     clearLocalData
   };
 }

@@ -1,3 +1,4 @@
+import { openReaderDetails } from "./reader-layout-helpers";
 import { expect, test as baseTest, type Page } from "@playwright/test";
 
 const test = baseTest.extend<{ pageErrors: string[] }>({
@@ -55,7 +56,7 @@ async function noOverflow(page: Page) { expect(await reader(page).evaluate(el =>
 
 test("audio settings persist without changing existing history and can be tested before starting", async ({ page }, info) => {
   await seed(page); await workout(page);
-  await reader(page).getByText("Son, voix et média", { exact: true }).click();
+  await openReaderDetails(page); await reader(page).getByText("Son, voix et média", { exact: true }).click();
   await reader(page).getByLabel("Voix du coach").check();
   await setVolume(page, 25);
   await reader(page).getByLabel("Fréquence des annonces").selectOption("changes");
@@ -151,7 +152,7 @@ test("calibrated voice warns once before a timed change and respects mute", asyn
   expect((await spoken(page))[1]).toMatchObject({ text: "Dans dix secondes. Roulage facile. niveau 9–12. Effort visé 3–4 sur dix. Cadence 65–75 tours par minute.", volume: 0.25 });
   await page.clock.fastForward(2000); expect((await spoken(page)).length).toBe(2);
   await page.clock.fastForward(8000); await expect.poll(async () => (await spoken(page)).length).toBe(3);
-  await reader(page).getByText("Son, voix et média", { exact: true }).click();
+  await openReaderDetails(page); await reader(page).getByText("Son, voix et média", { exact: true }).click();
   await setVolume(page, 0);
   await reader(page).getByRole("button", { name: "Tester mes alertes" }).click();
   await expect(reader(page)).toContainText("volume des alertes est à zéro");
