@@ -2,13 +2,15 @@
 
 ## État courant de référence
 
-Avant le présent lot de consolidation, `main` pointe sur `0c7077970a012bcf9af25072f397ccbd56518a2a`, fusion de la présentation commerciale illustrée. Ce même SHA a été observé dans le dernier déploiement Vercel de production en état `READY`. Au départ du lot, aucune PR ni issue n'est ouverte.
+À l'ouverture du lot de garde-fous qualité, `main` pointe sur `3b0ad08b162208e7b96aee128eece6a8550f5e5b` (PR 50). Le déploiement Vercel correspondant est observé en état `READY`. La CI du head final de la PR 50 a passé typecheck, tests unitaires, scénarios Playwright mobile/ordinateur et build ; le rejeu de `main` peut encore être en cours au moment exact de cette rédaction.
+
+La consolidation du 7 octobre a successivement livré : PR 48 / `266f543`, roadmap et architecture multi-vélos ; PR 49 / `09dced5`, registre `BikeAdapter`, FTMS générique et qualification centralisée ; PR 50 / `3b0ad08`, extraction de la connexion, télémétrie et contrôle dans `useBikeController`. `VeloQuestApp.tsx` est passé d'environ 2 264 à environ 2 205 lignes et ne contient plus de décision de marque ou de protocole matériel.
 
 Le produit courant recense 44 séances, 84 parcours natifs dont 38 balades, 12 thèmes, 6 programmes, 22 campagnes/carnets et 77 badges. La PR 46 a livré le programme personnel, les bilans, les défis de maîtrise, les carnets composés et le premier lot du canal de Nantes à Brest ; la PR 47 a ensuite aligné la présentation commerciale et le catalogue.
 
 Le TOPUTURE TEB5 utilisé par l'utilisateur a confirmé sur le chemin Bluefy/iPhone la connexion, la télémétrie, le transfert JSON et un effet physique de résistance. Ces preuves ne qualifient pas automatiquement un autre modèle, firmware ou navigateur. La recette globale restant à faire porte notamment sur reconnexion longue durée, contrôle automatique sur plusieurs paliers, Alléger/Renforcer, fréquence cardiaque en séance, commandes vocales réelles, écran éveillé et coexistence avec un média.
 
-La roadmap active est désormais `docs/ROADMAP.md`. Le chantier suivant est la consolidation technique : architecture multi-vélos par capacités/adaptateurs, réduction de la responsabilité de `VeloQuestApp.tsx`, puis durcissement de la CI. Le renouvellement du programme après la semaine 12 vient ensuite comme priorité métier. Voir `docs/CONNECTED-BIKES-ARCHITECTURE.md`.
+La roadmap active est `docs/ROADMAP.md`. Le socle multi-vélos et le premier découpage du composant principal sont engagés ; le lot suivant ajoute des garde-fous CI pour empêcher leur régression, puis le découpage séance/persistance peut continuer. Les essais physiques restant à mener sont conservés comme recette distincte. Le renouvellement du programme après la semaine 12 reste la prochaine grande priorité métier. Voir `docs/CONNECTED-BIKES-ARCHITECTURE.md`.
 
 Les sections datées ci-dessous constituent l'historique des lots successifs. Lorsqu'une entrée ancienne indique qu'une fonction « reste à qualifier » ou « reste à développer », l'état courant ci-dessus et la roadmap active priment.
 
