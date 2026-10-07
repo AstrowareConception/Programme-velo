@@ -52,14 +52,14 @@ Voir [Architecture des vélos connectés](CONNECTED-BIKES-ARCHITECTURE.md).
 
 ### P0.3 — Dette de `VeloQuestApp.tsx`
 
-**État : à engager après consolidation documentaire.**
+**État : engagé — le contrôleur de vélo connecté est extrait ; la séance active, la persistance et les écrans restent à découpler.**
 
 Le composant principal dépasse désormais 2 200 lignes et concentre navigation, séance, Bluetooth, persistance, lecteur et plusieurs écrans.
 
 Ordre de découpage proposé :
 
-1. contrôleur/hook de vélo connecté ;
-2. contrôleur de séance active et reprise ;
+1. ✅ contrôleur/hook de vélo connecté (`useBikeController`) ;
+2. ⏳ contrôleur de séance active et reprise ;
 3. contrôleur d'enregistrement et de persistance ;
 4. écrans Quête / Séances / Parcours / Suivi / Plus ;
 5. lecteur de séance et panneau Bluetooth ;
