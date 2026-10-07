@@ -53,20 +53,24 @@ Voir [Architecture des vélos connectés](CONNECTED-BIKES-ARCHITECTURE.md).
 
 ### P0.3 — Dette de `VeloQuestApp.tsx`
 
-**État : engagé — vélo connecté et reprise de séance extraits ; la PR 54 extrait maintenant la persistance locale. L’enregistrement final des séances et les écrans restent à découpler.**
+**État : engagé — vélo connecté, reprise et persistance locale sont extraits ; la PR 55 sort maintenant les règles de finalisation de séance.**
 
-Après la PR 52, le composant principal est descendu à environ 2 160 lignes. Le lot de persistance locale le ramène à environ 2 135 lignes en retirant l’hydratation et les écritures directes de `localStorage` du composant principal.
+Après la PR 54, le composant principal est à environ 2 135 lignes. Le lot de finalisation le ramène à environ 2 083 lignes en déplaçant dans `lib/session-completion.ts` les règles de durée, métriques, achèvement, records, défis, XP et Voyage.
 
 Ordre de découpage proposé :
 
 1. ✅ contrôleur/hook de vélo connecté (`useBikeController`) ;
 2. ✅ contrôleur de reprise et instantané de séance (`useSessionSnapshotController`) ;
-3. ⏳ enregistrement et persistance : `useLocalPersistenceController` couvre l’état principal et les parcours personnels ; l’enregistrement final de séance, l’import/export et leurs dépendances restent à extraire ;
+3. ⏳ enregistrement et persistance :
+   - ✅ état principal et parcours personnels dans `useLocalPersistenceController` ;
+   - ⏳ finalisation métier de séance dans `buildSessionCompletion` (PR 55) ;
+   - import/export et orchestration résiduelle à extraire si cela réduit réellement le couplage ;
 4. écrans Quête / Séances / Parcours / Suivi / Plus ;
 5. lecteur de séance et panneau Bluetooth ;
 6. suppression des dépendances croisées restantes.
 
 Les règles métier doivent continuer à vivre dans `lib/`, pas dans les composants visuels.
+
 
 ### P0.4 — Recette physique complète TOPUTURE
 
