@@ -88,15 +88,16 @@ Aucun de ces essais ne doit être généralisé à un autre modèle sans nouvell
 
 ### P0.5 — Durcissement qualité
 
-**État : à faire.**
+**État : engagé — garde-fous d'architecture et liens documentaires ajoutés à la CI.**
 
-Conserver les quatre contrôles actuels puis ajouter progressivement :
+Conserver les contrôles actuels puis ajouter progressivement :
 
+- ✅ garde-fou empêchant le retour des marques/protocoles dans `VeloQuestApp.tsx` et limitant sa croissance pendant le découpage ;
+- ✅ vérification automatique des liens Markdown locaux ;
 - ESLint / règles React et TypeScript ;
 - contrôle d'accessibilité automatisé sur les écrans principaux ;
 - couverture de tests et seuils raisonnables sur les modules métier critiques ;
 - scénario de restauration d'une sauvegarde ancienne dans chaque migration ;
-- vérification des liens/documentation catalogue ;
 - audit de dépendances automatisé ;
 - si stable, tests du parcours manuel sous WebKit en complément de Chromium.
 
