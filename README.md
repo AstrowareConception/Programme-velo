@@ -160,6 +160,7 @@ La version est visible dans **Plus** et dans [l'endpoint de version](https://pro
 - [Architecture multi-vélos : FTMS, adaptateurs et qualification](docs/CONNECTED-BIKES-ARCHITECTURE.md)
 - [Ancien protocole TEB5, contexte historique](docs/TEB5-BLUETOOTH-VALIDATION.md)
 - [État technique de reprise](docs/PROJECT-STATE.md)
+- [Continuité de travail et reprise après perte d’un fil](docs/CONTINUITY.md)
 - [Sources des balades et méthode des profils](docs/SCENIC-ROUTES.md)
 
 Les niveaux proposés sont des repères : le ressenti, la récupération et les limites d'intensité du programme restent prioritaires. Projet personnel / expérimental.
