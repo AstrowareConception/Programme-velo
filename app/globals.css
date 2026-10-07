@@ -1061,7 +1061,9 @@ button:focus-visible, input:focus-visible, .fileButton:focus-within { outline: 2
 .dashboardLandscapeOnly { display:none; }
 .dashboardNotice:empty, .dashboardRouteCanvas:empty { display:none; }
 .dashboardRouteCanvas { min-width:0; }
-.sessionDashboard .sessionEssentials { order:0; }
+.activeSessionModal .sessionDashboard .sessionEssentials,
+.activeSessionModal .sessionDashboard .readerViewChoice,
+.activeSessionModal .sessionDashboard .sessionScreenStatus { order:0; }
 .sessionDashboard .readerControls { order:10; }
 .sessionDashboard .dashboardHeader h2 { margin-bottom:14px; }
 
@@ -1156,7 +1158,7 @@ button:focus-visible, input:focus-visible, .fileButton:focus-within { outline: 2
 }
 
 @media (min-width:960px) and (min-height:560px) and (max-height:740px) and (orientation:landscape) {
-  .sessionModal.activeSessionModal { padding-top:10px; padding-bottom:10px; }
+  .sessionModal.activeSessionModal { padding-top:max(10px,env(safe-area-inset-top)); padding-bottom:max(10px,env(safe-area-inset-bottom)); }
   .sessionDashboard { gap:8px 14px; }
   .dashboardFocus { padding:12px; gap:8px; }
   .activeSessionModal .sessionEssentials { flex-direction:row; gap:12px; }

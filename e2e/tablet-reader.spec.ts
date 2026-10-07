@@ -20,7 +20,7 @@ async function fits(page: Page) {
   await expect.poll(() => reader.evaluate(el => ({
     horizontal: el.scrollWidth > el.clientWidth + 1, vertical: el.scrollHeight > el.clientHeight + 1
   }))).toEqual({ horizontal: false, vertical: false });
-  for (const selector of [".sessionEssentials", ".actualResistance", ".effortAdjustments", ".sessionOverall", ".readerControls"]) {
+  for (const selector of [".dashboardHeader", ".sessionEssentials", ".actualResistance", ".effortAdjustments", ".sessionOverall", ".readerControls"]) {
     const item = reader.locator(selector);
     await expect(item).toBeInViewport({ ratio: 1 });
   }
@@ -57,6 +57,8 @@ for (const viewport of [{ width: 1024, height: 768 }, { width: 1180, height: 820
     await page.getByRole("button", { name: "Terminer et enregistrer" }).click();
     await page.getByLabel("J’ai vérifié le bilan et les champs facultatifs.").check();
     await page.getByRole("button", { name: /Valider la quête/ }).click();
+    await expect(page.locator(".sessionModal")).toHaveCount(0);
+    await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem("veloquest:v1")!).sessions.length)).toBe(1);
     await page.reload();
     const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("veloquest:v1")!));
     expect(saved.sessions).toHaveLength(1); expect(saved.preferences.voiceCues).toBe(true);
@@ -74,7 +76,7 @@ for (const mode of ["Entraînement", "⏱ Time Attack", "⚡ Segments"]) {
     await page.getByRole("button", { name: mode === "Entraînement" ? "Démarrer la séance" : "Lancer le chrono", exact: true }).click();
     await fits(page);
     await expect(page.locator(".routeMap")).toBeInViewport({ ratio: 1 });
-    await expect(page.locator(".profileWrap")).toBeInViewport({ ratio: 1 });
+    await expect(page.locator(".activeSessionModal .profileWrap")).toBeInViewport({ ratio: 1 });
     await page.screenshot({ path: info.outputPath("tablet-route.png") });
     await page.setViewportSize({ width: 960, height: 600 }); await fits(page);
     await expect(page.locator(".routeMap")).toBeInViewport({ ratio: 1 });

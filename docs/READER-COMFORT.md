@@ -20,6 +20,14 @@ Pendant la séance, à partir de 960 px de largeur et 560 px de hauteur utiles e
 
 La disposition s’adapte automatiquement à la rotation sans relancer le lecteur, modifier le chrono ni perdre les réglages. La vue essentielle conserve ses fonctions et le profil d’effort, tout en retirant la carte, l’altitude et les photos. Si la fenêtre est trop petite (écran partagé, zoom ou téléphone), une présentation verticale défilante garde toutes les commandes accessibles. Il s’agit de toute la fenêtre disponible, sans obligation d’activer le plein écran système.
 
+### Aperçus sur tablette 1024 × 768
+
+![Séance en paysage : chrono, cible, profil et commandes](images/reader-tablet/seance-paysage.png)
+
+![Parcours en paysage : carte, altitude et consignes](images/reader-tablet/parcours-paysage.png)
+
+Captures Chromium du lot PR 56, profil de test fictif ; séance manuelle et parcours simulé. La carte crédite OpenStreetMap. Ces captures illustrent le lecteur, pas une qualification de tablette ou de vélo physique.
+
 ## Régler et vérifier les alertes
 
 Ouvre **Son, voix et média** avant de partir. Active bips et/ou voix, règle leur volume de 0 à 100 %, puis choisis tous les segments ou seulement les changements de résistance, RPE ou cadence. Un nouveau nom de ville à consigne identique peut ainsi rester silencieux. Le retour haptique se règle dans Plus et dépend du navigateur.
