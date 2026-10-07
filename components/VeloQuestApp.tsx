@@ -23,6 +23,7 @@ import { VoyagePanel } from "@/components/VoyagePanel";
 import { voyagePlan, voyageProgress, voyageWorkout } from "@/lib/voyage";
 import { validVoyagePortion } from "@/lib/voyage-progress";
 import { useBikeController } from "@/components/useBikeController";
+import { webBluetoothHint } from "@/lib/bike-adapters";
 import { ClimbProfile } from "@/components/ClimbProfile";
 import { RouteMap } from "@/components/RouteMap";
 import { RoutePlaces } from "@/components/RoutePlaces";
