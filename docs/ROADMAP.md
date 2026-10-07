@@ -53,15 +53,15 @@ Voir [Architecture des vélos connectés](CONNECTED-BIKES-ARCHITECTURE.md).
 
 ### P0.3 — Dette de `VeloQuestApp.tsx`
 
-**État : engagé — le contrôleur de vélo connecté est extrait ; la séance active, la persistance et les écrans restent à découpler.**
+**État : engagé — vélo connecté et reprise de séance extraits ; la PR 54 extrait maintenant la persistance locale. L’enregistrement final des séances et les écrans restent à découpler.**
 
-Le composant principal dépasse désormais 2 200 lignes et concentre navigation, séance, Bluetooth, persistance, lecteur et plusieurs écrans.
+Après la PR 52, le composant principal est descendu à environ 2 160 lignes. Le lot de persistance locale le ramène à environ 2 135 lignes en retirant l’hydratation et les écritures directes de `localStorage` du composant principal.
 
 Ordre de découpage proposé :
 
 1. ✅ contrôleur/hook de vélo connecté (`useBikeController`) ;
-2. ⏳ contrôleur de séance active et reprise ;
-3. contrôleur d'enregistrement et de persistance ;
+2. ✅ contrôleur de reprise et instantané de séance (`useSessionSnapshotController`) ;
+3. ⏳ enregistrement et persistance : `useLocalPersistenceController` couvre l’état principal et les parcours personnels ; l’enregistrement final de séance, l’import/export et leurs dépendances restent à extraire ;
 4. écrans Quête / Séances / Parcours / Suivi / Plus ;
 5. lecteur de séance et panneau Bluetooth ;
 6. suppression des dépendances croisées restantes.

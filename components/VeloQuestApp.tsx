@@ -18,7 +18,7 @@ import { CadenceResult } from "@/components/CadenceResult";
 import { withCadenceOffset, addCadenceInterval, bestCadenceAttempt, cadenceSummary, effortSettingsKey, emptyCadenceScore, numericRange, resistanceTarget } from "@/lib/effort";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { AppState, CompletedSession, Measurement, Preferences, TelemetrySample, TimeAttackSplit, VoyagePortion, WorkoutTemplate } from "@/lib/types";
+import type { CompletedSession, Measurement, Preferences, TelemetrySample, TimeAttackSplit, VoyagePortion, WorkoutTemplate } from "@/lib/types";
 import { VoyagePanel } from "@/components/VoyagePanel";
 import { voyagePlan, voyageProgress, voyageWorkout } from "@/lib/voyage";
 import { validVoyagePortion } from "@/lib/voyage-progress";
@@ -56,10 +56,8 @@ import {
 } from "@/lib/routes";
 import { parseGpxFile } from "@/lib/gpx";
 import {
-  STORAGE_KEY,
   badges,
   currentProgramWeek,
-  emptyState,
   levelForXp,
   totalXp,
   weekTargetFor,
@@ -76,16 +74,16 @@ import { localInputDate, localInputDateTime, localDateToIso } from "@/lib/dates"
 import { counterDelta } from "@/lib/session";
 import { compactTelemetry, formatClock } from "@/lib/session";
 import { cueCoach, adjustedResistance, cueSegment, prepareCueAudio, releaseCueAudio } from "@/lib/session-cues";
-import { createBackup, estimateLocalBytes, normalizeState, parseBackup, safeLocalStorageWrite } from "@/lib/storage";
+import { createBackup, estimateLocalBytes, parseBackup } from "@/lib/storage";
 import { captureSplits, checkpointKilometers, formatRaceTime, ghostDeltaSeconds, ghostDistanceAtElapsed, personalBest, routeAttempts, segmentAttempts, segmentBounds, segmentPersonalBest } from "@/lib/time-attack";
 import { challengesForRoute, evaluateRouteChallenge, routeChallenges, type RouteChallenge } from "@/lib/challenges";
 import { restoreSessionSnapshot } from "@/lib/session-recovery";
 import { useSessionSnapshotController } from "@/components/useSessionSnapshotController";
+import { useLocalPersistenceController } from "@/components/useLocalPersistenceController";
 
 type Tab = "dashboard" | "sessions" | "climbs" | "progress" | "more";
 type Energy = "easy" | "normal" | "hard";
 type RouteMode = "training" | "timeAttack" | "segmentAttack" | "voyage";
-const CUSTOM_ROUTES_KEY = "veloquest:custom-routes:v1";
 
 function pct(value: number, target: number) {
   return Math.min(100, Math.round((value / Math.max(1, target)) * 100));
@@ -122,10 +120,19 @@ function n(form: FormData, key: string) {
 
 export function VeloQuestApp() {
   const pwa = usePwa();
-  const [state, setState] = useState<AppState>(emptyState());
-  const [hydrated, setHydrated] = useState(false);
-  const [stateSaveFailed, setStateSaveFailed] = useState(false);
-  const [routesSaveFailed, setRoutesSaveFailed] = useState(false);
+  const [availableMinutes, setAvailableMinutes] = useState(35);
+  const [toast, setToast] = useState<string | null>(null);
+  const {
+    state,
+    setState,
+    customClimbs,
+    setCustomClimbs,
+    hydrated,
+    stateSaveFailed,
+    routesSaveFailed,
+    initialSessionMinutes,
+    clearLocalData
+  } = useLocalPersistenceController({ onToast: setToast });
   const [tab, setTab] = useState<Tab>("dashboard");
   const [active, setActive] = useState<WorkoutTemplate | null>(null);
   const [activeClimb, setActiveClimb] = useState<ClimbChallenge | null>(null);
@@ -152,11 +159,9 @@ export function VeloQuestApp() {
   const lastAutoTarget = useRef<number | undefined>(undefined);
   const [sessionStarted, setSessionStarted] = useState(false);
   const [showSetup, setShowSetup] = useState(false);
-  const [availableMinutes, setAvailableMinutes] = useState(35);
   const [energy, setEnergy] = useState<Energy>("normal");
   const [sessionResistanceDelta, setSessionResistanceDelta] = useState(0);
   const [backupExport, setBackupExport] = useState<ReturnType<typeof createBackup> | null>(null);
-  const [toast, setToast] = useState<string | null>(null);
   const [online, setOnline] = useState(true);
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
   const [telemetrySamples, setTelemetrySamples] = useState<TelemetrySample[]>([]);
@@ -225,7 +230,6 @@ export function VeloQuestApp() {
     onToast: setToast
   });
   const [climbStartDistanceM, setClimbStartDistanceM] = useState<number | null>(null);
-  const [customClimbs, setCustomClimbs] = useState<ClimbChallenge[]>([]);
   const [gpxError, setGpxError] = useState<string | null>(null);
   const [routeSearch, setRouteSearch] = useState("");
   const [routeThemeId, setRouteThemeId] = useState("");
@@ -304,50 +308,23 @@ export function VeloQuestApp() {
   }, [sessionStarted, preferences.readerView]);
 
   useEffect(() => {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      try {
-        const loaded = normalizeState(JSON.parse(raw));
-        setState(loaded);
-        setAvailableMinutes(loaded.guidance?.sessionMinutes ?? 35);
-      }
-      catch {
-        setState(emptyState());
-        setToast("Sauvegarde locale illisible : un état sain a été chargé.");
-      }
-    } else setAvailableMinutes(15);
+    if (hydrated) setAvailableMinutes(initialSessionMinutes);
+  }, [hydrated, initialSessionMinutes]);
+
+  useEffect(() => {
     const requestedTab = new URLSearchParams(window.location.search).get("tab");
     if (requestedTab && ["dashboard","sessions","climbs","progress","more"].includes(requestedTab)) setTab(requestedTab as Tab);
 
-    const savedRoutes = localStorage.getItem(CUSTOM_ROUTES_KEY);
-    if (savedRoutes) {
-      try { setCustomClimbs(JSON.parse(savedRoutes)); } catch { /* ignore corrupted custom routes */ }
-    }
     setOnline(navigator.onLine);
     const goOnline = () => setOnline(true);
     const goOffline = () => setOnline(false);
     window.addEventListener("online", goOnline);
     window.addEventListener("offline", goOffline);
-    setHydrated(true);
     return () => {
       window.removeEventListener("online", goOnline);
       window.removeEventListener("offline", goOffline);
     };
   }, []);
-
-  useEffect(() => {
-    if (hydrated) {
-      const saved = safeLocalStorageWrite(STORAGE_KEY, state); setStateSaveFailed(!saved);
-      if (!saved) setToast("Stockage local plein : exporte une sauvegarde puis allège l’historique.");
-    }
-  }, [state, hydrated]);
-
-  useEffect(() => {
-    if (hydrated) {
-      const saved = safeLocalStorageWrite(CUSTOM_ROUTES_KEY, customClimbs); setRoutesSaveFailed(!saved);
-      if (!saved) setToast("Impossible d’enregistrer les parcours : stockage local insuffisant.");
-    }
-  }, [customClimbs, hydrated]);
 
   useEffect(() => {
     if (!running || !active || !sessionStarted) return;
@@ -1199,11 +1176,8 @@ export function VeloQuestApp() {
 
   function resetLocalData() {
     if (!window.confirm("Effacer le profil, l’historique, les mesures et les parcours personnels de cet appareil ?")) return;
-    localStorage.removeItem(STORAGE_KEY);
-    localStorage.removeItem(CUSTOM_ROUTES_KEY);
+    clearLocalData();
     clearResumeSnapshot();
-    setState(emptyState());
-    setCustomClimbs([]);
     setSelectedSessionId(null);
     setTab("dashboard");
     setShowSetup(false);

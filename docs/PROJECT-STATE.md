@@ -2,15 +2,17 @@
 
 ## État courant de référence
 
-Checkpoint observé avant le lot de continuité : `main` pointe sur `eede12707b5dbf74439b94a5761e299e6f44368f`, fusion de la PR 51 « Durcir la CI avec des garde-fous d’architecture et de documentation ». Les PR 48 à 51 ont successivement posé la roadmap/architecture multi-vélos, le registre `BikeAdapter`, l’extraction de `useBikeController` puis les garde-fous CI d’architecture et de documentation.
+`main` pointe sur `8f59b5cfd149d578479c307b64c82e61e52003d8`, fusion de la PR 52 **« Extraire la sauvegarde et la reprise de séance du composant principal »**. La CI du commit final de `main` a réussi : garde-fous statiques, TypeScript, tests unitaires, Playwright mobile/ordinateur et build. Le déploiement Vercel correspondant est observé en succès.
 
-La PR 52 est ouverte : **« Extraire la sauvegarde et la reprise de séance du composant principal »**, branche `refactor/session-recovery-controller`, head `a9b585810672e7793b2276cf239c7cb8615b3a29`. Elle déplace la construction, l’écriture périodique et la gestion de l’instantané de séance dans `useSessionSnapshotController`, sans changer la clé `veloquest:active-session:v1` ni `ActiveSessionSnapshot.version = 1`. Sa CI GitHub Actions est observée en succès et sa preview Vercel est déployée. Ce lot est le prochain point de reprise technique tant qu’il n’a pas été fusionné ou remplacé.
+La PR 53 a installé le protocole de continuité du projet dans `docs/CONTINUITY.md`, le modèle de PR et `AGENTS.md`. La PR 52 a ensuite extrait la construction, l’écriture périodique et la gestion de `veloquest:active-session:v1` vers `useSessionSnapshotController`, sans migration du snapshot existant.
+
+Le lot actif est la PR 54 **« Extraire la persistance locale de VeloQuestApp »**, branche `refactor/local-persistence-controller`. Son premier code validé par TypeScript centralise le chargement et les écritures de `veloquest:v1` et `veloquest:custom-routes:v1` dans `useLocalPersistenceController`, sans changer les clés ni les formats. Les scénarios de rechargement, import de sauvegarde, opérations quotidiennes et reprise restent les critères de non-régression avant fusion.
 
 Le produit courant recense 44 séances, 84 parcours natifs dont 38 balades, 12 thèmes, 6 programmes, 22 campagnes/carnets et 77 badges. Le TOPUTURE TEB5 utilisé par l’utilisateur a confirmé sur Bluefy/iPhone connexion, télémétrie, transfert JSON et effet physique de résistance ; cela ne qualifie pas automatiquement un autre matériel, firmware ou navigateur.
 
-La roadmap active est `docs/ROADMAP.md`. La priorité immédiate reste la consolidation P0 : poursuivre le découpage de `VeloQuestApp.tsx`, conserver les garde-fous qualité et mener la recette physique restante. Le renouvellement du programme après la semaine 12 demeure la prochaine grande priorité métier.
+La priorité immédiate reste la consolidation P0 : terminer la PR 54, puis extraire l’enregistrement final de séance et poursuivre le découpage de `VeloQuestApp.tsx`. Le renouvellement du programme après la semaine 12 demeure la prochaine grande priorité métier.
 
-La reprise ne dépend plus d’un fil de conversation : suivre `docs/CONTINUITY.md`. À chaque nouvelle conversation, vérifier l’état live de GitHub, les PR, les CI et, si nécessaire, Vercel avant de se fier à ce checkpoint daté.
+La reprise ne dépend pas d’un fil de conversation : suivre `docs/CONTINUITY.md` et toujours vérifier l’état live de GitHub, les PR, les CI et, si nécessaire, Vercel avant de se fier à ce checkpoint daté.
 
 Les sections datées ci-dessous constituent l'historique des lots successifs. Lorsqu'une entrée ancienne indique qu'une fonction « reste à qualifier » ou « reste à développer », l'état courant ci-dessus et la roadmap active priment.
 
