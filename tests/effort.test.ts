@@ -83,3 +83,12 @@ it("ranks V2 points rather than grade, excludes V1 even with a matching key", ()
  const high = { ...base, points: base.points + 20, segments: [{ eligibleSeconds: 100, measuredSeconds: 100, onTargetSeconds: 95 }] };
  expect(bestCadenceAttempt([entry("S", base), entry("A+", high), entry("old", {...high, version: 1, points: 999999})], key)?.id).toBe("A+");
 });
+
+
+it("keeps a legacy restored attempt V1 without mixing new points into its history", () => {
+ const legacy = { ...emptyCadenceScore(), version: 1 as const, points: 100 };
+ const resumed = addCadenceInterval(legacy, 0, "60–80", 10, 75);
+ expect(resumed.version).toBe(1);
+ expect(resumed.points).toBe(200);
+ expect(bestCadenceAttempt([{metrics:{cadenceScore:resumed,cadenceSettingsKey:"legacy",cadenceRecordEligible:true}} as CompletedSession], "legacy")).toBeUndefined();
+});

@@ -9,7 +9,9 @@ async function setup(page: Page, measured = false, name = "La minute express") {
  if (measured) { await page.getByRole("button",{name:"Vélo Bluetooth"}).click(); await expect(page.getByText("Simulateur FTMS 1–32").first()).toBeVisible(); }
  await page.getByRole("button",{name:/Séances/}).click();
  await page.getByRole("button",{name:`Préparer · ${name}`,exact:true}).click();
- await page.clock.install();
+ const clockStart = await page.evaluate(() => Date.now());
+ await page.clock.install({ time: clockStart });
+ await page.clock.pauseAt(clockStart + 1000);
  await page.getByRole("button",{name:"Lancer le compte à rebours"}).click();
 }
 async function save(page: Page) {
@@ -77,4 +79,14 @@ test("lost or reset telemetry cannot earn a measured record", async ({page}) => 
  await expect(page.getByLabel("Résultat du défi chrono")).toContainText("remis à zéro");
  await save(page);
  expect(await page.evaluate(()=>JSON.parse(localStorage.getItem("veloquest:v1")!).sessions[0].metrics.timedTrial.eligible)).toBe(false);
+});
+test("measured fixed time freezes its distance before late packets", async ({page}) => {
+ await setup(page,true);
+ await page.clock.runFor(5000); await packet(page,1000);
+ for (let elapsed=3;elapsed<=57;elapsed+=3) { await page.clock.runFor(3000); await packet(page,1000+elapsed*5); }
+ await page.clock.runFor(2000); await packet(page,1295);
+ await page.clock.runFor(1000); await packet(page,9000);
+ await expect(page.getByLabel("Résultat du défi chrono")).toContainText("0.295 km");
+ await save(page);
+ expect(await page.evaluate(()=>JSON.parse(localStorage.getItem("veloquest:v1")!).sessions[0].metrics.timedTrial)).toMatchObject({source:"ftms",distanceM:295,elapsedSeconds:60,eligible:true});
 });

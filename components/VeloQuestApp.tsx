@@ -1069,7 +1069,7 @@ export function VeloQuestApp() {
   function exportCsv() {
     const quote = (value: unknown) => `"${String(value ?? "").replaceAll('"', '""')}"`;
     const sessions = [
-      ["date","seance","duree_min","distance_km","calories","vitesse_moy","rpm_moy","watts_moy","fc_moy","rpe","source","voyage_debut_km","voyage_fin_km","voyage_portion_achevee","voyage_position","score_coach_pct","note_coach","couverture_pct","points_combo","meilleur_combo_s"],
+      ["date","seance","duree_min","distance_km","calories","vitesse_moy","rpm_moy","watts_moy","fc_moy","rpe","source","voyage_debut_km","voyage_fin_km","voyage_portion_achevee","voyage_position","score_coach_pct","note_coach","couverture_pct","points_combo","meilleur_combo_s","score_version"],
       ...state.sessions.map((session) => {
         const template = [...workouts, ...timedTrials].find((w) => w.id === session.templateId);
         const route = allClimbs.find((c) => c.id === session.routeId);
@@ -1093,7 +1093,8 @@ export function VeloQuestApp() {
           session.metrics?.cadenceScore ? cadenceSummary(session.metrics.cadenceScore).grade : undefined,
           session.metrics?.cadenceScore ? cadenceSummary(session.metrics.cadenceScore).coverage.toFixed(1) : undefined,
           session.metrics?.cadenceScore?.points,
-          session.metrics?.cadenceScore?.bestComboSeconds
+          session.metrics?.cadenceScore?.bestComboSeconds,
+          session.metrics?.cadenceScore?.version
         ];
       })
     ].map((row) => row.map(quote).join(";")).join("\n");
@@ -1338,7 +1339,7 @@ export function VeloQuestApp() {
         <section>
           <div className="pageHead pageHeadActions"><div><p className="eyebrow">CATALOGUE</p><h1>Choisis ta quête</h1><p>Du décrassage au HIIT. Le ressenti reste prioritaire sur le numéro de résistance.</p></div><button className="secondary" onClick={openManualLog}>+ Enregistrer une séance déjà faite</button></div>
           <p className="finePrint">Les formats express de moins de 10 min rapportent 0,5 point : des compléments à tes séances principales. Les bonus récupération restent à 0 point. Les points des séances déjà enregistrées sont conservés.</p>
-          {hydrated && !active && !resumeSnapshot && <TimedTrialsPanel sessions={state.sessions} deviceName={bike?.deviceName} connected={Boolean(bike)} reading={trialReading} connect={connectBike} onBusy={setTrialBusy} onSave={saveCompletedSession} disabled={Boolean(active) || Boolean(resumeSnapshot)} locked={pwa.locked} />}
+          {hydrated && !active && !resumeSnapshot && <TimedTrialsPanel sessions={state.sessions} deviceName={bike?.deviceName} connected={Boolean(bike)} reading={trialReading} connect={connectBike} onBusy={setTrialBusy} onSave={saveCompletedSession} disabled={Boolean(active) || Boolean(resumeSnapshot)} locked={pwa.locked} keepScreenAwake={preferences.keepScreenAwake} bikeError={bluetoothError} connecting={connectingBike} />}
           <MasteryPanel sessions={state.sessions} />
           <WorkoutProgramsPanel sessions={state.sessions} workouts={workouts} onLaunch={(workout) => launch(workout)} />
           <div className="workoutFilters">

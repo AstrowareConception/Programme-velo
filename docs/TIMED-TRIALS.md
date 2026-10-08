@@ -19,7 +19,7 @@ Avec un vélo connecté, le premier relevé de distance reçu après le compte �
 
 En mode déclaré, le signal « Partez » démarre le chrono. Relève le compteur de ta console à ce moment. À temps fixé, saisis la différence de distance au bilan ; à distance fixée, clique sur **Distance atteinte** à l’arrivée. Ces résultats sont toujours déclarés et classés séparément.
 
-Un compteur qui recule, une coupure, un trou de télémétrie supérieur à cinq secondes ou un rechargement empêche un record mesuré. L’arrêt anticipé conserve un journal sans record ni récompense de complétion. Limite technique d’une heure par épreuve. Garde la fenêtre visible pour recevoir les mesures.
+Un compteur qui recule, une coupure, un trou de télémétrie supérieur à cinq secondes ou un rechargement empêche un record mesuré. L’arrêt anticipé conserve un journal sans record ni récompense de complétion. Limite technique d’une heure par épreuve. Garde la fenêtre visible pour recevoir les mesures. Le maintien de l’écran reprend ton réglage habituel ; son état et le bouton de relance restent visibles.
 
 ## Historique et fiabilité
 
