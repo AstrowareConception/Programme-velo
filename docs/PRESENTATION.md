@@ -411,7 +411,7 @@ Les mises à jour attendent ton action et le repos des lecteurs ouverts. La repr
 
 ### Tes données à portée de main
 
-Le profil, les historiques, les mesures, les préférences, les favoris, les carnets et les GPX personnels restent stockés dans le navigateur utilisé. Aucun compte ni abonnement n’est requis pour les fonctions présentées.
+Le profil, les historiques, les mesures, les préférences, les favoris, les carnets et les GPX personnels restent stockés dans le navigateur utilisé. Aucun compte ni abonnement n’est requis pour les fonctions locales. Un cloud Firebase facultatif peut être activé sur l’installation : il ajoute un compte e-mail vérifié, la synchronisation entre appareils et des versions récupérables. [Activation du cloud](FIREBASE-SETUP.md).
 
 **Exporter une sauvegarde JSON** permet de garder ton état et tes parcours personnels. Tu peux télécharger le fichier, utiliser le partage lorsque le navigateur le permet ou copier le texte complet puis le coller dans VéloQuest sur l’autre appareil. Des exports **CSV** permettent aussi de reprendre séances et mesures dans un tableur.
 

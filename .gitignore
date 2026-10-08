@@ -7,3 +7,8 @@ playwright-report/
 test-results/
 *.tsbuildinfo
 public/sw.js
+
+.env*
+!.env.example
+*-debug.log
+.firebase/

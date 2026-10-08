@@ -1,6 +1,18 @@
 # État de reprise VéloQuest — actualisé le 8 octobre 2026
 
-## Référence courante — séances courtes, 8 octobre 2026
+## Lot actif — sauvegarde et synchronisation Firebase, 8 octobre 2026
+
+Base vérifiée `57c53a9232cee12e361b0a1e471497251f258a2b`, PR 65 publiée ; aucune PR ouverte à la reprise. Le lot séances courtes est clos : 252 unités, 414 scénarios navigateur et version publique vérifiés. Branche `feat/firebase-sync`.
+
+Autorisation : réaliser tout le socle applicatif Firebase, puis fournir à l’utilisateur le tutoriel pour configurer son projet et Vercel. Aucun compte Firebase réel ni service payant à créer automatiquement. Le cloud reste désactivé sans configuration ; l’utilisation locale est préservée.
+
+Réalisé : connexion e-mail/mot de passe avec vérification et récupération ; consentement ; versions cloud immuables, fragments et intégrité SHA-256 ; fusion à trois versions des éléments identifiés, conflits modification/suppression explicites ; sauvegardes avant fusion/restauration ; file d’envoi IndexedDB durable et idempotente ; transaction Firestore conditionnée par le head ; journal local pour l’installation état/parcours/référence ; écran d’export de secours. Authentification et compte isolés, préférences et séance active locales, imports historiques préservés. Règles et index livrés, notice de confidentialité, guide utilisateur et [tutoriel de configuration](FIREBASE-SETUP.md) actualisés.
+
+Validation locale réussie : TypeScript, contrôles statiques, 267 tests unitaires, 7 tests des règles/SDK dans les émulateurs officiels, 8 scénarios cloud à deux contextes Chromium/WebKit et 12 scénarios sans configuration cloud/récupération/notes de version. Builds configuré et non configuré réussis. Les premières recettes ont révélé un fixture ouvrant le guide, le rafraîchissement après vérification d’e-mail et le formulaire revenant à la création après déconnexion ; corrigés. La file d’envoi traite aussi les modifications locales survenues pendant un envoi acquitté tardivement. Résultats finaux, head testé, CI et publication à consigner dans la PR avant de déclarer la livraison.
+
+Limites explicites : 3 Mio par version ; 30 versions listées, toutes conservées ; copie complète par version, quotas à surveiller ; pas de purge automatique ni corbeille par élément, restauration par version ; effacement définitif par administrateur documenté. Pas de chiffrement de bout en bout, ni promesse de synchronisation PWA fermée. Validation du projet réel et essai Bluefy après configuration utilisateur. Suite : terminer cette validation, publier le socle puis laisser l’utilisateur configurer Firebase selon le tutoriel.
+
+## Référence historique — séances courtes, 8 octobre 2026
 
 Base vérifiée : `7ced3299ab678ac67782c253eac9564c04e05140`, PR 64 fusionnée et publiée. Branche `feat/short-workouts-points`. La demande utilisateur porte désormais sur davantage de séances de 10–20 minutes et un minimum de 0,5 point pour chaque modèle du catalogue.
 

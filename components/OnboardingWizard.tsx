@@ -44,7 +44,7 @@ export function OnboardingWizard({ guide, profile, preferences, firstWorkout, ha
         <h2 id="onboarding-title" ref={heading} tabIndex={-1}>{titles[guide.step]}</h2>
         {hasInterruptedSession && <div className="guideHint">Une séance interrompue est conservée. Retrouve-la sur Quête avant de préparer une nouvelle séance.</div>}
         {guide.step === 0 && <div className="form">
-          <p>Quelques repères, une première séance, puis la suite à ton rythme. Aucun compte à créer : tes données restent sur cet appareil.</p>
+          <p>Quelques repères, une première séance, puis la suite à ton rythme. Aucun compte obligatoire : tes données restent sur cet appareil tant que tu n’actives pas le cloud.</p>
           <label>Prénom ou pseudo <span className="optionalLabel">facultatif</span><input name="name" value={profile.name} placeholder="Comment t’appeler ?" maxLength={80} onChange={(event) => onProfile({ ...profile, name: event.target.value })} /></label>
           <label>Ce qui te donne envie<select value={guide.goal} onChange={(event) => change({ goal: event.target.value as Guidance["goal"] })}>
             <option value="habit">Installer une habitude</option><option value="endurance">Gagner en endurance</option><option value="explore">Découvrir des paysages</option>

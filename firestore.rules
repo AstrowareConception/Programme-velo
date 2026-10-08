@@ -1,0 +1,37 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function owner(uid) { return request.auth != null && request.auth.uid == uid && request.auth.token.email_verified == true; }
+    match /users/{uid}/sync/head {
+      allow read: if owner(uid);
+      allow create, update: if owner(uid)
+        && request.resource.data.keys().hasOnly(['schema', 'revision', 'updatedAt'])
+        && request.resource.data.schema == 1
+        && request.resource.data.revision is string
+        && request.resource.data.revision.size() <= 64
+        && request.resource.data.updatedAt == request.time
+        && existsAfter(/databases/$(database)/documents/users/$(uid)/revisions/$(request.resource.data.revision));
+    }
+    match /users/{uid}/revisions/{revision} {
+      allow read: if owner(uid);
+      allow create: if owner(uid)
+        && request.resource.data.keys().hasOnly(['schema', 'chunks', 'bytes', 'hash', 'kind', 'summary', 'createdAt'])
+        && request.resource.data.schema == 1
+        && request.resource.data.chunks is int && request.resource.data.chunks >= 1 && request.resource.data.chunks <= 60
+        && request.resource.data.bytes is int && request.resource.data.bytes > 0 && request.resource.data.bytes <= 3145728
+        && request.resource.data.hash is string && request.resource.data.hash.size() == 64
+        && request.resource.data.kind in ['sync', 'restore', 'before-merge']
+        && request.resource.data.summary is string && request.resource.data.summary.size() <= 160
+        && request.resource.data.createdAt == request.time;
+      match /chunks/{chunk} {
+        allow read: if owner(uid);
+        allow create: if owner(uid) && request.resource.data.keys().hasOnly(['text'])
+          && request.resource.data.text is string && request.resource.data.text.size() <= 240000
+          && !exists(/databases/$(database)/documents/users/$(uid)/revisions/$(revision))
+          && existsAfter(/databases/$(database)/documents/users/$(uid)/revisions/$(revision));
+      }
+    }
+    // No public reads, cross-user access, edits to archives, or client-side destructive purge.
+    match /{document=**} { allow read, write: if false; }
+  }
+}

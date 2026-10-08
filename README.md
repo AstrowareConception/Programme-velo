@@ -44,6 +44,7 @@ Dix nouvelles séances, trois nouveaux programmes et défis de maîtrise ; repè
 - Trophées de découverte : Premier paysage, Flâneur de France (3 balades différentes), Atlas des balades (7), plus six trophées de variété : 10/20 parcours natifs, 6 destinations PACA, 3 parcours azuréens, 4 territoires et les 5 difficultés. Collection La France en douceur inchangée.
 - XP, niveaux, badges, collections, palmarès et analyses de performance.
 - Journal, dates/heures locales, mesures datées de poids/taille/abdomen et suppression des saisies erronées.
+- Cloud Firebase facultatif : compte e-mail vérifié, synchronisation entre appareils, fusion contrôlée et versions restaurables. [Configuration pas à pas](docs/FIREBASE-SETUP.md).
 - Export/import JSON (v3, compatible v2 et ancien état simple), exports CSV et estimation du stockage local.
 - Lecture FTMS : vitesse, cadence, distance, résistance, puissance, fréquence cardiaque, moyennes, énergie, MET et temps **si le vélo les transmet**. Contrôle de résistance facultatif avec acquittement.
 
@@ -113,7 +114,7 @@ Les tests FTMS simulés vérifient le protocole logiciel et l'interface. Ils ne 
 
 ## Données et PWA
 
-Aucun compte ni backend métier : profil, historique, mesures, préférences et favoris utilisent `veloquest:v1`, les parcours personnels `veloquest:custom-routes:v1` et la reprise `veloquest:active-session:v1`. Les sauvegardes JSON comprennent l'état et les GPX ; la reprise active reste propre à l'appareil et n'est pas transférée par ce fichier.
+Le compte cloud est facultatif et aucun backend métier à administrer n’est ajouté. En local, profil, historique, mesures, préférences et favoris utilisent `veloquest:v1`, les parcours personnels `veloquest:custom-routes:v1` et la reprise `veloquest:active-session:v1`. Les sauvegardes JSON comprennent l'état et les GPX ; la reprise active reste propre à l'appareil et n'est pas transférée par ce fichier.
 
 Les semaines suivent le calendrier local, y compris lors d'un changement d'heure. Les séances sont sauvegardées comme instants UTC et affichées dans le fuseau courant de l'appareil. Une mesure datée est enregistrée à midi local pour préserver le jour au moment de la saisie.
 

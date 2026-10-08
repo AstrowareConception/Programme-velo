@@ -7,6 +7,9 @@ import type { ClimbChallenge } from "@/lib/routes";
 import { normalizeState, safeLocalStorageWrite } from "@/lib/storage";
 import type { AppState, CompletedSession, Profile } from "@/lib/types";
 
+import { clearIntent } from "@/lib/cloud/outbox";
+import { CLOUD_LINK_KEY, recoverCloudApply } from "@/lib/cloud/local";
+
 const CUSTOM_ROUTES_KEY = "veloquest:custom-routes:v1";
 
 type LocalPersistenceControllerOptions = {
@@ -27,6 +30,7 @@ export function useLocalPersistenceController({
   onToastRef.current = onToast;
 
   useEffect(() => {
+    try { recoverCloudApply(); } catch { setStateSaveFailed(true); onToastRef.current?.("Restauration locale suspendue : libère de l’espace puis recharge. Les données de reprise sont conservées."); return; }
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       try {
@@ -84,6 +88,8 @@ export function useLocalPersistenceController({
   }
 
   function clearLocalData() {
+    localStorage.removeItem(CLOUD_LINK_KEY);
+    void clearIntent().catch(() => onToastRef.current?.("Les données locales sont réinitialisées, mais une copie d’envoi reste à supprimer. Recharge avant de reconnecter le cloud."));
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem(CUSTOM_ROUTES_KEY);
     localStorage.removeItem(TRIAL_SNAPSHOT_KEY);
