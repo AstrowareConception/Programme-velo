@@ -12,7 +12,7 @@ Entraînement guidé, exploration, défis, programme personnel, récompenses et 
 
 | Une application à explorer | De quoi renouveler tes séances |
 | --- | --- |
-| **44 séances** | De 3 à 70 minutes, du mouvement doux aux formats sportifs |
+| **52 séances** | De 3 à 70 minutes, du mouvement doux aux formats sportifs |
 | **84 parcours** | Balades, étapes vallonnées, grands cols et formats courts |
 | **38 balades à 1/5** | Des destinations accessibles, avec un effort doux conseillé |
 | **12 thèmes de découverte** | Littoral, lacs, canaux, patrimoine, vignobles et montagne |
@@ -83,7 +83,7 @@ Minutes, séances, variété et points donnent plusieurs façons de voir la sema
 
 <a id="seances"></a>
 
-## 44 séances pour que chaque journée trouve son rythme
+## 52 séances pour que chaque journée trouve son rythme
 
 Il y a les soirs où l’on veut se dépenser, ceux où l’on dispose d’une demi-heure et ceux où quelques minutes de mouvement sont déjà une belle décision. Le catalogue couvre ces différentes envies, avec des formats faciles, soutenus ou durs, une préparation et des consignes segment par segment.
 
@@ -102,7 +102,7 @@ Il y a les soirs où l’on veut se dépenser, ceux où l’on dispose d’une d
 | Ajouter un complément facile | Micro bonus 10/15/20 minutes, Parenthèse souple, Pause active |
 | Suivre ta propre inspiration | Séance libre ou enregistrement d’une séance déjà faite |
 
-Chaque fiche annonce sa durée, son intensité, ses segments et sa récompense. Les filtres **Express · moins de 10 min**, **Défis calories** et **Intensité** permettent de retrouver rapidement le bon format. Les séances express structurées de moins de dix minutes rapportent 0,5 point ; les compléments de récupération restent séparés des points principaux.
+Chaque fiche annonce sa durée, son intensité, ses segments et sa récompense. Les filtres **Express · moins de 10 min**, **10–20 min**, **Défis calories** et **Intensité** permettent de retrouver rapidement le bon format. Les séances express structurées de moins de dix minutes rapportent 0,5 point ; les compléments de récupération rapportent eux aussi 0,5 point au total hebdomadaire. Les séances de 10–20 minutes valent 0,5 point en facile, 1 point en soutenu et jusqu’à 2 points pour 20 minutes difficiles.
 
 ### Six chemins pour progresser
 
@@ -119,7 +119,7 @@ Les programmes découverte réunissent des séances complémentaires. Tu peux le
 
 ![Les programmes découverte regroupent les séances en chemins de progression](images/presentation/04-programmes-decouverte.jpg)
 
-**[Voir les 44 séances et leurs durées →](CATALOGUE.md#seances)**
+**[Voir les 52 séances et leurs durées →](CATALOGUE.md#seances)**
 
 <a id="parcours"></a>
 
@@ -484,7 +484,7 @@ Le paquet de séances et parcours peut être préparé et vérifié localement, 
 
 **Où trouver absolument tout le contenu proposé ?**
 
-Le [catalogue complet](CATALOGUE.md) répertorie les 44 séances, les 84 parcours, les 22 campagnes, les six programmes et les 77 badges de la version présentée.
+Le [catalogue complet](CATALOGUE.md) répertorie les 52 séances, les 84 parcours, les 22 campagnes, les six programmes et les 77 badges de la version présentée.
 
 ---
 

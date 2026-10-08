@@ -1,8 +1,12 @@
 # Roadmap VéloQuest
 
-Actualisée le **8 octobre 2026** à partir de `main` `5e64624ed42536a509626d0eb68ae498afcda176`. Orientation vers une distribution grand public validée par l’utilisateur. Les jalons ci-dessous pilotent désormais l’exécution ; le backlog détaillé reste conservé.
+Actualisée le **8 octobre 2026** à partir de `main` `7ced3299ab678ac67782c253eac9564c04e05140`. Orientation vers une distribution grand public validée par l’utilisateur. Les jalons ci-dessous pilotent désormais l’exécution ; le backlog détaillé reste conservé.
 
-Cette roadmap remplace les listes historiques devenues obsolètes. Le produit dispose déjà d'un socle très riche : 44 séances, 84 parcours natifs, 38 balades faciles, 12 thèmes, 6 programmes, 22 campagnes/carnets et 77 badges. L'objectif n'est plus d'empiler les fonctionnalités, mais de consolider le produit, fiabiliser son usage réel, prolonger le programme au-delà de douze semaines et rendre le matériel connecté extensible à plusieurs vélos.
+Cette roadmap remplace les listes historiques devenues obsolètes. Le produit dispose déjà d'un socle très riche : 52 séances, 84 parcours natifs, 38 balades faciles, 12 thèmes, 6 programmes, 22 campagnes/carnets et 77 badges. L'objectif n'est plus d'empiler les fonctionnalités, mais de consolider le produit, fiabiliser son usage réel, prolonger le programme au-delà de douze semaines et rendre le matériel connecté extensible à plusieurs vélos.
+
+## Priorité utilisateur du 8 octobre — séances courtes
+
+Lot actif : huit séances supplémentaires de 10–20 minutes, filtre dédié, minimum de 0,5 point pour tout le catalogue et prise en compte des points bonus dans la semaine. Barème détaillé dans [SHORT-WORKOUTS.md](SHORT-WORKOUTS.md). Les anciennes séances conservent leurs points. Validation et livraison à confirmer dans la PR de `feat/short-workouts-points`. Cette demande passe avant la suite générale de consolidation.
 
 ## Cap produit — de l’usage personnel à la distribution
 
@@ -36,7 +40,7 @@ La PR 58 est publiée sur `e65bf33` : 224 unités, 288 scénarios navigateur san
 - Retours utilisateur du 8 octobre : kilomètre lancé puis épreuve de calories concluants. Les autres formats et le nouvel affichage des mesures restent à éprouver ; le mode et l’appareil de l’essai calories ne sont pas précisés.
 - ✅ PR 62 publiée sur `493f9f3` : vitesse instantanée, cadence, watts et BPM dans les défis ; vitesse moyenne au bilan et dans l’historique. 249 unités et 366 scénarios navigateur réussis ; CI main et vérification production réussies. Fraîcheur indépendante des champs, zéro/absence et petit écran vérifiés. Essai sur le vélo réel différé par l’utilisateur.
 - ✅ PR 63 publiée sur `5e64624` : accessibilité du journal, Secteurs, Défis de parcours et Voyage ; 249 unités et 382 scénarios navigateur sans échec ni retry. CI main et vérification production réussies.
-- ⏳ Lot actif : libellé « Score » sans numéro de version dans l’interface et les guides utilisateur ; accessibilité du profil et du guide de démarrage, protection des saisies et enregistrement du profil confirmé avant fermeture.
+- ✅ PR 64 publiée sur `7ced329` : libellé « Score » sans numéro de version dans l’interface et les guides utilisateur ; accessibilité du profil et du guide de démarrage, protection des saisies et enregistrement du profil confirmé avant fermeture.
 - À suivre : essais VoiceOver/Safari/Bluefy réels, audit des autres modales, contrastes et parcours complet de première utilisation. Regrouper les changements avant publication pour éviter les cycles de CI inutiles.
 
 Passage au jalon suivant : plusieurs séances terminées par les testeurs, aucun blocage critique ni perte de données connue non corrigée. La CI ne remplace pas la recette physique.

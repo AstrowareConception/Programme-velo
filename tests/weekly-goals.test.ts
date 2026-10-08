@@ -41,5 +41,5 @@ it("makes short sessions complements and values sustained easy sessions", () => 
   expect(workouts.filter(w => w.duration < 10).every(w => w.points <= 0.5)).toBe(true);
   expect(workouts.find(w => w.id === "calories-10")!.points).toBe(1);
   expect(workouts.filter(w => !w.bonus && w.intensity === "easy" && w.duration >= 25 && w.duration <= 30).every(w => w.points === 2)).toBe(true);
-  expect(workouts.filter(w => w.bonus).every(w => w.points === 0)).toBe(true);
+  expect(workouts.filter(w => w.bonus).every(w => w.points === 0.5)).toBe(true);
 });

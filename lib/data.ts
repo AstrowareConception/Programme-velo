@@ -1,6 +1,7 @@
 import { canalRoutes } from "./canal-routes";
 import { masteryWorkouts } from "./mastery-workouts";
 import { calorieWorkouts } from "./calorie-challenge";
+import { shortWorkouts } from "./short-workouts";
 import { expressWorkouts } from "./express-workouts";
 import { localInputDate, localCalendarDay } from "./dates";
 import type { Badge, AppState, Preferences, WeekTarget, WorkoutTemplate } from "./types";
@@ -38,6 +39,7 @@ export const workouts: WorkoutTemplate[] = [
   ...discoveryWorkouts,
   ...masteryWorkouts,
   ...expressWorkouts,
+  ...shortWorkouts,
   ...calorieWorkouts,
   {
     id: "recovery-30",
@@ -231,7 +233,7 @@ export const workouts: WorkoutTemplate[] = [
     tagline: "Dix minutes valent mieux que zéro.",
     kind: "bonus",
     duration: 10,
-    points: 0,
+    points: 0.5,
     xp: 15,
     intensity: "easy",
     bonus: true,
@@ -248,7 +250,7 @@ export const workouts: WorkoutTemplate[] = [
     tagline: "15 minutes offertes à ta régularité.",
     kind: "bonus",
     duration: 15,
-    points: 0,
+    points: 0.5,
     xp: 20,
     intensity: "easy",
     bonus: true,
@@ -265,7 +267,7 @@ export const workouts: WorkoutTemplate[] = [
     tagline: "Vingt minutes tranquilles pour empiler du volume.",
     kind: "bonus",
     duration: 20,
-    points: 0,
+    points: 0.5,
     xp: 25,
     intensity: "easy",
     bonus: true,
@@ -360,7 +362,7 @@ export function weeklyStats(state: AppState, week: number) {
   return {
     sessions: structured.length,
     minutes: all.reduce((sum, s) => sum + s.duration, 0),
-    points: structured.reduce((sum, s) => sum + s.points, 0),
+    points: all.reduce((sum, s) => sum + s.points, 0),
     hard: structured.filter((s) => s.intensity === "hard").length,
     variety: new Set(structured.map((s) => s.kind)).size,
     bonuses: bonuses.length,

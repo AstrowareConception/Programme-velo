@@ -1,6 +1,6 @@
 # VéloQuest — Le catalogue complet
 
-**44 séances · 84 parcours · 22 campagnes · 6 programmes · 77 badges**
+**52 séances · 84 parcours · 22 campagnes · 6 programmes · 77 badges**
 
 Choisis une séance, une destination ou une collection à explorer. Ce catalogue complète la [présentation illustrée](PRESENTATION.md) et répertorie le contenu embarqué vérifié le 7 octobre 2026, version `1147628`. Les GPX et carnets personnels viennent ensuite enrichir ta propre sélection.
 
@@ -10,56 +10,64 @@ Choisis une séance, une destination ou une collection à explorer. Ce catalogue
 
 <a id="seances"></a>
 
-## Les 44 séances
+## Les 52 séances
 
-Les durées sont celles des modèles du catalogue. La séance libre peut être enregistrée avec sa durée réelle. Les compléments bonus restent distincts des points principaux.
+Les durées sont celles des modèles du catalogue. La séance libre peut être enregistrée avec sa durée réelle. Chaque séance vaut au moins 0,5 point. Les bonus ajoutent 0,5 point au total hebdomadaire sans remplacer une séance structurée. Le filtre **10–20 min** regroupe les formats courts ; [détail du barème et des huit nouveautés](SHORT-WORKOUTS.md).
 
-| Séance | Durée | Intensité | Ce qui t’attend |
-| --- | ---: | --- | --- |
-| Premiers tours de roue | 15 min | Facile | Une première séance pour découvrir les consignes, à ton rythme. |
-| Roulage contemplatif | 25 min | Facile | Vingt-cinq minutes pour pédaler sans te presser. |
-| Cadence fluide | 30 min | Facile | Changer de cadence, garder le même confort. |
-| Petites vagues | 40 min | Soutenue | Deux ondulations, des récupérations et aucun mur. |
-| Parenthèse souple | 12 min | Facile · bonus | Douze minutes de mouvement, sans chercher un record. |
-| Souffle tranquille | 18 min | Facile | Dix-huit minutes pour trouver ton confort. |
-| Cadence douce | 20 min | Facile | Quatre petits paliers, sans sprint. |
-| Faux-plats en douceur | 20 min | Facile | Une ondulation légère et un retour facile. |
-| Deux petites collines | 25 min | Soutenue | Deux efforts courts séparés par une vraie récupération. |
-| Endurance nomade | 30 min | Facile | Des changements de rythme, toujours faciles. |
-| Pause active | 8 min | Facile · bonus | Huit minutes pour délier les jambes. |
-| Reprendre doucement | 10 min | Facile | Dix minutes pour retrouver le mouvement. Aucun objectif de vitesse, aucun rattrapage. |
-| Retrouver ses repères | 20 min | Facile | Vingt minutes faciles pour évaluer ton confort après une pause. |
-| Le métronome | 15 min | Facile | Garde une cadence régulière sur trois petits plateaux. La précision prime sur la vitesse. |
-| La ligne tranquille | 25 min | Facile | Une cadence stable pendant quinze minutes, avec une résistance légèrement ondulante. |
-| Garder une réserve | 20 min | Facile | Pars avec retenue et cherche à finir aussi proprement que tu as commencé. |
-| Finir avec aisance | 30 min | Soutenue | Deux plateaux comparables pour travailler la gestion de l’effort, sans sprint final. |
-| Petites bosses, rythme stable | 18 min | Soutenue | La résistance change, mais la cadence reste dans la même fenêtre. Allège si le geste se dégrade. |
-| Un peu plus longtemps | 35 min | Facile | Un roulage facile prolongé. La durée est le défi ; conserve un souffle confortable. |
-| Six minutes de précision | 6 min | Facile | Un format express pour suivre deux petites variations de cadence, sans chercher la puissance. |
-| Huit minutes ondulées | 8 min | Soutenue | Deux petites bosses avec des récupérations. Un complément court, pas une obligation quotidienne. |
-| Pause active · 3 min | 3 min | Facile | Trois minutes toutes douces pour remettre les jambes en mouvement. |
-| Petit tour · 4 min | 4 min | Facile | Un mini voyage en souplesse, sans recherche de vitesse. |
-| Cadence précise · 5 min | 5 min | Facile | Deux cibles proches pour jouer avec la régularité. |
-| Petit escalier · 5 min | 5 min | Soutenue | Une montée progressive et une descente, sans palier brutal. |
-| Vagues express · 6 min | 6 min | Soutenue | Deux petites bosses séparées par une récupération. |
-| Tempo minute · 7 min | 7 min | Soutenue | Trois minutes régulières pour travailler la maîtrise du rythme. |
-| Éclats courts · 8 min | 8 min | Dure | Trois efforts de vingt secondes, avec de vraies récupérations. |
-| Sommet éclair · 9 min | 9 min | Dure | Deux ascensions courtes : un défi de résistance, pas de sprint maximal. |
-| Défi calories · 5 min | 5 min | Dure | Cadence libre, résistance libre : ton record en kcal sur un temps fixe. |
-| Défi calories · 10 min | 10 min | Dure | Cadence libre, résistance libre : ton record en kcal sur un temps fixe. |
-| Décrassage | 30 min | Facile | Faire tourner les jambes sans ajouter de fatigue. |
-| Endurance | 45 min | Soutenue | Le socle : régulier, soutenu, durable. |
-| Grande traversée | 70 min | Soutenue | Longue, calme, redoutablement rentable. |
-| Ascension | 35 min | Dure | Chaque palier te rapproche du rouge. |
-| Impact | 25 min | Dure | Court. Dense. Sans négociation. |
-| Forge 4×4 | 39 min | Dure | Quatre blocs qui ne pardonnent rien. |
-| Ligne rouge | 45 min | Dure | Longtemps difficile, jamais hors contrôle. |
-| Cols | 40 min | Dure | Du couple, du contrôle, des jambes lourdes. |
-| Escalier | 37 min | Dure | Monte jusqu'au sommet, redescends proprement. |
-| Séance libre | 30 min | Soutenue | Tu roules, VeloQuest enregistre. |
-| Micro bonus 10 | 10 min | Facile · bonus | Dix minutes valent mieux que zéro. |
-| Micro bonus | 15 min | Facile · bonus | 15 minutes offertes à ta régularité. |
-| Micro bonus 20 | 20 min | Facile · bonus | Vingt minutes tranquilles pour empiler du volume. |
+| Séance | Durée | Intensité | Points | Ce qui t’attend |
+| --- | ---: | --- | ---: | --- |
+| Premiers tours de roue | 15 min | Facile | 0,5 | Une première séance pour découvrir les consignes, à ton rythme. |
+| Roulage contemplatif | 25 min | Facile | 2 | Vingt-cinq minutes pour pédaler sans te presser. |
+| Cadence fluide | 30 min | Facile | 2 | Changer de cadence, garder le même confort. |
+| Petites vagues | 40 min | Soutenue | 3 | Deux ondulations, des récupérations et aucun mur. |
+| Parenthèse souple | 12 min | Facile · bonus | 0,5 | Douze minutes de mouvement, sans chercher un record. |
+| Souffle tranquille | 18 min | Facile | 0,5 | Dix-huit minutes pour trouver ton confort. |
+| Cadence douce | 20 min | Facile | 0,5 | Quatre petits paliers, sans sprint. |
+| Faux-plats en douceur | 20 min | Facile | 0,5 | Une ondulation légère et un retour facile. |
+| Deux petites collines | 25 min | Soutenue | 2 | Deux efforts courts séparés par une vraie récupération. |
+| Endurance nomade | 30 min | Facile | 2 | Des changements de rythme, toujours faciles. |
+| Pause active | 8 min | Facile · bonus | 0,5 | Huit minutes pour délier les jambes. |
+| Reprendre doucement | 10 min | Facile | 0,5 | Dix minutes pour retrouver le mouvement. Aucun objectif de vitesse, aucun rattrapage. |
+| Retrouver ses repères | 20 min | Facile | 0,5 | Vingt minutes faciles pour évaluer ton confort après une pause. |
+| Le métronome | 15 min | Facile | 0,5 | Garde une cadence régulière sur trois petits plateaux. La précision prime sur la vitesse. |
+| La ligne tranquille | 25 min | Facile | 2 | Une cadence stable pendant quinze minutes, avec une résistance légèrement ondulante. |
+| Garder une réserve | 20 min | Facile | 0,5 | Pars avec retenue et cherche à finir aussi proprement que tu as commencé. |
+| Finir avec aisance | 30 min | Soutenue | 2 | Deux plateaux comparables pour travailler la gestion de l’effort, sans sprint final. |
+| Petites bosses, rythme stable | 18 min | Soutenue | 1 | La résistance change, mais la cadence reste dans la même fenêtre. Allège si le geste se dégrade. |
+| Un peu plus longtemps | 35 min | Facile | 3 | Un roulage facile prolongé. La durée est le défi ; conserve un souffle confortable. |
+| Six minutes de précision | 6 min | Facile | 0,5 | Un format express pour suivre deux petites variations de cadence, sans chercher la puissance. |
+| Huit minutes ondulées | 8 min | Soutenue | 0,5 | Deux petites bosses avec des récupérations. Un complément court, pas une obligation quotidienne. |
+| Pause active · 3 min | 3 min | Facile | 0,5 | Trois minutes toutes douces pour remettre les jambes en mouvement. |
+| Petit tour · 4 min | 4 min | Facile | 0,5 | Un mini voyage en souplesse, sans recherche de vitesse. |
+| Cadence précise · 5 min | 5 min | Facile | 0,5 | Deux cibles proches pour jouer avec la régularité. |
+| Petit escalier · 5 min | 5 min | Soutenue | 0,5 | Une montée progressive et une descente, sans palier brutal. |
+| Vagues express · 6 min | 6 min | Soutenue | 0,5 | Deux petites bosses séparées par une récupération. |
+| Tempo minute · 7 min | 7 min | Soutenue | 0,5 | Trois minutes régulières pour travailler la maîtrise du rythme. |
+| Éclats courts · 8 min | 8 min | Dure | 0,5 | Trois efforts de vingt secondes, avec de vraies récupérations. |
+| Sommet éclair · 9 min | 9 min | Dure | 0,5 | Deux ascensions courtes : un défi de résistance, pas de sprint maximal. |
+| Délier les jambes | 10 min | Facile | 0,5 | Dix minutes de souplesse, avec une résistance qui monte puis redescend doucement. |
+| Jeu de cadence | 12 min | Soutenue | 1 | Trois paliers de cadence pour varier le rythme à résistance modérée. |
+| Souffle léger | 15 min | Facile | 0,5 | Un roulage facile et continu pour profiter d’un quart d’heure disponible. |
+| Tempo compact | 15 min | Soutenue | 1 | Deux plateaux soutenus séparés par une minute pour retrouver ton souffle. |
+| Pyramide courte | 18 min | Soutenue | 1 | Gravis trois marches, puis redescends les mêmes paliers sans sprint final. |
+| Trois vagues | 20 min | Soutenue | 1 | Trois bosses de deux minutes, chacune suivie d’une vraie récupération. |
+| Relances contrôlées | 20 min | Dure | 2 | Cinq relances d’une minute : alterne effort franc et récupération, puis stabilise le rythme. |
+| Double ascension | 20 min | Dure | 2 | Deux montées assises, une vallée centrale et un retour au calme généreux. |
+| Défi calories · 5 min | 5 min | Dure | 0,5 | Cadence libre, résistance libre : ton record en kcal sur un temps fixe. |
+| Défi calories · 10 min | 10 min | Dure | 1 | Cadence libre, résistance libre : ton record en kcal sur un temps fixe. |
+| Décrassage | 30 min | Facile | 2 | Faire tourner les jambes sans ajouter de fatigue. |
+| Endurance | 45 min | Soutenue | 3 | Le socle : régulier, soutenu, durable. |
+| Grande traversée | 70 min | Soutenue | 4 | Longue, calme, redoutablement rentable. |
+| Ascension | 35 min | Dure | 3 | Chaque palier te rapproche du rouge. |
+| Impact | 25 min | Dure | 4 | Court. Dense. Sans négociation. |
+| Forge 4×4 | 39 min | Dure | 4 | Quatre blocs qui ne pardonnent rien. |
+| Ligne rouge | 45 min | Dure | 3 | Longtemps difficile, jamais hors contrôle. |
+| Cols | 40 min | Dure | 3 | Du couple, du contrôle, des jambes lourdes. |
+| Escalier | 37 min | Dure | 3 | Monte jusqu'au sommet, redescends proprement. |
+| Séance libre | 30 min | Soutenue | 2 | Tu roules, VeloQuest enregistre. |
+| Micro bonus 10 | 10 min | Facile · bonus | 0,5 | Dix minutes valent mieux que zéro. |
+| Micro bonus | 15 min | Facile · bonus | 0,5 | 15 minutes offertes à ta régularité. |
+| Micro bonus 20 | 20 min | Facile · bonus | 0,5 | Vingt minutes tranquilles pour empiler du volume. |
 
 <a id="parcours"></a>
 

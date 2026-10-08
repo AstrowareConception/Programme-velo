@@ -3,7 +3,7 @@ import type { WorkoutTemplate } from "./types";
 export const discoveryWorkouts: WorkoutTemplate[] = [
   {
     id: "first-pedals-15", name: "Premiers tours de roue", tagline: "Une première séance pour découvrir les consignes, à ton rythme.",
-    kind: "recovery", duration: 15, points: 1, xp: 25, intensity: "easy",
+    kind: "recovery", duration: 15, points: 0.5, xp: 25, intensity: "easy",
     description: "Règle la résistance à la main. Le ressenti d’effort (RPE) va de 1, très facile, à 10, maximal. Ici, garde un effort confortable de 2 à 3 : les niveaux sont des repères que tu peux diminuer. À la fin, indique ton ressenti pour aider le coach à choisir la suite.",
     segments: [
       { label: "Découvrir le pédalage", minutes: 4, resistance: "4–5", rpe: "2", cadence: "libre" },
@@ -49,7 +49,7 @@ export const discoveryWorkouts: WorkoutTemplate[] = [
   },
   {
     id: "bonus-soft-12", name: "Parenthèse souple", tagline: "Douze minutes de mouvement, sans chercher un record.",
-    kind: "bonus", duration: 12, points: 0, xp: 18, intensity: "easy", bonus: true,
+    kind: "bonus", duration: 12, points: 0.5, xp: 18, intensity: "easy", bonus: true,
     description: "Un micro-bonus très doux, soumis au plafond commun de 60 XP par semaine. Ne remplace pas une séance structurée.",
     segments: [
       { label: "Départ tranquille", minutes: 3, resistance: "4–6", rpe: "2", cadence: "libre" },
@@ -59,7 +59,7 @@ export const discoveryWorkouts: WorkoutTemplate[] = [
   },
   {
     id: "breathing-18", name: "Souffle tranquille", tagline: "Dix-huit minutes pour trouver ton confort.",
-    kind: "recovery", duration: 18, points: 1, xp: 30, intensity: "easy",
+    kind: "recovery", duration: 18, points: 0.5, xp: 30, intensity: "easy",
     description: "Un rythme auquel tu peux parler facilement. Ajuste la résistance manuellement pour rester à RPE 2–3 ; la durée ne constitue pas un objectif de vitesse.",
     segments: [
       { label: "Se mettre en mouvement", minutes: 3, resistance: "4–5", rpe: "2", cadence: "libre" },
@@ -69,7 +69,7 @@ export const discoveryWorkouts: WorkoutTemplate[] = [
   },
   {
     id: "soft-cadence-20", name: "Cadence douce", tagline: "Quatre petits paliers, sans sprint.",
-    kind: "ladder", duration: 20, points: 1, xp: 35, intensity: "easy",
+    kind: "ladder", duration: 20, points: 0.5, xp: 35, intensity: "easy",
     description: "Change doucement de cadence sans durcir l’effort. Les tours par minute sont indicatifs : privilégie un mouvement souple et réduis le niveau si nécessaire.",
     segments: [
       { label: "Cadence de départ", minutes: 5, resistance: "4–6", rpe: "2", cadence: "65–75" },
@@ -80,7 +80,7 @@ export const discoveryWorkouts: WorkoutTemplate[] = [
   },
   {
     id: "false-flats-20", name: "Faux-plats en douceur", tagline: "Une ondulation légère et un retour facile.",
-    kind: "progressive", duration: 20, points: 1, xp: 35, intensity: "easy",
+    kind: "progressive", duration: 20, points: 0.5, xp: 35, intensity: "easy",
     description: "Découvre les changements de résistance avec une seule petite ondulation. Les niveaux 1–32 du TEB5 se règlent à la main ; reste entre RPE 2 et 4.",
     segments: [
       { label: "Terrain roulant", minutes: 5, resistance: "5–7", rpe: "2–3", cadence: "70–85" },
@@ -115,7 +115,7 @@ export const discoveryWorkouts: WorkoutTemplate[] = [
   },
   {
     id: "bonus-pause-8", name: "Pause active", tagline: "Huit minutes pour délier les jambes.",
-    kind: "bonus", duration: 8, points: 0, xp: 12, intensity: "easy", bonus: true,
+    kind: "bonus", duration: 8, points: 0.5, xp: 12, intensity: "easy", bonus: true,
     description: "Un bonus doux, dans le plafond commun de 60 XP par semaine. Ce petit format ne valide pas un programme guidé et ne remplace pas une séance structurée.",
     segments: [
       { label: "Commencer doucement", minutes: 3, resistance: "4–5", rpe: "2", cadence: "libre" },
