@@ -1,28 +1,29 @@
 # État de reprise VéloQuest — actualisé le 8 octobre 2026
 
-## Référence de reprise vérifiée
+## Référence de reprise vérifiée — 8 octobre, après livraison de la PR 61
 
-Main `9360ec8623df2ccc5ae8bc2cdcf2e22cf9eb6d2c` ; aucune PR ouverte au début de cette reprise. La PR 60 est bien fusionnée et publiée : `/api/version` consulté directement confirme ce SHA. La PR consigne 236 unités, 334 tests navigateur (32 WebKit), CI 37752400330 réussie et production READY. Le précédent checkpoint la présentait encore en cours : cet état est réconcilié.
+Main et production : `cb7cb15090bb945836321d0f3a1153b3c318d5ce`, vérifié par `/api/version`. Aucune PR ouverte au début de ce lot. [PR 61](https://github.com/AstrowareConception/Programme-velo/pull/61) fusionnée : head validé `31fdbac268af0e2a3eaf346a67c540a83c165f3a`, arbre `aac2ba929f62551abb2dc616000bdae1c575f0d2` identique au commit fusionné. 245 unités et 362 scénarios navigateur réussis ; [CI main](https://github.com/AstrowareConception/Programme-velo/actions/runs/37770437819) et [vérification production](https://github.com/AstrowareConception/Programme-velo/actions/runs/37771487518) réussies. La description de PR conserve les preuves complètes.
 
-## Lot actif — Défis chrono et score V2
+Retour utilisateur du 8 octobre : « le kilomètre lancé marche bien », une partie des nouveautés essayée et aucune autre anomalie signalée. Ce retour valide son essai du kilomètre, sans qualifier tous les défis, appareils ou navigateurs. Demande suivante : voir notamment la vitesse instantanée pour mieux suivre l’effort.
 
-PR [61](https://github.com/AstrowareConception/Programme-velo/pull/61), branche `feat/timed-trials-score-v2`, base `9360ec8`. Demande du 8 octobre : maximiser la distance en temps limité, couvrir une distance au meilleur temps, départ lancé de cinq secondes ; points dépendant de la cadence et note indépendante. Autorisation de repartir sur de nouveaux records.
+## Lot actif — Mesures visibles dans les défis chrono
 
-Réalisé dans ce lot :
-- score V2 = cadence / 6 points par seconde × combo (×1 hors cible, ×2/3/4 après 10/20/30 s dans la cible) ; note et couverture inchangées ; zéro rpm ne donne aucun point ;
-- classement par points, version et réglages identiques ; les anciens scores V1 restent dans l’historique, exclus des nouveaux records, sans effacer séances/XP/mesures ; reprise V1 conservée comme V1 ;
-- cartes de séances : points ET note ; bilan et comparaison alignés ;
-- six défis dans Séances : 1/5/12 minutes à distance maximale, 1/5/10 km au meilleur temps ; cadence/résistance libres, départ lancé ;
-- moteur métier séparé, premier relevé après compte à rebours comme zéro mesuré, interpolation du franchissement de distance, arrêt conservateur au dernier compteur avant la limite de temps ;
-- résultats FTMS par nom de vélo et déclarés séparés ; trous, compteur remis à zéro, départ absent et rechargement hors record ;
-- bilan protégé d’un refus de stockage, reprise locale distincte `veloquest:timed-trial:v1` ramenant au bilan hors record ; historique et sauvegarde v3 conservés ;
-- journal de séances intenses et points/XP modestes, aucune simulation de distance.
+Base `cb7cb15`, branche `feat/trial-live-metrics`, [PR 62](https://github.com/AstrowareConception/Programme-velo/pull/62). Vitesse instantanée en grand, cadence, watts et fréquence cardiaque reçus du vélo, pendant l’élan et l’épreuve. Expiration indépendante de chaque mesure (5 secondes, 10 pour le cœur), valeurs manquantes/anciennes indiquées par un tiret, vrais zéros conservés pour vitesse/cadence/puissance. Compteur de départ et mesures effacés avant une reconnexion. Chrono et mesures côte à côte en paysage ; empilés en portrait. Vitesse moyenne distance/temps dans le bilan et l’historique, y compris pour les anciens défis, calculée hors élan et clairement nommée.
 
-Validation : TypeScript, garde-fous et 245 unités réussis localement ; build exécuté par la préparation Playwright. Chromium local ne peut pas démarrer (création de socket refusée par l’environnement), donc les scénarios navigateur seront exécutés par la CI existante. Première CI 37767709037 : 350 scénarios réussis, 8 échecs correspondant aux deux assertions de chrono exact sur quatre projets : l’horloge de test avançait pendant les interactions/captures. Le test pilote maintenant explicitement une horloge suspendue, sans assouplir les valeurs attendues. Un scénario FTMS à temps fixé couvre aussi les paquets postérieurs à l’arrivée. Captures inspectées : le nouveau dialogue imbriqué dans une carte créait un contexte d’empilement qui laissait la navigation passer devant ; déplacement dans un portail à la racine, fermeture normalisée, actions visibles testées à 960×600. Maintien écran, erreurs Bluetooth et effacement de la reprise ajoutés. Résultats finaux, SHA, fusion et publication à consigner dans la description de PR avant d’affirmer la livraison.
+Pas de migration ni nouveau champ persistant, pas de commande vélo supplémentaire. Chronométrage, records, note et score V2 inchangés. Mesures affichées sans annonce vocale continue ; mode déclaré renvoyant à la console.
 
-Limites : le nom du vélo n’est pas un identifiant matériel unique ; les résistances libres et étalonnages ne garantissent pas des efforts égaux. Le dernier relevé des épreuves minutées peut sous-estimer la distance de deux secondes au plus pour être admissible. Le chrono d’arrivée est interpolé entre deux paquets. Aucune qualification matérielle ajoutée. Safari/Bluefy/VoiceOver et épreuves sur vélo réel restent à essayer.
+Validation locale : TypeScript, garde-fous, 249 tests unitaires, build et **16 scénarios navigateur Chromium mobile/ordinateur réussis**, dont affichage paysage 960×600, largeur 320 px, fraîcheur indépendante, zéro/absence, bilan, sauvegarde/rechargement et moyenne excluant l’élan. Captures inspectées. Première recette : le scénario d’historique devait ouvrir le détail après Suivi ; corrigé sans retirer la vérification. Message de connexion pouvant recouvrir l’arrêt : dialogue chrono placé devant les notifications, commande vérifiée par hit-test. Chromium standard ne démarre pas ici (socket refusée), mais le binaire headless_shell disponible fonctionne et a exécuté la recette locale. Revue React : composant visuel séparé, aucun nouveau timer/souscripteur Bluetooth, dates capturées avant les mises à jour d’état et pas d’annonces répétées. Complément : arrivée d’un paquet entre deux ticks du chrono, affichage immédiat sans clignotement vérifié dans deux scénarios ciblés après un build neuf. La recette précédente réutilisait un ancien HTML local ; le build généré a été mis de côté puis reconstruit pour tester le nouveau bundle. CI complète Chromium/WebKit sur le head exact, fusion et publication à confirmer dans la PR avant d’affirmer la livraison.
 
-Prochaine action : finaliser la recette/CI du lot, publier selon l’autorisation de continuation, puis reprendre l’accessibilité des autres fenêtres et les essais de première utilisation. Voir [règles et recette chrono](TIMED-TRIALS.md).
+Limites : vitesse et watts dépendent de la console et de son étalonnage ; une vitesse affichée n’établit pas une mesure physiologique de l’effort. Le nouvel affichage reste à essayer sur le vélo réel. Suite : recueillir cette recette, puis accessibilité des autres fenêtres et parcours de première utilisation selon la roadmap.
+
+## Lot clos — Défis chrono et score V2, PR 61
+
+- Score V2 : cadence / 6 points par seconde × combo ; note de régularité indépendante. Cartes avec points et note. Anciens scores V1 conservés hors nouveaux records, historiques et XP préservés.
+- Six épreuves : distance maximale en 1/5/12 minutes, meilleur temps sur 1/5/10 km, départ lancé de cinq secondes exclu du résultat ; chrono continu, résistance libre.
+- FTMS : premier relevé après l’élan comme zéro, interpolation de l’arrivée en distance et fin conservative au dernier relevé avant le délai. Resets, trous, arrêt/rechargement hors record.
+- Records mesurés par nom de vélo, déclarés séparés ; bilan conservé après refus du stockage et réessai ; reprise au bilan hors record.
+
+Limites restantes : nom de vélo non unique, résistances libres/étalonnages sans équivalence universelle ; fin minutée pouvant sous-estimer légèrement la distance. Le retour utilisateur ci-dessus concerne le kilomètre lancé. Les autres formats et essais Safari/Bluefy/VoiceOver restent à documenter. Voir [règles et recette chrono](TIMED-TRIALS.md).
 
 ## Lot précédent clos — Accessibilité/WebKit, PR 60
 

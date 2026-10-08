@@ -80,6 +80,17 @@ export async function mockFtms(page: Page, mode: "standard" | "sport02" = "stand
     }
 
     characteristic(BIKE_DATA);
+    (window as any).__emitMetrics = (values: { speedKmh?: number; cadenceRpm?: number; distanceM?: number; powerW?: number; heartRate?: number }) => {
+      const flags = (values.speedKmh === undefined ? 1 : 0) | (values.cadenceRpm !== undefined ? 1 << 2 : 0) | (values.distanceM !== undefined ? 1 << 4 : 0) | (values.powerW !== undefined ? 1 << 6 : 0) | (values.heartRate !== undefined ? 1 << 9 : 0);
+      const view = new DataView(new ArrayBuffer(12));
+      view.setUint16(0, flags, true); let offset = 2;
+      if (values.speedKmh !== undefined) { view.setUint16(offset, Math.round(values.speedKmh * 100), true); offset += 2; }
+      if (values.cadenceRpm !== undefined) { view.setUint16(offset, values.cadenceRpm * 2, true); offset += 2; }
+      if (values.distanceM !== undefined) { const m = values.distanceM; view.setUint8(offset++, m & 255); view.setUint8(offset++, (m >> 8) & 255); view.setUint8(offset++, (m >> 16) & 255); }
+      if (values.powerW !== undefined) { view.setInt16(offset, values.powerW, true); offset += 2; }
+      if (values.heartRate !== undefined) view.setUint8(offset, values.heartRate);
+      emit(BIKE_DATA, view);
+    };
     (window as any).__emitDistance = (metres: number) => {
       const view = new DataView(new ArrayBuffer(7));
       view.setUint16(0, 1 << 4, true); view.setUint16(2, 2000, true);

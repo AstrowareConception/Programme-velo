@@ -27,6 +27,14 @@ Relis le bilan, coche la confirmation puis enregistre. Si le stockage refuse, la
 
 Les records FTMS sont groupés par épreuve et nom du vélo connecté. Un nom n’identifie pas toujours un exemplaire unique ; utiliser le même vélo et des conditions similaires. Résistance libre et étalonnage de la console limitent les comparaisons : ce ne sont pas des records de puissance universels. Les défis comptent comme séances intenses. Les épreuves terminées rapportent 15 XP et 0,5 point sous dix minutes, 1 point au-delà ; les interruptions ne rapportent pas ces bonus.
 
+## Mesures pendant l’épreuve
+
+En mode vélo connecté, la **vitesse instantanée en km/h** est affichée dès le compte à rebours puis pendant la course, accompagnée de la cadence (tr/min), de la puissance (W) et de la fréquence cardiaque (bpm) lorsqu’elles sont transmises. Sur tablette paysage, chrono et mesures sont côte à côte ; sur téléphone, ils se succèdent. Les valeurs changeantes ne déclenchent pas d’annonce vocale permanente.
+
+Un tiret signifie qu’une mesure n’est pas reçue ou n’est plus récente : cinq secondes pour vitesse, cadence et puissance, dix pour la fréquence cardiaque. Chaque champ possède sa propre date de réception ; une nouvelle distance ne rajeunit pas une ancienne vitesse. Une vitesse reçue de zéro reste affichée **0,0 km/h**. Aucun calcul depuis la cadence ni vitesse simulée ne remplace une valeur absente. En mode déclaré, lis ces informations sur la console.
+
+Le bilan et l’historique affichent la **vitesse moyenne calculée** à partir de la distance du défi et de son temps, sans les cinq secondes d’élan. Elle est distincte de la vitesse instantanée diffusée par la console et reste fondée sur les valeurs déclarées lorsque le résultat est manuel. Ces indications ne changent ni le chronométrage, ni la sélection des records, ni les sauvegardes existantes.
+
 ## Points et note des séances guidées
 
 Le **score V2** est distinct de la **note** :
