@@ -834,7 +834,9 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .onboardingBar i { height:4px; flex:1; border-radius:8px; background:var(--line); }
 .onboardingBar i.done { background:var(--cyan); }
 .onboardingForm select, .guideToday select { width:100%; color:var(--text); background:#080e1b; border:1px solid var(--line); border-radius:12px; min-height:44px; padding:10px; font:inherit; }
-.onboardingForm .form { gap:16px; }
+.onboardingForm .form { gap:16px; grid-template-columns:minmax(0,1fr); }
+.onboardingForm .form > *, .onboardingForm label { min-width:0; }
+.onboardingForm label { grid-template-columns:minmax(0,1fr); }
 .onboardingForm .form p { margin:0; }
 .onboardingForm summary, .guideLesson summary { cursor:pointer; color:var(--cyan); font-size:.8rem; min-height:32px; }
 .optionalLabel { color:var(--muted); font-size:.7rem; font-weight:400; }
