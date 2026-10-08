@@ -281,3 +281,11 @@ Le score des séances guidées dépend désormais de la cadence : 60 tr/min = 10
 ### Modifier le profil sans perdre ses saisies
 
 Dans Plus → Modifier le profil et les objectifs, les mesures corporelles restent facultatives. Échap place le focus sur le bouton de fermeture ; le formulaire reste ouvert avec tes saisies. Un clic sur le fond ne le ferme pas. Si le stockage refuse l’enregistrement, une explication et un bouton de réessai restent dans le formulaire. Après réussite, le profil est enregistré sur cet appareil et la fenêtre se ferme.
+
+### Sauvegarde cloud facultative
+
+Dans **Plus → Sauvegarde et synchronisation**, l’application indique si le cloud est configuré. Après activation volontaire, crée ou connecte un compte e-mail, vérifie ton adresse, puis examine et confirme la première association. Sur un second appareil, utilise le même compte. Seul le message **Copie confirmée en ligne** atteste une sauvegarde distante réussie.
+
+Les ajouts indépendants sont fusionnés ; un conflit demande ton choix. Les préférences du vélo, du son et de l’affichage restent propres à l’appareil. Hors connexion, continue normalement puis reconnecte-toi avec l’application ouverte. La synchronisation est différée pendant les séances et les saisies protégées.
+
+**Voir les versions sauvegardées** permet de récupérer un ancien état, notamment après une suppression. La restauration est confirmée et synchronisée sur les autres appareils ; l’état précédent est archivé. La réinitialisation locale détache l’appareil sans supprimer le cloud. L’export JSON reste utile comme copie indépendante. [Activation et dépannage](FIREBASE-SETUP.md).

@@ -8,6 +8,9 @@ import { AdaptiveProgram } from "@/components/AdaptiveProgram";
 import { WeeklyReview, SessionDebrief } from "@/components/WeeklyReview";
 import { MasteryPanel } from "@/components/MasteryPanel";
 import { PersonalJourneys } from "@/components/PersonalJourneys";
+import { CloudRecoveryRescue } from "@/components/CloudRecoveryRescue";
+import { CloudPanel } from "@/components/CloudPanel";
+import { useCloudSync } from "@/components/useCloudSync";
 import { BackupTransfer, BackupPaste } from "@/components/BackupTransfer";
 import { CalorieResult } from "@/components/CalorieResult";
 import { isCalorieWorkout, startCalories, sampleCalories, measuredCaloriesEligible, bestCalorieAttempt, type CalorieAttempt, type CalorieResult as CalorieResultType } from "@/lib/calorie-challenge";
@@ -299,7 +302,11 @@ export function VeloQuestApp() {
     onForeground: () => setForegroundNotice(true)
   });
   const preferences: Preferences = { ...defaultPreferences, ...(state.preferences ?? {}) };
-  useEffect(() => { pwa.setBusy(!hydrated || trialBusy || Boolean(active) || Boolean(bike) || connectingBike || diagnosingBike || showSetup || stateSaveFailed || routesSaveFailed); }, [hydrated, trialBusy, active, bike, connectingBike, diagnosingBike, showSetup, stateSaveFailed, routesSaveFailed, pwa.setBusy]);
+  const cloud = useCloudSync({ state, customClimbs, hydrated, locked: pwa.locked,
+    blocked: !hydrated || trialBusy || Boolean(active) || Boolean(resumeSnapshot) || showSetup || state.guidance?.status === "setup" || stateSaveFailed || routesSaveFailed,
+    onInstall: value => { setState(value.state); setCustomClimbs(value.customClimbs); }
+  });
+  useEffect(() => { pwa.setBusy(cloud.working || cloud.formDirty || !hydrated || trialBusy || Boolean(active) || Boolean(bike) || connectingBike || diagnosingBike || showSetup || stateSaveFailed || routesSaveFailed); }, [cloud.working, cloud.formDirty, hydrated, trialBusy, active, bike, connectingBike, diagnosingBike, showSetup, stateSaveFailed, routesSaveFailed, pwa.setBusy]);
   const screenWake = useScreenWakeLock(running && sessionStarted && preferences.keepScreenAwake);
 
   useEffect(() => { setFinishReviewed(false); }, [showFinish]);
@@ -704,6 +711,7 @@ export function VeloQuestApp() {
     onClear={() => { setState(prev => ({ ...prev, voyage: undefined })); setVoyagePickerOpen(false); setTab("climbs"); }}
   /> : null;
 
+  if (!hydrated && stateSaveFailed) return <CloudRecoveryRescue />;
   if (!hydrated) {
     return (
       <main className="splashScreen" aria-busy="true">
@@ -1715,8 +1723,9 @@ export function VeloQuestApp() {
             </div>
           </section>
 
+          <CloudPanel cloud={cloud} />
           <section className="card actionStack">
-            <div><p className="eyebrow">DONNÉES LOCALES</p><h2>Profil & sauvegardes</h2><p>Les données restent sur cet appareil tant que tu ne les exportes pas.</p></div>
+            <div><p className="eyebrow">DONNÉES LOCALES</p><h2>Profil & sauvegardes</h2><p>Les données restent locales tant que tu n’actives pas le cloud ou un export.</p></div>
             <button className="secondary" onClick={() => setShowSetup(true)}>Modifier le profil et les objectifs</button>
             <button className="secondary" onClick={reviewGuidance}>Revoir le guide de démarrage</button>
             <div className="storageMeter"><span>Empreinte locale</span><strong>{localBytes < 1024 * 1024 ? `${Math.max(1, Math.round(localBytes / 1024))} Ko` : `${(localBytes / 1024 / 1024).toFixed(2)} Mo`}</strong></div>

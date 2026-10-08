@@ -2,6 +2,16 @@
  * Change an id only for a new user-facing release, never for a rebuild. */
 export const releases = [
   {
+    id: "2026-10-cloud-foundation", date: "2026-10-08", label: "8 octobre 2026",
+    title: "Ton suivi peut voyager avec toi",
+    summary: "Un espace de sauvegarde et de synchronisation facultatif, prêt à être activé sur cette installation.",
+    changes: [
+      { title: "Un compte facultatif", text: "Dans Plus, l’espace cloud indique sa disponibilité. Une fois activé sur le site, connecte le même compte sur tes appareils et vérifie la première fusion." },
+      { title: "Des versions récupérables", text: "Les sauvegardes cloud conservent les versions précédentes. Examine-les avant de restaurer ; les modifications contradictoires demandent ton choix." },
+      { title: "Le local reste disponible", text: "Sans cloud, ou hors connexion, tes données restent sur l’appareil. L’export JSON reste accessible. Seul le message de synchronisation confirmée garantit que la copie est arrivée en ligne." }
+    ]
+  },
+  {
     id: "2026-10-short-workouts", date: "2026-10-08", label: "8 octobre 2026",
     title: "Dix à vingt minutes pour avancer",
     summary: "Huit nouvelles séances courtes, et des points pour chaque séance du catalogue.",
