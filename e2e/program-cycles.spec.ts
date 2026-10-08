@@ -28,9 +28,9 @@ test('completed cycle is previewed, confirmed and reloaded with history and XP i
   await expect(current.locator('.closedCycle')).toContainText('30 min');
   await current.screenshot({ path: info.outputPath('cycles-history.png') });
   await page.setViewportSize({ width: 320, height: 720 }); await page.evaluate(() => { document.documentElement.style.fontSize = '200%'; });
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
   await current.getByRole('button', { name: 'Préparer un nouveau cycle' }).click();
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
   await page.screenshot({ path: info.outputPath('cycles-320-text-200.png') });
 });
 test('restart produces easy dated rides and cancel leaves the cycle untouched', async ({ page }) => {

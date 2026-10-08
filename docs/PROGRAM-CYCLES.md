@@ -29,7 +29,7 @@ Si le stockage refuse l’enregistrement, la proposition reste ouverte et le cyc
 
 Le JSON v3 contient le calendrier optionnel `programTimeline` ; les sauvegardes antérieures restent lisibles sans remise à zéro. Une archive de cycles invalide est refusée à l’import. Utilise la version actuelle sur tous les appareils avant d’échanger ces nouvelles sauvegardes : une ancienne version ne connaît pas ce champ.
 
-Avec le cloud activé, le cycle, ses objectifs et ses plannings voyagent ensemble. Les séances ajoutées indépendamment restent fusionnées. Deux départs contradictoires, ou un changement de cycle concurrent à une modification d’ancien planning, demandent un choix explicite du programme à conserver. La restauration d’une version conserve l’ensemble du calendrier qu’elle contient.
+Avec le cloud activé, le cycle, ses objectifs et ses plannings voyagent ensemble. Les séances ajoutées indépendamment restent fusionnées. Deux départs contradictoires, ou un changement de cycle concurrent à une modification d’ancien planning, demandent un choix explicite du programme à conserver. La disparition d’un calendrier connu exige aussi ce choix sur un appareil à jour, notamment après réception de données d’une ancienne application. La restauration d’une version conserve le calendrier qu’elle contient ; si elle précède les cycles, les autres appareils vérifient ce changement.
 
 Les jours sont ceux du calendrier local de l’appareil, pas des périodes fixes de 24 heures. Un changement de fuseau peut déplacer le classement d’une séance.
 

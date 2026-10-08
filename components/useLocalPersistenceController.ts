@@ -130,6 +130,11 @@ export function useLocalPersistenceController({
   }
 
   function saveTrophyReceipts(ids: string[]) {
+    // An automatic acknowledgement must never write an old tab over newer history.
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw && canonical(normalizeState(JSON.parse(raw))) !== canonical(normalizeState(state))) return false;
+    } catch { return false; }
     const nextState = { ...state, preferences: { ...state.preferences!, trophyNotifications: ids } };
     if (!safeLocalStorageWrite(STORAGE_KEY, nextState)) { setStateSaveFailed(true); return false; }
     persistedStateRef.current = nextState;

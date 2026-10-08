@@ -45,9 +45,9 @@ La PR 58 est publiée sur `e65bf33` : 224 unités, 288 scénarios navigateur san
 
 Passage au jalon suivant : plusieurs séances terminées par les testeurs, aucun blocage critique ni perte de données connue non corrigée. La CI ne remplace pas la recette physique.
 
-### Jalon C — Usage durable · lot cycles et trophées en validation
+### Jalon C — Usage durable · cycles et trophées dans la PR 67
 
-- Implémenté : programme renouvelable après douze semaines et reprise après interruption, historique conservé. [Règles des cycles](PROGRAM-CYCLES.md). Validation finale et publication suivies dans la PR.
+- Implémenté : programme renouvelable après douze semaines et reprise après interruption, historique conservé. [Règles des cycles](PROGRAM-CYCLES.md). Validation finale et publication suivies dans la [PR 67](https://github.com/AstrowareConception/Programme-velo/pull/67).
 - Implémenté : bilans de cycle, minutes, régularité, mesures quotidiennes et RPE à réglages comparables. Bilan mensuel restant.
 - Voyage V2 : continuité des carnets, étape suivante, reprise facile.
 - Implémenté : six [trophées de régularité](TROPHIES.md), notifications et son respectant les préférences. Revue des programmes et règles de progression par un professionnel qualifié avant diffusion large.
@@ -175,7 +175,7 @@ Tableau de bord de séance sur toute la fenêtre, consignes et parcours en colon
 
 ### P1.1 — Cycle après la semaine 12
 
-**Implémenté dans le lot du 8 octobre ; validation finale et publication suivies dans la PR.**
+**Implémenté dans la PR 67 du 8 octobre ; validation finale et publication suivies dans cette PR.**
 
 Le bilan de cycle, les caps régularité/endurance/progression/maintien/poids, les disponibilités actuelles et le départ confirmé sont intégrés. Les cycles archivés conservent objectifs et plannings ; les séances et mesures restent dans le profil. Reprise douce deux semaines et maintenance facile, export v3 et synchronisation du calendrier complet. [Guide](PROGRAM-CYCLES.md). Les programmes découverte et séances libres restent disponibles.
 

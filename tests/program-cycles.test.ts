@@ -57,6 +57,14 @@ describe('program cycles', () => {
     const chosen = mergeData(b, l, r, { 'state.programTimeline': 'remote' }); expect(chosen.data.state.programTimeline).toEqual(r.state.programTimeline); expect(chosen.data.state.weeklyGoals).toEqual(r.state.weeklyGoals);
     const old = cloudData(s, []); old.state.weeklyGoals![0].minutes = 70; expect(mergeData(b, l, old).conflicts.map(c => c.path)).toEqual(['state.programTimeline']);
   });
+  it('requires confirmation when an older device drops the calendar, keeping independent additions', () => {
+    const s = next(initial()), base = cloudData(s, []), remote = cloudData(s, []);
+    delete remote.state.programTimeline; remote.state.sessions.push(session('older-device', '2026-10-08T19:00:00Z'));
+    const proposed = mergeData(base, base, remote);
+    expect(proposed.conflicts.map(c => c.path)).toEqual(['state.programTimeline']);
+    const kept = mergeData(base, base, remote, { 'state.programTimeline': 'local' });
+    expect(kept.conflicts).toHaveLength(0); expect(kept.data.state.programTimeline).toEqual(s.programTimeline); expect(kept.data.state.sessions).toHaveLength(1);
+  });
   it('reports only the selected cycle, excludes future dates and requires paired effort settings', () => {
     const s = next(initial()); s.sessions = [session('old', '2026-07-02T00:00:00Z'), session('a', '2026-10-08T19:00:00Z'), session('b', '2026-10-09T19:00:00Z'), session('future', '2026-10-11T12:00:00Z')];
     s.sessions[1].metrics!.cadenceSettingsKey = 'same'; s.sessions[2].metrics!.cadenceSettingsKey = 'same'; s.sessions[2].rpe = 2;

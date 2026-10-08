@@ -26,6 +26,7 @@ export function TrophyCelebration({ badges, preferences, hydrated, blocked, onRe
     if (!onRemember([...new Set([...previous, ...unlocked.map(b => b.id)])])) return;
     if (earned.length) {
       setRetrospective(initial);
+      played.current = false;
       setPending(current => [...current, ...earned.filter(b => !current.some(c => c.id === b.id))]);
     }
   }, [badges, preferences.trophyNotifications, hydrated, blocked, onRemember]);
@@ -41,7 +42,11 @@ export function TrophyCelebration({ badges, preferences, hydrated, blocked, onRe
   if (!pending.length || blocked) return null;
   return <aside className="trophyCelebration" aria-label="Récompense obtenue">
     <button type="button" className="trophyClose secondary" aria-label="Fermer la notification de trophées" onClick={() => setPending([])}>×</button>
-    <div className="trophyMedal" aria-hidden="true">{pending.length === 1 ? pending[0].icon : '🏆'}</div>
+    <div className="trophyMedal" aria-hidden="true"><svg viewBox="0 0 64 64" width="52" height="52" fill="none">
+      <path d="M18 14H9v8c0 9 6 14 15 14m22-22h9v8c0 9-6 14-15 14" stroke="#ffd166" strokeWidth="4" strokeLinecap="round" />
+      <path d="M18 9h28v16c0 10-6 17-14 17s-14-7-14-17V9Z" fill="#ffd166" /><path d="M32 42v10m-10 4h20" stroke="#ffd166" strokeWidth="5" strokeLinecap="round" />
+      <path d="m32 16 2.5 5 5.5.8-4 4 .9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-4 5.5-.8 2.5-5Z" fill="#916225" />
+    </svg></div>
     <div role="status" aria-live="polite"><p className="eyebrow">{retrospective ? 'TON HISTORIQUE RÉCOMPENSÉ' : pending.length === 1 ? 'TROPHÉE DÉBLOQUÉ' : `${pending.length} TROPHÉES DÉBLOQUÉS`}</p>
       <h2>{pending.length === 1 ? pending[0].name : 'Tes efforts prennent leur place au palmarès'}</h2>
       {pending.length === 1 ? <p className="trophyDescription">{pending[0].description}</p> : <ul>{pending.map(b => <li key={b.id}><strong>{b.icon} {b.name}</strong><p>{b.description}</p></li>)}</ul>}

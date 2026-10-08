@@ -1392,3 +1392,22 @@ body:has(.onboardingDialog[open]) .shell { overflow-x:clip; }
 .cloudPanel ul { padding-left: 20px; }
 .cloudPanel li { margin: 14px 0; display: grid; gap: 8px; }
 @media (max-width: 600px) { .cloudConflict { grid-template-columns: 1fr; } }
+
+/* A reward must stay inside the actual viewport, including at 200% text. */
+.hero > div, .sectionHead > div { min-width: 0; }
+.card { overflow-wrap: anywhere; }
+.hero :is(h1, p, strong, small), .programCycles, .trophyCelebration { overflow-wrap: anywhere; }
+.heroLevelProgress > span, .sectionHead { flex-wrap: wrap; }
+.sectionHead > * { min-width: 0; max-width: 100%; }
+.coachStatus { white-space: normal; overflow-wrap: anywhere; }
+.cycleReport .reviewMetrics { grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr)); }
+.cycleSetup, .cycleSetup > *, .cycleSetup fieldset { min-width: 0; }
+.trophyDescription { color: #c3cde0; line-height: 1.6; }
+.trophyCelebration button { min-width: 0; max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+.trophyCelebration button.trophyClose { min-width: 44px; }
+.bottomNav { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.bottomNav button { min-width: 0; overflow-wrap: anywhere; }
+.bottomNav button > span { font-size: min(1.3rem, 7vw); }
+@media (max-width: 600px) {
+  .missionItems { grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr)); }
+}

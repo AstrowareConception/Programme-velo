@@ -34,6 +34,8 @@ test('recognizes new historic trophies in a single quiet notice and respects red
   await page.evaluate(() => { document.documentElement.style.fontSize = '200%'; });
   const reward = page.getByRole('complementary', { name: 'Récompense obtenue' }); await expect(reward).toContainText('TON HISTORIQUE RÉCOMPENSÉ'); await expect(reward).not.toContainText('Premier tour de roue');
   expect(await reward.evaluate(el => getComputedStyle(el).animationName)).toBe('none');
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
+  const box = await reward.boundingBox(); expect(box!.x).toBeGreaterThanOrEqual(0); expect(box!.x + box!.width).toBeLessThanOrEqual(321);
+  expect(await reward.evaluate(el => el.scrollWidth <= el.clientWidth + 1)).toBe(true);
   await page.screenshot({ path: info.outputPath('historic-trophy.png') }); await reward.getByRole('button', { name: 'Continuer', exact: true }).click(); await page.reload(); await expect(reward).toHaveCount(0);
 });
