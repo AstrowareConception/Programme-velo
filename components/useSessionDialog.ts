@@ -1,6 +1,10 @@
 "use client";
 
-import { useEffect, type RefObject } from "react";
+import { useEffect, useRef, type RefObject } from "react";
+
+// Transfer the original launcher when a picker is replaced by the session reader.
+// Only retained until the next effect or focus-restoration animation frame.
+let pendingOpener: HTMLElement | null = null;
 
 function focusTitle(dialog: HTMLElement) {
   const title = dialog.querySelector<HTMLElement>("h2");
@@ -9,11 +13,15 @@ function focusTitle(dialog: HTMLElement) {
 }
 
 /** Keep the same reader mounted through preparation, riding, review and rotation. */
-export function useSessionDialog(ref: RefObject<HTMLDivElement | null>, open: boolean, phase: string) {
+export function useSessionDialog(ref: RefObject<HTMLDivElement | null>, open: boolean, phase: string, onEscape?: () => void) {
+  const escapeHandler = useRef(onEscape);
+  useEffect(() => { escapeHandler.current = onEscape; }, [onEscape]);
   useEffect(() => {
     const dialog = ref.current;
     if (!open || !dialog) return;
-    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const focused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const opener = pendingOpener?.isConnected ? pendingOpener : focused;
+    pendingOpener = null;
     const overflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const background = new Map<HTMLElement, boolean>();
@@ -35,7 +43,8 @@ export function useSessionDialog(ref: RefObject<HTMLDivElement | null>, open: bo
       // The explicit button still uses the existing guarded snapshot write.
       if (event.key === "Escape") {
         event.preventDefault();
-        dialog.querySelector<HTMLButtonElement>(".close")?.focus();
+        if (escapeHandler.current) escapeHandler.current();
+        else dialog.querySelector<HTMLButtonElement>(".close")?.focus();
         return;
       }
       if (event.key !== "Tab") return;
@@ -65,8 +74,12 @@ export function useSessionDialog(ref: RefObject<HTMLDivElement | null>, open: bo
       window.removeEventListener("resize", repairFocus);
       for (const [element, previous] of background) element.inert = previous;
       document.body.style.overflow = overflow;
+      pendingOpener = opener?.isConnected && opener !== document.body ? opener : null;
       requestAnimationFrame(() => {
+        pendingOpener = null;
         if (ref.current?.isConnected) return;
+        // A newly mounted dialog owns focus; the old dialog must not steal it.
+        if (document.querySelector('[role="dialog"][aria-modal="true"]')) return;
         if (opener?.isConnected && opener !== document.body && !opener.closest("[inert]")) opener.focus();
         else document.querySelector<HTMLElement>(".bottomNav button.active")?.focus();
       });

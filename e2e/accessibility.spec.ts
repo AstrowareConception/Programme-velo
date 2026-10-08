@@ -19,6 +19,10 @@ async function prepare(page: Page) {
 
 async function noHorizontalOverflow(dialog: Locator) {
   expect(await dialog.evaluate(el => el.scrollWidth <= el.clientWidth + 1)).toBe(true);
+  expect(await dialog.page().evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(dialog.page().viewportSize()!.width);
+  const box = await dialog.boundingBox();
+  expect(box!.x).toBeGreaterThanOrEqual(0);
+  expect(box!.x + box!.width).toBeLessThanOrEqual(dialog.page().viewportSize()!.width + 1);
 }
 
 test("keyboard stays in the session, follows each phase and returns after saving", async ({ page }, info) => {
@@ -115,4 +119,113 @@ test("320 pixel manual journey keeps the review usable and preserves a parked se
   await page.reload();
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem("veloquest:v1")!).sessions.length)).toBe(1);
   expect(await page.evaluate(() => localStorage.getItem("veloquest:active-session:v1"))).toBeNull();
+});
+
+async function seedSecondaryDialogs(page: Page) {
+  await page.addInitScript(() => localStorage.setItem("veloquest:v1", JSON.stringify({
+    profile: { name: "Fenêtres QA", startDate: "2026-10-01" }, measurements: [],
+    sessions: [{ id: "dialog-history", templateId: "recovery-30", date: "2026-10-02T12:00:00Z",
+      duration: 30, xp: 35, points: 1, intensity: "easy", kind: "recovery", bonus: false, note: "Séance conservée" }],
+    preferences: { soundCues: false, voiceCues: false, haptics: false, keepScreenAwake: false }
+  })));
+  await page.goto("/");
+  await expect(page.locator(".hero")).toBeVisible();
+}
+
+async function checkDialogKeyboard(page: Page, dialog: Locator) {
+  await expect(dialog).toHaveAttribute("aria-modal", "true");
+  await expect(dialog.locator("h2").first()).toBeFocused();
+  const close = dialog.locator(".close");
+  await close.focus();
+  await page.keyboard.press("Shift+Tab");
+  const lastFocused = await dialog.evaluate(el => el.contains(document.activeElement) && document.activeElement !== el.querySelector(".close"));
+  expect(lastFocused).toBe(true);
+  await page.keyboard.press("Tab");
+  await expect(close).toBeFocused();
+  expect(await page.locator(".bottomNav").evaluate(el => Boolean(el.closest("[inert]")))).toBe(true);
+  await page.locator(".bottomNav button").first().evaluate((el: HTMLElement) => el.focus());
+  expect(await dialog.evaluate(el => el.contains(document.activeElement))).toBe(true);
+}
+
+for (const choice of [
+  { name: "sectors", opener: /Segments/, label: "Choisir un secteur", action: /Secteur 2/, route: "Tour des Corniches" },
+  { name: "route challenges", opener: /Défis/, label: "Choisir un défi de parcours", action: /Pacing progressif/, route: "Alpe d’Huez" }
+]) test(`${choice.name}: Escape restores the launcher and the reader handoff keeps focus`, async ({ page }, info) => {
+  await seedSecondaryDialogs(page);
+  await page.getByRole("button", { name: /▲ Parcours/ }).click();
+  await page.getByLabel("Rechercher", { exact: true }).fill(choice.route);
+  const opener = page.locator("article.routeLibraryCard").getByRole("button", { name: choice.opener });
+  await opener.focus(); await page.keyboard.press("Enter");
+  const dialog = page.getByRole("dialog", { name: choice.label, exact: true });
+  await checkDialogKeyboard(page, dialog);
+  await page.keyboard.press("Escape");
+  await expect(dialog).toHaveCount(0); await expect(opener).toBeFocused();
+  expect(await page.evaluate(() => document.body.style.overflow)).toBe("");
+  await page.keyboard.press("Enter");
+  await page.addStyleTag({ content: "html { font-size:200% !important; }" });
+  await noHorizontalOverflow(dialog);
+  const action = dialog.getByRole("button", { name: choice.action });
+  await action.scrollIntoViewIfNeeded();
+  await expect(action).toBeInViewport({ ratio: 1 });
+  await page.screenshot({ path: info.outputPath(`${choice.name.replaceAll(" ", "-")}-texte-200.png`) });
+  await action.press("Enter");
+  const reader = page.getByRole("dialog", { name: "Préparer la séance", exact: true });
+  await expect(reader.locator("h2").first()).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(reader.getByRole("button", { name: "Mettre la séance de côté" })).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(reader).toHaveCount(0); await expect(opener).toBeFocused();
+  expect(await page.locator(".bottomNav").evaluate(el => Boolean(el.closest("[inert]")))).toBe(false);
+});
+
+test("Voyage choices survive Escape and rotation, then hand focus to the session", async ({ page }, info) => {
+  await seedSecondaryDialogs(page);
+  await page.getByRole("button", { name: /▲ Parcours/ }).click();
+  await page.getByLabel("Rechercher", { exact: true }).fill("Tour des Corniches");
+  const opener = page.locator("article.routeLibraryCard").getByRole("button", { name: /Voyage en plusieurs séances/ });
+  await opener.focus(); await page.keyboard.press("Enter");
+  const dialog = page.getByRole("dialog", { name: "Préparer mon voyage", exact: true });
+  await checkDialogKeyboard(page, dialog);
+  await dialog.getByLabel("Temps disponible").selectOption("15");
+  await page.setViewportSize({ width: 960, height: 600 });
+  await page.addStyleTag({ content: "html { font-size:200% !important; }" });
+  await noHorizontalOverflow(dialog);
+  await page.screenshot({ path: info.outputPath("voyage-texte-200-paysage.png") });
+  await page.keyboard.press("Escape"); await expect(opener).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(dialog.getByLabel("Temps disponible")).toHaveValue("15");
+  await page.setViewportSize({ width: 320, height: 740 });
+  await noHorizontalOverflow(dialog);
+  await dialog.getByRole("button", { name: "Commencer mon voyage", exact: true }).press("Enter");
+  const reader = page.getByRole("dialog", { name: "Préparer la séance", exact: true });
+  await expect(reader.locator("h2").first()).toBeFocused();
+  await reader.getByRole("button", { name: "Mettre la séance de côté" }).press("Enter");
+  await expect(reader).toHaveCount(0); await expect(opener).toBeFocused();
+});
+
+test("journal detail traps focus, closes by Escape or backdrop and returns safely after deletion", async ({ page }, info) => {
+  await seedSecondaryDialogs(page);
+  await page.getByRole("button", { name: /↗ Suivi/ }).click();
+  const opener = page.locator(".sessionHistoryRow");
+  await opener.focus(); await page.keyboard.press("Enter");
+  const dialog = page.getByRole("dialog", { name: "Détail de la séance", exact: true });
+  await checkDialogKeyboard(page, dialog);
+  await expect(dialog).toContainText("Séance conservée");
+  await page.keyboard.press("Escape"); await expect(opener).toBeFocused();
+  await page.keyboard.press("Enter");
+  await page.locator(".auxiliaryBackdrop").click({ position: { x: 2, y: 2 } });
+  await expect(dialog).toHaveCount(0); await expect(opener).toBeFocused();
+  await page.keyboard.press("Enter");
+  await page.setViewportSize({ width: 320, height: 740 });
+  await page.addStyleTag({ content: "html { font-size:200% !important; }" });
+  await noHorizontalOverflow(dialog);
+  await page.screenshot({ path: info.outputPath("journal-texte-200-320.png") });
+  page.once("dialog", confirmation => confirmation.dismiss());
+  await dialog.getByRole("button", { name: "Supprimer cette séance" }).press("Enter");
+  await expect(dialog).toBeVisible();
+  page.once("dialog", confirmation => confirmation.accept());
+  await dialog.getByRole("button", { name: "Supprimer cette séance" }).press("Enter");
+  await expect(dialog).toHaveCount(0);
+  await expect(page.locator(".bottomNav button.active")).toBeFocused();
+  expect(await page.evaluate(() => document.body.style.overflow)).toBe("");
 });
