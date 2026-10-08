@@ -44,6 +44,7 @@ import { ReleaseAnnouncement, ReleaseNotesCard } from "@/components/ReleaseNotes
 import { QuickGuideCard, ReaderHelp } from "@/components/ReaderHelp";
 import { SessionDashboard } from "@/components/SessionDashboard";
 import { useSessionDialog } from "@/components/useSessionDialog";
+import { AppDialog } from "@/components/AppDialog";
 import { ReaderViewChoice, SessionComfort } from "@/components/SessionComfort";
 import { screenWakeLabel, useScreenWakeLock } from "@/components/useScreenWakeLock";
 import { PerformanceRecords, SectorAnalysis } from "@/components/PerformancePanel";
@@ -1737,9 +1738,7 @@ export function VeloQuestApp() {
       </nav>
 
       {segmentAttackRoute && (
-        <div className="modalBackdrop" onClick={() => setSegmentAttackRoute(null)}>
-          <section className="sessionModal segmentAttackPicker" onClick={(event) => event.stopPropagation()}>
-            <button className="close" aria-label="Fermer les secteurs" onClick={() => setSegmentAttackRoute(null)}>×</button>
+        <AppDialog className="segmentAttackPicker" label="Choisir un secteur" closeLabel="Fermer les secteurs" onClose={() => setSegmentAttackRoute(null)}>
             <p className="eyebrow">SEGMENT ATTACK · {segmentAttackRoute.name.toUpperCase()}</p>
             <h2>Choisis ton secteur.</h2>
             <p className="challengeLead">Chaque quart possède son propre record. Avec FTMS, la distance réelle déclenche l’arrivée ; sinon VeloQuest simule le secteur à partir du profil.</p>
@@ -1760,14 +1759,11 @@ export function VeloQuestApp() {
                 );
               })}
             </div>
-          </section>
-        </div>
+        </AppDialog>
       )}
 
       {challengeRoute && (
-        <div className="modalBackdrop" onClick={() => setChallengeRoute(null)}>
-          <section className="sessionModal challengePicker" onClick={(event) => event.stopPropagation()}>
-            <button className="close" aria-label="Fermer les défis" onClick={() => setChallengeRoute(null)}>×</button>
+        <AppDialog className="challengePicker" label="Choisir un défi de parcours" closeLabel="Fermer les défis" onClose={() => setChallengeRoute(null)}>
             <p className="eyebrow">DÉFIS · {challengeRoute.name.toUpperCase()}</p>
             <h2>Choisis une contrainte.</h2>
             <p className="challengeLead">Les défis donnent un bonus XP uniquement s’ils sont réellement validés à l’arrivée. Les règles utilisant cadence ou chrono s’appuient sur FTMS quand il est disponible, sinon sur les valeurs saisies.</p>
@@ -1780,11 +1776,10 @@ export function VeloQuestApp() {
                 </button>
               ))}
             </div>
-          </section>
-        </div>
+        </AppDialog>
       )}
 
-      {voyagePickerOpen && !active && <div className="modalBackdrop"><section className="sessionModal voyagePicker" role="dialog" aria-label="Préparer mon voyage"><button className="close" aria-label="Fermer le voyage" onClick={() => setVoyagePickerOpen(false)}>×</button>{voyageCard}</section></div>}
+      {voyagePickerOpen && !active && <AppDialog className="voyagePicker" label="Préparer mon voyage" closeLabel="Fermer le voyage" onClose={() => setVoyagePickerOpen(false)}>{voyageCard}</AppDialog>}
 
       {active && (
         <div className={`modalBackdrop ${sessionStarted && !showFinish ? "activeSessionBackdrop" : ""}`}>
@@ -2027,9 +2022,7 @@ export function VeloQuestApp() {
       )}
 
       {selectedSession && (
-        <div className="modalBackdrop" onClick={() => setSelectedSessionId(null)}>
-          <section className="sessionModal historyDetail" onClick={(event) => event.stopPropagation()}>
-            <button className="close" aria-label="Fermer le détail" onClick={() => setSelectedSessionId(null)}>×</button>
+        <AppDialog className="historyDetail" label="Détail de la séance" closeLabel="Fermer le détail" onClose={() => setSelectedSessionId(null)}>
             <p className="eyebrow">JOURNAL</p>
             <h2>{selectedRoute?.name ?? selectedTemplate?.name ?? selectedSession.templateId}</h2>
             {selectedSession.metrics?.voyage && <p className="voyageNext">Voyage · {selectedSession.metrics.voyage.startKm.toFixed(2)} → {selectedSession.metrics.voyage.endKm.toFixed(2)} km · {selectedSession.metrics.voyage.completedPortion ? "portion achevée" : "portion inachevée"} · position simulée. Cette séance seule ne valide pas un parcours entier.</p>}
@@ -2073,8 +2066,7 @@ export function VeloQuestApp() {
             <button className="secondary dangerButton fullWidth" onClick={() => deleteSession(selectedSession.id)}>Supprimer cette séance</button>
             {selectedSession.note && <div className="sessionNote"><small>NOTE</small><p>{selectedSession.note}</p></div>}
             {selectedSession.metrics?.samples?.length ? <p className="finePrint">{selectedSession.metrics.samples.length} points de télémétrie compactés sont conservés avec cette séance.</p> : null}
-          </section>
-        </div>
+        </AppDialog>
       )}
 
       {toast && <div className="toast" role="status">{toast}</div>}
