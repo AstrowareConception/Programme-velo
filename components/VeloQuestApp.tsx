@@ -193,6 +193,7 @@ export function VeloQuestApp() {
   const [manualChallengeCalories, setManualChallengeCalories] = useState("");
   const [caloriesOnly, setCaloriesOnly] = useState(false);
   const [expressOnly, setExpressOnly] = useState(false);
+  const [shortOnly, setShortOnly] = useState(false);
   const [sessionIntensityFilter, setSessionIntensityFilter] = useState("all");
   const {
     bike,
@@ -1302,7 +1303,7 @@ export function VeloQuestApp() {
               <span className={`coachStatus ${adaptiveCoach.load}`}>{adaptiveCoach.load === "recovery" ? "🌿 récupération" : adaptiveCoach.load === "push" ? "🔥 fenêtre d’effort" : "⚡ charge équilibrée"}</span>
             </div>
             <div className="coachSelectors">
-              <div><small>Temps disponible</small><div className="choiceRow">{[20,30,35,45,60].map((minutes) => <button key={minutes} className={availableMinutes === minutes ? "choice active" : "choice"} onClick={() => setAvailableMinutes(minutes)}>{minutes} min</button>)}</div></div>
+              <div><small>Temps disponible</small><div className="choiceRow">{[10,15,20,30,35,45,60].map((minutes) => <button key={minutes} className={availableMinutes === minutes ? "choice active" : "choice"} onClick={() => setAvailableMinutes(minutes)}>{minutes} min</button>)}</div></div>
               <div><small>Énergie du jour</small><div className="choiceRow">
                 <button className={energy === "easy" ? "choice active" : "choice"} onClick={() => setEnergy("easy")}>🌿 tranquille</button>
                 <button className={energy === "normal" ? "choice active" : "choice"} onClick={() => setEnergy("normal")}>⚡ normal</button>
@@ -1324,7 +1325,7 @@ export function VeloQuestApp() {
 
           <section className="card">
             <div className="sectionHead"><div><p className="eyebrow">BONUS</p><h2>Une petite marge ?</h2></div><span className="spark">+20 XP</span></div>
-            <p>Ajoute 15 minutes faciles. Elles comptent dans ton volume et ta régularité, mais pas dans les points principaux. Les bonus XP sont plafonnés à 60 par semaine.</p>
+            <p>Ajoute 15 minutes faciles. Elles comptent dans ton volume et ta régularité, et rapportent 0,5 point par séance. Les bonus XP sont plafonnés à 60 par semaine.</p>
             <div className="bonusChoices">
               <button className="secondary" onClick={() => launch(workouts.find((w) => w.id === "bonus-10")!)}>10 min</button>
               <button className="secondary" onClick={() => launch(workouts.find((w) => w.id === "bonus-soft-12")!)}>12 min souples</button>
@@ -1345,17 +1346,18 @@ export function VeloQuestApp() {
       {tab === "sessions" && (
         <section>
           <div className="pageHead pageHeadActions"><div><p className="eyebrow">CATALOGUE</p><h1>Choisis ta quête</h1><p>Du décrassage au HIIT. Le ressenti reste prioritaire sur le numéro de résistance.</p></div><button className="secondary" onClick={openManualLog}>+ Enregistrer une séance déjà faite</button></div>
-          <p className="finePrint">Les formats express de moins de 10 min rapportent 0,5 point : des compléments à tes séances principales. Les bonus récupération restent à 0 point. Les points des séances déjà enregistrées sont conservés.</p>
+          <p className="finePrint">Chaque séance du catalogue rapporte au moins 0,5 point, bonus compris. De 10 à 20 min : 0,5 point en facile, 1 point en soutenu ou en difficile de moins de 20 min, 2 points pour 20 min difficiles. Les points déjà enregistrés sont conservés.</p>
           {hydrated && !active && !resumeSnapshot && <TimedTrialsPanel sessions={state.sessions} deviceName={bike?.deviceName} connected={Boolean(bike)} reading={trialReading} liveMetrics={trialMetrics} connect={connectBike} onBusy={setTrialBusy} onSave={saveCompletedSession} disabled={Boolean(active) || Boolean(resumeSnapshot)} locked={pwa.locked} keepScreenAwake={preferences.keepScreenAwake} bikeError={bluetoothError} connecting={connectingBike} />}
           <MasteryPanel sessions={state.sessions} />
           <WorkoutProgramsPanel sessions={state.sessions} workouts={workouts} onLaunch={(workout) => launch(workout)} />
           <div className="workoutFilters">
-            <button type="button" className="secondary" aria-pressed={expressOnly} onClick={() => setExpressOnly(value => !value)}>Express · moins de 10 min</button>
-            <button type="button" className="secondary" aria-pressed={caloriesOnly} onClick={() => { setCaloriesOnly(value => !value); setExpressOnly(false); setSessionIntensityFilter("all"); }}>Défis calories</button>
+            <button type="button" className="secondary" aria-pressed={expressOnly} onClick={() => { setExpressOnly(value => !value); setShortOnly(false); setCaloriesOnly(false); }}>Express · moins de 10 min</button>
+            <button type="button" className="secondary" aria-pressed={shortOnly} onClick={() => { setShortOnly(value => !value); setExpressOnly(false); setCaloriesOnly(false); }}>10–20 min</button>
+            <button type="button" className="secondary" aria-pressed={caloriesOnly} onClick={() => { setCaloriesOnly(value => !value); setExpressOnly(false); setShortOnly(false); setSessionIntensityFilter("all"); }}>Défis calories</button>
             <label>Intensité des séances<select value={sessionIntensityFilter} onChange={event => setSessionIntensityFilter(event.target.value)}><option value="all">Toutes</option><option value="easy">Facile</option><option value="moderate">Soutenue</option><option value="hard">Dure</option></select></label>
           </div>
           <div className="grid workoutGrid">
-            {workouts.filter(w => (!expressOnly || w.duration < 10) && (!caloriesOnly || isCalorieWorkout(w.id)) && (sessionIntensityFilter === "all" || w.intensity === sessionIntensityFilter)).map((w) => {
+            {workouts.filter(w => (!expressOnly || w.duration < 10) && (!shortOnly || (w.duration >= 10 && w.duration <= 20)) && (!caloriesOnly || isCalorieWorkout(w.id)) && (sessionIntensityFilter === "all" || w.intensity === sessionIntensityFilter)).map((w) => {
               const key = effortSettingsKey(w.id, withCadenceOffset(w, preferences.cadenceOffset ?? -15).segments, preferences.resistanceOffset, "training");
               const best = bestCadenceAttempt(state.sessions, key);
               const score = cadenceSummary(best?.metrics?.cadenceScore);

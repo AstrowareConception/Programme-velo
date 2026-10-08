@@ -2,7 +2,7 @@ import type { WorkoutTemplate, Segment } from './types';
 const s=(label:string,minutes:number,resistance:string,cadence='libre',rpe='3–4'):Segment=>({label,minutes,resistance,cadence,rpe});
 function workout(id:string,name:string,kind:WorkoutTemplate['kind'],intensity:WorkoutTemplate['intensity'],description:string,segments:Segment[]):WorkoutTemplate {
   const duration=segments.reduce((a,s)=>a+s.minutes,0);
-  return {id,name,kind,intensity,description,tagline:description,duration,points:duration<10?.5:duration<25?1:duration<=30?2:3,xp:Math.round(duration*2),segments};
+  return {id,name,kind,intensity,description,tagline:description,duration,points:duration<10 || (duration<=20 && intensity==='easy')?.5:duration<25?1:duration<=30?2:3,xp:Math.round(duration*2),segments};
 }
 // Cadences are authored in the catalogue reference scale. The common reader offset
 // (comfortable -15 by default) is applied exactly once, as for existing workouts.

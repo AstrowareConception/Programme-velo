@@ -54,9 +54,9 @@ describe("flexible discovery programmes", () => {
     state.sessions = state.sessions.filter((session) => session.templateId !== program.workoutIds[0]);
     expect(totalXp(state)).toBe(xp-25-120); expect(workoutProgramBonusXp(state.sessions)).toBe(0);
   });
-  it("keeps the eight-minute bonus in the shared weekly cap with no structured points or programme completion", () => {
+  it("keeps the eight-minute bonus in the shared weekly cap while awarding points without structured sessions or programme completion", () => {
     const state = emptyState(); state.profile.startDate = "2026-10-01";
     state.sessions = Array.from({ length: 8 }, (_, i) => ({ ...completed("bonus-pause-8"), id: String(i) }));
-    expect(totalXp(state)).toBe(60); expect(weeklyStats(state, 1).points).toBe(0); expect(workoutProgramBonusXp(state.sessions)).toBe(0);
+    expect(totalXp(state)).toBe(60); expect(weeklyStats(state, 1).points).toBe(4); expect(weeklyStats(state, 1).sessions).toBe(0); expect(workoutProgramBonusXp(state.sessions)).toBe(0);
   });
 });

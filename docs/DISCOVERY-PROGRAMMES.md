@@ -74,7 +74,7 @@ Le carnet **Route Napoléon · de Gap à Grenoble** demande ces six parcours com
 
 Ordre et dates libres ; une séance peut contribuer à deux programmes. Un programme donne un badge et un bonus calculé une seule fois depuis l’historique. Répétitions : XP de séance ordinaire seulement. Les incomplets, bonus, parcours, Time Attack et secteurs sont exclus. Une ancienne séance sans `completedWorkout` doit atteindre la durée prévue ; une date invalide ou future est exclue. Supprimer la dernière réalisation recalcule bonus et badge ; export/import compatible.
 
-Six modèles supplémentaires portent les séances découverte à onze : Souffle tranquille (18), Cadence douce (20), Faux-plats en douceur (20), Deux petites collines (25), Endurance nomade (30), Pause active (8). Ce dernier bonus vaut 12 XP, zéro point structuré, dans le plafond commun de 60 XP par semaine. Il ne valide aucun programme. Le programme de douze semaines et le coach conservent leurs règles.
+Six modèles supplémentaires portent les séances découverte à onze : Souffle tranquille (18), Cadence douce (20), Faux-plats en douceur (20), Deux petites collines (25), Endurance nomade (30), Pause active (8). Ce dernier bonus vaut 12 XP et désormais 0,5 point hebdomadaire, dans le plafond commun de 60 XP par semaine. Il ne valide aucun programme. Le programme de douze semaines et le coach conservent leurs règles.
 
 ## Fiches historiques harmonisées
 

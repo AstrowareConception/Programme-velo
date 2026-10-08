@@ -2,6 +2,16 @@
  * Change an id only for a new user-facing release, never for a rebuild. */
 export const releases = [
   {
+    id: "2026-10-short-workouts", date: "2026-10-08", label: "8 octobre 2026",
+    title: "Dix à vingt minutes pour avancer",
+    summary: "Huit nouvelles séances courtes, et des points pour chaque séance du catalogue.",
+    changes: [
+      { title: "Un créneau facile à trouver", text: "Dans Séances, le filtre 10–20 min rassemble les formats courts : souplesse, endurance, cadence, tempo, pyramide, bosses et relances." },
+      { title: "Des points selon l’effort", text: "De 10 à 20 minutes : 0,5 point en facile, 1 point en soutenu et 2 points pour les nouvelles séances difficiles de 20 minutes. Le défi calories de 10 minutes reste à 1 point." },
+      { title: "Les bonus comptent aussi", text: "Chaque séance du catalogue vaut au moins 0,5 point. Les bonus contribuent aux points hebdomadaires, avec toujours un plafond commun de 60 XP. Les anciennes séances enregistrées gardent leurs points." }
+    ]
+  },
+  {
     id: "2026-10-chrono-score-v2", date: "2026-10-08", label: "8 octobre 2026",
     title: "Le chrono entre en jeu",
     summary: "Six défis au départ lancé et un score qui suit vraiment ta cadence.",

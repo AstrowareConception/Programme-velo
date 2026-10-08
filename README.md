@@ -12,7 +12,7 @@ VéloQuest est une PWA personnelle Next.js / React / TypeScript. Elle associe un
 
 **[Lire la présentation complète et illustrée →](docs/PRESENTATION.md)**
 
-44 séances · 84 parcours, dont 38 balades faciles · 12 thèmes de découverte · 12 semaines de programme · 6 programmes découverte · 22 campagnes et carnets · 77 badges.
+52 séances · 84 parcours, dont 38 balades faciles · 12 thèmes de découverte · 12 semaines de programme · 6 programmes découverte · 22 campagnes et carnets · 77 badges.
 
 [![VéloQuest : une semaine adaptée à ton rythme](docs/images/presentation/02-semaine-adaptee.jpg)](docs/PRESENTATION.md)
 
