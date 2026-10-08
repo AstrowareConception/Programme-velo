@@ -10,7 +10,7 @@ Le focus visible couvre aussi les listes déroulantes, les résumés de détails
 
 ## Tests automatisés
 
-Une seule CI existante installe Chromium et WebKit, sans nouveau workflow ni déploiement supplémentaire. Les deux projets Chromium conservent l’ensemble de la couverture. Les projets `mobile-webkit` et `tablet-webkit` exécutent une sélection explicite :
+La CI existante utilise le conteneur officiel `mcr.microsoft.com/playwright:v1.63.0-noble`, avec Chromium, WebKit et leurs dépendances préinstallés. La version de cette image doit rester alignée avec `@playwright/test` dans le lockfile. Aucun nouveau workflow ni déploiement supplémentaire. Cette configuration évite de réinstaller les 184 paquets système observés lors de la première exécution (près de douze minutes). Les deux projets Chromium conservent l’ensemble de la couverture. Les projets `mobile-webkit` et `tablet-webkit` exécutent une sélection explicite :
 
 - clavier, texte à 200 % et largeur 320 px ;
 - préparation/bilan, rotation, sauvegarde et rechargement ;
@@ -34,3 +34,7 @@ Le test à 200 % augmente la taille racine du texte ; il ne simule pas toutes le
 Ce lot n’est pas une certification WCAG ou un audit exhaustif : contrastes de toutes les cartes, autres modales, formulaires annexes et parcours de première utilisation restent au backlog. Le pattern de dialogue s’appuie sur les [recommandations WAI-ARIA](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/), avec la différence d’Échap décrite ci-dessus pour protéger les saisies.
 
 Voir [la roadmap](ROADMAP.md) et [la recette bêta](BETA-TEST.md).
+
+## Correction révélée par la première CI de ce lot
+
+La CI 37749061577 a passé 332 scénarios, dont les 32 WebKit, et relevé deux échecs Chromium mobile : la zone d’affichage s’élargissait à 363 px pour une fenêtre de 320 px, et à 1095 px avec texte agrandi pour une fenêtre de 1024 px. Les traces montraient des clics décalés vers d’autres éléments. L’en-tête et les cartes de séances peuvent désormais revenir à la ligne ; les débordements du fond inerte sont contenus pendant la modale. Les tests de clic restent sans contournement et contrôlent aussi la largeur réelle. Une nouvelle CI du correctif est requise avant publication.

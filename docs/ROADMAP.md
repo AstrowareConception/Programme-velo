@@ -31,7 +31,7 @@ La PR 58 est publiée sur `e65bf33` : 224 unités, 288 scénarios navigateur san
 - Éprouver interruption, reprise, reconnexion, enregistrement, export et restauration avec des utilisateurs extérieurs.
 - ✅ Diagnostic de support livré par la PR 59 sur `b0818af` : aperçu exact, copie/export, repli manuel, champs personnels exclus. 236 unités et 296 scénarios navigateur réussis ; CI main et vérification production réussies.
 - Rendre explicites mesures reçues, données manquantes et simulations.
-- ⏳ Lot actif : [accessibilité des séances et couverture WebKit](ACCESSIBILITY.md). Focus clavier, arrière-plan inerte, texte agrandi et champs sur petit écran ; deux projets WebKit ciblés ajoutés à la CI existante. Résultats et publication à vérifier dans la PR de ce lot.
+- ⏳ Lot actif : [accessibilité des séances et couverture WebKit](ACCESSIBILITY.md). Focus clavier, arrière-plan inerte, texte agrandi et champs sur petit écran ; deux projets WebKit ciblés ajoutés à la CI existante, avec navigateurs préinstallés dans le conteneur officiel verrouillé. Résultats et publication à vérifier dans la PR de ce lot.
 - À suivre : essais VoiceOver/Safari/Bluefy réels, audit des autres modales, contrastes et parcours complet de première utilisation. Regrouper les changements avant publication pour éviter les cycles de CI inutiles.
 
 Passage au jalon suivant : plusieurs séances terminées par les testeurs, aucun blocage critique ni perte de données connue non corrigée. La CI ne remplace pas la recette physique.

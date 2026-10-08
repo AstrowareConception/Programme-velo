@@ -8,6 +8,8 @@ async function prepare(page: Page) {
     }));
   });
   await page.goto("/");
+  await expect(page.locator(".hero")).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize()!.width);
   await page.getByRole("button", { name: /⚡ Séances/ }).click();
   const opener = page.getByRole("heading", { name: "Décrassage", exact: true }).locator("xpath=ancestor::article").getByRole("button", { name: "Voir / démarrer" });
   await opener.focus();
@@ -71,6 +73,7 @@ test("200 percent text reflows the landscape journey without losing review input
   await dialog.getByLabel("Rythme de pédalage").selectOption("10");
   await dialog.getByRole("button", { name: "Démarrer la séance" }).click();
   await dialog.getByRole("button", { name: "Pause", exact: true }).click();
+  expect(await page.evaluate(() => innerWidth)).toBe(1024);
   await noHorizontalOverflow(dialog);
   await dialog.getByRole("button", { name: "Terminer et enregistrer" }).click();
   await dialog.getByLabel("Distance (km)", { exact: true }).fill("2.4");

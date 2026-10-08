@@ -12,11 +12,16 @@ Branche `feat/accessibility-webkit`, base `b0818af`. Le lecteur devient un dialo
 
 Le focus visible est étendu aux listes, résumés et zones de texte. Les champs du bilan se réorganisent à 320 px ; en paysage, une requête de conteneur relative à la taille du texte remplace la grille contrainte par un flux défilant quand le texte est agrandi. Ni donnée ni règle de séance modifiée.
 
-La CI existante installe également WebKit. Deux projets mobile/tablette couvrent les parcours manuels essentiels : préparation/bilan, rotation, écriture refusée puis réussie, découverte/lexique, diagnostic et transfert de sauvegarde. Trois scénarios dédiés vérifient clavier, texte à 200 % et largeur 320 px, avec sauvegarde/rechargement. Voir [périmètre et recette](ACCESSIBILITY.md).
+La CI existante utilise le conteneur officiel Playwright 1.63.0 correspondant au lockfile, avec Chromium et WebKit préinstallés, pour éviter la longue installation des dépendances système. Deux projets mobile/tablette couvrent les parcours manuels essentiels : préparation/bilan, rotation, écriture refusée puis réussie, découverte/lexique, diagnostic et transfert de sauvegarde. Trois scénarios dédiés vérifient clavier, texte à 200 % et largeur 320 px, avec sauvegarde/rechargement. Voir [périmètre et recette](ACCESSIBILITY.md).
 
 Validation locale : TypeScript et 236 unités réussis. CI navigateur et build requis avant fusion ; résultats exacts, SHA testé et publication à consigner dans la description finale de la PR. Ce checkpoint précède la publication.
 
 Limites : WebKit Linux automatisé ne remplace pas Safari ou Bluefy sur iPad/iPhone réels. Pas de qualification Bluetooth ou de certification WCAG. Les autres modales et une recette VoiceOver restent à traiter. Prochaine action après livraison : essais réels et poursuite de l’accessibilité hors lecteur.
+
+
+## Correction révélée par la première CI de ce lot
+
+La CI 37749061577 a passé 332 scénarios, dont les 32 WebKit, et relevé deux échecs Chromium mobile : la zone d’affichage s’élargissait à 363 px pour une fenêtre de 320 px, et à 1095 px avec texte agrandi pour une fenêtre de 1024 px. Les traces montraient des clics décalés vers d’autres éléments. L’en-tête et les cartes de séances peuvent désormais revenir à la ligne ; les débordements du fond inerte sont contenus pendant la modale. Les tests de clic restent sans contournement et contrôlent aussi la largeur réelle. Une nouvelle CI du correctif est requise avant publication.
 
 ## 8 octobre 2026 — Diagnostic de support livré (PR 59)
 
