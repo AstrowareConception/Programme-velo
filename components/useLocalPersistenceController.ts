@@ -9,6 +9,8 @@ import type { AppState, CompletedSession, Profile } from "@/lib/types";
 
 import { clearIntent } from "@/lib/cloud/outbox";
 import { CLOUD_LINK_KEY, recoverCloudApply } from "@/lib/cloud/local";
+import { canonical } from "@/lib/cloud/model";
+import { startNextCycle, type NextCycleOptions } from "@/lib/program-cycles";
 
 const CUSTOM_ROUTES_KEY = "veloquest:custom-routes:v1";
 
@@ -113,6 +115,32 @@ export function useLocalPersistenceController({
     return true;
   }
 
+  function saveNextCycle(options: NextCycleOptions): string | undefined {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw && canonical(normalizeState(JSON.parse(raw))) !== canonical(normalizeState(state))) return "Les données de cet onglet ont changé. Recharge avant de préparer un nouveau cycle.";
+      const nextState = startNextCycle(state, options);
+      if (!safeLocalStorageWrite(STORAGE_KEY, nextState)) {
+        setStateSaveFailed(true);
+        return "Le cycle n’a pas pu être enregistré. La proposition reste ouverte : libère du stockage puis réessaie.";
+      }
+      persistedStateRef.current = nextState;
+      setState(nextState); setStateSaveFailed(false);
+    } catch (error) { return error instanceof Error ? error.message : "Impossible d’enregistrer ce cycle."; }
+  }
+
+  function saveTrophyReceipts(ids: string[]) {
+    // An automatic acknowledgement must never write an old tab over newer history.
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw && canonical(normalizeState(JSON.parse(raw))) !== canonical(normalizeState(state))) return false;
+    } catch { return false; }
+    const nextState = { ...state, preferences: { ...state.preferences!, trophyNotifications: ids } };
+    if (!safeLocalStorageWrite(STORAGE_KEY, nextState)) { setStateSaveFailed(true); return false; }
+    persistedStateRef.current = nextState;
+    setState(nextState); setStateSaveFailed(false); return true;
+  }
+
   return {
     state,
     setState,
@@ -124,6 +152,8 @@ export function useLocalPersistenceController({
     initialSessionMinutes,
     saveCompletedSession,
     saveProfile,
+    saveNextCycle,
+    saveTrophyReceipts,
     clearLocalData
   };
 }

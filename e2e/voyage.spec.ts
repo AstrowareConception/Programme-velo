@@ -155,6 +155,8 @@ test("a personal GPX Voyage restores from JSON, finishes on its own geometry and
   await expect(panel(page)).toContainText("Voyage achevé");
   await expect(page.locator(".levelPill")).toContainText(`${35 + custom.xp} XP`);
   await noOverflow(page);
+  const reward = page.getByRole('complementary', { name: 'Récompense obtenue' });
+  if (await reward.isVisible()) await reward.getByRole('button', { name: 'Continuer', exact: true }).click();
   await page.getByRole("button", { name: /▲ Parcours/ }).click(); await page.getByLabel("Rechercher", { exact: true }).fill(custom.name);
   await page.locator("article.routeLibraryCard").getByRole("button", { name: "Supprimer", exact: true }).click();
   await page.getByRole("button", { name: /⌂ Quête/ }).click();

@@ -17,6 +17,8 @@ import { alsaceRoutes } from "./alsace-routes";
 import { napoleonShortRoutes } from "./napoleon-short-routes";
 import { workoutProgramBadges, workoutProgramBonusXp } from "./workout-programs";
 import { initialGuidance } from "./onboarding";
+import { cycleStates, programStartDate } from "./program-calendar";
+import { regularityBadges } from "./regularity";
 
 export const STORAGE_KEY = "veloquest:v1";
 
@@ -342,7 +344,7 @@ export function currentProgramWeek(startDate: string) {
 }
 
 export function sessionsForProgramWeek(state: AppState, week: number) {
-  const start = new Date(state.profile.startDate + "T00:00:00");
+  const start = new Date(programStartDate(state) + "T00:00:00");
   const end = new Date(start);
   start.setDate(start.getDate() + (week - 1) * 7);
   end.setDate(end.getDate() + week * 7);
@@ -350,7 +352,7 @@ export function sessionsForProgramWeek(state: AppState, week: number) {
   const to = end.getTime();
   return state.sessions.filter((s) => {
     const time = new Date(s.date).getTime();
-    return time >= from && time < to;
+    return time >= from && time < to && (!state.programTimeline || time >= Date.parse(state.programTimeline.active.startedAt));
   });
 }
 
@@ -372,11 +374,9 @@ export function weeklyStats(state: AppState, week: number) {
 
 export function totalXp(state: AppState) {
   const sessionXp = state.sessions.filter((s) => !s.bonus && s.metrics?.voyage === undefined).reduce((sum, s) => sum + s.xp, 0);
-  const completedWeeks = weekTargets.map(target => weekTargetFor(state, target.week)).filter((target) => {
-    const s = weeklyStats(state, target.week);
-    return s.points >= target.points && s.minutes >= target.minutes && s.sessions >= target.sessions && s.variety >= target.variety && s.hard <= target.maxHard;
-  }).length;
-  const bonusXp = weekTargets.reduce((sum, target) => sum + weeklyStats(state, target.week).bonusXp, 0);
+  const views = cycleStates(state);
+  const completedWeeks = views.reduce((sum, view) => sum + weekTargets.filter(t => isPerfectWeek(view, t.week)).length, 0);
+  const bonusXp = views.reduce((sum, view) => sum + weekTargets.reduce((n, t) => n + weeklyStats(view, t.week).bonusXp, 0), 0);
   return sessionXp + bonusXp + completedWeeks * 250 + campaignBonusXp(state.sessions) + workoutProgramBonusXp(state.sessions) + voyageBonusXp(state.sessions);
 }
 
@@ -397,18 +397,27 @@ export function isPerfectWeek(state: AppState, week: number) {
 
 export function streak(state: AppState) {
   let count = 0;
-  for (let week = currentProgramWeek(state.profile.startDate) - 1; week >= 1; week--) {
+  for (let week = currentProgramWeek(programStartDate(state)) - 1; week >= 1; week--) {
     if (isPerfectWeek(state, week)) count++;
     else break;
   }
   return count;
 }
 
+function bestPerfectStreak(state: AppState) {
+  let best = 0;
+  for (const view of cycleStates(state)) {
+    let run = 0;
+    for (const t of weekTargets) { run = isPerfectWeek(view, t.week) ? run + 1 : 0; best = Math.max(best, run); }
+  }
+  return best;
+}
+
 export function badges(state: AppState): Badge[] {
   const structured = state.sessions.filter((s) => !s.bonus);
   const bonus = state.sessions.filter((s) => s.bonus);
   const kinds = new Set(structured.map((s) => s.kind));
-  const perfectWeeks = weekTargets.filter((w) => isPerfectWeek(state, w.week)).length;
+  const perfectWeeks = cycleStates(state).reduce((sum, view) => sum + weekTargets.filter(w => isPerfectWeek(view, w.week)).length, 0);
   const sortedMeasurements = [...state.measurements].sort((a, b) => b.date.localeCompare(a.date));
   const latestWeight = sortedMeasurements.find((m) => m.weight !== undefined)?.weight;
   const latestWaist = sortedMeasurements.find((m) => m.waist !== undefined)?.waist;
@@ -428,6 +437,7 @@ export function badges(state: AppState): Badge[] {
   const completedVoyages = voyages.filter(p => p.complete).length;
 
   return [
+    ...regularityBadges(state.sessions),
     ...[
       { id: "voyage-first", name: "Première escale", icon: "🧳", target: 1, count: voyages.length ? 1 : 0, description: "Achever et enregistrer une première portion en mode Voyage." },
       { id: "voyage-complete", name: "Au bout du voyage", icon: "🏁", target: 1, count: completedVoyages, description: "Couvrir un parcours entier en une ou plusieurs portions Voyage, sans kilomètre manquant." },
@@ -459,7 +469,7 @@ export function badges(state: AppState): Badge[] {
     { id: "first", name: "Premier tour de roue", icon: "🚲", description: "Terminer une première séance.", unlocked: structured.length >= 1, progress: `${Math.min(structured.length, 1)}/1` },
     { id: "variety", name: "Explorateur", icon: "🧭", description: "Valider 5 familles de séances.", unlocked: kinds.size >= 5, progress: `${Math.min(kinds.size, 5)}/5` },
     { id: "perfect", name: "Semaine parfaite", icon: "👑", description: "Atteindre tous les objectifs d'une semaine sans dépasser la charge dure.", unlocked: perfectWeeks >= 1, progress: `${Math.min(perfectWeeks, 1)}/1` },
-    { id: "streak3", name: "Trilogie", icon: "🔥", description: "Enchaîner 3 semaines parfaites.", unlocked: streak(state) >= 3, progress: `${Math.min(streak(state), 3)}/3` },
+    { id: "streak3", name: "Trilogie", icon: "🔥", description: "Enchaîner 3 semaines parfaites.", unlocked: bestPerfectStreak(state) >= 3, progress: `${Math.min(bestPerfectStreak(state), 3)}/3` },
     { id: "bonus5", name: "Encore un tour", icon: "✨", description: "Ajouter 5 micro-séances bonus.", unlocked: bonus.length >= 5, progress: `${Math.min(bonus.length, 5)}/5` },
     { id: "bonus20", name: "Régularité d'acier", icon: "⚙️", description: "Cumuler 20 micro-séances bonus.", unlocked: bonus.length >= 20, progress: `${Math.min(bonus.length, 20)}/20` },
     { id: "weight25", name: "Allégé", icon: "⚖️", description: "Perdre 2,5 kg depuis le départ.", unlocked: weightLost >= 2.5, progress: `${Math.max(0, weightLost).toFixed(1)}/2,5 kg` },

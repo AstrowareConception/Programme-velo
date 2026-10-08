@@ -85,3 +85,33 @@ test("incoming changes wait for the active workout to be saved", async ({ browse
   await expect.poll(async () => (await saved(a)).length, { timeout: 45000 }).toBe(3); await expect.poll(async () => (await saved(b)).length, { timeout: 45000 }).toBe(3);
   await one.close(); await two.close();
 });
+
+test("a renewed cycle synchronizes, and competing offline departures require one explicit choice", async ({ browser }, info) => {
+  const email = `cycles-${info.project.name}-${Date.now()}@example.test`; await createAccount(email);
+  const one = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: "block" }), two = await browser.newContext({ viewport: { width: 1024, height: 768 }, serviceWorkers: "block" });
+  const a = await one.newPage(), b = await two.newPage(); await seed(a, [session("preserved")]); await seed(b);
+  await login(a, email); await associate(a); await login(b, email); await associate(b);
+  async function depart(page: Page, goal: string) {
+    await page.getByRole("button", { name: /⌂ Quête/ }).click();
+    const cycle = page.locator('.programCycles'); await cycle.getByRole('button', { name: 'Préparer un nouveau cycle' }).click();
+    await cycle.getByLabel('Objectif du prochain cycle').selectOption(goal);
+    await cycle.getByLabel('J’ai vérifié le bilan et le départ du nouveau cycle aujourd’hui.').check();
+    await cycle.getByRole('button', { name: 'Confirmer le départ du cycle' }).click();
+    await expect(cycle.getByRole('status')).toContainText('Nouveau cycle enregistré');
+  }
+  const timeline = (page: Page) => page.evaluate(() => JSON.parse(localStorage.getItem('veloquest:v1')!).programTimeline);
+  await depart(a, 'endurance'); await expect.poll(async () => (await timeline(b))?.active.goal, { timeout: 45000 }).toBe('endurance');
+  expect(await timeline(a)).toEqual(await timeline(b)); await b.reload(); await expect(b.locator('.programCycles')).toContainText('Mon cycle 2');
+  await one.setOffline(true); await two.setOffline(true); await depart(a, 'maintain'); await depart(b, 'progress');
+  const local = await timeline(b); expect(local.active.goal).toBe('progress');
+  await one.setOffline(false); await a.reload(); await panel(a); await expect(a.locator('.cloudPanel [role=status]')).toContainText('Copie confirmée en ligne');
+  await two.setOffline(false); await b.reload(); const cloud = await panel(b);
+  await expect(cloud).toContainText('Cycle, objectifs et planning : choisir le programme à conserver');
+  await expect(cloud.getByRole('button', { name: 'Confirmer la synchronisation', exact: true })).toBeDisabled();
+  expect(await timeline(b)).toEqual(local);
+  await cloud.getByRole('radio', { name: /Garder le cloud/ }).check();
+  await cloud.getByLabel('J’ai vérifié le compte, les données et mes choix.').check(); await cloud.getByRole('button', { name: 'Confirmer la synchronisation', exact: true }).click();
+  await expect.poll(async () => (await timeline(b)).active.goal).toBe('maintain'); expect(await timeline(a)).toEqual(await timeline(b));
+  expect(await saved(b)).toEqual(['preserved']); await b.reload(); await expect(b.locator('.programCycles')).toContainText('Mon cycle 3');
+  await one.close(); await two.close();
+});

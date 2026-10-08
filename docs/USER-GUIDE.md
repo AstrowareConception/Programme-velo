@@ -9,7 +9,7 @@ Le guide accompagne le premier lancement en quatre étapes :
 3. Le mode manuel du vélo et le ressenti d’effort **RPE**, de 1 (très facile) à 10 (maximal). Tu peux commencer sans Bluetooth ; les niveaux 1–32 sont réglables à la main. Un son de changement de segment est facultatif.
 4. **Premiers tours de roue**, une première séance facile de 15 minutes. « Préparer ma première séance » ouvre la préparation ; le pédalage commence seulement après « Démarrer la séance ». « Plus tard, ouvrir ma quête » garde la proposition pour ton prochain passage.
 
-Poids, tour de taille et objectifs corporels restent facultatifs, dans **Plus → Modifier le profil et les objectifs**. Toutes ces informations restent sur cet appareil. Le guide conserve son étape et tes choix après un rechargement.
+Poids, tour de taille et objectifs corporels restent facultatifs, dans **Plus → Modifier le profil et les objectifs**. Ces informations restent sur cet appareil, ou rejoignent ta sauvegarde distante si tu actives volontairement le cloud. Le guide conserve son étape et tes choix après un rechargement.
 
 Tu peux choisir **Explorer librement** à tout moment, ou revenir au guide avec **Plus → Revoir le guide de démarrage**. Cela conserve ton historique et tes réglages. Un ancien profil n’est pas forcé à suivre ce guide.
 
@@ -22,6 +22,12 @@ Après la configuration, la Quête donne une prochaine action et trois repères 
 Après ta première séance, le guide explique comment noter ton ressenti. Ensuite, il propose de découvrir les balades faciles. Après trois séances, tu peux choisir le temps et l’énergie du jour directement dans cette Quête simplifiée. Le coach tient compte du ressenti, des séances récentes et de la charge ; les premiers formats restent faciles. Les anciennes séances sans marqueur d’incomplétude et les séances saisies manuellement sont reconnues, sans validation physique indépendante.
 
 Ton cap personnel est un repère de régularité, pas une nouvelle mission donnant un bonus XP. Le programme de douze semaines et ses outils avancés restent disponibles en dépliant la section sous le guide. Le catalogue, les parcours, le suivi et Plus restent accessibles à tout moment. Ajuste les réglages durables avec « Ajuster mon démarrage » ; les choix du jour sont temporaires.
+
+### Renouveler ton programme et gagner des trophées
+
+Dans **Quête → Mon cycle**, consulte ton bilan et prépare un nouveau cycle ou une reprise douce. Choisis le cap, les jours et le créneau, puis vérifie et confirme le départ aujourd’hui. Les anciens bilans, séances, mesures et XP restent conservés. Le nouveau planning se prépare ensuite dans **Ma semaine adaptée**. [Guide des cycles](PROGRAM-CYCLES.md).
+
+Les nouveaux trophées récompensent 3 ou 7 jours consécutifs, puis 2, 4, 8 ou 12 semaines avec du vélo au moins trois jours par semaine. Une notification dorée les annonce après l’enregistrement ; **Voir mes trophées** ouvre la galerie dans Plus. Le petit son respecte les sons et le volume du cockpit. Ton historique existant compte aussi. [Conditions et réglages](TROPHIES.md).
 
 ## 2. Choisir une séance
 

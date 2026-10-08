@@ -5,6 +5,9 @@ import { sampleBikeLiveMetrics, type BikeLiveMetrics } from "@/lib/bike-live-met
 import { timedTrials } from "@/lib/timed-trials";
 import { CadenceCalibration } from "@/components/CadenceCalibration";
 import { AdaptiveProgram } from "@/components/AdaptiveProgram";
+import { ProgramCyclesPanel } from "@/components/ProgramCyclesPanel";
+import { TrophyCelebration } from "@/components/TrophyCelebration";
+import { cycleEnded, programStartDate } from "@/lib/program-calendar";
 import { WeeklyReview, SessionDebrief } from "@/components/WeeklyReview";
 import { MasteryPanel } from "@/components/MasteryPanel";
 import { PersonalJourneys } from "@/components/PersonalJourneys";
@@ -146,10 +149,13 @@ export function VeloQuestApp() {
     routesSaveFailed,
     initialSessionMinutes,
     saveCompletedSession,
+    saveNextCycle,
+    saveTrophyReceipts,
     saveProfile: saveProfileChanges,
     clearLocalData
   } = useLocalPersistenceController({ onToast: setToast });
   const [tab, setTab] = useState<Tab>("dashboard");
+  const [cycleEditing, setCycleEditing] = useState(false);
   const [trialBusy, setTrialBusy] = useState(false);
   const [trialReading, setTrialReading] = useState<{ distanceM: number; at: number }>();
   const [trialMetrics, setTrialMetrics] = useState<BikeLiveMetrics>({});
@@ -303,10 +309,10 @@ export function VeloQuestApp() {
   });
   const preferences: Preferences = { ...defaultPreferences, ...(state.preferences ?? {}) };
   const cloud = useCloudSync({ state, customClimbs, hydrated, locked: pwa.locked,
-    blocked: !hydrated || trialBusy || Boolean(active) || Boolean(resumeSnapshot) || showSetup || state.guidance?.status === "setup" || stateSaveFailed || routesSaveFailed,
+    blocked: cycleEditing || !hydrated || trialBusy || Boolean(active) || Boolean(resumeSnapshot) || showSetup || state.guidance?.status === "setup" || stateSaveFailed || routesSaveFailed,
     onInstall: value => { setState(value.state); setCustomClimbs(value.customClimbs); }
   });
-  useEffect(() => { pwa.setBusy(cloud.working || cloud.formDirty || !hydrated || trialBusy || Boolean(active) || Boolean(bike) || connectingBike || diagnosingBike || showSetup || stateSaveFailed || routesSaveFailed); }, [cloud.working, cloud.formDirty, hydrated, trialBusy, active, bike, connectingBike, diagnosingBike, showSetup, stateSaveFailed, routesSaveFailed, pwa.setBusy]);
+  useEffect(() => { pwa.setBusy(cycleEditing || cloud.working || cloud.formDirty || !hydrated || trialBusy || Boolean(active) || Boolean(bike) || connectingBike || diagnosingBike || showSetup || stateSaveFailed || routesSaveFailed); }, [cycleEditing, cloud.working, cloud.formDirty, hydrated, trialBusy, active, bike, connectingBike, diagnosingBike, showSetup, stateSaveFailed, routesSaveFailed, pwa.setBusy]);
   const screenWake = useScreenWakeLock(running && sessionStarted && preferences.keepScreenAwake);
 
   useEffect(() => { setFinishReviewed(false); }, [showFinish]);
@@ -330,7 +336,7 @@ export function VeloQuestApp() {
   }, [state.preferences, preferences.resistanceOffset, sessionResistanceDelta]);
 
   useEffect(() => {
-    if (!active || showFinish) releaseCueAudio();
+    if (!active || showFinish) releaseCueAudio(true);
   }, [active, showFinish]);
   useEffect(() => () => releaseCueAudio(), []);
   useEffect(() => {
@@ -440,7 +446,7 @@ export function VeloQuestApp() {
     return () => window.clearTimeout(timer);
   }, [toast]);
 
-  const week = currentProgramWeek(state.profile.startDate);
+  const week = currentProgramWeek(programStartDate(state));
   const target = weekTargetFor(state, week);
   const stats = weeklyStats(state, week);
   const xp = totalXp(state);
@@ -520,10 +526,10 @@ export function VeloQuestApp() {
       clearAppBadge?: () => Promise<void>;
     };
     if (!badgeNavigator.setAppBadge) return;
-    const remaining = Math.max(0, target.sessions - stats.sessions);
+    const remaining = cycleEnded(state) ? 0 : Math.max(0, target.sessions - stats.sessions);
     if (remaining > 0) badgeNavigator.setAppBadge(remaining).catch(() => undefined);
     else badgeNavigator.clearAppBadge?.().catch(() => undefined);
-  }, [target.sessions, stats.sessions]);
+  }, [target.sessions, stats.sessions, state.profile.startDate, state.programTimeline]);
 
   const adaptiveCoach = useMemo(() => recommendAdaptiveWorkout({
     state,
@@ -1210,7 +1216,7 @@ export function VeloQuestApp() {
 
       <section className={guidedView ? "hero guidedHero" : "hero"}>
         <div>
-          <p className="eyebrow">{guidedView ? "TON PARCOURS DE DÉMARRAGE" : `SEMAINE ${week} / 12`}</p>
+          <p className="eyebrow">{guidedView ? "TON PARCOURS DE DÉMARRAGE" : cycleEnded(state) ? "CYCLE TERMINÉ · TA QUÊTE CONTINUE" : `SEMAINE ${week} / 12`}</p>
           <h1>{state.profile.name ? `${state.profile.name}, ta quête continue.` : "Ta quête continue."}</h1>
           <p>{guidedView ? "Une prochaine action claire. Le programme se précise avec tes séances et ton ressenti." : "Choisis selon ton temps et ton énergie. VeloQuest récompense la régularité, la variété et la progression."}</p>
           <div className="heroLevelProgress"><span><strong>{currentLevelTitle}</strong><small>{levelXp}/500 XP vers le niveau {level + 1}</small></span><i><b style={{ width: `${Math.round((levelXp / 500) * 100)}%` }} /></i></div>
@@ -1242,7 +1248,8 @@ export function VeloQuestApp() {
             onExplore={exploreGentleRides} onReview={reviewGuidance} onFree={leaveGuidance} />}
 
           {voyageCard}
-          <AdaptiveProgram state={state} week={week} workouts={workouts} onChange={setState} onLaunch={workout => launch(workout)} />
+          <ProgramCyclesPanel state={state} workouts={workouts} disabled={!hydrated || trialBusy || !!active || !!resumeSnapshot || showSetup || cloud.working || !!cloud.pending || pwa.locked()} onBusy={setCycleEditing} onSave={saveNextCycle} />
+          <AdaptiveProgram key={state.programTimeline?.active.id ?? state.profile.startDate} state={state} week={week} workouts={workouts} onChange={setState} onLaunch={workout => launch(workout)} />
 
           <details className={guidedView ? "guidedAdvanced" : "legacyDashboard"} open={guidedView ? undefined : true}>
             <summary hidden={!guidedView}>Voir le programme de douze semaines et les outils avancés</summary>
@@ -1255,7 +1262,7 @@ export function VeloQuestApp() {
           </section>
 
           <section className="card weeklyMission">
-            <div className="sectionHead"><div><p className="eyebrow">MISSION SEMAINE {week}</p><h2>Ce qu’il reste à conquérir</h2></div><strong>{perfectWeek ? "✓ complète" : `${quantity(Math.max(0, target.points - stats.points))} pts restants`}</strong></div>
+            <div className="sectionHead"><div><p className="eyebrow">{cycleEnded(state) ? 'DERNIÈRE SEMAINE DU CYCLE' : `MISSION SEMAINE ${week}`}</p><h2>{cycleEnded(state) ? 'Ta dernière semaine en chiffres' : 'Ce qu’il reste à conquérir'}</h2></div><strong>{cycleEnded(state) ? 'Cycle terminé' : perfectWeek ? "✓ complète" : `${quantity(Math.max(0, target.points - stats.points))} pts restants`}</strong></div>
             <p className="weeklyGoalHint">Objectif : {target.sessions} séances · {target.minutes} min au total. <button className="secondary miniButton" onClick={() => { setTab("more"); window.setTimeout(() => document.getElementById("weekly-goals")?.scrollIntoView({ block: "start" }), 0); }}>Régler mes objectifs</button></p>
             <div className="missionItems">
               <MissionItem label="Charge" value={stats.points} target={target.points} suffix=" pts" />
@@ -1578,7 +1585,7 @@ export function VeloQuestApp() {
             <MetricChart title="Tour de taille" points={waistPoints} unit="cm" target={state.profile.targetWaist} />
           </div>
 
-          <WeeklyReview state={state} week={week} workouts={workouts} onHabits={entry => setState(previous => ({ ...previous, habits: [...(previous.habits ?? []).filter(h => h.date !== entry.date), entry] }))} />
+          <WeeklyReview key={state.programTimeline?.active.id ?? state.profile.startDate} state={state} week={week} workouts={workouts} onHabits={entry => setState(previous => ({ ...previous, habits: [...(previous.habits ?? []).filter(h => h.date !== entry.date), entry] }))} />
           <PerformanceRecords sessions={state.sessions} />
 
           <section className="card journalCard">
@@ -1714,7 +1721,7 @@ export function VeloQuestApp() {
 
           <section>
             <div className="sectionHead subsectionTitle"><div><p className="eyebrow">GAMIFICATION</p><h2>Badges</h2></div><strong>{allBadges.filter((b) => b.unlocked).length}/{allBadges.length}</strong></div>
-            <div className="grid badgeGrid">
+            <div className="grid badgeGrid" id="trophy-gallery" tabIndex={-1}>
               {allBadges.map((b) => (
                 <article className={`card badge ${b.unlocked ? "unlocked" : ""}`} key={b.id}>
                   <span className="badgeIcon">{b.icon}</span><div><h2>{b.name}</h2><p>{b.description}</p><small>{b.unlocked ? "Débloqué" : b.progress}</small></div>
@@ -2081,6 +2088,9 @@ export function VeloQuestApp() {
       )}
 
       {toast && <div className="toast" role="status">{toast}</div>}
+      <TrophyCelebration badges={allBadges} preferences={preferences} hydrated={hydrated}
+        blocked={trialBusy || !!active || !!resumeSnapshot || showSetup || !!selectedSession || !!challengeRoute || !!segmentAttackRoute || cycleEditing || voyagePickerOpen || state.guidance?.status === 'setup' || cloud.working || cloud.formDirty || !!cloud.pending || stateSaveFailed}
+        onRemember={saveTrophyReceipts} onGallery={() => { setTab('more'); window.setTimeout(() => document.getElementById('trophy-gallery')?.focus(), 0); }} />
 
       {showSetup && <ProfileDialog profile={state.profile} onSave={saveProfile} onClose={() => setShowSetup(false)} />}
       {hydrated && state.guidance?.status === "setup" && !active && <OnboardingWizard

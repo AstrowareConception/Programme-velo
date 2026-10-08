@@ -1,8 +1,8 @@
 # Roadmap VéloQuest
 
-Actualisée le **8 octobre 2026** à partir de `main` `57c53a9232cee12e361b0a1e471497251f258a2b`. Orientation vers une distribution grand public validée par l’utilisateur. Les jalons ci-dessous pilotent désormais l’exécution ; le backlog détaillé reste conservé.
+Actualisée le **8 octobre 2026** à partir de `main` `9451be7e5bc7847e7c1bf9484dcb642671550baf`. Orientation vers une distribution grand public validée par l’utilisateur. Les jalons ci-dessous pilotent désormais l’exécution ; le backlog détaillé reste conservé.
 
-Cette roadmap remplace les listes historiques devenues obsolètes. Le produit dispose déjà d'un socle très riche : 52 séances, 84 parcours natifs, 38 balades faciles, 12 thèmes, 6 programmes, 22 campagnes/carnets et 77 badges. L'objectif n'est plus d'empiler les fonctionnalités, mais de consolider le produit, fiabiliser son usage réel, prolonger le programme au-delà de douze semaines et rendre le matériel connecté extensible à plusieurs vélos.
+Cette roadmap remplace les listes historiques devenues obsolètes. Le produit dispose déjà d'un socle très riche : 52 séances, 84 parcours natifs, 38 balades faciles, 12 thèmes, 6 programmes, 22 campagnes/carnets et 83 badges. L'objectif n'est plus d'empiler les fonctionnalités, mais de consolider le produit, fiabiliser son usage réel, prolonger le programme au-delà de douze semaines et rendre le matériel connecté extensible à plusieurs vélos.
 
 ## Priorité utilisateur du 8 octobre — séances courtes
 
@@ -45,18 +45,18 @@ La PR 58 est publiée sur `e65bf33` : 224 unités, 288 scénarios navigateur san
 
 Passage au jalon suivant : plusieurs séances terminées par les testeurs, aucun blocage critique ni perte de données connue non corrigée. La CI ne remplace pas la recette physique.
 
-### Jalon C — Usage durable
+### Jalon C — Usage durable · cycles et trophées dans la PR 67
 
-- Programme renouvelable après douze semaines et reprise après interruption, historique conservé.
-- Bilans mensuels et de cycle ; enrichir le bilan hebdomadaire et les repères de ressenti déjà présents.
+- Implémenté : programme renouvelable après douze semaines et reprise après interruption, historique conservé. [Règles des cycles](PROGRAM-CYCLES.md). Validation finale et publication suivies dans la [PR 67](https://github.com/AstrowareConception/Programme-velo/pull/67).
+- Implémenté : bilans de cycle, minutes, régularité, mesures quotidiennes et RPE à réglages comparables. Bilan mensuel restant.
 - Voyage V2 : continuité des carnets, étape suivante, reprise facile.
-- Défis axés sur régularité, variété et maîtrise ; revue des programmes et règles de progression par un professionnel qualifié avant diffusion large.
+- Implémenté : six [trophées de régularité](TROPHIES.md), notifications et son respectant les préférences. Revue des programmes et règles de progression par un professionnel qualifié avant diffusion large.
 
 Passage au jalon suivant : le produit accompagne plusieurs cycles et les retours après interruption sans remise à zéro ni accumulation de séances manquées.
 
 ### Jalon D — Ouverture publique
 
-- Sauvegarde distante facultative d’abord ; compte facultatif puis synchronisation avec gestion des conflits et récupération.
+- ✅ Firebase livré par la PR 66 sur `9451be7` : compte facultatif, sauvegardes versionnées, synchronisation, conflits et récupération. L’utilisateur confirme le fonctionnement réel entre ses appareils après configuration.
 - Présentation publique, démonstration, compatibilités, aide, historique des versions et canal de retours.
 - Revue sécurité, confidentialité et droits des contenus ; modalités de support et modèle économique à décider.
 - Évaluer une enveloppe native selon les limites constatées de Bluetooth, installation et arrière-plan.
@@ -175,17 +175,9 @@ Tableau de bord de séance sur toute la fenêtre, consignes et parcours en colon
 
 ### P1.1 — Cycle après la semaine 12
 
-**Priorité métier la plus élevée après le P0.**
+**Implémenté dans la PR 67 du 8 octobre ; validation finale et publication suivies dans cette PR.**
 
-La semaine 12 clôt aujourd'hui le premier cycle. Il faut concevoir une continuité explicite :
-
-- bilan de fin de cycle ;
-- choix d'un nouveau cap : régularité, endurance, paysages, performance mesurée ;
-- nouveau cycle sans effacer l'historique ;
-- semaines de relâche planifiées ;
-- reprise après interruption ;
-- objectifs recalculés à partir des disponibilités actuelles ;
-- conservation des programmes découverte et séances libres.
+Le bilan de cycle, les caps régularité/endurance/progression/maintien/poids, les disponibilités actuelles et le départ confirmé sont intégrés. Les cycles archivés conservent objectifs et plannings ; les séances et mesures restent dans le profil. Reprise douce deux semaines et maintenance facile, export v3 et synchronisation du calendrier complet. [Guide](PROGRAM-CYCLES.md). Les programmes découverte et séances libres restent disponibles.
 
 Aucune progression de charge ne doit être automatique uniquement parce qu'un objectif de points n'est pas atteint.
 
@@ -206,7 +198,7 @@ Ces indicateurs restent des outils d'entraînement et non un diagnostic médical
 Le bilan hebdomadaire, les habitudes et le débrief de séance existent déjà. Compléter avec :
 
 - bilan mensuel ;
-- bilan de cycle ;
+- bilan de cycle : implémenté dans le lot courant ;
 - évolution des minutes, séances, régularité et RPE ;
 - records comparables ;
 - distance et dénivelé virtuels ;
@@ -221,19 +213,15 @@ Le bilan hebdomadaire, les habitudes et le débrief de séance existent déjà. 
 - bilan final du carnet ;
 - distinction permanente entre distance simulée et distance mesurée.
 
-### P1.5 — Données multi-appareils · intégration Firebase en validation
+### P1.5 — Données multi-appareils · socle livré et essai réel concluant
 
-Demande utilisateur du 8 octobre : préparer tout le code et fournir un tutoriel, puis laisser la configuration du projet Firebase à l’utilisateur. Socle sur `feat/firebase-sync` : compte e-mail vérifié, consentement, SDK différé, versions immuables découpées avec SHA-256, fusion à trois versions, conflits explicites, file IndexedDB idempotente, reprise d’écriture locale, historique restaurable et règles par UID. Préférences et séance active restent locales. [Tutoriel complet](FIREBASE-SETUP.md).
+Demande utilisateur du 8 octobre : préparer tout le code et fournir un tutoriel, puis laisser la configuration du projet Firebase à l’utilisateur. PR 66 fusionnée et publiée sur `9451be7` : compte e-mail vérifié, consentement, SDK différé, versions immuables découpées avec SHA-256, fusion à trois versions, conflits explicites, file IndexedDB idempotente, reprise d’écriture locale, historique restaurable et règles par UID. Préférences et séance active restent locales. [Tutoriel complet](FIREBASE-SETUP.md).
 
-Aucun projet réel, compte réel ou service payant activé dans ce lot. Sans les quatre variables publiques et les règles déployées, le cloud reste inactif. La recette matérielle Bluefy et la délivrabilité des e-mails du projet réel devront suivre sa configuration.
+Aucun projet réel, compte réel ou service payant activé dans ce lot. Sans les quatre variables publiques et les règles déployées, le cloud reste inactif. Après configuration, l’utilisateur confirme la synchronisation réelle de ses appareils. Cela ne qualifie pas tous les navigateurs ni l’usage en arrière-plan.
 
 Suite d’exploitation : surveiller les quotas et la croissance des archives, définir rétention/purge administrative, puis envisager corbeille par élément et effacement autonome du compte. L’interface expose 30 versions mais les archives sont conservées sans purge automatique ; la procédure d’effacement complet est documentée.
 
-Décisions d’architecture conservées :
-
-Étudier d'abord une **sauvegarde distante facultative**, puis une vraie synchronisation.
-
-Avant toute implémentation :
+Décisions d’architecture traitées par le socle Firebase, à conserver pour les évolutions :
 
 - choisir authentification et stockage ;
 - définir la source de vérité ;

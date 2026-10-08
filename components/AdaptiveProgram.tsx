@@ -3,6 +3,7 @@ import { useState } from 'react';
 import type { AppState, WorkoutTemplate } from '@/lib/types';
 import { acceptPlan, buildProgramPlan, completedPlannedRide, recalculatePlan, sessionsInWeek, weekDates, type ProgramPlan, type ProgramSettings } from '@/lib/adaptive-program';
 import { localInputDate } from '@/lib/dates';
+import { cycleEnded, programStartDate } from '@/lib/program-calendar';
 const weekdays = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
 type Props = { state: AppState; week: number; workouts: WorkoutTemplate[]; onChange: (update: (state: AppState) => AppState) => void; onLaunch: (w: WorkoutTemplate) => void };
 export function AdaptiveProgram({state,week,workouts,onChange,onLaunch}:Props) {
@@ -11,6 +12,7 @@ export function AdaptiveProgram({state,week,workouts,onChange,onLaunch}:Props) {
   const [draft,setDraft]=useState<ProgramPlan>();
   const [notice,setNotice]=useState('');
   const plan=draft??state.programPlans?.find(p=>p.week===selectedWeek);
+  if (cycleEnded(state)) return null;
   const today=localInputDate();
   function preview() { try { setDraft(buildProgramPlan(state,settings,selectedWeek,workouts));setNotice('Proposition prête : tes objectifs ne changent qu’après confirmation.'); } catch(e) {setNotice(e instanceof Error?e.message:'Impossible de préparer la semaine.');} }
   function edit(index:number, patch:Partial<ProgramPlan['rides'][number]>) {
@@ -34,7 +36,7 @@ export function AdaptiveProgram({state,week,workouts,onChange,onLaunch}:Props) {
         const done=completedPlannedRide(ride,state.sessions);
         const past=ride.date<today;
         return <li key={ride.date}><div className="plannedHeading"><strong>{new Date(ride.date+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'short'})}</strong><span>{done?'✓ Réalisée':past?'Jour passé · sans rattrapage':'À ton rythme'}</span></div><h3>{workout?.name??'Séance indisponible'}</h3><p>{workout?.duration} min · {workout?.intensity==='easy'?'facile':'modérée'}</p>
-          {!done && workout && <div className="planActions"><button className="primary" onClick={()=>onLaunch(workout)}>Ouvrir la séance</button><details><summary>Déplacer ou raccourcir</summary><label>Autre jour<select value={ride.date} onChange={e=>edit(i,{date:e.target.value})}>{weekDates(state.profile.startDate,selectedWeek).filter(d=>localInputDate(d)===ride.date || (!plan.rides.some(r=>r.date===localInputDate(d)) && localInputDate(d)>=today)).map(d=><option key={localInputDate(d)} value={localInputDate(d)}>{d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric'})}</option>)}</select></label><label>Séance de remplacement<select value={ride.workoutId} onChange={e=>edit(i,{workoutId:e.target.value})}>{workouts.filter(w=>w.id===ride.workoutId || (!w.bonus && !w.id.startsWith('calories-') && w.duration>=10 && w.duration<=workout.duration && w.intensity==='easy')).map(w=><option key={w.id} value={w.id}>{w.name} · {w.duration} min</option>)}</select></label></details></div>}
+          {!done && workout && <div className="planActions"><button className="primary" onClick={()=>onLaunch(workout)}>Ouvrir la séance</button><details><summary>Déplacer ou raccourcir</summary><label>Autre jour<select value={ride.date} onChange={e=>edit(i,{date:e.target.value})}>{weekDates(programStartDate(state),selectedWeek).filter(d=>localInputDate(d)===ride.date || (!plan.rides.some(r=>r.date===localInputDate(d)) && localInputDate(d)>=today)).map(d=><option key={localInputDate(d)} value={localInputDate(d)}>{d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric'})}</option>)}</select></label><label>Séance de remplacement<select value={ride.workoutId} onChange={e=>edit(i,{workoutId:e.target.value})}>{workouts.filter(w=>w.id===ride.workoutId || (!w.bonus && !w.id.startsWith('calories-') && w.duration>=10 && w.duration<=workout.duration && w.intensity==='easy')).map(w=><option key={w.id} value={w.id}>{w.name} · {w.duration} min</option>)}</select></label></details></div>}
         </li>;
       })}</ol>
       {draft && <button className="primary" onClick={()=>{onChange(previous=>acceptPlan(previous,draft,settings));setDraft(undefined);setNotice('Semaine enregistrée et objectifs ajustés. Les autres semaines et ton historique sont conservés.');}}>Confirmer cette semaine</button>}

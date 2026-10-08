@@ -126,6 +126,7 @@ export type Profile = {
 };
 
 export type Preferences = {
+  trophyNotifications?: string[];
   soundCues: boolean;
   voiceCues: boolean;
   haptics: boolean;
@@ -141,6 +142,7 @@ export type Preferences = {
 };
 
 export type AppState = {
+  programTimeline?: import("./program-calendar").ProgramTimeline;
   program?: import("./adaptive-program").ProgramSettings;
   programPlans?: import("./adaptive-program").ProgramPlan[];
   habits?: import("./adaptive-program").HabitDay[];

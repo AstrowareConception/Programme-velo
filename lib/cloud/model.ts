@@ -31,10 +31,30 @@ const keyed: Record<string, string> = { "state.sessions": "id", "state.measureme
 export function mergeData(base: CloudData | null, local: CloudData, remote: CloudData, choices: Choices = {}) {
   const conflicts: Conflict[] = [];
   const eq = (a: unknown, b: unknown) => canonical(a) === canonical(b);
+  const cycleKeys = ['programTimeline', 'program', 'programPlans', 'weeklyGoals'];
+  const context = (state: any) => state && Object.fromEntries(cycleKeys.map(k => [k, state[k]]));
+  // An older app may omit the new calendar. Its disappearance needs an explicit choice.
+  const removedCycle = !!base?.state.programTimeline && Boolean(local.state.programTimeline) !== Boolean(remote.state.programTimeline);
+  function atomic(b: any, l: any, r: any, path: string) {
+    if (eq(l, r)) return l;
+    if (!removedCycle && base && eq(l, b)) return r;
+    if (!removedCycle && base && eq(r, b)) return l;
+    if (!base && l === undefined) return r;
+    if (!base && r === undefined) return l;
+    if (!choices[path]) conflicts.push({ path, local: l, remote: r });
+    return choices[path] === 'remote' ? r : l;
+  }
   function merge(b: any, l: any, r: any, path: string): any {
     if (eq(l, r)) return l;
-    if (base && eq(l, b)) return r;
-    if (base && eq(r, b)) return l;
+    const guardCalendar = removedCycle && (path === '' || path === 'state');
+    if (!guardCalendar && base && eq(l, b)) return r;
+    if (!guardCalendar && base && eq(r, b)) return l;
+    // A changed cycle and its week targets/plans travel together. Never mix two calendars.
+    if (path === 'state' && l && r && !eq(l.programTimeline, r.programTimeline)) {
+      const chosen = atomic(context(b), context(l), context(r), 'state.programTimeline');
+      const keys = [...new Set([...Object.keys(b ?? {}), ...Object.keys(l), ...Object.keys(r)])].filter(k => !cycleKeys.includes(k));
+      return { ...Object.fromEntries(keys.map(k => [k, merge(b?.[k], l[k], r[k], `state.${k}`)]).filter(([, v]) => v !== undefined)), ...chosen };
+    }
     if (keyed[path]) {
       const key = keyed[path];
       const map = (rows: any[] = []) => new Map(rows.map(x => [String(x[key]), x]));

@@ -19,7 +19,7 @@ Entraînement guidé, exploration, défis, programme personnel, récompenses et 
 | **12 semaines de programme** | Des objectifs personnalisables et une semaine adaptée |
 | **6 programmes découverte** | Six chemins pour reprendre, varier et progresser |
 | **22 campagnes et carnets prédéfinis** | Des aventures à construire au fil des sorties |
-| **77 badges** | Régularité, découverte, parcours, programmes et objectifs |
+| **83 badges** | Régularité, découverte, parcours, programmes et objectifs |
 | **Des carnets personnels et tes GPX** | Tes propres idées de voyage rejoignent le catalogue |
 
 *Présentation de la version vérifiée le 7 octobre 2026 (`1147628`). Captures authentiques de l’application publiée, sur ordinateur. Les écrans de suivi utilisent le profil « Camille · démo fictive » : ses séances et mesures sont des exemples, pas des résultats utilisateurs ni une promesse de résultat.*
@@ -66,6 +66,8 @@ Dans **Quête → Ma semaine adaptée**, tu choisis tes jours disponibles, un cr
 VéloQuest propose une semaine lisible, avec les séances, les durées et les points correspondants. **Tu confirmes la proposition avant qu’elle devienne ton planning.** Un imprévu ? Tu peux déplacer, raccourcir ou remplacer une séance par les propositions disponibles. Les jours manqués ne créent pas une dette d’entraînement à rattraper.
 
 Le cycle dure douze semaines. Les deux premières installent des bases faciles ; les semaines 4, 8 et 12 sont allégées. Une interruption prolongée ou des ressentis trop élevés peuvent également conduire à une proposition plus douce. La progression privilégie la variété et une pratique tenable, sans augmentation automatique du volume.
+
+Le bilan de fin de cycle prépare la suite : choisis un nouveau cap ou une reprise douce, confirme le départ, puis prépare ta première semaine. Les séances, mesures, XP et bilans précédents restent conservés. [Cycles et reprise](PROGRAM-CYCLES.md).
 
 ### Un coach pour choisir aujourd’hui
 
@@ -325,15 +327,17 @@ Ces formats sont classés difficiles et restent facultatifs. Les calories du vé
 
 Tu accumules de l’**XP**, franchis des niveaux et vois ton titre évoluer. Une semaine parfaite peut ajouter **250 XP** ; les micro-séances faciles ont leur bonus plafonné à **60 XP par semaine**. Les campagnes et programmes offrent leurs propres récompenses uniques.
 
-Les **77 badges** donnent plusieurs raisons de revenir : première séance, régularité, variété, nouveaux paysages, programmes terminés, kilomètres cumulés, objectifs personnels, découvertes régionales ou grands voyages. À chacun sa collection : les **Premiers aigles** de la Route Napoléon, les **Roches rouges** de l’Estérel, les **Vignes et villages** d’Alsace ou le **Grand voyageur**.
+Les **83 badges** donnent plusieurs raisons de revenir : première séance, régularité, variété, nouveaux paysages, programmes terminés, kilomètres cumulés, objectifs personnels, découvertes régionales ou grands voyages. À chacun sa collection : les **Premiers aigles** de la Route Napoléon, les **Roches rouges** de l’Estérel, les **Vignes et villages** d’Alsace ou le **Grand voyageur**.
 
-![Collections et catalogue des 77 badges ; progression issue du profil fictif](images/presentation/18-badges.jpg)
+![Galerie photographiée avant les six nouveaux trophées de régularité ; profil fictif](images/presentation/18-badges.jpg)
+
+Les séries de 3 ou 7 jours et les suites de 2, 4, 8 ou 12 semaines à trois jours de vélo minimum ont leurs trophées. Une notification dorée célèbre chaque nouveau déblocage, avec un petit son si les sons sont activés. Les séances faciles comptent aussi. [Récompenses et réglages](TROPHIES.md).
 
 Le **palmarès** rassemble parcours distincts, dénivelé virtuel, défis réussis, Time Attacks et améliorations de records. Quatre collections prolongent le plaisir : **Couronne Alpine**, **Légendes du Tour**, **Grand fond** et **La France en douceur**.
 
 La progression suit ton historique. Une répétition reste une nouvelle séance, mais ne se transforme pas en nouvelle destination. Si tu supprimes une saisie erronée, les objectifs et récompenses concernés se recalculent depuis les séances restantes.
 
-**[Parcourir les 77 badges →](CATALOGUE.md#badges)**
+**[Parcourir les 83 badges →](CATALOGUE.md#badges)**
 
 <a id="suivi"></a>
 
@@ -484,7 +488,7 @@ Le paquet de séances et parcours peut être préparé et vérifié localement, 
 
 **Où trouver absolument tout le contenu proposé ?**
 
-Le [catalogue complet](CATALOGUE.md) répertorie les 52 séances, les 84 parcours, les 22 campagnes, les six programmes et les 77 badges de la version présentée.
+Le [catalogue complet](CATALOGUE.md) répertorie les 52 séances, les 84 parcours, les 22 campagnes, les six programmes et les 83 badges de la version présentée.
 
 ---
 

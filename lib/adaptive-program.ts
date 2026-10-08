@@ -1,6 +1,7 @@
 import type { AppState, CompletedSession, WeekTarget, WorkoutTemplate } from './types';
 import { localInputDate, localCalendarDay } from './dates';
 import { numericRange, cadenceSummary } from './effort';
+import { programStartDate } from './program-calendar';
 
 export type ProgramSettings = { version: 1; days: number[]; minutes: number; goal: 'habit' | 'endurance' | 'weight'; energy: 'easy' | 'normal'; };
 export type PlannedRide = { date: string; workoutId: string };
@@ -50,8 +51,8 @@ export function weekDates(startDate: string, week: number) {
   return Array.from({length:7}, (_,i) => { const d = new Date(startDate + 'T12:00:00'); d.setDate(d.getDate() + (week-1)*7+i); return d; });
 }
 export function sessionsInWeek(state: AppState, week: number, now = new Date()) {
-  const dates = new Set(weekDates(state.profile.startDate,week).map(d => localInputDate(d)));
-  return state.sessions.filter(s => Number.isFinite(Date.parse(s.date)) && Date.parse(s.date) <= now.getTime() && dates.has(localInputDate(new Date(s.date))));
+  const dates = new Set(weekDates(programStartDate(state),week).map(d => localInputDate(d)));
+  return state.sessions.filter(s => Number.isFinite(Date.parse(s.date)) && Date.parse(s.date) <= now.getTime() && dates.has(localInputDate(new Date(s.date))) && (!state.programTimeline || Date.parse(s.date) >= Date.parse(state.programTimeline.active.startedAt)));
 }
 export function targetRpe(workout?: WorkoutTemplate) {
   const segments = workout?.segments.flatMap(s => { const r = numericRange(s.rpe); return r ? [{ minutes:s.minutes, rpe:(r[0]+r[1])/2 }] : []; }) ?? [];
@@ -70,11 +71,13 @@ export function recentFeedback(state: AppState, workouts: WorkoutTemplate[], now
 }
 export function buildProgramPlan(state: AppState, settings: ProgramSettings, week: number, workouts: WorkoutTemplate[], now = new Date()): ProgramPlan {
   const feedback = recentFeedback(state, workouts, now);
-  const recovery = week % 4 === 0 || feedback.difficult || feedback.returnAfterBreak || settings.energy === 'easy';
-  const phase = feedback.returnAfterBreak ? 'Retour en selle' : recovery ? 'Consolidation douce' : week <= 2 ? 'Installer l’habitude' : week <= 7 ? 'Développer l’aisance' : 'Renforcer la régularité';
-  const reason = feedback.returnAfterBreak ? 'Après une interruption, des séances faciles pour retrouver tes repères.' : feedback.difficult ? 'Ton ressenti dépasse les consignes récentes : durée et difficulté allégées.' : week%4===0 ? 'Une semaine plus légère pour consolider. Aucune dette à rattraper.' : settings.energy==='easy' ? 'Tu as choisi une semaine tranquille.' : 'La durée respecte tes disponibilités. La progression passe par la variété, sans hausse automatique du volume.';
+  const returnStart = !!state.programTimeline?.active.returning && week <= 2;
+  const maintenance = state.programTimeline?.active.goal === 'maintain';
+  const recovery = week % 4 === 0 || feedback.difficult || feedback.returnAfterBreak || settings.energy === 'easy' || returnStart || maintenance;
+  const phase = returnStart || feedback.returnAfterBreak ? 'Retour en selle' : maintenance ? 'Entretenir la routine' : recovery ? 'Consolidation douce' : week <= 2 ? 'Installer l’habitude' : week <= 7 ? 'Développer l’aisance' : 'Renforcer la régularité';
+  const reason = returnStart || feedback.returnAfterBreak ? 'Après une interruption, des séances faciles pour retrouver tes repères.' : maintenance ? 'Un cycle de maintien : des rendez-vous faciles, à volume stable.' : feedback.difficult ? 'Ton ressenti dépasse les consignes récentes : durée et difficulté allégées.' : week%4===0 ? 'Une semaine plus légère pour consolider. Aucune dette à rattraper.' : settings.energy==='easy' ? 'Tu as choisi une semaine tranquille.' : 'La durée respecte tes disponibilités. La progression passe par la variété, sans hausse automatique du volume.';
   const duration = Math.max(10, settings.minutes - (recovery ? 5 : 0));
-  const dates = weekDates(state.profile.startDate,week).filter(d => settings.days.includes(d.getDay()));
+  const dates = weekDates(programStartDate(state),week).filter(d => settings.days.includes(d.getDay()));
   const pool = workouts.filter(w => !w.bonus && !w.id.startsWith('calories-') && w.duration >= 10 && w.duration <= duration && w.intensity !== 'hard' && w.id !== 'free-ride');
   const used = new Set<string>();
   const usedKinds = new Set<string>();

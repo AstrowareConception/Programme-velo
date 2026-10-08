@@ -12,6 +12,7 @@ export function CloudPanel({ cloud }: { cloud: Controller }) {
   useEffect(() => { if (cloud.user) { setPassword(""); setEmail(""); setSignup(false); } }, [cloud.user]);
   const disabled = cloud.working;
   function label(path: string) {
+    if (path === 'state.programTimeline') return 'Cycle, objectifs et planning : choisir le programme à conserver';
     const fields: Record<string, string> = { name: "Nom", startDate: "Début du programme", targetWeight: "Objectif de poids", startWeight: "Poids initial", targetWaist: "Objectif de tour de taille", startWaist: "Tour de taille initial", points: "Points", duration: "Durée", date: "Date", weight: "Poids", waist: "Tour de taille", abdomen: "Tour abdominal", xp: "Expérience" };
     const match = path.match(/^state\.(sessions|measurements)\[([^\]]+)\](?:\.(.*))?$/);
     if (match && cloud.pending) {

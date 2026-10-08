@@ -86,10 +86,12 @@ export async function testCueAudio(preferences: Preferences) {
   return "Test envoyé. Vérifie que tu l’entends avec ton casque ou ton podcast ; le volume du téléphone compte aussi.";
 }
 
-export function releaseCueAudio() {
+export function releaseCueAudio(keepAudio = false) {
   const player = audio;
-  audio = null;
-  try { if (player && player.state !== "closed") void player.close().catch(() => undefined); } catch {}
+  if (!keepAudio) {
+    audio = null;
+    try { if (player && player.state !== "closed") void player.close().catch(() => undefined); } catch {}
+  }
   try { if (speaking && typeof window !== "undefined") window.speechSynthesis.cancel(); } catch {}
   speaking = false;
 }
@@ -110,3 +112,25 @@ export function cueCoach(text: string, preferences: Preferences) {
 }
 
 export function coachIsSpeaking() { return speaking || (typeof window !== "undefined" && Boolean(window.speechSynthesis?.speaking)); }
+
+/** Short reward arpeggio, using the existing volume and sound/haptic preferences. */
+export function cueTrophyReward(preferences: Preferences) {
+  if (typeof window === 'undefined' || document.visibilityState === 'hidden') return;
+  const volume = Math.max(0, Math.min(100, preferences.cueVolume ?? 65)) / 100;
+  try {
+    const player = audio;
+    if (preferences.soundCues && volume && player?.state === 'running') {
+      [523.25, 659.25, 783.99, 1046.5].forEach((frequency, i) => {
+        const oscillator = player.createOscillator(), gain = player.createGain();
+        const start = player.currentTime + i * .11;
+        oscillator.type = 'sine'; oscillator.frequency.value = frequency;
+        gain.gain.setValueAtTime(.0001, start);
+        gain.gain.exponentialRampToValueAtTime(Math.max(.0001, .1 * volume), start + .02);
+        gain.gain.exponentialRampToValueAtTime(.0001, start + .24);
+        oscillator.connect(gain).connect(player.destination); oscillator.start(start); oscillator.stop(start + .26);
+        oscillator.addEventListener('ended', () => { oscillator.disconnect(); gain.disconnect(); }, { once: true });
+      });
+    }
+    if (preferences.haptics && 'vibrate' in navigator) navigator.vibrate([60, 50, 100]);
+  } catch { /* A refused sound never prevents the visual reward. */ }
+}
