@@ -1001,8 +1001,12 @@ button:focus-visible, input:focus-visible, .fileButton:focus-within { outline: 2
 .backupTransfer, .backupPaste { min-width:0; padding:16px; border:1px solid var(--line); border-radius:14px; background:rgba(80,227,255,.035); }
 .backupTransfer { display:grid; gap:12px; }
 .backupTransfer h3, .backupTransfer p { margin:0; }
+.supportDiagnostic { display:grid; gap:14px; min-width:0; }
+.supportDiagnostic > h2, .supportDiagnostic > p { margin:0; }
+.supportDiagnostic > button { justify-self:start; }
 .backupTransfer label, .backupPaste label { display:grid; gap:8px; min-width:0; }
 .backupTransfer textarea, .backupPaste textarea { width:100%; min-height:140px; max-height:300px; resize:vertical; font:12px/1.5 monospace; overflow-wrap:anywhere; }
+.supportPreview textarea { min-height:240px; }
 .backupButtons { display:flex; flex-wrap:wrap; gap:10px; }
 .backupButtons > button { flex:1 1 180px; }
 .backupPaste summary { cursor:pointer; min-height:32px; }

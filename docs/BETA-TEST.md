@@ -34,7 +34,15 @@ Pour les modes chronométrés, vérifier leur règle propre de pause : le chrono
 - Capture facultative, après masquage des informations personnelles :
 - Ce qui a nécessité une explication pendant la découverte :
 
-Ne pas joindre une sauvegarde complète par défaut : elle peut contenir des données personnelles et corporelles. Un diagnostic technique prévisualisable reste un prochain chantier ; aucun envoi automatique n’est ajouté.
+Ne pas joindre une sauvegarde complète par défaut : elle peut contenir des données personnelles et corporelles.
+
+### Joindre un diagnostic technique
+
+Dans **Plus → Un souci avec VéloQuest ?**, choisir **Préparer un diagnostic**. Relire le texte complet avant **Copier le rapport** ou **Exporter le rapport JSON**. Si la copie automatique est refusée, le texte est sélectionné pour la copie manuelle ; si le téléchargement ne donne pas de fichier dans Bluefy, utiliser cette copie. Aucun destinataire n’est choisi et aucun envoi n’est effectué par VéloQuest.
+
+Le rapport contient uniquement la version ouverte (pas une version distante), les dimensions de la fenêtre, le mode navigateur/PWA, les API exposées, la connexion réseau et les indicateurs connus de cache, mise à jour, stockage, séance/reprise et Bluetooth. Le profil, l’historique, les mesures, les traces GPS, les noms et identifiants d’appareils, les erreurs brutes et le navigateur détaillé sont exclus. Il faut préciser soi-même l’appareil et le navigateur dans le retour.
+
+Le rapport est un instantané : le copier après une rotation ou un changement de connexion ne le modifie pas. Choisir **Actualiser le rapport** pour prendre un nouvel instantané. Il n’est pas conservé après avoir quitté Plus ou rechargé ; **Effacer le diagnostic** le retire immédiatement. Il peut être préparé hors connexion, sans requête réseau, lecture/écriture de stockage ou scan Bluetooth. Il ne remplace pas une sauvegarde, ne mesure pas le quota disponible, ne prouve pas la compatibilité d’un vélo et ne peut pas décrire une application qui échoue avant d’afficher Plus. L’inventaire matériel BLE reste un outil distinct, déclenché explicitement.
 
 ## Conditions pour élargir la bêta
 

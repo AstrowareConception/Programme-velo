@@ -1,12 +1,24 @@
-# État de reprise VéloQuest — actualisé le 7 octobre 2026
+# État de reprise VéloQuest — actualisé le 8 octobre 2026
 
-## État courant de référence — 7 octobre 2026
+## État courant de référence — 8 octobre 2026
 
-Base live vérifiée : `main` `e65bf33dc016212078516760e1f18a91df6d8ca9`, fusion de la [PR 58](https://github.com/AstrowareConception/Programme-velo/pull/58). Vercel READY (`dpl_5QuZbTrPfmw1yjryfRW3MoRcQZB5`) et `/api/version` concordants. La CI de main [37687903225](https://github.com/AstrowareConception/Programme-velo/actions/runs/37687903225) et la vérification production [37688875817](https://github.com/AstrowareConception/Programme-velo/actions/runs/37688875817) ont réussi. Avant fusion : 224 unités et 288 scénarios navigateur sans échec ni retry, CI [37686874610](https://github.com/AstrowareConception/Programme-velo/actions/runs/37686874610), head `e676e888af4ce0a19790126923f5f914c9de3eec`.
+Base live vérifiée : `main` `de6cfcf16a386ee4c8956f270584efddb6b256c2`, fusion de la [PR 55](https://github.com/AstrowareConception/Programme-velo/pull/55). Vercel READY (`dpl_JC44SYRAR9tcYS4P6WWVLXsjGnQY`) et `/api/version` concordants. La CI main [37693366872](https://github.com/AstrowareConception/Programme-velo/actions/runs/37693366872) et la vérification production [37694525096](https://github.com/AstrowareConception/Programme-velo/actions/runs/37694525096) ont réussi. Aucune PR ouverte au début de ce lot.
 
-Livré : lecteur paysage (PR 56, essai utilisateur concluant), préparation/bilan et mises à jour visibles (PR 57), nouveautés et lexique débutant (PR 58). Le marqueur de lecture des nouveautés reste une préférence locale facultative, hors sauvegarde sportive. Les essais avec de nouveaux utilisateurs restent à recueillir.
+Livré : lecteur paysage (PR 56, essai utilisateur concluant), préparation/bilan et mises à jour visibles (PR 57), nouveautés et lexique débutant (PR 58), finalisation des séances et protection en cas de refus du stockage (PR 55). Les essais avec de nouveaux utilisateurs restent à recueillir.
 
-## Lot actif — Fiabilité de l’enregistrement et préparation de la bêta
+## Lot actif — Diagnostic de support prévisualisable
+
+Branche `feat/support-diagnostic`, base `de6cfcf`. Carte indépendante dans Plus, rapport construit à la demande par une projection explicite de champs techniques. La version est celle du bundle ouvert ; celle du cache PWA est séparée. Ni requête réseau, ni accès direct au stockage, ni sélection ou commande Bluetooth. Aucun envoi automatique, destinataire ou sauvegarde persistante du diagnostic.
+
+L’aperçu JSON est le contenu exact copié/exporté, stable jusqu’à une actualisation explicite. Copie manuelle après refus du presse-papiers, export JSON et effacement avec retour du focus. Profil, historique, mesures, traces GPS, identifiants et erreurs brutes exclus ; les champs inattendus ne traversent pas la projection. Guide bêta et nouveautés actualisés.
+
+Validation locale : TypeScript, architecture/documentation et **236 tests unitaires** réussis (39 fichiers). Trois nouveaux scénarios Playwright par projet couvrent aperçu/copie/export exacts, rotation, absence de réseau/stockage/scan, effacement, et copies refusée/absente hors connexion avec refus de stockage observé. La CI navigateur et le build restent requis avant fusion. Références de PR, SHA testé, résultats et version publiée à consigner dans la description finale de la PR ; ce checkpoint précède la publication.
+
+Limites : indications de capacités et d’erreurs déjà observées, pas une qualification matérielle ni un test de quota. Une application bloquée avant Plus ne peut pas générer le rapport. Aucun journal historique d’erreurs n’est ajouté. Bluefy et matériel réels restent à éprouver.
+
+Prochaine action : valider et publier ce lot, puis renforcer la recette d’accessibilité et la couverture WebKit, en parallèle des retours bêta réels. Voir [la roadmap](ROADMAP.md) et [le protocole bêta](BETA-TEST.md).
+
+## 7–8 octobre 2026 — Fiabilité de l’enregistrement livrée (PR 55)
 
 [PR 55](https://github.com/AstrowareConception/Programme-velo/pull/55), branche distante `refactor/session-completion`. Reprise depuis son ancien head `e0db73b8a3c4fac68a881348afa217715f3d0eee` (CI 37613584600 réussie), avec intégration de main `e65bf33`. Les conflits documentaires sont résolus en conservant les dernières livraisons. Les nouveaux écrans, le lexique et la PWA sont conservés.
 
@@ -18,11 +30,11 @@ Changements :
 - garde-fou principal abaissé à 2 150 lignes ; huit tests unitaires de finalisation et scénario navigateur de refus/réessai/rechargement ;
 - [protocole bêta](BETA-TEST.md) pour la découverte, les interruptions, le matériel et les sauvegardes, avec résultats physiques séparés des simulations.
 
-Validation locale : TypeScript, architecture/documentation et 232 tests unitaires réussis. Build et CI navigateur complète requis avant fusion ; les références exactes et résultats seront consignés dans la PR, puis complétés par le SHA publié. À ce checkpoint : lot non fusionné/non publié, production `e65bf33`.
+Validation : 232 tests unitaires, 290 scénarios navigateur sans échec ni retry, TypeScript, contrôles statiques et build réussis. CI PR [37692286565](https://github.com/AstrowareConception/Programme-velo/actions/runs/37692286565), head `feaf7f690b789377a796bd1006421e7f29a97fbf`. Fusion publiée sur `de6cfcf16a386ee4c8956f270584efddb6b256c2`, arbre identique `12057fa68e1d20214e88292aa78dabbf0cf865b2`. CI main et vérification production réussies, voir état courant.
 
 Limites : les saisies manuelles non enregistrées restent en mémoire tant que le bilan reste ouvert ; elles ne sont pas sauvegardées automatiquement après fermeture ou rechargement. La reprise garde l’instantané disponible, pas ces nouvelles saisies. Ce lot ne résout pas les conflits d’édition simultanée entre onglets et n’ajoute pas de sauvegarde distante. Les tests FTMS simulés ne constituent pas une qualification matérielle.
 
-Prochaine action : vérifier et publier la PR 55, puis recueillir la recette bêta et préparer le diagnostic prévisualisable destiné au support. Voir [la roadmap](ROADMAP.md).
+Suite : diagnostic de support et recette bêta. Voir [la roadmap](ROADMAP.md).
 
 Les sections suivantes sont des checkpoints historiques, à confronter à l’état live du dépôt.
 
