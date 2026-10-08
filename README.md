@@ -12,11 +12,15 @@ VéloQuest est une PWA personnelle Next.js / React / TypeScript. Elle associe un
 
 **[Lire la présentation complète et illustrée →](docs/PRESENTATION.md)**
 
-52 séances · 84 parcours, dont 38 balades faciles · 12 thèmes de découverte · 12 semaines de programme · 6 programmes découverte · 22 campagnes et carnets · 77 badges.
+52 séances · 84 parcours, dont 38 balades faciles · 12 thèmes de découverte · 12 semaines de programme · 6 programmes découverte · 22 campagnes et carnets · 83 badges.
 
 [![VéloQuest : une semaine adaptée à ton rythme](docs/images/presentation/02-semaine-adaptee.jpg)](docs/PRESENTATION.md)
 
 [Explorer les séances et les parcours](docs/PRESENTATION.md#parcours) · [Découvrir le mode Voyage](docs/PRESENTATION.md#voyage) · [Tous les contenus et récompenses](docs/CATALOGUE.md) · [Ouvrir l’application](https://programme-velo.vercel.app/)
+
+## Cycles et trophées de régularité
+
+Après douze semaines, consulte le bilan dans **Quête**, puis confirme un nouveau cycle ou une reprise douce sans perdre l’historique. Six nouveaux trophées récompensent les séries de jours et de semaines ; une notification dorée et un petit son annoncent les récompenses obtenues. [Mode d’emploi des cycles](docs/PROGRAM-CYCLES.md) · [Règles des trophées](docs/TROPHIES.md).
 
 ## Mise à jour programme personnel — PR 46
 
@@ -60,7 +64,7 @@ Le guide et ses réglages sont sauvegardés avec les données locales et le JSON
 
 ## Campagnes et historique
 
-Le **mode Voyage** permet de terminer un parcours natif ou un GPX en portions de 15/30/45/60 minutes, puis de le retrouver dans Quête. Carte, profil et lieux conservent les kilomètres du parcours entier. Cette première version utilise une position **simulée à 15 km/h** ; la distance mesurée sur le vélo reste distincte. Seules les portions achevées et enregistrées comptent. Les chevauchements ne multiplient pas la progression ; les XP du parcours sont attribués une seule fois en Voyage à sa fin, sans second bonus s’il existe déjà une séance classique complète à cette date. Suppression et restauration recalculent couverture, campagnes et trophées. Trois trophées Voyage complètent les récompenses ; le catalogue actuel compte **77 badges**, avec les carnets et trophées alsaciens. Voir [le guide Voyage](docs/VOYAGE.md).
+Le **mode Voyage** permet de terminer un parcours natif ou un GPX en portions de 15/30/45/60 minutes, puis de le retrouver dans Quête. Carte, profil et lieux conservent les kilomètres du parcours entier. Cette première version utilise une position **simulée à 15 km/h** ; la distance mesurée sur le vélo reste distincte. Seules les portions achevées et enregistrées comptent. Les chevauchements ne multiplient pas la progression ; les XP du parcours sont attribués une seule fois en Voyage à sa fin, sans second bonus s’il existe déjà une séance classique complète à cette date. Suppression et restauration recalculent couverture, campagnes et trophées. Trois trophées Voyage complètent les récompenses ; le catalogue actuel compte **83 badges**, avec les carnets et trophées alsaciens. Voir [le guide Voyage](docs/VOYAGE.md).
 
 Les coches reflètent les parcours réellement terminés, même réalisés dans le désordre. « Continuer » propose la première étape encore manquante. Une séance complète peut compter pour plusieurs campagnes qui contiennent le même parcours.
 

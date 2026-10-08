@@ -12,6 +12,28 @@
   --gold: #ffd166;
 }
 
+.programCycles { margin-bottom: 18px; }
+.programCycles > details { margin: 18px 0; }
+.cycleReport { padding-top: 14px; }
+.cycleReport details, .closedCycle { margin: 12px 0; }
+.cycleSetup { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
+.cycleSetup select { width: 100%; min-width: 0; white-space: normal; }
+.cycleWeekList { list-style: none; padding: 0; display: grid; gap: 8px; }
+.cycleWeekList li { display: flex; flex-wrap: wrap; gap: 8px 16px; justify-content: space-between; padding: 10px; background: rgba(255,255,255,.035); border-radius: 10px; }
+.cycleWeekList span { color: var(--muted); }
+.trophyCelebration { position: fixed; z-index: 100; inset: auto 24px calc(90px + env(safe-area-inset-bottom)) auto; width: min(440px, calc(100vw - 32px)); max-height: min(70dvh, 650px); overflow-y: auto; padding: 28px; border: 1px solid rgba(255,209,102,.65); border-radius: 26px; background: radial-gradient(ellipse at 50% 0,rgba(255,209,102,.18),transparent 60%),#11172a; box-shadow: 0 15px 65px #0009,0 0 35px rgba(255,209,102,.13); animation: trophy-arrival .45s ease-out; }
+.trophyMedal { width: 80px; height: 80px; margin: 0 auto 20px; display: grid; place-items: center; font-size: 2.8rem; border-radius: 50%; border: 1px solid var(--gold); background: linear-gradient(140deg,#ffd16630,#936cff20); box-shadow: 0 0 28px #ffd16625; }
+.trophyCelebration .eyebrow { color: var(--gold); }
+.trophyCelebration h2 { margin: 8px 0 18px; font-size: 1.3rem; }
+.trophyCelebration ul { list-style: none; padding: 0; display: grid; gap: 12px; }
+.trophyCelebration li { padding: 12px; background: #ffffff05; border-radius: 12px; }
+.trophyCelebration li p { color: #c3cde0; font-size: .85rem; line-height: 1.5; margin: 8px 0 0; }
+.trophyClose { position: absolute; top: 10px; right: 10px; min-width: 44px; min-height: 44px; font-size: 1.2rem; }
+.trophyCelebration .backupButtons { display: flex; flex-wrap: wrap; gap: 10px; }
+@keyframes trophy-arrival { from { opacity: 0; transform: translateY(20px) scale(.96); } to { opacity: 1; transform: none; } }
+@media (max-width: 600px) { .trophyCelebration { right: 16px; padding: 22px; } .cycleReport .reviewMetrics { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media (prefers-reduced-motion: reduce) { .trophyCelebration { animation: none; } }
+
 * { box-sizing: border-box; }
 html { background: var(--bg); }
 body { margin: 0; color: var(--text); background:

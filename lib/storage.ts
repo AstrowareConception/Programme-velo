@@ -1,4 +1,5 @@
 import { normalizeProgram, normalizePlans, normalizeHabits, normalizeJourneys } from "./adaptive-program";
+import { normalizeTimeline } from "./program-cycles";
 import { defaultPreferences, emptyState, currentProgramWeek, normalizeWeeklyGoals } from "./data";
 import type { AppState, Preferences } from "./types";
 import type { ClimbChallenge } from "./routes";
@@ -30,6 +31,7 @@ function normalizePreferences(value: unknown): Preferences {
     typeof raw[key] === "boolean" ? raw[key] as boolean : (defaultPreferences[key] ?? false);
   return {
     soundCues: bool("soundCues"),
+    trophyNotifications: Array.isArray(raw.trophyNotifications) ? [...new Set(raw.trophyNotifications.filter((id): id is string => typeof id === 'string' && id.length > 0 && id.length <= 150))] : undefined,
     voiceCues: bool("voiceCues"),
     haptics: bool("haptics"),
     keepScreenAwake: bool("keepScreenAwake"),
@@ -58,12 +60,14 @@ export function normalizeState(value: unknown): AppState {
     targetWaist: numberOrUndefined(rawProfile.targetWaist)
   };
 
+  const programTimeline = normalizeTimeline(value.programTimeline);
   return {
+    programTimeline,
     program: normalizeProgram(value.program),
     programPlans: normalizePlans(value.programPlans),
     habits: normalizeHabits(value.habits),
     journeys: normalizeJourneys(value.journeys),
-    weeklyGoals: normalizeWeeklyGoals(value.weeklyGoals, currentProgramWeek(profile.startDate)),
+    weeklyGoals: normalizeWeeklyGoals(value.weeklyGoals, currentProgramWeek(programTimeline?.active.startDate ?? profile.startDate)),
     profile,
     guidance: normalizeGuidance(value.guidance),
     voyage: isObject(value.voyage) && typeof value.voyage.routeId === "string" && value.voyage.routeId.length > 0
@@ -102,6 +106,7 @@ export function parseBackup(text: string): { state: AppState; customClimbs: Clim
   const candidate = wrapped ? parsed.state : parsed;
   if (!isObject(candidate) || !(isObject(candidate.profile) || Array.isArray(candidate.sessions) || Array.isArray(candidate.measurements))) throw new Error("Sauvegarde incomplète");
   if (("profile" in candidate && !isObject(candidate.profile)) || ("sessions" in candidate && !Array.isArray(candidate.sessions)) || ("measurements" in candidate && !Array.isArray(candidate.measurements))) throw new Error("Structure de sauvegarde invalide");
+  if (candidate.programTimeline !== undefined && !normalizeTimeline(candidate.programTimeline)) throw new Error('Cycles de programme invalides : sauvegarde refusée sans modifier les données locales.');
   return { state: normalizeState(candidate), customClimbs: wrapped && Array.isArray(parsed.customClimbs) ? parsed.customClimbs.filter(isObject) as unknown as ClimbChallenge[] : [] };
 
 }

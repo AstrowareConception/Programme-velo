@@ -34,9 +34,10 @@ export default defineConfig({
     ...(["mobile", "tablet"] as const).map(size => ({
       name: `${size}-webkit`,
       // Real WebKit rendering on the essential manual flows, not simulated BLE qualification.
-      testMatch: ["**/cloud-unconfigured.spec.ts", "**/short-workouts.spec.ts", "**/timed-trials.spec.ts", "**/accessibility.spec.ts", "**/coach-score.spec.ts", "**/session-journey.spec.ts", "**/session-persistence.spec.ts", "**/discovery.spec.ts", "**/support-diagnostic.spec.ts", "**/backup-transfer.spec.ts"],
+      testMatch: ["**/program-cycles.spec.ts", "**/trophy-rewards.spec.ts", "**/cloud-unconfigured.spec.ts", "**/short-workouts.spec.ts", "**/timed-trials.spec.ts", "**/accessibility.spec.ts", "**/coach-score.spec.ts", "**/session-journey.spec.ts", "**/session-persistence.spec.ts", "**/discovery.spec.ts", "**/support-diagnostic.spec.ts", "**/backup-transfer.spec.ts"],
       use: {
         browserName: "webkit" as const,
+        launchOptions: process.env.WEBKIT_PATH ? { executablePath: process.env.WEBKIT_PATH } : undefined,
         viewport: size === "tablet" ? { width: 1024, height: 768 } : { width: 390, height: 844 },
         isMobile: true,
         hasTouch: true

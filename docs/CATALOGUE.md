@@ -1,6 +1,6 @@
 # VéloQuest — Le catalogue complet
 
-**52 séances · 84 parcours · 22 campagnes · 6 programmes · 77 badges**
+**52 séances · 84 parcours · 22 campagnes · 6 programmes · 83 badges**
 
 Choisis une séance, une destination ou une collection à explorer. Ce catalogue complète la [présentation illustrée](PRESENTATION.md) et répertorie le contenu embarqué vérifié le 7 octobre 2026, version `1147628`. Les GPX et carnets personnels viennent ensuite enrichir ta propre sélection.
 
@@ -359,15 +359,21 @@ Trois ou quatre séances complémentaires, sans calendrier imposé ; une séance
 
 <a id="badges"></a>
 
-## Les 77 badges
+## Les 83 badges
 
-De la première séance aux grandes traversées, les badges racontent plusieurs formes de progression. Les objectifs corporels sont facultatifs. Les seuils décrivent des conditions de déblocage, jamais des résultats garantis.
+De la première séance aux grandes traversées, les badges racontent plusieurs formes de progression. Les objectifs corporels sont facultatifs. Les seuils décrivent des conditions de déblocage, jamais des résultats garantis. Les semaines de régularité vont du lundi au dimanche et laissent des jours de repos. [Notifications et règles détaillées](TROPHIES.md).
 
 <details>
-<summary>Afficher les 77 badges et leurs conditions</summary>
+<summary>Afficher les 83 badges et leurs conditions</summary>
 
 | Badge | Comment le débloquer |
 | --- | --- |
+| 🌱 Trois rendez-vous | Enregistrer du vélo pendant 3 jours consécutifs, y compris facile ou micro-séance. |
+| 🌟 Sept jours en selle | Enregistrer du vélo pendant 7 jours consécutifs, sans intensité imposée. |
+| 🌿 Routine naissante | Enchaîner 2 semaines civiles avec du vélo au moins 3 jours par semaine. |
+| 🗓️ Un mois de rendez-vous | Enchaîner 4 semaines civiles avec du vélo au moins 3 jours par semaine. |
+| 💎 Le rythme s’installe | Enchaîner 8 semaines civiles avec du vélo au moins 3 jours par semaine. |
+| 🏆 Fidèle au rendez-vous | Enchaîner 12 semaines civiles avec du vélo au moins 3 jours par semaine. |
 | 🧳 Première escale | Achever et enregistrer une première portion en mode Voyage. |
 | 🏁 Au bout du voyage | Couvrir un parcours entier en une ou plusieurs portions Voyage, sans kilomètre manquant. |
 | 📖 Voyages au long cours | Achever trois parcours différents en mode Voyage. |

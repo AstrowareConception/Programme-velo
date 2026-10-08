@@ -13,7 +13,7 @@
 
 Proposition explicite pour une semaine à la fois, sans modification silencieuse des objectifs existants. Semaines 1–2 faciles ; ensuite variété facile/modérée. Semaines 4, 8, 12 allégées ; allègement aussi après interruption de dix jours, deux retours récents nettement au-dessus du RPE visé ou un effort déclaré très élevé. Aucun rattrapage automatique, aucune augmentation automatique du volume et aucune séance maximale prescrite. La durée est bornée par la disponibilité (10–60 min), avec réduction de cinq minutes pour une semaine douce. Les séances sous dix minutes restent des compléments au catalogue.
 
-Le planning reflète les jours disponibles dans chaque semaine ancrée sur la date de début du programme. Une coche signifie une séance complète du modèle prévu, enregistrée au jour prévu. Les séances libres ou déplacées sans changer le planning restent dans le bilan. Les autres semaines ne sont pas recalculées à la confirmation. La semaine 12 clôt ce premier cycle ; un renouvellement complet de cycle reste à concevoir.
+Le planning reflète les jours disponibles dans chaque semaine ancrée sur la date de début du programme. Une coche signifie une séance complète du modèle prévu, enregistrée au jour prévu. Les séances libres ou déplacées sans changer le planning restent dans le bilan. Les autres semaines ne sont pas recalculées à la confirmation. La semaine 12 ouvre le bilan du cycle. Le renouvellement et la reprise douce sont désormais disponibles avec historique conservé : voir [Cycles et reprise](PROGRAM-CYCLES.md).
 
 Le coach express tient compte des écarts de ressenti et des interruptions. Les points manquants ne poussent plus sa sélection vers une charge supérieure. Les RPE de référence sont des consignes pondérées par la durée, pas des mesures physiologiques. Le mode perte de poids est centré sur l’adhésion et le suivi, sans estimation de kilogrammes à partir des calories.
 
@@ -21,13 +21,13 @@ Le coach express tient compte des écarts de ressenti et des interruptions. Les 
 
 Dix séances : Reprendre doucement (10), Retrouver ses repères (20), Le métronome (15), La ligne tranquille (25), Garder une réserve (20), Finir avec aisance (30), Petites bosses, rythme stable (18), Un peu plus longtemps (35), Six minutes de précision (6), Huit minutes ondulées (8).
 
-Trois programmes : Retour en selle (+100 XP uniques), L’art de la régularité (+100), Gérer sa réserve (+160). Catalogue désormais à six programmes et 77 badges. Les deux nouveaux express rapportent 0,5 point chacun.
+Trois programmes : Retour en selle (+100 XP uniques), L’art de la régularité (+100), Gérer sa réserve (+160). Catalogue à six programmes ; les six trophées de régularité du 8 octobre portent la galerie à 83 badges. Les deux nouveaux express rapportent 0,5 point chacun.
 
 Défis de maîtrise sans XP additionnel : trois séances distinctes à ≥90 % ; combo ≥60 s ; seconde moitié au moins aussi précise que la première sur les deux exercices de gestion (première moitié ≥80 %, couverture de chaque plateau ≥80 %). Séance complète, réglages constants, score non provisoire requis. Aucun classement physiologique.
 
 ## Données et transfert
 
-Les nouveaux champs optionnels `program`, `programPlans`, `habits`, `journeys` sont normalisés à l’import et inclus dans le JSON v3. Les sauvegardes anciennes restent lisibles. Les historiques ne sont pas recalculés aux nouveaux tarifs. Les références de GPX manquants sont conservées. La copie et le partage JSON demeurent le moyen de transfert entre appareils ; aucune synchronisation distante ni compte utilisateur n’est activé.
+Les nouveaux champs optionnels `program`, `programPlans`, `habits`, `journeys` sont normalisés à l’import et inclus dans le JSON v3. Les sauvegardes anciennes restent lisibles. Les historiques ne sont pas recalculés aux nouveaux tarifs. Les références de GPX manquants sont conservées. La copie et le partage JSON restent disponibles. Une [synchronisation Firebase facultative](FIREBASE-SETUP.md) a depuis été livrée et configurée par l’utilisateur ; ses préférences et sa séance active restent locales.
 
 ## Repères et limites
 
@@ -38,4 +38,4 @@ Les repères de population ne deviennent pas une obligation immédiate de durée
 
 ## Suites distinctes
 
-Synchronisation distante : nécessite choix et configuration d’une authentification et d’un stockage, puis gestion des conflits, suppressions et restauration. Pas de service configuré dans ce dépôt. Packs Grandes Alpes et Ardèche, extension photographique sous licences compatibles, validation professionnelle des progressions et nouveau cycle après semaine 12 restent à développer. Ils ne sont pas annoncés comme livrés.
+La synchronisation et les cycles renouvelables disposent désormais de leur socle. Packs Grandes Alpes et Ardèche, extension photographique sous licences compatibles et validation professionnelle des progressions restent à développer. Ils ne sont pas annoncés comme livrés.

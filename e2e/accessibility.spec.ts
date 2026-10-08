@@ -318,6 +318,9 @@ test("the first-use guide keeps keyboard focus and enlarged choices through the 
   await reader.getByRole("button", { name: /Valider la quête/ }).press("Enter");
   await expect(reader).toHaveCount(0);
   await expect(page.locator(".bottomNav button.active")).toBeFocused();
+  const firstReward = page.getByRole('complementary', { name: 'Récompense obtenue' });
+  await expect(firstReward).toContainText('Premier tour de roue');
+  await firstReward.getByRole('button', { name: 'Continuer', exact: true }).click();
   await page.reload();
   const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("veloquest:v1")!));
   expect(saved.sessions).toHaveLength(1);

@@ -2,6 +2,16 @@
  * Change an id only for a new user-facing release, never for a rebuild. */
 export const releases = [
   {
+    id: "2026-10-cycles-trophies", date: "2026-10-08", label: "8 octobre 2026",
+    title: "Une nouvelle étape, de nouveaux trophées",
+    summary: "Renouvelle ton cycle sans perdre ton histoire et savoure chaque récompense.",
+    changes: [
+      { title: "Ton programme continue", text: "Dans Quête, consulte le bilan du cycle, puis prépare un nouveau départ ou une reprise douce. Tu vérifies l’objectif et les disponibilités avant de confirmer ; séances, mesures et XP restent conservés." },
+      { title: "Six rendez-vous avec la régularité", text: "Trois ou sept jours consécutifs, puis deux, quatre, huit ou douze semaines avec du vélo au moins trois jours par semaine. Les séances faciles comptent et les semaines laissent des jours de repos." },
+      { title: "Le plaisir de la récompense", text: "Une notification animée annonce tes nouveaux trophées après l’enregistrement, avec un petit son si les sons sont activés. Retrouve-les dans Plus ; les nouveaux trophées reconnaissent aussi ton historique." }
+    ]
+  },
+  {
     id: "2026-10-cloud-foundation", date: "2026-10-08", label: "8 octobre 2026",
     title: "Ton suivi peut voyager avec toi",
     summary: "Un espace de sauvegarde et de synchronisation facultatif, prêt à être activé sur cette installation.",

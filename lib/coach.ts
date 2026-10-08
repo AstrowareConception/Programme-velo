@@ -1,6 +1,7 @@
 import { recentFeedback, targetRpe } from "./adaptive-program";
 import type { AppState, WeekTarget, WorkoutTemplate } from "./types";
 import { guidanceSessions } from "./onboarding";
+import { cycleElapsedDays } from "./program-calendar";
 
 export type CoachEnergy = "easy" | "normal" | "hard";
 
@@ -65,7 +66,9 @@ export function recommendAdaptiveWorkout({
   const discovering = state.guidance?.status === "active" && guidanceSessions(state, now).length < 3;
 
   const feedback = recentFeedback(state, workouts, now);
+  const cycleRecovery = !!state.programTimeline && (state.programTimeline.active.goal === 'maintain' || (state.programTimeline.active.returning && cycleElapsedDays(state, now) < 14));
   const recoveryNeeded =
+    cycleRecovery ||
     feedback.difficult || feedback.returnAfterBreak ||
     discovering ||
     energy === "easy" ||
@@ -111,6 +114,7 @@ export function recommendAdaptiveWorkout({
   const reasons: string[] = [];
 
   if (recoveryNeeded) {
+    if (cycleRecovery) reasons.push("Ton cycle privilégie actuellement des séances faciles, sans rattrapage.");
     if (feedback.difficult) reasons.push("Ton ressenti a dépassé les consignes récentes : une séance plus facile est proposée.");
     if (feedback.returnAfterBreak) reasons.push("Après une interruption, retrouve tes repères sans rattrapage.");
     if (discovering) reasons.push("Tes trois premiers repères se construisent avec des séances faciles.");
@@ -136,7 +140,7 @@ export function recommendAdaptiveWorkout({
     .map((session) => session.rpe as number);
   const sameWorkoutAvgRpe = average(sameWorkoutRpe);
   const suggestedResistanceDelta: -1 | 0 | 1 =
-    discovering ? 0 :
+    discovering || cycleRecovery ? 0 :
     sameWorkoutRpe.length >= 2 && sameWorkoutAvgRpe !== undefined && sameWorkoutAvgRpe < (targetRpe(workout) ?? 4) - 1 ? 1 :
     sameWorkoutRpe.length >= 2 && sameWorkoutAvgRpe !== undefined && sameWorkoutAvgRpe > (targetRpe(workout) ?? 4) + 1.5 ? -1 : 0;
 

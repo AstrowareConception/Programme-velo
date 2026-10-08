@@ -4,6 +4,7 @@ import type { AppState, WorkoutTemplate } from '@/lib/types';
 import { recentFeedback, sessionsInWeek, sessionDebrief, weightTrend, weekDates, type HabitDay } from '@/lib/adaptive-program';
 import { cadenceSummary } from '@/lib/effort';
 import { localInputDate } from '@/lib/dates';
+import { programStartDate } from '@/lib/program-calendar';
 export function WeeklyReview({state,week,workouts,onHabits}: {state:AppState;week:number;workouts:WorkoutTemplate[];onHabits:(entry:HabitDay)=>void}) {
   const [reviewWeek,setReviewWeek]=useState(week);
   const [notice,setNotice]=useState('');
@@ -18,7 +19,7 @@ export function WeeklyReview({state,week,workouts,onHabits}: {state:AppState;wee
   const trend=weightTrend(state);
   const today=localInputDate();
   const habit=state.habits?.find(h=>h.date===today);
-  const dateKeys=new Set(weekDates(state.profile.startDate,reviewWeek).map(d=>localInputDate(d)));
+  const dateKeys=new Set(weekDates(programStartDate(state),reviewWeek).map(d=>localInputDate(d)));
   const habits=(state.habits??[]).filter(h=>dateKeys.has(h.date) && h.date<=today);
   return <section className="card weeklyReview" aria-label="Bilan et habitudes"><p className="eyebrow">PROGRESSER DANS LA DURÉE</p><h2>Mon bilan</h2>
     <label>Semaine du bilan<select value={reviewWeek} onChange={e=>setReviewWeek(Number(e.target.value))}>{Array.from({length:week},(_,i)=>i+1).map(w=><option key={w} value={w}>Semaine {w}{w===week?' · en cours':''}</option>)}</select></label>

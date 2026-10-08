@@ -1,6 +1,18 @@
 # État de reprise VéloQuest — actualisé le 8 octobre 2026
 
-## Lot actif — sauvegarde et synchronisation Firebase, 8 octobre 2026
+## Lot actif — cycles renouvelables et trophées, 8 octobre 2026
+
+Base observée `9451be7e5bc7847e7c1bf9484dcb642671550baf` (PR 66), main et production vérifiés ; aucune PR ouverte à la reprise. Branche `feat/program-cycles`. L’utilisateur confirme la configuration Firebase et une synchronisation réelle concluante entre ses appareils, puis autorise la suite des cycles et demande davantage de trophées avec notification et son.
+
+Réalisé : calendrier optionnel de cycles, bilans actuels et archivés, objectifs et plannings historiques conservés, nouveau départ confirmé et reprise douce deux semaines. Séances, mesures et XP préservés ; séparation des séances par instant de départ, y compris le même jour. Choix atomique du cycle/planning/objectifs lors d’un conflit cloud. Refus local laissant la proposition ouverte. [Guide des cycles](PROGRAM-CYCLES.md).
+
+Six nouveaux trophées portent la galerie à 83 : 3/7 jours consécutifs, 2/4/8/12 semaines avec trois jours actifs par semaine. Notification groupée dorée, son/haptique suivant les préférences, réduction des animations, attente des séances/formulaires protégés et mémorisation locale des annonces. Reprise de l’historique ancien sans rejouer les 77 anciennes notifications. [Règles](TROPHIES.md).
+
+Checkpoint de validation : 278 tests unitaires et 20 parcours ciblés Chromium/WebKit réussis avant les derniers compléments premier lancement/petit écran. TypeScript, garde-fous et build réussis. Recette complète, émulateurs et CI finale en cours ; la PR conserve le head exact, les résultats finaux, la fusion et la preuve de publication. Ne pas annoncer une livraison avant ces vérifications.
+
+Limites : jours calendaires locaux sensibles au fuseau, bilans recalculés après correction de l’historique, préférences d’annonce propres à chaque appareil ; audio sous les restrictions du navigateur. Pas de bilan mensuel, pas de qualification VoiceOver/Bluefy physique supplémentaire. Prochaine action : finir la recette multi-appareils/petit écran, publier le lot, puis recueillir le retour utilisateur sur les récompenses et cycles.
+
+## Lot clos — sauvegarde et synchronisation Firebase, PR 66
 
 Base vérifiée `57c53a9232cee12e361b0a1e471497251f258a2b`, PR 65 publiée ; aucune PR ouverte à la reprise. Le lot séances courtes est clos : 252 unités, 414 scénarios navigateur et version publique vérifiés. Branche `feat/firebase-sync`.
 
@@ -8,9 +20,9 @@ Autorisation : réaliser tout le socle applicatif Firebase, puis fournir à l’
 
 Réalisé : connexion e-mail/mot de passe avec vérification et récupération ; consentement ; versions cloud immuables, fragments et intégrité SHA-256 ; fusion à trois versions des éléments identifiés, conflits modification/suppression explicites ; sauvegardes avant fusion/restauration ; file d’envoi IndexedDB durable et idempotente ; transaction Firestore conditionnée par le head ; journal local pour l’installation état/parcours/référence ; écran d’export de secours. Authentification et compte isolés, préférences et séance active locales, imports historiques préservés. Règles et index livrés, notice de confidentialité, guide utilisateur et [tutoriel de configuration](FIREBASE-SETUP.md) actualisés.
 
-Validation locale réussie : TypeScript, contrôles statiques, 267 tests unitaires, 7 tests des règles/SDK dans les émulateurs officiels, 8 scénarios cloud à deux contextes Chromium/WebKit et 12 scénarios sans configuration cloud/récupération/notes de version. Builds configuré et non configuré réussis. Les premières recettes ont révélé un fixture ouvrant le guide, le rafraîchissement après vérification d’e-mail et le formulaire revenant à la création après déconnexion ; corrigés. La file d’envoi traite aussi les modifications locales survenues pendant un envoi acquitté tardivement. Résultats finaux, head testé, CI et publication à consigner dans la PR avant de déclarer la livraison.
+Validation locale réussie : TypeScript, contrôles statiques, 267 tests unitaires, 7 tests des règles/SDK dans les émulateurs officiels, 8 scénarios cloud à deux contextes Chromium/WebKit et 12 scénarios sans configuration cloud/récupération/notes de version. Builds configuré et non configuré réussis. Les premières recettes ont révélé un fixture ouvrant le guide, le rafraîchissement après vérification d’e-mail et le formulaire revenant à la création après déconnexion ; corrigés. La file d’envoi traite aussi les modifications locales survenues pendant un envoi acquitté tardivement. PR 66 fusionnée et publiée sur `9451be7e5bc7847e7c1bf9484dcb642671550baf` ; CI main et production vérifiées à la reprise. La PR conserve les résultats finaux. L’utilisateur confirme ensuite la configuration et la synchronisation réelle entre ses appareils.
 
-Limites explicites : 3 Mio par version ; 30 versions listées, toutes conservées ; copie complète par version, quotas à surveiller ; pas de purge automatique ni corbeille par élément, restauration par version ; effacement définitif par administrateur documenté. Pas de chiffrement de bout en bout, ni promesse de synchronisation PWA fermée. Validation du projet réel et essai Bluefy après configuration utilisateur. Suite : terminer cette validation, publier le socle puis laisser l’utilisateur configurer Firebase selon le tutoriel.
+Limites explicites : 3 Mio par version ; 30 versions listées, toutes conservées ; copie complète par version, quotas à surveiller ; pas de purge automatique ni corbeille par élément, restauration par version ; effacement définitif par administrateur documenté. Pas de chiffrement de bout en bout, ni promesse de synchronisation PWA fermée. Validation du projet réel et essai Bluefy après configuration utilisateur. Configuration réalisée par l’utilisateur et essai multi-appareils concluant. Suite : quotas/rétention et retours d’usage, selon les besoins.
 
 ## Référence historique — séances courtes, 8 octobre 2026
 
