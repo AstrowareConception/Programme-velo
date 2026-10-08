@@ -122,12 +122,12 @@ test("320 pixel manual journey keeps the review usable and preserves a parked se
 });
 
 async function seedSecondaryDialogs(page: Page) {
-  await page.addInitScript(() => localStorage.setItem("veloquest:v1", JSON.stringify({
+  await page.addInitScript(() => { if (!localStorage.getItem("veloquest:v1")) localStorage.setItem("veloquest:v1", JSON.stringify({
     profile: { name: "Fenêtres QA", startDate: "2026-10-01" }, measurements: [],
     sessions: [{ id: "dialog-history", templateId: "recovery-30", date: "2026-10-02T12:00:00Z",
       duration: 30, xp: 35, points: 1, intensity: "easy", kind: "recovery", bonus: false, note: "Séance conservée" }],
     preferences: { soundCues: false, voiceCues: false, haptics: false, keepScreenAwake: false }
-  })));
+  })); });
   await page.goto("/");
   await expect(page.locator(".hero")).toBeVisible();
 }
@@ -228,4 +228,104 @@ test("journal detail traps focus, closes by Escape or backdrop and returns safel
   await expect(dialog).toHaveCount(0);
   await expect(page.locator(".bottomNav button.active")).toBeFocused();
   expect(await page.evaluate(() => document.body.style.overflow)).toBe("");
+});
+
+test("profile edits survive Escape, backdrop, rotation and storage refusal before saving", async ({ page }, info) => {
+  await seedSecondaryDialogs(page);
+  await page.getByRole("button", { name: /••• Plus/ }).click();
+  const opener = page.getByRole("button", { name: "Modifier le profil et les objectifs" });
+  await opener.focus(); await page.keyboard.press("Enter");
+  const dialog = page.getByRole("dialog", { name: "Profil et objectifs", exact: true });
+  await checkDialogKeyboard(page, dialog);
+  await dialog.getByLabel("Prénom ou pseudo").fill("Profil modifié");
+  await dialog.getByLabel("Objectif poids", { exact: true }).fill("90.5");
+  await page.keyboard.press("Escape");
+  await expect(dialog.getByRole("button", { name: "Fermer le profil" })).toBeFocused();
+  await expect(dialog.getByLabel("Prénom ou pseudo")).toHaveValue("Profil modifié");
+  await page.locator(".auxiliaryBackdrop").click({ position: { x: 2, y: 2 } });
+  await expect(dialog).toBeVisible();
+  await page.setViewportSize({ width: 320, height: 740 });
+  await page.addStyleTag({ content: "html { font-size:200% !important; }" });
+  await noHorizontalOverflow(dialog);
+  await expect(dialog.getByLabel("Objectif poids", { exact: true })).toHaveValue("90.5");
+  await page.screenshot({ path: info.outputPath("profil-texte-200-320.png") });
+  await page.setViewportSize({ width: 960, height: 600 });
+  await noHorizontalOverflow(dialog);
+  await page.evaluate(() => {
+    const write = Storage.prototype.setItem;
+    (window as typeof window & { restoreProfileStorage?: () => void }).restoreProfileStorage = () => { Storage.prototype.setItem = write; };
+    Storage.prototype.setItem = function(key, value) {
+      if (key === "veloquest:v1") throw new DOMException("Quota QA", "QuotaExceededError");
+      write.call(this, key, value);
+    };
+  });
+  await dialog.getByRole("button", { name: "Enregistrer mon profil" }).press("Enter");
+  await expect(dialog.getByRole("alert")).toContainText("Tes saisies restent ici");
+  await expect(dialog.getByLabel("Prénom ou pseudo")).toHaveValue("Profil modifié");
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem("veloquest:v1")!).profile.name)).toBe("Fenêtres QA");
+  await page.evaluate(() => (window as typeof window & { restoreProfileStorage: () => void }).restoreProfileStorage());
+  await dialog.getByRole("button", { name: "Réessayer l’enregistrement du profil" }).press("Enter");
+  await expect(dialog).toHaveCount(0); await expect(opener).toBeFocused();
+  await page.reload();
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("veloquest:v1")!));
+  expect(saved.profile).toMatchObject({ name: "Profil modifié", targetWeight: 90.5 });
+  expect(saved.sessions).toHaveLength(1); expect(saved.sessions[0].note).toBe("Séance conservée");
+  expect(saved.measurements).toEqual([]);
+});
+
+test("the first-use guide keeps keyboard focus and enlarged choices through the first saved session", async ({ page }, info) => {
+  await page.clock.install();
+  await page.goto("/");
+  const guide = page.getByRole("dialog");
+  await expect(guide).toHaveAccessibleName("Bienvenue, commençons simplement.");
+  await expect(guide.locator("h2")).toBeFocused();
+  await page.setViewportSize({ width: 320, height: 740 });
+  await page.addStyleTag({ content: "html { font-size:200% !important; }" });
+  await noHorizontalOverflow(guide);
+  const first = guide.getByLabel(/Prénom ou pseudo/);
+  await first.focus(); await page.keyboard.press("Shift+Tab");
+  await expect(guide.getByRole("button", { name: "Explorer librement" })).toBeFocused();
+  await page.keyboard.press("Tab"); await expect(first).toBeFocused();
+  await first.fill("Découverte clavier");
+  await guide.getByLabel("Ce qui te donne envie").selectOption("explore");
+  await guide.getByRole("button", { name: "Continuer", exact: true }).press("Enter");
+  await expect(guide.locator("h2")).toBeFocused();
+  await guide.getByLabel("Temps habituel pour une séance").selectOption("25");
+  await guide.getByRole("button", { name: "Retour", exact: true }).press("Enter");
+  await expect(first).toHaveValue("Découverte clavier");
+  await page.setViewportSize({ width: 960, height: 600 });
+  await noHorizontalOverflow(guide);
+  await guide.getByRole("button", { name: "Continuer", exact: true }).press("Enter");
+  await expect(guide.getByLabel("Temps habituel pour une séance")).toHaveValue("25");
+  await guide.getByRole("button", { name: "Continuer", exact: true }).press("Enter");
+  await guide.getByLabel("Un son aux changements de segment").uncheck();
+  await guide.getByRole("button", { name: "Continuer", exact: true }).press("Enter");
+  await expect(guide.locator("h2")).toBeFocused();
+  await noHorizontalOverflow(guide);
+  await page.screenshot({ path: info.outputPath("demarrage-texte-200-paysage.png") });
+  await guide.getByRole("button", { name: "Préparer ma première séance", exact: true }).press("Enter");
+  const reader = page.getByRole("dialog");
+  await expect(reader).toHaveAccessibleName("Préparer la séance");
+  await expect(reader.locator("h2").first()).toBeFocused();
+  await reader.getByRole("button", { name: "Démarrer la séance" }).press("Enter");
+  await page.clock.fastForward(16 * 60 * 1000);
+  await expect(reader).toHaveAccessibleName("Bilan de séance");
+  await reader.getByLabel("Note", { exact: true }).fill("Première séance au clavier");
+  await reader.getByLabel("J’ai vérifié le bilan et les champs facultatifs.").check();
+  await reader.getByRole("button", { name: /Valider la quête/ }).press("Enter");
+  await expect(reader).toHaveCount(0);
+  await expect(page.locator(".bottomNav button.active")).toBeFocused();
+  await page.reload();
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("veloquest:v1")!));
+  expect(saved.sessions).toHaveLength(1);
+  expect(saved.sessions[0]).toMatchObject({ note: "Première séance au clavier", metrics: { completedWorkout: true } });
+  expect(saved.profile.name).toBe("Découverte clavier"); expect(saved.guidance.sessionMinutes).toBe(25);
+  await page.getByRole("button", { name: /••• Plus/ }).click();
+  await page.getByRole("button", { name: "Revoir le guide de démarrage" }).press("Enter");
+  await expect(guide.locator("h2")).toBeFocused();
+  await expect(guide.getByLabel(/Prénom ou pseudo/)).toHaveValue("Découverte clavier");
+  await page.keyboard.press("Escape");
+  await expect(guide).toHaveCount(0);
+  await expect(page.locator(".bottomNav button.active")).toBeFocused();
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem("veloquest:v1")!).guidance.goal)).toBe("explore");
 });

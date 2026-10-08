@@ -13,7 +13,7 @@ function focusTitle(dialog: HTMLElement) {
 }
 
 /** Keep the same reader mounted through preparation, riding, review and rotation. */
-export function useSessionDialog(ref: RefObject<HTMLDivElement | null>, open: boolean, phase: string, onEscape?: () => void) {
+export function useSessionDialog(ref: RefObject<HTMLElement | null>, open: boolean, phase: string, onEscape?: () => void) {
   const escapeHandler = useRef(onEscape);
   useEffect(() => { escapeHandler.current = onEscape; }, [onEscape]);
   useEffect(() => {
@@ -25,7 +25,7 @@ export function useSessionDialog(ref: RefObject<HTMLDivElement | null>, open: bo
     const overflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const background = new Map<HTMLElement, boolean>();
-    // The backdrop is inside <main>; hide its siblings without hiding the dialog itself.
+    // Hide siblings of the backdrop/container without hiding the dialog itself.
     let branch: HTMLElement = dialog.parentElement!;
     while (branch.parentElement) {
       for (const sibling of branch.parentElement.children) {
@@ -79,7 +79,7 @@ export function useSessionDialog(ref: RefObject<HTMLDivElement | null>, open: bo
         pendingOpener = null;
         if (ref.current?.isConnected) return;
         // A newly mounted dialog owns focus; the old dialog must not steal it.
-        if (document.querySelector('[role="dialog"][aria-modal="true"]')) return;
+        if (document.querySelector('[role="dialog"][aria-modal="true"], dialog[open]')) return;
         if (opener?.isConnected && opener !== document.body && !opener.closest("[inert]")) opener.focus();
         else document.querySelector<HTMLElement>(".bottomNav button.active")?.focus();
       });

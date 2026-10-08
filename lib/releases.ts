@@ -7,9 +7,10 @@ export const releases = [
     summary: "Six défis au départ lancé et un score qui suit vraiment ta cadence.",
     changes: [
       { title: "Distance ou chrono ?", text: "Dans Séances, parcours la plus grande distance en 1, 5 ou 12 minutes, ou termine 1, 5 ou 10 km au meilleur temps. Prends ton élan pendant le compte à rebours de cinq secondes." },
-      { title: "Deux résultats distincts", text: "Le score V2 dépend de ta cadence, avec un combo quand tu tiens la cible. La note reste fondée sur la régularité. Les cartes affichent les deux ; les anciens résultats sont conservés hors nouveaux records." },
+      { title: "Deux résultats distincts", text: "Le score dépend de ta cadence, avec un combo quand tu tiens la cible. La note reste fondée sur la régularité. Les cartes affichent les deux ; les anciens résultats sont conservés hors nouveaux records." },
       { title: "Tes mesures dans le défi", text: "Vitesse instantanée en km/h, cadence, watts et fréquence cardiaque reçus du vélo accompagnent l’élan puis le chrono. Une mesure absente ou ancienne devient un tiret. Le bilan et l’historique indiquent la vitesse moyenne calculée hors élan." },
       { title: "Des fenêtres plus accessibles", text: "Secteurs, défis de parcours, Voyage et détail du journal gardent le clavier dans leur fenêtre. Échap les ferme et le focus revient au bouton d’ouverture, y compris après un passage au lecteur." },
+      { title: "Un profil protégé", text: "Le formulaire conserve tes saisies si l’enregistrement échoue et propose de réessayer. Échap revient au bouton de fermeture ; le profil reste ouvert. Le guide de démarrage garde aussi le clavier dans ses commandes." },
       { title: "Des records comparables", text: "Les résultats mesurés sont comparés sur le même nom de vélo et séparés des saisies déclarées. Coupure, compteur remis à zéro ou rechargement : pas de faux record." }
     ]
   },

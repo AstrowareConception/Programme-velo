@@ -1,4 +1,4 @@
-# Défis chrono et score cadence V2
+# Défis chrono et score cadence
 
 Dans **Séances → Défis chrono**, six épreuves complètent les parcours Time Attack, Segment Attack et défis calories :
 
@@ -37,7 +37,7 @@ Le bilan et l’historique affichent la **vitesse moyenne calculée** à partir 
 
 ## Points et note des séances guidées
 
-Le **score V2** est distinct de la **note** :
+Le **score** est distinct de la **note** :
 
 - Base : `cadence en tr/min ÷ 6` points par seconde. À 60 tr/min : 10 points/s ; à 75 : 12,5 points/s.
 - Dans la cible : combo ×2 après 10 secondes, ×3 après 20, ×4 après 30.
@@ -45,7 +45,7 @@ Le **score V2** est distinct de la **note** :
 - À zéro tr/min : zéro point. Pauses et mesures absentes ne rapportent rien.
 - Note : même pourcentage de temps mesuré dans la cible, même barème S à E.
 
-Les cartes affichent les points et la note du meilleur score comparable. Les classements choisissent les **points** à réglages et version identiques. Comme avant, séance complète, au moins 60 secondes mesurées et 80 % de couverture sont nécessaires. Les anciens scores V1 restent lisibles dans l’historique mais ne concurrencent pas V2 ; aucune séance ni XP n’est supprimé. Une ancienne séance en reprise reste V1, sans mélange des barèmes. Le score représente le jeu, pas la puissance ni l’énergie physiologique.
+Les cartes affichent les points et la note du meilleur score comparable. Les classements choisissent les **points** à réglages et version identiques. Comme avant, séance complète, au moins 60 secondes mesurées et 80 % de couverture sont nécessaires. Les anciens scores de l’ancien barème restent lisibles dans l’historique mais ne concurrencent pas le barème actuel ; aucune séance ni XP n’est supprimé. Une ancienne séance en reprise garde son ancien barème, sans mélange des barèmes. Le score représente le jeu, pas la puissance ni l’énergie physiologique.
 
 ## Recette
 

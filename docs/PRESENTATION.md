@@ -264,7 +264,7 @@ Si la page est rechargée ou la séance interrompue, la **reprise locale** perme
 
 ### La cadence devient un jeu de précision
 
-Avec une cadence mesurée, VéloQuest peut suivre le temps passé dans la cible et calculer un **score V2 proportionnel à la cadence**, une note de régularité indépendante, la couverture de mesure et des **combos**. Les séries de secondes régulières font monter le multiplicateur jusqu’à ×4. Tu travailles la maîtrise du geste autant que la motivation.
+Avec une cadence mesurée, VéloQuest peut suivre le temps passé dans la cible et calculer un **score proportionnel à la cadence**, une note de régularité indépendante, la couverture de mesure et des **combos**. Les séries de secondes régulières font monter le multiplicateur jusqu’à ×4. Tu travailles la maîtrise du geste autant que la motivation.
 
 Les records de points comparent les séances à réglages équivalents. Si les données sont insuffisantes, le score reste provisoire. Modifier cadence ou résistance ne permet pas de mélanger artificiellement des performances obtenues avec des consignes différentes.
 

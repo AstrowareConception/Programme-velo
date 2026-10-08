@@ -822,6 +822,10 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .onboardingDialog { width:min(560px,calc(100% - 28px)); max-height:calc(100dvh - 32px); overflow:auto; color:var(--text); background:#0c1222; border:1px solid rgba(80,227,255,.25); border-radius:24px; padding:28px; box-shadow:0 30px 100px rgba(0,0,0,.6); }
 .onboardingDialog::backdrop { background:rgba(3,5,10,.88); backdrop-filter:blur(8px); }
 .onboardingDialog h2 { font-size:1.65rem; line-height:1.2; margin:20px 0 14px; outline:none; }
+.onboardingDialog h2:focus-visible { outline:2px solid var(--cyan); outline-offset:4px; }
+.onboardingDialog { min-width:0; overflow-wrap:anywhere; }
+.onboardingForm :is(input, select), .setupModal :is(label, input) { min-width:0; max-width:100%; }
+.setupModal .formRow { grid-template-columns:repeat(auto-fit,minmax(min(100%,12rem),1fr)); }
 .onboardingDialog h3, .gettingStartedCard h3 { margin:10px 0; }
 .onboardingDialog p, .gettingStartedCard p { line-height:1.65; }
 .onboardingStep { color:var(--muted); font-size:.75rem; }
@@ -834,7 +838,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .onboardingForm .form p { margin:0; }
 .onboardingForm summary, .guideLesson summary { cursor:pointer; color:var(--cyan); font-size:.8rem; min-height:32px; }
 .optionalLabel { color:var(--muted); font-size:.7rem; font-weight:400; }
-.onboardingActions { display:flex; gap:10px; margin:22px 0 12px; }
+.onboardingActions { display:flex; flex-wrap:wrap; gap:10px; margin:22px 0 12px; }
 .onboardingActions .primary { flex:1; }
 .onboardingSkip { border:0; background:transparent; color:var(--muted); padding:12px 4px; min-height:44px; cursor:pointer; font:inherit; font-size:.78rem; text-decoration:underline; text-underline-offset:4px; }
 .onboardingForm > .onboardingSkip { width:100%; }
@@ -1311,6 +1315,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 /* Inert background content must not enlarge the mobile visual viewport. */
 .shell > [inert] { overflow-x:clip; }
 .shell[inert] { overflow-x:clip; }
+body:has(.onboardingDialog[open]) .shell { overflow-x:clip; }
 
 /* Timed events share the session dialog’s keyboard and mobile behavior. */
 .trialGrid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr)); gap:1rem; }
