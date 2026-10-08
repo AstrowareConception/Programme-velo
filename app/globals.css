@@ -1312,12 +1312,12 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .trialCard h3, .trialCard p { margin:0; }
 .trialCard button { margin-top:auto; white-space:normal; }
 .trialCard small { line-height:1.7; }
-.trialModal { max-width:850px; overflow-y:auto; }
+.trialModal { width:min(850px,calc(100vw - 32px)); max-width:850px; max-height:calc(100dvh - 32px); overflow-y:auto; }
 .trialModal label { display:flex; flex-direction:column; gap:.5rem; margin:1rem 0; }
 .trialModal label.check { flex-direction:row; align-items:center; }
-.trialClock { display:flex; flex-direction:column; text-align:center; padding:2rem 0; }
+.trialClock { display:flex; flex-direction:column; text-align:center; padding:1rem 0; }
 .trialClock strong { font-size:clamp(3rem,10vw,6rem); font-variant-numeric:tabular-nums; }
 .trialDistance { text-align:center; font-size:1.5rem; font-variant-numeric:tabular-nums; }
 .trialActions { display:flex; flex-wrap:wrap; gap:.75rem; margin-top:1rem; }
-.trialModal button.close { position:static; width:auto; height:auto; }
+.trialModal button.close { position:static; width:auto; height:auto; border-radius:12px; font:inherit; line-height:1.4; padding:.8rem 1.1rem; }
 .trialModal input, .trialModal select { max-width:100%; }

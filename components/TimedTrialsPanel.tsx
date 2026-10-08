@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { bestTrial, declareTrial, sampleTrial, startTrial, stopTrial, tickTrial, timedTrials, trialSession, trialValue, TRIAL_SNAPSHOT_KEY, type Trial, type TrialResult, type TrialRun } from "@/lib/timed-trials";
 import type { CompletedSession } from "@/lib/types";
 import { safeLocalStorageWrite } from "@/lib/storage";
@@ -95,7 +96,7 @@ export function TimedTrialsPanel({ sessions, deviceName, connected, reading, con
       return <article className="trialCard" key={t.id}><h3>{t.name}</h3><p>{t.kind === "time" ? `Distance maximale en ${t.target / 60} min` : `${t.target / 1000} km au meilleur temps`}</p><small>Record vélo : {measured ? trialValue(measured) : "à établir"}{connected ? ` · ${deviceName}` : " · connecte ton vélo"}<br />Record déclaré : {declared ? trialValue(declared) : "à établir"}</small><button className="secondary" disabled={disabled || !ready} onClick={() => { if (locked()) return; setSelected(t); setSource(connected ? "ftms" : "manual"); setDistance(""); setError(""); setReviewed(false); }}>Préparer · {t.name}</button></article>;
     })}</div>
     <p className="finePrint">Échauffe-toi avant l’épreuve. Ces défis comptent comme séances intenses. Distance issue de la console, jamais simulée ; rythme et résistance libres. Les notes et points du coach restent réservés aux séances guidées.</p>
-    {selected && <div className="modalBackdrop"><div ref={dialog} className="sessionModal trialModal" role="dialog" aria-modal="true" aria-label={selected.name} tabIndex={-1}>
+    {selected && createPortal(<div className="modalBackdrop"><div ref={dialog} className="sessionModal trialModal" role="dialog" aria-modal="true" aria-label={selected.name} tabIndex={-1}>
       <h2>{selected.name}</h2>
       {error && <p role="alert">{error}</p>}
       {snapshotError && <p role="alert">La sauvegarde de reprise est indisponible : garde cette fenêtre ouverte.</p>}
@@ -123,6 +124,6 @@ export function TimedTrialsPanel({ sessions, deviceName, connected, reading, con
         <label className="check"><input type="checkbox" checked={reviewed} onChange={e => setReviewed(e.target.checked)} /> J’ai vérifié le résultat du défi.</label>
         <div className="trialActions"><button className="primary" disabled={!reviewed} onClick={save}>Enregistrer le défi</button><button className="secondary close" onClick={close}>Abandonner sans enregistrer</button></div>
       </>}
-    </div></div>}
+    </div></div>, document.body)}
   </section>;
 }

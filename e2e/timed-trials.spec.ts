@@ -37,12 +37,18 @@ test("manual countdown, fixed duration, persistence and separate record", async 
  expect(session.intensity).toBe("hard"); expect(session.duration).toBe(1);
 });
 test("flying kilometre starts after countdown and interpolates measured finish", async ({page}, info) => {
+ if (info.project.name === "desktop-chromium") await page.setViewportSize({width:960,height:600});
  await setup(page, true, "Le kilomètre lancé");
  await packet(page, 500); await page.clock.runFor(4000); await packet(page, 900);
  await expect(page.locator(".trialDistance")).toContainText("0.000 km");
  await page.clock.runFor(1000); await packet(page, 1000);
  await page.clock.runFor(1000); await packet(page, 1300);
  await page.clock.runFor(1000); await packet(page, 1800);
+ await expect(page.locator(".trialDistance")).toBeVisible();
+ const stop = page.getByRole("button",{name:"Arrêter l’épreuve",exact:true});
+ const box = await stop.boundingBox();
+ expect(box!.y).toBeGreaterThanOrEqual(0); expect(box!.y + box!.height).toBeLessThanOrEqual(page.viewportSize()!.height);
+ expect(await stop.evaluate(el => { const r=el.getBoundingClientRect(); return el.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)); })).toBe(true);
  await page.screenshot({path:info.outputPath("flying-kilometre-live.png")});
  await page.clock.runFor(1000); await packet(page, 2200);
  await expect(page.getByLabel("Résultat du défi chrono")).toContainText("2.5 s");
