@@ -1,5 +1,7 @@
 "use client";
 
+import { TimedTrialsPanel, TrialSummary } from "@/components/TimedTrialsPanel";
+import { timedTrials } from "@/lib/timed-trials";
 import { CadenceCalibration } from "@/components/CadenceCalibration";
 import { AdaptiveProgram } from "@/components/AdaptiveProgram";
 import { WeeklyReview, SessionDebrief } from "@/components/WeeklyReview";
@@ -141,6 +143,8 @@ export function VeloQuestApp() {
     clearLocalData
   } = useLocalPersistenceController({ onToast: setToast });
   const [tab, setTab] = useState<Tab>("dashboard");
+  const [trialBusy, setTrialBusy] = useState(false);
+  const [trialReading, setTrialReading] = useState<{ distanceM: number; at: number }>();
   const [active, setActive] = useState<WorkoutTemplate | null>(null);
   const [activeClimb, setActiveClimb] = useState<ClimbChallenge | null>(null);
   const [routeMode, setRouteMode] = useState<RouteMode>("training");
@@ -215,6 +219,7 @@ export function VeloQuestApp() {
       calorieReading.current = undefined;
     },
     onTelemetry: (next) => {
+      if (next.distanceM !== undefined) setTrialReading({ distanceM: next.distanceM, at: Date.now() });
       if (next.totalEnergyKcal !== undefined) {
         const now = Date.now();
         calorieReading.current = { kcal: next.totalEnergyKcal, at: now };
@@ -284,7 +289,7 @@ export function VeloQuestApp() {
     onForeground: () => setForegroundNotice(true)
   });
   const preferences: Preferences = { ...defaultPreferences, ...(state.preferences ?? {}) };
-  useEffect(() => { pwa.setBusy(!hydrated || Boolean(active) || Boolean(bike) || connectingBike || diagnosingBike || showSetup || stateSaveFailed || routesSaveFailed); }, [hydrated, active, bike, connectingBike, diagnosingBike, showSetup, stateSaveFailed, routesSaveFailed, pwa.setBusy]);
+  useEffect(() => { pwa.setBusy(!hydrated || trialBusy || Boolean(active) || Boolean(bike) || connectingBike || diagnosingBike || showSetup || stateSaveFailed || routesSaveFailed); }, [hydrated, trialBusy, active, bike, connectingBike, diagnosingBike, showSetup, stateSaveFailed, routesSaveFailed, pwa.setBusy]);
   const screenWake = useScreenWakeLock(running && sessionStarted && preferences.keepScreenAwake);
 
   useEffect(() => { setFinishReviewed(false); }, [showFinish]);
@@ -464,7 +469,7 @@ export function VeloQuestApp() {
     });
   }, [allClimbs, routeSearch, routeThemeId, routeCategoryFilter, routeDifficultyFilter, routeFavoritesOnly, routeDuration, routeSort, favoriteRouteIds, state.sessions]);
   const selectedSession = selectedSessionId ? state.sessions.find((session) => session.id === selectedSessionId) : undefined;
-  const selectedTemplate = selectedSession ? workouts.find((w) => w.id === selectedSession.templateId) : undefined;
+  const selectedTemplate = selectedSession ? [...workouts, ...timedTrials].find((w) => w.id === selectedSession.templateId) : undefined;
   const selectedRoute = selectedSession ? allClimbs.find((c) => c.id === selectedSession.routeId) : undefined;
   const currentStreak = streak(state);
   const perfectWeek = isPerfectWeek(state, week);
@@ -1064,9 +1069,9 @@ export function VeloQuestApp() {
   function exportCsv() {
     const quote = (value: unknown) => `"${String(value ?? "").replaceAll('"', '""')}"`;
     const sessions = [
-      ["date","seance","duree_min","distance_km","calories","vitesse_moy","rpm_moy","watts_moy","fc_moy","rpe","source","voyage_debut_km","voyage_fin_km","voyage_portion_achevee","voyage_position","score_coach_pct","note_coach","couverture_pct","points_combo","meilleur_combo_s"],
+      ["date","seance","duree_min","distance_km","calories","vitesse_moy","rpm_moy","watts_moy","fc_moy","rpe","source","voyage_debut_km","voyage_fin_km","voyage_portion_achevee","voyage_position","score_coach_pct","note_coach","couverture_pct","points_combo","meilleur_combo_s","score_version"],
       ...state.sessions.map((session) => {
-        const template = workouts.find((w) => w.id === session.templateId);
+        const template = [...workouts, ...timedTrials].find((w) => w.id === session.templateId);
         const route = allClimbs.find((c) => c.id === session.routeId);
         return [
           session.date,
@@ -1088,7 +1093,8 @@ export function VeloQuestApp() {
           session.metrics?.cadenceScore ? cadenceSummary(session.metrics.cadenceScore).grade : undefined,
           session.metrics?.cadenceScore ? cadenceSummary(session.metrics.cadenceScore).coverage.toFixed(1) : undefined,
           session.metrics?.cadenceScore?.points,
-          session.metrics?.cadenceScore?.bestComboSeconds
+          session.metrics?.cadenceScore?.bestComboSeconds,
+          session.metrics?.cadenceScore?.version
         ];
       })
     ].map((row) => row.map(quote).join(";")).join("\n");
@@ -1333,6 +1339,7 @@ export function VeloQuestApp() {
         <section>
           <div className="pageHead pageHeadActions"><div><p className="eyebrow">CATALOGUE</p><h1>Choisis ta quête</h1><p>Du décrassage au HIIT. Le ressenti reste prioritaire sur le numéro de résistance.</p></div><button className="secondary" onClick={openManualLog}>+ Enregistrer une séance déjà faite</button></div>
           <p className="finePrint">Les formats express de moins de 10 min rapportent 0,5 point : des compléments à tes séances principales. Les bonus récupération restent à 0 point. Les points des séances déjà enregistrées sont conservés.</p>
+          {hydrated && !active && !resumeSnapshot && <TimedTrialsPanel sessions={state.sessions} deviceName={bike?.deviceName} connected={Boolean(bike)} reading={trialReading} connect={connectBike} onBusy={setTrialBusy} onSave={saveCompletedSession} disabled={Boolean(active) || Boolean(resumeSnapshot)} locked={pwa.locked} keepScreenAwake={preferences.keepScreenAwake} bikeError={bluetoothError} connecting={connectingBike} />}
           <MasteryPanel sessions={state.sessions} />
           <WorkoutProgramsPanel sessions={state.sessions} workouts={workouts} onLaunch={(workout) => launch(workout)} />
           <div className="workoutFilters">
@@ -1351,7 +1358,7 @@ export function VeloQuestApp() {
               <article className={`card workoutCard ${w.bonus ? "bonusCard" : ""}`} key={w.id}>
                 <div className="sectionHead"><span className={`intensity ${w.intensity}`}>{w.intensity === "easy" ? "FACILE" : w.intensity === "moderate" ? "SOUTENU" : "DUR"}</span><strong>{w.duration} min</strong></div>
                 <h2>{w.name}</h2><p>{w.tagline}</p>
-                <p className="workoutBest"><strong>{isCalorieWorkout(w.id) ? `Record vélo : ${kcalBike ? kcalBike.kcal.toFixed(0) + " kcal · " + kcalBike.deviceName : "à établir"}` : best ? `Record coach : ${score.grade} · ${score.percent?.toFixed(1)} %` : "Record coach : à établir"}</strong><small>{isCalorieWorkout(w.id) ? `Record déclaré : ${kcalManual ? kcalManual.kcal.toFixed(0) + " kcal" : "à établir"} · ${w.duration} min complètes` : "À tes réglages actuels · séance complète"}</small></p>
+                <p className="workoutBest"><strong>{isCalorieWorkout(w.id) ? `Record vélo : ${kcalBike ? kcalBike.kcal.toFixed(0) + " kcal · " + kcalBike.deviceName : "à établir"}` : best ? `Score V2 : ${Math.floor(best.metrics?.cadenceScore?.points ?? 0)} pts · Note ${score.grade} · ${score.percent?.toFixed(1)} %` : "Score V2 : à établir · Note : —"}</strong><small>{isCalorieWorkout(w.id) ? `Record déclaré : ${kcalManual ? kcalManual.kcal.toFixed(0) + " kcal" : "à établir"} · ${w.duration} min complètes` : "À tes réglages actuels · séance complète"}</small></p>
                 <div className="chips"><span>{quantity(w.points)} pt{w.points > 1 ? "s" : ""}</span><span>{w.xp} XP</span><span>{w.segments.length} segments</span></div>
                 <button className="secondary" onClick={() => launch(w)}>Voir / démarrer</button>
               </article>
@@ -1561,7 +1568,7 @@ export function VeloQuestApp() {
             <h2>Journal des séances</h2>
             <div className="sessionHistory">
               {[...state.sessions].sort((a,b) => b.date.localeCompare(a.date)).slice(0,20).map((session) => {
-                const template = workouts.find((w) => w.id === session.templateId);
+                const template = [...workouts, ...timedTrials].find((w) => w.id === session.templateId);
                 const route = allClimbs.find((c) => c.id === session.routeId);
                 return (
                   <button className="sessionHistoryRow" key={session.id} onClick={() => setSelectedSessionId(session.id)}>
@@ -1841,7 +1848,7 @@ export function VeloQuestApp() {
                 </header>
                 <div className="journeyBody">
                 <section className="journeyOverview" aria-label="Programme de la séance">
-                {previousCadenceBest && <p className="cadenceBest">Meilleur suivi à ces réglages : {cadenceSummary(previousCadenceBest.metrics?.cadenceScore).grade} · {cadenceSummary(previousCadenceBest.metrics?.cadenceScore).percent?.toFixed(1)} %</p>}
+                {previousCadenceBest && <p className="cadenceBest">Meilleur score à ces réglages : {Math.floor(previousCadenceBest.metrics?.cadenceScore?.points ?? 0)} pts · Note {cadenceSummary(previousCadenceBest.metrics?.cadenceScore).grade} · {cadenceSummary(previousCadenceBest.metrics?.cadenceScore).percent?.toFixed(1)} %</p>}
                 <p className="previewDescription">{activeVoyage ? `${active.tagline} · ≈ ${active.duration.toFixed(1)} min. Position simulée à 15 km/h, pauses libres. Les mesures FTMS sont enregistrées séparément et ne pilotent pas ce mode.` : scenicSession ? "RPE 2–4, résistance douce et pauses libres. Parcours entier, sans objectif de chrono : choisis selon la durée estimée et ton énergie." : activeClimb?.subtitle ?? active.description}</p>
                 <div className="previewStats">
                   <span><small>{(routeMode === "timeAttack" || routeMode === "segmentAttack") && activeClimb ? "Record" : "Durée"}</small><strong>{(routeMode === "timeAttack" || routeMode === "segmentAttack") && activeClimb ? (activeRaceBest?.metrics?.elapsedSeconds !== undefined ? formatRaceTime(activeRaceBest.metrics.elapsedSeconds) : "à établir") : `${activeVoyage ? active.duration.toFixed(1) : active.duration} min`}</strong></span>
@@ -2022,6 +2029,7 @@ export function VeloQuestApp() {
             {selectedSession.metrics?.voyage && <p className="voyageNext">Voyage · {selectedSession.metrics.voyage.startKm.toFixed(2)} → {selectedSession.metrics.voyage.endKm.toFixed(2)} km · {selectedSession.metrics.voyage.completedPortion ? "portion achevée" : "portion inachevée"} · position simulée. Cette séance seule ne valide pas un parcours entier.</p>}
             <SessionDebrief state={state} workouts={workouts} sessionId={selectedSession.id} />
             <p className="detailDate">{new Intl.DateTimeFormat("fr-FR", { dateStyle: "full", timeStyle: "short" }).format(new Date(selectedSession.date))}</p>
+            {selectedSession.metrics?.timedTrial && <TrialSummary result={selectedSession.metrics.timedTrial} />}
             {selectedSession.metrics?.calorieChallenge && <CalorieResult result={selectedSession.metrics.calorieChallenge} previous={bestCalorieAttempt(state.sessions.filter(s => s.date < selectedSession.date), selectedSession.templateId, selectedSession.metrics.calorieChallenge.source, selectedSession.metrics.calorieChallenge.deviceName)?.metrics?.calorieChallenge} />}
             {!isCalorieWorkout(selectedSession.templateId) && <CadenceResult score={selectedSession.metrics?.cadenceScore} />}
             <CoachComparison score={selectedSession.metrics?.cadenceScore} previous={bestCadenceAttempt(state.sessions.filter(session => session.date < selectedSession.date), selectedSession.metrics?.cadenceSettingsKey)?.metrics?.cadenceScore} eligible={Boolean(selectedSession.metrics?.cadenceRecordEligible)} />

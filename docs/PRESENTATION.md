@@ -264,9 +264,9 @@ Si la page est rechargée ou la séance interrompue, la **reprise locale** perme
 
 ### La cadence devient un jeu de précision
 
-Avec une cadence mesurée, VéloQuest peut suivre le temps passé dans la cible et calculer un **score de suivi**, une note, la couverture de mesure et des **combos**. Les séries de secondes régulières font monter le multiplicateur jusqu’à ×4. Tu travailles la maîtrise du geste autant que la motivation.
+Avec une cadence mesurée, VéloQuest peut suivre le temps passé dans la cible et calculer un **score V2 proportionnel à la cadence**, une note de régularité indépendante, la couverture de mesure et des **combos**. Les séries de secondes régulières font monter le multiplicateur jusqu’à ×4. Tu travailles la maîtrise du geste autant que la motivation.
 
-Les records de suivi comparent les séances à réglages équivalents. Si les données sont insuffisantes, le score reste provisoire. Modifier cadence ou résistance ne permet pas de mélanger artificiellement des performances obtenues avec des consignes différentes.
+Les records de points comparent les séances à réglages équivalents. Si les données sont insuffisantes, le score reste provisoire. Modifier cadence ou résistance ne permet pas de mélanger artificiellement des performances obtenues avec des consignes différentes.
 
 Dans **Mes repères de cadence**, tu peux personnaliser le décalage de −25 à +10 tr/min. Après trois séances faciles complètes, mesurées et ressenties à 4/10 au maximum, l’application peut proposer un repère personnel, que tu restes libre d’appliquer.
 
@@ -495,3 +495,7 @@ Une application conçue par **Térence Ferut / AstroWare Conception** pour donne
 [Ouvrir l’application](https://programme-velo.vercel.app/) · [Guide utilisateur](USER-GUIDE.md) · [Catalogue complet](CATALOGUE.md) · [Retour au README](../README.md)
 
 *Pour la provenance et l’actualisation des illustrations : [notice des captures](images/presentation/README.md). Les fonctions annoncées correspondent au code et à l’application vérifiés ; les évolutions de la roadmap ne sont pas présentées comme déjà disponibles.*
+
+## Défis au départ lancé
+
+[Six épreuves chrono](TIMED-TRIALS.md) donnent une autre saveur aux séances : aller le plus loin en 1, 5 ou 12 minutes, ou battre son temps sur 1, 5 ou 10 km. Cinq secondes pour prendre son élan, puis le vrai départ ! Résultats de console mesurés ou déclarés restent distincts.

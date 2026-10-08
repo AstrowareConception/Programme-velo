@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { TRIAL_SNAPSHOT_KEY } from "@/lib/timed-trials";
 import { STORAGE_KEY, emptyState } from "@/lib/data";
 import type { ClimbChallenge } from "@/lib/routes";
 import { normalizeState, safeLocalStorageWrite } from "@/lib/storage";
@@ -85,6 +86,7 @@ export function useLocalPersistenceController({
   function clearLocalData() {
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem(CUSTOM_ROUTES_KEY);
+    localStorage.removeItem(TRIAL_SNAPSHOT_KEY);
     setState(emptyState());
     setCustomClimbs([]);
     setStateSaveFailed(false);

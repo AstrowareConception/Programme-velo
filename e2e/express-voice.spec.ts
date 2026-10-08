@@ -26,13 +26,13 @@ test("express filters show all intensities and persist a short workout", async (
 test("cards show the best comparable grade and exclude unrelated settings", async ({ page }) => {
   const w = expressWorkouts[0];
   const key = effortSettingsKey(w.id, withCadenceOffset(w, -15).segments, 0, "training");
-  const score = { version: 1, comboSeconds: 0, bestComboSeconds: 80, points: 1000, segments: [{ eligibleSeconds: 180, measuredSeconds: 180, onTargetSeconds: 171 }] };
+  const score = { version: 2, comboSeconds: 0, bestComboSeconds: 80, points: 1000, segments: [{ eligibleSeconds: 180, measuredSeconds: 180, onTargetSeconds: 171 }] };
   const session = { id: "best", templateId: w.id, date: "2026-10-06T17:00:00Z", duration: 3, points: 1, xp: 10, intensity: "easy", kind: "recovery", bonus: false, metrics: { source: "ftms", cadenceRecordEligible: true, cadenceSettingsKey: key, cadenceScore: score } };
   await seed(page, [session, { ...session, id: "different", metrics: { ...session.metrics, cadenceSettingsKey: "other", cadenceScore: { ...score, segments: [{ eligibleSeconds: 180, measuredSeconds: 180, onTargetSeconds: 180 }] } } }]);
   await catalog(page);
   const card = page.getByRole("heading", { name: w.name, exact: true }).locator("xpath=ancestor::article");
-  await expect(card).toContainText("Record coach : A+ · 95.0 %");
-  await page.reload(); await page.getByRole("button", { name: /Séances/ }).click(); await expect(card).toContainText("Record coach : A+ · 95.0 %");
+  await expect(card).toContainText("Score V2 : 1000 pts · Note A+ · 95.0 %");
+  await page.reload(); await page.getByRole("button", { name: /Séances/ }).click(); await expect(card).toContainText("Score V2 : 1000 pts · Note A+ · 95.0 %");
 });
 test("voice commands need opt in, final wake phrases and stop at the finish form", async ({ page }) => {
   await seed(page);

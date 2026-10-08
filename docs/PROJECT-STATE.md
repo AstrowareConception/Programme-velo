@@ -1,27 +1,32 @@
 # État de reprise VéloQuest — actualisé le 8 octobre 2026
 
-## État courant de référence — 8 octobre 2026
+## Référence de reprise vérifiée
 
-Base live vérifiée : `main` `b0818af787fc1b807ea3f390fe4e39db5e15eb0a`, fusion de la [PR 59](https://github.com/AstrowareConception/Programme-velo/pull/59). Vercel READY (`dpl_FgZqTrGkyPEFUKxPNgS2KfcumUAR`) et `/api/version` concordants. La CI main [37740725988](https://github.com/AstrowareConception/Programme-velo/actions/runs/37740725988) et la vérification production [37741353632](https://github.com/AstrowareConception/Programme-velo/actions/runs/37741353632) ont réussi. Aucune PR ouverte au début de ce lot.
+Main `9360ec8623df2ccc5ae8bc2cdcf2e22cf9eb6d2c` ; aucune PR ouverte au début de cette reprise. La PR 60 est bien fusionnée et publiée : `/api/version` consulté directement confirme ce SHA. La PR consigne 236 unités, 334 tests navigateur (32 WebKit), CI 37752400330 réussie et production READY. Le précédent checkpoint la présentait encore en cours : cet état est réconcilié.
 
-Livré : lecteur paysage (PR 56, essai utilisateur concluant), préparation/bilan et mises à jour visibles (PR 57), nouveautés et lexique débutant (PR 58), protection en cas de refus du stockage (PR 55), diagnostic de support prévisualisable (PR 59). Les essais avec de nouveaux utilisateurs restent à recueillir.
+## Lot actif — Défis chrono et score V2
 
-## Lot actif — Accessibilité des séances et WebKit
+PR [61](https://github.com/AstrowareConception/Programme-velo/pull/61), branche `feat/timed-trials-score-v2`, base `9360ec8`. Demande du 8 octobre : maximiser la distance en temps limité, couvrir une distance au meilleur temps, départ lancé de cinq secondes ; points dépendant de la cadence et note indépendante. Autorisation de repartir sur de nouveaux records.
 
-Branche `feat/accessibility-webkit`, base `b0818af`. Le lecteur devient un dialogue identifié : focus au titre de chaque phase, tabulation contenue, arrière-plan inerte, restauration du focus et du défilement après fermeture. Échap ferme les détails ouverts ; ailleurs il revient au bouton explicite de mise de côté, sans fermer ni perdre les champs du bilan. La protection d’écriture de reprise reste inchangée.
+Réalisé dans ce lot :
+- score V2 = cadence / 6 points par seconde × combo (×1 hors cible, ×2/3/4 après 10/20/30 s dans la cible) ; note et couverture inchangées ; zéro rpm ne donne aucun point ;
+- classement par points, version et réglages identiques ; les anciens scores V1 restent dans l’historique, exclus des nouveaux records, sans effacer séances/XP/mesures ; reprise V1 conservée comme V1 ;
+- cartes de séances : points ET note ; bilan et comparaison alignés ;
+- six défis dans Séances : 1/5/12 minutes à distance maximale, 1/5/10 km au meilleur temps ; cadence/résistance libres, départ lancé ;
+- moteur métier séparé, premier relevé après compte à rebours comme zéro mesuré, interpolation du franchissement de distance, arrêt conservateur au dernier compteur avant la limite de temps ;
+- résultats FTMS par nom de vélo et déclarés séparés ; trous, compteur remis à zéro, départ absent et rechargement hors record ;
+- bilan protégé d’un refus de stockage, reprise locale distincte `veloquest:timed-trial:v1` ramenant au bilan hors record ; historique et sauvegarde v3 conservés ;
+- journal de séances intenses et points/XP modestes, aucune simulation de distance.
 
-Le focus visible est étendu aux listes, résumés et zones de texte. Les champs du bilan se réorganisent à 320 px ; en paysage, une requête de conteneur relative à la taille du texte remplace la grille contrainte par un flux défilant quand le texte est agrandi. Ni donnée ni règle de séance modifiée.
+Validation : TypeScript, garde-fous et 245 unités réussis localement ; build exécuté par la préparation Playwright. Chromium local ne peut pas démarrer (création de socket refusée par l’environnement), donc les scénarios navigateur seront exécutés par la CI existante. Première CI 37767709037 : 350 scénarios réussis, 8 échecs correspondant aux deux assertions de chrono exact sur quatre projets : l’horloge de test avançait pendant les interactions/captures. Le test pilote maintenant explicitement une horloge suspendue, sans assouplir les valeurs attendues. Un scénario FTMS à temps fixé couvre aussi les paquets postérieurs à l’arrivée. Captures inspectées : le nouveau dialogue imbriqué dans une carte créait un contexte d’empilement qui laissait la navigation passer devant ; déplacement dans un portail à la racine, fermeture normalisée, actions visibles testées à 960×600. Maintien écran, erreurs Bluetooth et effacement de la reprise ajoutés. Résultats finaux, SHA, fusion et publication à consigner dans la description de PR avant d’affirmer la livraison.
 
-La CI existante utilise le conteneur officiel Playwright 1.63.0 correspondant au lockfile, avec Chromium et WebKit préinstallés, pour éviter la longue installation des dépendances système. Deux projets mobile/tablette couvrent les parcours manuels essentiels : préparation/bilan, rotation, écriture refusée puis réussie, découverte/lexique, diagnostic et transfert de sauvegarde. Trois scénarios dédiés vérifient clavier, texte à 200 % et largeur 320 px, avec sauvegarde/rechargement. Voir [périmètre et recette](ACCESSIBILITY.md).
+Limites : le nom du vélo n’est pas un identifiant matériel unique ; les résistances libres et étalonnages ne garantissent pas des efforts égaux. Le dernier relevé des épreuves minutées peut sous-estimer la distance de deux secondes au plus pour être admissible. Le chrono d’arrivée est interpolé entre deux paquets. Aucune qualification matérielle ajoutée. Safari/Bluefy/VoiceOver et épreuves sur vélo réel restent à essayer.
 
-Validation locale : TypeScript et 236 unités réussis. CI navigateur et build requis avant fusion ; résultats exacts, SHA testé et publication à consigner dans la description finale de la PR. Ce checkpoint précède la publication.
+Prochaine action : finaliser la recette/CI du lot, publier selon l’autorisation de continuation, puis reprendre l’accessibilité des autres fenêtres et les essais de première utilisation. Voir [règles et recette chrono](TIMED-TRIALS.md).
 
-Limites : WebKit Linux automatisé ne remplace pas Safari ou Bluefy sur iPad/iPhone réels. Pas de qualification Bluetooth ou de certification WCAG. Les autres modales et une recette VoiceOver restent à traiter. Prochaine action après livraison : essais réels et poursuite de l’accessibilité hors lecteur.
+## Lot précédent clos — Accessibilité/WebKit, PR 60
 
-
-## Correction révélée par la première CI de ce lot
-
-La CI 37749061577 a passé 332 scénarios, dont les 32 WebKit, et relevé deux échecs Chromium mobile : la zone d’affichage s’élargissait à 363 px pour une fenêtre de 320 px, et à 1095 px avec texte agrandi pour une fenêtre de 1024 px. Les traces montraient des clics décalés vers d’autres éléments. L’en-tête et les cartes de séances peuvent désormais revenir à la ligne ; les débordements du fond inerte sont contenus pendant la modale. Les tests de clic restent sans contournement et contrôlent aussi la largeur réelle. Une nouvelle CI du correctif est requise avant publication.
+Focus et clavier des séances, texte agrandi, petits écrans et rotation livrés ; deux projets WebKit dans la CI existante. Les débordements révélés par la première CI ont été corrigés, puis validés dans 37752400330 avant fusion. Les essais physiques iPad/VoiceOver restent à réaliser, sans constituer un travail de code interrompu.
 
 ## 8 octobre 2026 — Diagnostic de support livré (PR 59)
 

@@ -5,7 +5,7 @@ import { effortSettingsKey } from "../lib/effort";
 for (const reducedMotion of [false, true]) test(`comparable record survives saving and celebrates with reduced motion ${reducedMotion}`, async ({ page }, info) => {
   const workout = workouts.find(workout => workout.id === "recovery-30")!;
   const key = effortSettingsKey(workout.id, workout.segments, 0, "training");
-  const score = (rate: number) => ({ version: 1, comboSeconds: 0, bestComboSeconds: 300, points: rate * 12000, segments: workout.segments.map(segment => ({ eligibleSeconds: segment.minutes * 60, measuredSeconds: segment.minutes * 60, onTargetSeconds: segment.minutes * 60 * rate })) });
+  const score = (rate: number) => ({ version: 2, comboSeconds: 0, bestComboSeconds: 300, points: rate * 12000, segments: workout.segments.map(segment => ({ eligibleSeconds: segment.minutes * 60, measuredSeconds: segment.minutes * 60, onTargetSeconds: segment.minutes * 60 * rate })) });
   const history = { id: "old", templateId: workout.id, date: "2026-10-05T17:00:00Z", duration: 30, points: 1, xp: 35, intensity: "easy", kind: "recovery", bonus: false, metrics: { source: "ftms", completedWorkout: true, cadenceScore: score(.8), cadenceSettingsKey: key, cadenceRecordEligible: true } };
   await page.emulateMedia({ reducedMotion: reducedMotion ? "reduce" : "no-preference" });
   await page.addInitScript(({ history, key, score }) => {
@@ -17,10 +17,10 @@ for (const reducedMotion of [false, true]) test(`comparable record survives savi
   await page.goto("/");
   await page.getByRole("button", { name: "Reprendre", exact: true }).click();
   const comparison = page.getByRole("status", { name: "Comparaison du suivi" });
-  await expect(comparison).toContainText("Nouveau record de suivi");
+  await expect(comparison).toContainText("Nouveau record de score");
   await expect(comparison).toContainText("B+ · 80.0 %");
   await expect(comparison).toContainText("S · 100.0 %");
-  await expect(comparison).toContainText("+20.0 points");
+  await expect(comparison).toContainText("+2400 points");
   if (reducedMotion) expect(await comparison.evaluate(el => getComputedStyle(el).animationName)).toBe("none");
   await page.screenshot({ path: info.outputPath("coach-record.png") });
   await page.getByLabel("J’ai vérifié le bilan et les champs facultatifs.").check();
@@ -29,5 +29,5 @@ for (const reducedMotion of [false, true]) test(`comparable record survives savi
   await page.reload();
   await page.getByRole("button", { name: /Séances/ }).click();
   await page.getByRole("heading", { name: "Décrassage", exact: true }).locator("xpath=ancestor::article").getByRole("button", { name: "Voir / démarrer" }).click();
-  await expect(page.locator(".cadenceBest")).toHaveText("Meilleur suivi à ces réglages : S · 100.0 %");
+  await expect(page.locator(".cadenceBest")).toHaveText("Meilleur score à ces réglages : 12000 pts · Note S · 100.0 %");
 });
