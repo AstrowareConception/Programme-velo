@@ -19,7 +19,7 @@ La meilleure série de ton historique détermine le déblocage : une pause ulté
 
 Après l’enregistrement, une notification dorée affiche les nouveaux trophées ensemble. Elle attend la fin d’une séance, d’un bilan ou d’un formulaire protégé. **Voir mes trophées** ouvre la galerie ; **Continuer** ou la croix ferme la notification. Elle reste visible jusqu’à ton action.
 
-Le petit son utilise **Plus → Ton cockpit → Sons de changement de segment** et le volume des alertes. Les vibrations suivent leur réglage habituel. Le navigateur peut exiger une interaction préalable pour autoriser le son ; la récompense visuelle reste disponible. Le réglage système de réduction des animations est respecté.
+Le petit son utilise **Plus → Ton cockpit → Bips de consigne** et le volume des alertes. Les vibrations suivent leur réglage habituel. Le navigateur peut exiger une interaction préalable pour autoriser le son ; la récompense visuelle reste disponible. Le réglage système de réduction des animations est respecté.
 
 Chaque appareil mémorise les trophées déjà annoncés. Les anciens trophées ne rejouent pas toutes leurs notifications lors de cette mise à jour ; les nouveaux trophées de régularité acquis auparavant font l’objet d’une seule annonce groupée. Un nouveau trophée peut être annoncé sur chacun de tes appareils après synchronisation. Les préférences d’annonce restent locales ; le JSON les conserve. Une suppression puis un nouveau déblocage ne rejoue pas une annonce déjà mémorisée.
 
