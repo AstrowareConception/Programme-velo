@@ -270,3 +270,9 @@ Les express de moins de 10 minutes valent 0,5 point, quelle que soit leur intens
 
 ### Transférer une sauvegarde depuis Bluefy
 Dans Plus, exporter une sauvegarde affiche toujours son profil et ses nombres de séances/mesures, même si le téléchargement ne fonctionne pas. Utilise « Partager le fichier JSON » si disponible, sinon « Copier la sauvegarde ». Si la copie automatique est refusée, « Tout sélectionner » prépare le texte pour la commande Copier du téléphone. Transfère ce texte par le moyen de ton choix. Sur la tablette : Plus → Coller une sauvegarde → Importer le texte collé. L’import remplace les données locales ; il ne synchronise pas les appareils. Les JSON non reconnus sont refusés. Le téléchargement automatique reste proposé avec une URL temporaire conservée une minute.
+
+### Défis chrono au départ lancé et score V2
+
+Dans Séances, découvre six [défis chrono](TIMED-TRIALS.md) : distance maximale en 1/5/12 minutes, ou 1/5/10 km au meilleur temps. Pédale pendant le compte à rebours de cinq secondes ; les mètres d’élan ne comptent pas. Mesures du vélo et résultats déclarés sont séparés. Le bilan explique l’admissibilité du record et permet de réessayer si l’enregistrement échoue.
+
+Le score des séances guidées dépend désormais de la cadence : 60 tr/min = 10 points/s, 75 tr/min = 12,5 points/s, multipliés par le combo quand tu tiens la cible. Hors cible, tu gardes les points de base avec combo à zéro ; immobile, tu ne marques rien. La note garde le pourcentage de temps dans la cible. Les cartes affichent les deux, les records sont classés par points. Les anciens scores restent visibles comme V1 mais les records V2 repartent à établir ; historique sportif et XP conservés.

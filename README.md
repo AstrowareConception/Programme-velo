@@ -170,3 +170,7 @@ Les quinze nouvelles traces, leurs sections, les lieux traversés et les récomp
 Hors connexion et mises à jour : dans **Plus → Emporte ta séance**, vérifie le paquet local et prépare les photos facultatives. Une nouvelle version attend ton action et le repos des lecteurs ouverts ; la reprise sauvegardée reste conservée. [Usage, construction et limites PWA](docs/PWA-OFFLINE.md).
 
 Le **Vignoble d’Alsace** ajoute six étapes de Marlenheim à Thann et trois parenthèses de 14 à 23 minutes simulées. Deux carnets distincts, **Vignoble d’Alsace · la traversée** (650 XP) et **Parenthèses alsaciennes** (120 XP), rejoignent les **22 objectifs**. Les formats courts ne remplacent aucune grande étape. Deux trophées accompagnent ces découvertes. [Sources, relief et limites](docs/ALSACE-VIGNOBLE.md).
+
+### Défis chrono et score V2
+
+[Six épreuves au départ lancé](docs/TIMED-TRIALS.md) : distance maximale en temps limité ou distance imposée au meilleur temps. Les séances guidées affichent désormais des points proportionnels à la cadence et une note de régularité indépendante.

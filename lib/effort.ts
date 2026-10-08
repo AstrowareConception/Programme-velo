@@ -21,10 +21,12 @@ export function resistanceTarget(segment: Segment, elapsed: number, offset = 0) 
 }
 
 export type CadenceBucket = { eligibleSeconds: number; measuredSeconds: number; onTargetSeconds: number };
-export type CadenceScore = { version: 1; segments: CadenceBucket[]; comboSeconds: number; bestComboSeconds: number; points: number };
-export const emptyCadenceScore = (): CadenceScore => ({ version: 1, segments: [], comboSeconds: 0, bestComboSeconds: 0, points: 0 });
+export type CadenceScore = { version: 1 | 2; segments: CadenceBucket[]; comboSeconds: number; bestComboSeconds: number; points: number };
+export const emptyCadenceScore = (): CadenceScore => ({ version: 2, segments: [], comboSeconds: 0, bestComboSeconds: 0, points: 0 });
 
 export function addCadenceInterval(score: CadenceScore, index: number, target: string | undefined, seconds: number, rpm?: number): CadenceScore {
+  // A v1 recovery keeps its old grade but never mixes scoring systems.
+  const legacy = score.version === 1;
   const range = numericRange(target);
   const free = target?.trim().toLowerCase() === "libre";
   if ((!range && !free) || seconds <= 0 || !Number.isFinite(seconds)) return score;
@@ -33,15 +35,17 @@ export function addCadenceInterval(score: CadenceScore, index: number, target: s
   const comboSeconds = success ? score.comboSeconds + seconds : 0;
   // Integrate across multiplier boundaries, independent of packet frequency.
   let points = score.points;
+  const base = measured ? rpm / 6 : 0; // 60 rpm = 10 points/s; 75 rpm = 12.5 points/s.
   if (success) {
     let position = score.comboSeconds;
     while (position < comboSeconds) {
       const multiplier = Math.min(4, 1 + Math.floor(position / 10));
       const end = multiplier === 4 ? comboSeconds : Math.min(comboSeconds, multiplier * 10);
-      points += (end - position) * 10 * multiplier;
+      points += (end - position) * (legacy ? 10 : base) * multiplier;
       position = end;
     }
   }
+  if (!success && !legacy) points += base * seconds;
   const segments = score.segments.slice();
   const previous = segments[index] ?? { eligibleSeconds: 0, measuredSeconds: 0, onTargetSeconds: 0 };
   segments[index] = {
@@ -49,7 +53,7 @@ export function addCadenceInterval(score: CadenceScore, index: number, target: s
     measuredSeconds: previous.measuredSeconds + (measured ? seconds : 0),
     onTargetSeconds: previous.onTargetSeconds + (success ? seconds : 0)
   };
-  return { version: 1, segments, comboSeconds, bestComboSeconds: Math.max(score.bestComboSeconds, comboSeconds), points };
+  return { version: score.version, segments, comboSeconds, bestComboSeconds: Math.max(score.bestComboSeconds, comboSeconds), points };
 }
 
 export function cadenceSummary(score?: CadenceScore) {
@@ -61,17 +65,18 @@ export function cadenceSummary(score?: CadenceScore) {
 }
 
 export function effortSettingsKey(workoutId: string, segments: Segment[], offset: number, mode: string) {
-  return JSON.stringify([1, workoutId, mode, offset, segments.map(segment => [segment.minutes, segment.resistance, segment.cadence ?? null])]);
+  return JSON.stringify([2, workoutId, mode, offset, segments.map(segment => [segment.minutes, segment.resistance, segment.cadence ?? null])]);
 }
 
 export function bestCadenceAttempt(sessions: import("./types").CompletedSession[], key?: string) {
   if (!key) return undefined;
-  return sessions.filter(session => session.metrics?.cadenceRecordEligible && session.metrics?.cadenceSettingsKey === key)
+  return sessions.filter(session => session.metrics?.cadenceScore?.version === 2 && session.metrics?.cadenceRecordEligible && session.metrics?.cadenceSettingsKey === key)
     .reduce<import("./types").CompletedSession | undefined>((best, session) => {
       const candidate = cadenceSummary(session.metrics?.cadenceScore);
       if (candidate.provisional || candidate.percent === undefined) return best;
-      const previous = cadenceSummary(best?.metrics?.cadenceScore).percent;
-      return previous === undefined || candidate.percent > previous ? session : best;
+      const points = session.metrics!.cadenceScore!.points;
+      if (!Number.isFinite(points) || points < 0) return best;
+      return !best || points > best.metrics!.cadenceScore!.points ? session : best;
     }, undefined);
 }
 

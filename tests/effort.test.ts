@@ -24,9 +24,9 @@ describe("coach score and combos", () => {
     expect(score.comboSeconds).toBe(0);
   });
   it("rewards free cadence and integrates multipliers irrespective of sample rate", () => {
-    const one = addCadenceInterval(emptyCadenceScore(), 0, "libre", 40, 0);
+    const one = addCadenceInterval(emptyCadenceScore(), 0, "libre", 40, 60);
     let many = emptyCadenceScore();
-    for (let i=0;i<400;i++) many = addCadenceInterval(many, 0, "libre", .1, 0);
+    for (let i=0;i<400;i++) many = addCadenceInterval(many, 0, "libre", .1, 60);
     expect(one.points).toBe(1000);
     expect(many.points).toBeCloseTo(one.points);
     expect(one.bestComboSeconds).toBe(40);
@@ -34,7 +34,7 @@ describe("coach score and combos", () => {
     const missed = addCadenceInterval(one, 1, "80–90", 1, 100);
     expect(missed.comboSeconds).toBe(0);
     expect(missed.bestComboSeconds).toBe(40);
-    expect(addCadenceInterval(missed, 1, "80–90", 1, 85).points).toBe(1010);
+    expect(addCadenceInterval(missed, 1, "80–90", 1, 85).points).toBeCloseTo(1000 + 100 / 6 + 85 / 6);
   });
 });
 
@@ -62,4 +62,24 @@ it("adapts cadence without touching free segments or resistance and changes the 
  expect(soft.segments[0].resistance).toBe("11–15");
  expect(workout.segments[0].cadence).toBe("80–90");
  expect(withCadenceOffset(workout, 10).segments[0].cadence).toBe("90–100");
+});
+
+it("V2 separates cadence points, target combo and grade", () => {
+ const slow = addCadenceInterval(emptyCadenceScore(), 0, "60–80", 60, 60);
+ const fast = addCadenceInterval(emptyCadenceScore(), 0, "60–80", 60, 75);
+ expect(fast.points).toBe(slow.points * 1.25);
+ expect(cadenceSummary(fast).grade).toBe(cadenceSummary(slow).grade);
+ const outside = addCadenceInterval(fast, 0, "60–80", 10, 90);
+ expect(outside.points - fast.points).toBe(150);
+ expect(outside.comboSeconds).toBe(0);
+ const stopped = addCadenceInterval(outside, 0, "libre", 10, 0);
+ expect(stopped.points).toBe(outside.points);
+ expect(addCadenceInterval(stopped, 0, "libre", 5).points).toBe(stopped.points);
+});
+it("ranks V2 points rather than grade, excludes V1 even with a matching key", () => {
+ const key = effortSettingsKey("test", [segment], 0, "training");
+ const base = addCadenceInterval(emptyCadenceScore(), 0, "60–80", 100, 60);
+ const entry = (id: string, score: typeof base) => ({ id, metrics: { cadenceScore: score, cadenceRecordEligible: true, cadenceSettingsKey: key } } as CompletedSession);
+ const high = { ...base, points: base.points + 20, segments: [{ eligibleSeconds: 100, measuredSeconds: 100, onTargetSeconds: 95 }] };
+ expect(bestCadenceAttempt([entry("S", base), entry("A+", high), entry("old", {...high, version: 1, points: 999999})], key)?.id).toBe("A+");
 });

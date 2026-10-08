@@ -2,6 +2,16 @@
  * Change an id only for a new user-facing release, never for a rebuild. */
 export const releases = [
   {
+    id: "2026-10-chrono-score-v2", date: "2026-10-08", label: "8 octobre 2026",
+    title: "Le chrono entre en jeu",
+    summary: "Six défis au départ lancé et un score qui suit vraiment ta cadence.",
+    changes: [
+      { title: "Distance ou chrono ?", text: "Dans Séances, parcours la plus grande distance en 1, 5 ou 12 minutes, ou termine 1, 5 ou 10 km au meilleur temps. Prends ton élan pendant le compte à rebours de cinq secondes." },
+      { title: "Deux résultats distincts", text: "Le score V2 dépend de ta cadence, avec un combo quand tu tiens la cible. La note reste fondée sur la régularité. Les cartes affichent les deux ; les anciens résultats sont conservés hors nouveaux records." },
+      { title: "Des records comparables", text: "Les résultats mesurés sont comparés sur le même nom de vélo et séparés des saisies déclarées. Coupure, compteur remis à zéro ou rechargement : pas de faux record." }
+    ]
+  },
+  {
     id: "2026-10-discovery",
     date: "2026-10-07",
     label: "7 octobre 2026",
