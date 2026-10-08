@@ -70,6 +70,8 @@ test("live speed updates during countdown and racing without reviving missing me
  await setup(page, true, "Le kilomètre lancé");
  const live = page.getByRole("region", {name:"Mesures du vélo en direct"});
  const speed = live.locator(".trialSpeed dd");
+ // A packet between 100 ms clock ticks must display immediately, without blinking.
+ await page.clock.runFor(50);
  await page.evaluate(() => (window as any).__emitMetrics({speedKmh:30.4,cadenceRpm:75,powerW:180,heartRate:135}));
  await expect(speed).toHaveText("30,4 km/h");
  await expect(live).toContainText("75 tr/min");
