@@ -282,6 +282,8 @@ test("the first-use guide keeps keyboard focus and enlarged choices through the 
   await page.setViewportSize({ width: 320, height: 740 });
   await page.addStyleTag({ content: "html { font-size:200% !important; }" });
   await noHorizontalOverflow(guide);
+  await guide.getByLabel("Ce qui te donne envie").scrollIntoViewIfNeeded();
+  await page.screenshot({ path: info.outputPath("demarrage-select-texte-200-320.png") });
   const first = guide.getByLabel(/Prénom ou pseudo/);
   await first.focus(); await page.keyboard.press("Shift+Tab");
   await expect(guide.getByRole("button", { name: "Explorer librement" })).toBeFocused();
@@ -291,6 +293,7 @@ test("the first-use guide keeps keyboard focus and enlarged choices through the 
   await guide.getByRole("button", { name: "Continuer", exact: true }).press("Enter");
   await expect(guide.locator("h2")).toBeFocused();
   await guide.getByLabel("Temps habituel pour une séance").selectOption("25");
+  await noHorizontalOverflow(guide);
   await guide.getByRole("button", { name: "Retour", exact: true }).press("Enter");
   await expect(first).toHaveValue("Découverte clavier");
   await page.setViewportSize({ width: 960, height: 600 });

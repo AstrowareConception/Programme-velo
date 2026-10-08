@@ -823,8 +823,9 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .onboardingDialog::backdrop { background:rgba(3,5,10,.88); backdrop-filter:blur(8px); }
 .onboardingDialog h2 { font-size:1.65rem; line-height:1.2; margin:20px 0 14px; outline:none; }
 .onboardingDialog h2:focus-visible { outline:2px solid var(--cyan); outline-offset:4px; }
-.onboardingDialog { min-width:0; overflow-wrap:anywhere; }
+.onboardingDialog { min-width:0; max-width:calc(100% - 28px); overflow-wrap:anywhere; }
 .onboardingForm :is(input, select), .setupModal :is(label, input) { min-width:0; max-width:100%; }
+.onboardingForm select { white-space:normal; }
 .setupModal .formRow { grid-template-columns:repeat(auto-fit,minmax(min(100%,12rem),1fr)); }
 .onboardingDialog h3, .gettingStartedCard h3 { margin:10px 0; }
 .onboardingDialog p, .gettingStartedCard p { line-height:1.65; }
@@ -834,6 +835,8 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .onboardingBar i { height:4px; flex:1; border-radius:8px; background:var(--line); }
 .onboardingBar i.done { background:var(--cyan); }
 .onboardingForm select, .guideToday select { width:100%; color:var(--text); background:#080e1b; border:1px solid var(--line); border-radius:12px; min-height:44px; padding:10px; font:inherit; }
+/* WebKit's native select decoration can overflow its box with enlarged text. */
+.onboardingForm select { appearance:none; padding-right:2em; text-overflow:ellipsis; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m4 6 4 4 4-4' fill='none' stroke='%23edf1fb' stroke-width='2'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right .6em center; background-size:1em; }
 .onboardingForm .form { gap:16px; grid-template-columns:minmax(0,1fr); }
 .onboardingForm .form > *, .onboardingForm label { min-width:0; }
 .onboardingForm label { grid-template-columns:minmax(0,1fr); }
