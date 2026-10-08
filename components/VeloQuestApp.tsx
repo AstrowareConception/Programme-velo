@@ -40,6 +40,7 @@ import { SessionJourneySteps, SessionReviewSummary } from "@/components/SessionJ
 import { ReleaseAnnouncement, ReleaseNotesCard } from "@/components/ReleaseNotes";
 import { QuickGuideCard, ReaderHelp } from "@/components/ReaderHelp";
 import { SessionDashboard } from "@/components/SessionDashboard";
+import { useSessionDialog } from "@/components/useSessionDialog";
 import { ReaderViewChoice, SessionComfort } from "@/components/SessionComfort";
 import { screenWakeLabel, useScreenWakeLock } from "@/components/useScreenWakeLock";
 import { PerformanceRecords, SectorAnalysis } from "@/components/PerformancePanel";
@@ -250,6 +251,7 @@ export function VeloQuestApp() {
   const cuePreferencesRef = useRef<Preferences>(defaultPreferences);
   const upcomingCueRef = useRef("");
   const readerRef = useRef<HTMLDivElement>(null);
+  useSessionDialog(readerRef, Boolean(active), showFinish ? "review" : sessionStarted ? "ride" : "prepare");
   const [foregroundNotice, setForegroundNotice] = useState(false);
   const {
     resumeSnapshot,
@@ -1773,7 +1775,8 @@ export function VeloQuestApp() {
 
       {active && (
         <div className={`modalBackdrop ${sessionStarted && !showFinish ? "activeSessionBackdrop" : ""}`}>
-          <div ref={readerRef} className={`sessionModal ${sessionStarted && !showFinish ? "activeSessionModal" : "sessionJourneyModal"} ${activeClimb ? "climbSession" : ""} ${activeVoyage ? "voyageSession" : ""} ${sessionStarted && !showFinish && preferences.readerView === "essential" ? "essentialSession" : ""}`}>
+          <div ref={readerRef} role="dialog" aria-modal="true" aria-label={showFinish ? "Bilan de séance" : sessionStarted ? "Séance en cours" : "Préparer la séance"} aria-describedby="session-keyboard-help" tabIndex={-1} className={`sessionModal ${sessionStarted && !showFinish ? "activeSessionModal" : "sessionJourneyModal"} ${activeClimb ? "climbSession" : ""} ${activeVoyage ? "voyageSession" : ""} ${sessionStarted && !showFinish && preferences.readerView === "essential" ? "essentialSession" : ""}`}>
+            <p id="session-keyboard-help" className="visuallyHidden">Tabulation parcourt les commandes. Échap revient au bouton de mise de côté sans fermer la séance. Active ce bouton pour quitter.</p>
             <button className="close" aria-label="Mettre la séance de côté" onClick={parkActiveSession}>×</button>
 
             {showFinish ? (

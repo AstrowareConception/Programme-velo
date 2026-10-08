@@ -9,7 +9,6 @@ export default defineConfig({
   use: {
     serviceWorkers: "block",
     baseURL: process.env.E2E_BASE_URL || "http://127.0.0.1:3000",
-    launchOptions: process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH, args: ["--no-sandbox", "--disable-dev-shm-usage"] } : undefined,
     trace: "retain-on-failure",
     screenshot: "only-on-failure"
   },
@@ -18,6 +17,7 @@ export default defineConfig({
       name: "mobile-chromium",
       use: {
         browserName: "chromium",
+        launchOptions: process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH, args: ["--no-sandbox", "--disable-dev-shm-usage"] } : undefined,
         viewport: { width: 390, height: 844 },
         isMobile: true,
         hasTouch: true
@@ -27,9 +27,21 @@ export default defineConfig({
       name: "desktop-chromium",
       use: {
         browserName: "chromium",
+        launchOptions: process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH, args: ["--no-sandbox", "--disable-dev-shm-usage"] } : undefined,
         viewport: { width: 1280, height: 900 }
       }
-    }
+    },
+    ...(["mobile", "tablet"] as const).map(size => ({
+      name: `${size}-webkit`,
+      // Real WebKit rendering on the essential manual flows, not simulated BLE qualification.
+      testMatch: ["**/accessibility.spec.ts", "**/session-journey.spec.ts", "**/session-persistence.spec.ts", "**/discovery.spec.ts", "**/support-diagnostic.spec.ts", "**/backup-transfer.spec.ts"],
+      use: {
+        browserName: "webkit" as const,
+        viewport: size === "tablet" ? { width: 1024, height: 768 } : { width: 390, height: 844 },
+        isMobile: true,
+        hasTouch: true
+      }
+    }))
   ],
   webServer: process.env.E2E_BASE_URL ? undefined : {
     command: "npm run build && npm run start -- --hostname 127.0.0.1",

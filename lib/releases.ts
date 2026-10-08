@@ -8,6 +8,7 @@ export const releases = [
     title: "Tes repères, au bon moment",
     summary: "Des explications avant de pédaler et un espace pour retrouver ce qui change.",
     changes: [
+      { title: "Une séance plus accessible", text: "Au clavier, les commandes restent dans la séance et le focus suit la préparation, la lecture et le bilan. Le paysage s’adapte au texte agrandi, avec défilement quand nécessaire. Échap revient au bouton de mise de côté sans effacer tes saisies." },
       { title: "Un diagnostic à relire", text: "Un souci ? Dans Plus, prépare un rapport technique, vérifie son contenu puis copie-le ou exporte-le pour accompagner ton retour. Ni profil ni historique sportif ne sont inclus, et rien n’est envoyé automatiquement." },
       { title: "Un bilan protégé", text: "Si le stockage refuse l’enregistrement, le bilan reste ouvert avec tes saisies et un bouton pour réessayer. Ferme-le seulement après une sauvegarde réussie." },
       { title: "Comprendre le lecteur", text: "Avant le départ, ouvre « Les repères du lecteur » pour distinguer niveau, cadence, ressenti et mesures reçues." },

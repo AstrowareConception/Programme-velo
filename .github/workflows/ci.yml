@@ -8,6 +8,10 @@ on:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    container:
+      # Keep aligned with @playwright/test in package-lock.json.
+      image: mcr.microsoft.com/playwright:v1.63.0-noble
+      options: --user 1001
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -17,7 +21,6 @@ jobs:
       - run: npm run check:static
       - run: npm run typecheck
       - run: npm test
-      - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
       - name: Preserve browser evidence
         if: always()

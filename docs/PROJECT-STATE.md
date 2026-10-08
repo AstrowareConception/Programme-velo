@@ -2,21 +2,38 @@
 
 ## État courant de référence — 8 octobre 2026
 
-Base live vérifiée : `main` `de6cfcf16a386ee4c8956f270584efddb6b256c2`, fusion de la [PR 55](https://github.com/AstrowareConception/Programme-velo/pull/55). Vercel READY (`dpl_JC44SYRAR9tcYS4P6WWVLXsjGnQY`) et `/api/version` concordants. La CI main [37693366872](https://github.com/AstrowareConception/Programme-velo/actions/runs/37693366872) et la vérification production [37694525096](https://github.com/AstrowareConception/Programme-velo/actions/runs/37694525096) ont réussi. Aucune PR ouverte au début de ce lot.
+Base live vérifiée : `main` `b0818af787fc1b807ea3f390fe4e39db5e15eb0a`, fusion de la [PR 59](https://github.com/AstrowareConception/Programme-velo/pull/59). Vercel READY (`dpl_FgZqTrGkyPEFUKxPNgS2KfcumUAR`) et `/api/version` concordants. La CI main [37740725988](https://github.com/AstrowareConception/Programme-velo/actions/runs/37740725988) et la vérification production [37741353632](https://github.com/AstrowareConception/Programme-velo/actions/runs/37741353632) ont réussi. Aucune PR ouverte au début de ce lot.
 
-Livré : lecteur paysage (PR 56, essai utilisateur concluant), préparation/bilan et mises à jour visibles (PR 57), nouveautés et lexique débutant (PR 58), finalisation des séances et protection en cas de refus du stockage (PR 55). Les essais avec de nouveaux utilisateurs restent à recueillir.
+Livré : lecteur paysage (PR 56, essai utilisateur concluant), préparation/bilan et mises à jour visibles (PR 57), nouveautés et lexique débutant (PR 58), protection en cas de refus du stockage (PR 55), diagnostic de support prévisualisable (PR 59). Les essais avec de nouveaux utilisateurs restent à recueillir.
 
-## Lot actif — Diagnostic de support prévisualisable
+## Lot actif — Accessibilité des séances et WebKit
+
+Branche `feat/accessibility-webkit`, base `b0818af`. Le lecteur devient un dialogue identifié : focus au titre de chaque phase, tabulation contenue, arrière-plan inerte, restauration du focus et du défilement après fermeture. Échap ferme les détails ouverts ; ailleurs il revient au bouton explicite de mise de côté, sans fermer ni perdre les champs du bilan. La protection d’écriture de reprise reste inchangée.
+
+Le focus visible est étendu aux listes, résumés et zones de texte. Les champs du bilan se réorganisent à 320 px ; en paysage, une requête de conteneur relative à la taille du texte remplace la grille contrainte par un flux défilant quand le texte est agrandi. Ni donnée ni règle de séance modifiée.
+
+La CI existante utilise le conteneur officiel Playwright 1.63.0 correspondant au lockfile, avec Chromium et WebKit préinstallés, pour éviter la longue installation des dépendances système. Deux projets mobile/tablette couvrent les parcours manuels essentiels : préparation/bilan, rotation, écriture refusée puis réussie, découverte/lexique, diagnostic et transfert de sauvegarde. Trois scénarios dédiés vérifient clavier, texte à 200 % et largeur 320 px, avec sauvegarde/rechargement. Voir [périmètre et recette](ACCESSIBILITY.md).
+
+Validation locale : TypeScript et 236 unités réussis. CI navigateur et build requis avant fusion ; résultats exacts, SHA testé et publication à consigner dans la description finale de la PR. Ce checkpoint précède la publication.
+
+Limites : WebKit Linux automatisé ne remplace pas Safari ou Bluefy sur iPad/iPhone réels. Pas de qualification Bluetooth ou de certification WCAG. Les autres modales et une recette VoiceOver restent à traiter. Prochaine action après livraison : essais réels et poursuite de l’accessibilité hors lecteur.
+
+
+## Correction révélée par la première CI de ce lot
+
+La CI 37749061577 a passé 332 scénarios, dont les 32 WebKit, et relevé deux échecs Chromium mobile : la zone d’affichage s’élargissait à 363 px pour une fenêtre de 320 px, et à 1095 px avec texte agrandi pour une fenêtre de 1024 px. Les traces montraient des clics décalés vers d’autres éléments. L’en-tête et les cartes de séances peuvent désormais revenir à la ligne ; les débordements du fond inerte sont contenus pendant la modale. Les tests de clic restent sans contournement et contrôlent aussi la largeur réelle. Une nouvelle CI du correctif est requise avant publication.
+
+## 8 octobre 2026 — Diagnostic de support livré (PR 59)
 
 Branche `feat/support-diagnostic`, base `de6cfcf`. Carte indépendante dans Plus, rapport construit à la demande par une projection explicite de champs techniques. La version est celle du bundle ouvert ; celle du cache PWA est séparée. Ni requête réseau, ni accès direct au stockage, ni sélection ou commande Bluetooth. Aucun envoi automatique, destinataire ou sauvegarde persistante du diagnostic.
 
 L’aperçu JSON est le contenu exact copié/exporté, stable jusqu’à une actualisation explicite. Copie manuelle après refus du presse-papiers, export JSON et effacement avec retour du focus. Profil, historique, mesures, traces GPS, identifiants et erreurs brutes exclus ; les champs inattendus ne traversent pas la projection. Guide bêta et nouveautés actualisés.
 
-Validation locale : TypeScript, architecture/documentation et **236 tests unitaires** réussis (39 fichiers). Trois nouveaux scénarios Playwright par projet couvrent aperçu/copie/export exacts, rotation, absence de réseau/stockage/scan, effacement, et copies refusée/absente hors connexion avec refus de stockage observé. La CI navigateur et le build restent requis avant fusion. Références de PR, SHA testé, résultats et version publiée à consigner dans la description finale de la PR ; ce checkpoint précède la publication.
+Validation : [CI 37739764466](https://github.com/AstrowareConception/Programme-velo/actions/runs/37739764466), head `6d20a2db523559ec624082e774e6fdd21679fb35`, 236 unités et 296 scénarios navigateur sans échec ni retry ; build réussi. Fusion publiée `b0818af787fc1b807ea3f390fe4e39db5e15eb0a`, arbre identique `552fee58a96ec264ab514091f814f68a05abedb6`. [PR 59](https://github.com/AstrowareConception/Programme-velo/pull/59), Vercel et version publique vérifiés ; CI main et production réussies, voir état courant.
 
 Limites : indications de capacités et d’erreurs déjà observées, pas une qualification matérielle ni un test de quota. Une application bloquée avant Plus ne peut pas générer le rapport. Aucun journal historique d’erreurs n’est ajouté. Bluefy et matériel réels restent à éprouver.
 
-Prochaine action : valider et publier ce lot, puis renforcer la recette d’accessibilité et la couverture WebKit, en parallèle des retours bêta réels. Voir [la roadmap](ROADMAP.md) et [le protocole bêta](BETA-TEST.md).
+Suite engagée : recette d’accessibilité et couverture WebKit, en parallèle des retours bêta réels. Voir [la roadmap](ROADMAP.md) et [le protocole bêta](BETA-TEST.md).
 
 ## 7–8 octobre 2026 — Fiabilité de l’enregistrement livrée (PR 55)
 
