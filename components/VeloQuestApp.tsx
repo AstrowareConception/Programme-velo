@@ -45,6 +45,7 @@ import { QuickGuideCard, ReaderHelp } from "@/components/ReaderHelp";
 import { SessionDashboard } from "@/components/SessionDashboard";
 import { useSessionDialog } from "@/components/useSessionDialog";
 import { AppDialog } from "@/components/AppDialog";
+import { ProfileDialog } from "@/components/ProfileDialog";
 import { ReaderViewChoice, SessionComfort } from "@/components/SessionComfort";
 import { screenWakeLabel, useScreenWakeLock } from "@/components/useScreenWakeLock";
 import { PerformanceRecords, SectorAnalysis } from "@/components/PerformancePanel";
@@ -142,6 +143,7 @@ export function VeloQuestApp() {
     routesSaveFailed,
     initialSessionMinutes,
     saveCompletedSession,
+    saveProfile: saveProfileChanges,
     clearLocalData
   } = useLocalPersistenceController({ onToast: setToast });
   const [tab, setTab] = useState<Tab>("dashboard");
@@ -1012,18 +1014,16 @@ export function VeloQuestApp() {
   }
 
   function saveProfile(form: FormData) {
-    setState((prev) => ({
-      ...prev,
-      profile: {
-        name: String(form.get("name") || ""),
-        startDate: String(form.get("startDate") || localInputDate()),
-        startWeight: n(form, "startWeight"),
-        targetWeight: n(form, "targetWeight"),
-        startWaist: n(form, "startWaist"),
-        targetWaist: n(form, "targetWaist")
-      }
-    }));
+    if (!saveProfileChanges({
+      name: String(form.get("name") || ""),
+      startDate: String(form.get("startDate") || localInputDate()),
+      startWeight: n(form, "startWeight"),
+      targetWeight: n(form, "targetWeight"),
+      startWaist: n(form, "startWaist"),
+      targetWaist: n(form, "targetWaist")
+    })) return false;
     setShowSetup(false);
+    return true;
   }
 
   function reviewGuidance() {
@@ -1365,7 +1365,7 @@ export function VeloQuestApp() {
               <article className={`card workoutCard ${w.bonus ? "bonusCard" : ""}`} key={w.id}>
                 <div className="sectionHead"><span className={`intensity ${w.intensity}`}>{w.intensity === "easy" ? "FACILE" : w.intensity === "moderate" ? "SOUTENU" : "DUR"}</span><strong>{w.duration} min</strong></div>
                 <h2>{w.name}</h2><p>{w.tagline}</p>
-                <p className="workoutBest"><strong>{isCalorieWorkout(w.id) ? `Record vélo : ${kcalBike ? kcalBike.kcal.toFixed(0) + " kcal · " + kcalBike.deviceName : "à établir"}` : best ? `Score V2 : ${Math.floor(best.metrics?.cadenceScore?.points ?? 0)} pts · Note ${score.grade} · ${score.percent?.toFixed(1)} %` : "Score V2 : à établir · Note : —"}</strong><small>{isCalorieWorkout(w.id) ? `Record déclaré : ${kcalManual ? kcalManual.kcal.toFixed(0) + " kcal" : "à établir"} · ${w.duration} min complètes` : "À tes réglages actuels · séance complète"}</small></p>
+                <p className="workoutBest"><strong>{isCalorieWorkout(w.id) ? `Record vélo : ${kcalBike ? kcalBike.kcal.toFixed(0) + " kcal · " + kcalBike.deviceName : "à établir"}` : best ? `Score : ${Math.floor(best.metrics?.cadenceScore?.points ?? 0)} pts · Note ${score.grade} · ${score.percent?.toFixed(1)} %` : "Score : à établir · Note : —"}</strong><small>{isCalorieWorkout(w.id) ? `Record déclaré : ${kcalManual ? kcalManual.kcal.toFixed(0) + " kcal" : "à établir"} · ${w.duration} min complètes` : "À tes réglages actuels · séance complète"}</small></p>
                 <div className="chips"><span>{quantity(w.points)} pt{w.points > 1 ? "s" : ""}</span><span>{w.xp} XP</span><span>{w.segments.length} segments</span></div>
                 <button className="secondary" onClick={() => launch(w)}>Voir / démarrer</button>
               </article>
@@ -2071,29 +2071,7 @@ export function VeloQuestApp() {
 
       {toast && <div className="toast" role="status">{toast}</div>}
 
-      {showSetup && (
-        <div className="modalBackdrop">
-          <form action={saveProfile} className="sessionModal setupModal">
-            <button type="button" className="close" aria-label="Fermer le profil" onClick={() => setShowSetup(false)}>×</button>
-            <Image src="/logo.svg" alt="" width={64} height={64} className="setupLogo" />
-            <p className="eyebrow">BIENVENUE DANS VELOQUEST</p>
-            <h2>Configure ta quête</h2>
-            <div className="form">
-              <label>Prénom ou pseudo<input name="name" defaultValue={state.profile.name} placeholder="Ton nom" /></label>
-              <label>Date de départ<input name="startDate" type="date" defaultValue={state.profile.startDate} required /></label>
-              <div className="formRow">
-                <label>Poids de départ<input name="startWeight" type="number" step="0.1" defaultValue={state.profile.startWeight} /></label>
-                <label>Objectif poids<input name="targetWeight" type="number" step="0.1" defaultValue={state.profile.targetWeight} /></label>
-              </div>
-              <div className="formRow">
-                <label>Tour de taille départ<input name="startWaist" type="number" step="0.1" defaultValue={state.profile.startWaist} /></label>
-                <label>Objectif tour de taille<input name="targetWaist" type="number" step="0.1" defaultValue={state.profile.targetWaist} /></label>
-              </div>
-              <button className="primary" type="submit">Entrer dans VeloQuest</button>
-            </div>
-          </form>
-        </div>
-      )}
+      {showSetup && <ProfileDialog profile={state.profile} onSave={saveProfile} onClose={() => setShowSetup(false)} />}
       {hydrated && state.guidance?.status === "setup" && !active && <OnboardingWizard
         guide={state.guidance} profile={state.profile} preferences={preferences} firstWorkout={firstGuidedWorkout(workouts)}
         hasInterruptedSession={Boolean(resumeSnapshot)}

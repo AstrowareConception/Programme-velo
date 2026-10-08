@@ -16,12 +16,21 @@ La fermeture revient au bouton qui a ouvert la fenêtre. Ce bouton reste aussi l
 
 Cette fermeture par Échap concerne ces fenêtres de choix/consultation. Le lecteur conserve la différence décrite plus haut pour protéger la séance et les champs du bilan.
 
+## Profil et première utilisation
+
+Le profil utilise le même dialogue avec fermeture explicite : Échap se place sur **Fermer le profil** et le clic sur l’arrière-plan ne ferme pas le formulaire. Les saisies restent présentes pendant les rotations et un refus d’écriture. La fenêtre ne se ferme qu’après un enregistrement local confirmé ; sinon elle indique l’erreur et propose de réessayer. Les mesures corporelles restent facultatives.
+
+Le guide de démarrage conserve son dialogue natif et la mémorisation de ses choix entre étapes. Le titre reçoit un focus visible ; Tab/Maj+Tab boucle dans les commandes, Échap quitte pour explorer librement en conservant les choix. Champs et actions peuvent se redisposer avec texte agrandi. La recette couvre la boucle clavier, le retour à une étape précédente, les réglages conservés, la transition au lecteur et une première séance complète enregistrée puis relue.
+
 ## Tests automatisés
 
 La CI existante utilise le conteneur officiel `mcr.microsoft.com/playwright:v1.63.0-noble`, avec Chromium, WebKit et leurs dépendances préinstallés. La version de cette image doit rester alignée avec `@playwright/test` dans le lockfile. Aucun nouveau workflow ni déploiement supplémentaire. Cette configuration évite de réinstaller les 184 paquets système observés lors de la première exécution (près de douze minutes). Les deux projets Chromium conservent l’ensemble de la couverture. Les projets `mobile-webkit` et `tablet-webkit` exécutent une sélection explicite :
 
 - clavier, texte à 200 % et largeur 320 px ;
 - Secteurs, Défis de parcours, Voyage et journal : focus, Échap, transition au lecteur, rotation et retour après suppression ;
+- profil : champs conservés après Échap/rotation/refus du stockage, puis réessai et relecture ;
+- guide de première utilisation au clavier, jusqu’à la sauvegarde d’une séance ;
+- score sans numéro de version et ancien barème toujours exclu des records ;
 - préparation/bilan, rotation, sauvegarde et rechargement ;
 - refus d’écriture et réessai sans perdre la séance ;
 - nouveautés, repères et lexique ;
@@ -40,7 +49,7 @@ Le test à 200 % augmente la taille racine du texte ; il ne simule pas toutes le
 4. Agrandir le texte/zoom dans les réglages réellement disponibles ; vérifier préparation, pause, commandes, bilan et clavier virtuel en portrait/paysage. Ne pas accepter un bouton tronqué ou inaccessible.
 5. Contrôler le rechargement, le transfert de sauvegarde et les refus de permissions sur le navigateur réel ; joindre le diagnostic de support en cas de problème.
 
-Ce lot n’est pas une certification WCAG ou un audit exhaustif : contrastes de toutes les cartes, fenêtres de profil/démarrage et autres formulaires annexes, ainsi que parcours complet de première utilisation restent au backlog. Le pattern de dialogue s’appuie sur les [recommandations WAI-ARIA](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/), avec la différence d’Échap décrite ci-dessus pour protéger les saisies.
+Ce lot n’est pas une certification WCAG ou un audit exhaustif : contrastes de toutes les cartes, autres formulaires annexes et essais réels de première utilisation restent au backlog. Le pattern de dialogue s’appuie sur les [recommandations WAI-ARIA](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/), avec la différence d’Échap décrite ci-dessus pour protéger les saisies.
 
 Voir [la roadmap](ROADMAP.md) et [la recette bêta](BETA-TEST.md).
 

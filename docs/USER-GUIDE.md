@@ -237,7 +237,7 @@ La rubrique **Premier test du vélo · 10 à 15 minutes** guide le premier essai
 
 Le profil du lecteur montre les niveaux de résistance prévus ; la position blanche avance avec la séance. Une plage 11–15 suit 11,12,13,14,15,14,13,12,11 sur le segment. Les très courts segments réduisent le nombre de paliers pour laisser au moins cinq secondes par commande. La cible est distincte du niveau envoyé par le vélo. Le pilotage automatique conserve son activation explicite dans Plus.
 
-La note de régularité compare la cadence reçue à la fourchette du segment, limites incluses. Le score V2 dépend séparément de la cadence et du multiplicateur. En cadence libre, toute mesure est réussie. Le calcul utilise le temps, pas le nombre de paquets Bluetooth. Le combo augmente tant que la cadence convient, jusqu'à ×4 après trente secondes. Les pauses ne donnent pas de points. Une donnée manquante ne vaut pas un échec dans le pourcentage mais coupe le combo et réduit la couverture.
+La note de régularité compare la cadence reçue à la fourchette du segment, limites incluses. Le score dépend séparément de la cadence et du multiplicateur. En cadence libre, toute mesure est réussie. Le calcul utilise le temps, pas le nombre de paquets Bluetooth. Le combo augmente tant que la cadence convient, jusqu'à ×4 après trente secondes. Les pauses ne donnent pas de points. Une donnée manquante ne vaut pas un échec dans le pourcentage mais coupe le combo et réduit la couverture.
 
 Le bilan présente la note, les points, le meilleur combo et le détail des segments. La préparation, le bilan et l'historique permettent de comparer les épreuves aux mêmes paramètres. Seules les épreuves complètes suffisamment mesurées établissent un record. Un nouveau record est célébré ; les animations sont désactivées si le système demande de réduire les mouvements. Le bilan exige de cocher la relecture avant le bouton d'enregistrement ; la touche Entrée d'un champ ne valide plus la séance.
 
@@ -271,8 +271,13 @@ Les express de moins de 10 minutes valent 0,5 point, quelle que soit leur intens
 ### Transférer une sauvegarde depuis Bluefy
 Dans Plus, exporter une sauvegarde affiche toujours son profil et ses nombres de séances/mesures, même si le téléchargement ne fonctionne pas. Utilise « Partager le fichier JSON » si disponible, sinon « Copier la sauvegarde ». Si la copie automatique est refusée, « Tout sélectionner » prépare le texte pour la commande Copier du téléphone. Transfère ce texte par le moyen de ton choix. Sur la tablette : Plus → Coller une sauvegarde → Importer le texte collé. L’import remplace les données locales ; il ne synchronise pas les appareils. Les JSON non reconnus sont refusés. Le téléchargement automatique reste proposé avec une URL temporaire conservée une minute.
 
-### Défis chrono au départ lancé et score V2
+### Défis chrono au départ lancé et score
 
 Dans Séances, découvre six [défis chrono](TIMED-TRIALS.md) : distance maximale en 1/5/12 minutes, ou 1/5/10 km au meilleur temps. Pédale pendant le compte à rebours de cinq secondes ; les mètres d’élan ne comptent pas. Mesures du vélo et résultats déclarés sont séparés. Le bilan explique l’admissibilité du record et permet de réessayer si l’enregistrement échoue.
 
-Le score des séances guidées dépend désormais de la cadence : 60 tr/min = 10 points/s, 75 tr/min = 12,5 points/s, multipliés par le combo quand tu tiens la cible. Hors cible, tu gardes les points de base avec combo à zéro ; immobile, tu ne marques rien. La note garde le pourcentage de temps dans la cible. Les cartes affichent les deux, les records sont classés par points. Les anciens scores restent visibles comme V1 mais les records V2 repartent à établir ; historique sportif et XP conservés.
+Le score des séances guidées dépend désormais de la cadence : 60 tr/min = 10 points/s, 75 tr/min = 12,5 points/s, multipliés par le combo quand tu tiens la cible. Hors cible, tu gardes les points de base avec combo à zéro ; immobile, tu ne marques rien. La note garde le pourcentage de temps dans la cible. Les cartes affichent les deux, les records sont classés par points. Les anciens scores restent visibles avec la mention « Ancien barème » mais les records du barème actuel repartent à établir ; historique sportif et XP conservés.
+
+
+### Modifier le profil sans perdre ses saisies
+
+Dans Plus → Modifier le profil et les objectifs, les mesures corporelles restent facultatives. Échap place le focus sur le bouton de fermeture ; le formulaire reste ouvert avec tes saisies. Un clic sur le fond ne le ferme pas. Si le stockage refuse l’enregistrement, une explication et un bouton de réessai restent dans le formulaire. Après réussite, le profil est enregistré sur cet appareil et la fenêtre se ferme.

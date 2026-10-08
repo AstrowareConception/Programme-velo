@@ -34,7 +34,7 @@ export default defineConfig({
     ...(["mobile", "tablet"] as const).map(size => ({
       name: `${size}-webkit`,
       // Real WebKit rendering on the essential manual flows, not simulated BLE qualification.
-      testMatch: ["**/timed-trials.spec.ts", "**/accessibility.spec.ts", "**/session-journey.spec.ts", "**/session-persistence.spec.ts", "**/discovery.spec.ts", "**/support-diagnostic.spec.ts", "**/backup-transfer.spec.ts"],
+      testMatch: ["**/timed-trials.spec.ts", "**/accessibility.spec.ts", "**/coach-score.spec.ts", "**/session-journey.spec.ts", "**/session-persistence.spec.ts", "**/discovery.spec.ts", "**/support-diagnostic.spec.ts", "**/backup-transfer.spec.ts"],
       use: {
         browserName: "webkit" as const,
         viewport: size === "tablet" ? { width: 1024, height: 768 } : { width: 390, height: 844 },

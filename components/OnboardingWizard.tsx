@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, type FormEvent } from "react";
 import type { Guidance, Preferences, Profile, WorkoutTemplate } from "@/lib/types";
+import { useSessionDialog } from "@/components/useSessionDialog";
 
 const titles = ["Bienvenue, commençons simplement.", "Quel rythme te convient ?", "Ton vélo, simplement.", "Ta première séance est prête."];
 
@@ -20,6 +21,7 @@ export function OnboardingWizard({ guide, profile, preferences, firstWorkout, ha
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const heading = useRef<HTMLHeadingElement>(null);
+  useSessionDialog(dialog, true, "guide", onSkip);
   useEffect(() => {
     const element = dialog.current;
     element?.showModal();
@@ -33,8 +35,9 @@ export function OnboardingWizard({ guide, profile, preferences, firstWorkout, ha
     else onFinish(!hasInterruptedSession);
   };
   return (
-    <dialog ref={dialog} className="onboardingDialog" aria-labelledby="onboarding-title" onCancel={(event) => { event.preventDefault(); onSkip(); }}>
+    <dialog ref={dialog} className="onboardingDialog" aria-labelledby="onboarding-title" aria-describedby="onboarding-keyboard-help" onCancel={(event) => { event.preventDefault(); onSkip(); }}>
       <form onSubmit={submit} className="onboardingForm">
+        <p id="onboarding-keyboard-help" className="visuallyHidden">Tabulation parcourt les commandes. Échap quitte le guide pour explorer librement ; les choix déjà saisis sont conservés.</p>
         <p className="eyebrow">BIENVENUE DANS VELOQUEST</p>
         <p className="onboardingStep">Étape {guide.step + 1} sur 4 <span>· Tu peux revenir en arrière</span></p>
         <div className="onboardingBar" aria-hidden="true">{titles.map((_, i) => <i key={i} className={i <= guide.step ? "done" : ""} />)}</div>

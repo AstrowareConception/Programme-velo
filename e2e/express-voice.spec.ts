@@ -31,8 +31,8 @@ test("cards show the best comparable grade and exclude unrelated settings", asyn
   await seed(page, [session, { ...session, id: "different", metrics: { ...session.metrics, cadenceSettingsKey: "other", cadenceScore: { ...score, segments: [{ eligibleSeconds: 180, measuredSeconds: 180, onTargetSeconds: 180 }] } } }]);
   await catalog(page);
   const card = page.getByRole("heading", { name: w.name, exact: true }).locator("xpath=ancestor::article");
-  await expect(card).toContainText("Score V2 : 1000 pts · Note A+ · 95.0 %");
-  await page.reload(); await page.getByRole("button", { name: /Séances/ }).click(); await expect(card).toContainText("Score V2 : 1000 pts · Note A+ · 95.0 %");
+  await expect(card).toContainText("Score : 1000 pts · Note A+ · 95.0 %");
+  await page.reload(); await page.getByRole("button", { name: /Séances/ }).click(); await expect(card).toContainText("Score : 1000 pts · Note A+ · 95.0 %");
 });
 test("voice commands need opt in, final wake phrases and stop at the finish form", async ({ page }) => {
   await seed(page);

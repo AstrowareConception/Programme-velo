@@ -5,7 +5,7 @@ import { TRIAL_SNAPSHOT_KEY } from "@/lib/timed-trials";
 import { STORAGE_KEY, emptyState } from "@/lib/data";
 import type { ClimbChallenge } from "@/lib/routes";
 import { normalizeState, safeLocalStorageWrite } from "@/lib/storage";
-import type { AppState, CompletedSession } from "@/lib/types";
+import type { AppState, CompletedSession, Profile } from "@/lib/types";
 
 const CUSTOM_ROUTES_KEY = "veloquest:custom-routes:v1";
 
@@ -94,6 +94,19 @@ export function useLocalPersistenceController({
     setInitialSessionMinutes(15);
   }
 
+  /** Keep the profile form open until its edits are durable. */
+  function saveProfile(profile: Profile) {
+    const nextState = { ...state, profile };
+    if (!safeLocalStorageWrite(STORAGE_KEY, nextState)) {
+      setStateSaveFailed(true);
+      return false;
+    }
+    persistedStateRef.current = nextState;
+    setState(nextState);
+    setStateSaveFailed(false);
+    return true;
+  }
+
   return {
     state,
     setState,
@@ -104,6 +117,7 @@ export function useLocalPersistenceController({
     routesSaveFailed,
     initialSessionMinutes,
     saveCompletedSession,
+    saveProfile,
     clearLocalData
   };
 }
