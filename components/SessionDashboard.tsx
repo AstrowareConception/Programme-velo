@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { useId, useRef, useState, type ReactNode } from "react";
 
 type Props = {
   header: ReactNode;
@@ -19,19 +19,13 @@ export function SessionDashboard({ header, notice, focus, visual, progress, extr
   const trigger = useRef<HTMLButtonElement>(null);
   const close = useRef<HTMLButtonElement>(null);
 
-  useEffect(() => {
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = previous; };
-  }, []);
-
   function closeDetails() {
     setDetailsOpen(false);
     trigger.current?.focus();
   }
 
   return <div className="sessionDashboard" onKeyDown={event => {
-    if (event.key === "Escape" && detailsOpen) { event.stopPropagation(); closeDetails(); }
+    if (event.key === "Escape" && detailsOpen) { event.preventDefault(); event.stopPropagation(); closeDetails(); }
   }}>
     <header className="dashboardHeader">{header}</header>
     <div className="dashboardNotice">{notice}</div>

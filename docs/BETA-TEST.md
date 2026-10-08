@@ -12,6 +12,7 @@ Noter la version affichée dans Plus, l’appareil, le navigateur, l’installat
 | --- | --- | --- |
 | Première découverte | Laisser un nouveau venu choisir et préparer une séance sans explication orale | Il trouve le départ, comprend les consignes et sait consulter le lexique |
 | Mode manuel | Pédaler sans connecter de vélo, terminer, saisir les mesures connues | Les inconnues peuvent rester vides ; les mesures et le ressenti saisis se retrouvent dans Suivi après rechargement |
+| Accessibilité | Au clavier, parcourir préparation/lecture/bilan ; agrandir le texte ; tester le bilan en petit format | Le focus reste dans la séance, les commandes restent accessibles, les champs sont conservés ; [recette détaillée](ACCESSIBILITY.md) |
 | Tablette | Passer portrait/paysage en préparation, en lecture et au bilan | Les réglages et champs restent présents ; les commandes principales restent accessibles |
 | Pause et reprise | Mettre en pause, mettre la séance de côté, recharger et reprendre | La proposition de reprise apparaît avec la progression sauvegardée ; une seule séance est finalement enregistrée |
 | Arrière-plan réel | Passer brièvement dans une autre application puis revenir | Vérifier le temps, les consignes, le maintien de l’écran et la connexion ; noter ce que le navigateur interrompt réellement |

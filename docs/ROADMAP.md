@@ -1,6 +1,6 @@
 # Roadmap VéloQuest
 
-Actualisée le **8 octobre 2026** à partir de `main` `de6cfcf16a386ee4c8956f270584efddb6b256c2`. Orientation vers une distribution grand public validée par l’utilisateur. Les jalons ci-dessous pilotent désormais l’exécution ; le backlog détaillé reste conservé.
+Actualisée le **8 octobre 2026** à partir de `main` `b0818af787fc1b807ea3f390fe4e39db5e15eb0a`. Orientation vers une distribution grand public validée par l’utilisateur. Les jalons ci-dessous pilotent désormais l’exécution ; le backlog détaillé reste conservé.
 
 Cette roadmap remplace les listes historiques devenues obsolètes. Le produit dispose déjà d'un socle très riche : 44 séances, 84 parcours natifs, 38 balades faciles, 12 thèmes, 6 programmes, 22 campagnes/carnets et 77 badges. L'objectif n'est plus d'empiler les fonctionnalités, mais de consolider le produit, fiabiliser son usage réel, prolonger le programme au-delà de douze semaines et rendre le matériel connecté extensible à plusieurs vélos.
 
@@ -29,9 +29,10 @@ La PR 58 est publiée sur `e65bf33` : 224 unités, 288 scénarios navigateur san
 - ✅ Protocole de [recette bêta](BETA-TEST.md) préparé ; essais physiques et retours utilisateurs à recueillir.
 - Qualifier plusieurs combinaisons vélo/appareil/navigateur et afficher les capacités réellement disponibles.
 - Éprouver interruption, reprise, reconnexion, enregistrement, export et restauration avec des utilisateurs extérieurs.
-- ⏳ Lot actif : diagnostic de support prévisualisable dans Plus, avec copie/export du texte exact, sélection manuelle si le presse-papiers est indisponible, exclusion du profil/historique/mesures/identifiants. Aucun envoi, scan Bluetooth ou test d’écriture du stockage. CI navigateur et publication à vérifier dans la PR de ce lot.
+- ✅ Diagnostic de support livré par la PR 59 sur `b0818af` : aperçu exact, copie/export, repli manuel, champs personnels exclus. 236 unités et 296 scénarios navigateur réussis ; CI main et vérification production réussies.
 - Rendre explicites mesures reçues, données manquantes et simulations.
-- Renforcer accessibilité, tests WebKit et qualité ; regrouper les changements avant publication pour éviter les cycles de CI inutiles.
+- ⏳ Lot actif : [accessibilité des séances et couverture WebKit](ACCESSIBILITY.md). Focus clavier, arrière-plan inerte, texte agrandi et champs sur petit écran ; deux projets WebKit ciblés ajoutés à la CI existante. Résultats et publication à vérifier dans la PR de ce lot.
+- À suivre : essais VoiceOver/Safari/Bluefy réels, audit des autres modales, contrastes et parcours complet de première utilisation. Regrouper les changements avant publication pour éviter les cycles de CI inutiles.
 
 Passage au jalon suivant : plusieurs séances terminées par les testeurs, aucun blocage critique ni perte de données connue non corrigée. La CI ne remplace pas la recette physique.
 
