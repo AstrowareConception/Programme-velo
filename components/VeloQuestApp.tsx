@@ -10,6 +10,7 @@ import { CalorieResult } from "@/components/CalorieResult";
 import { isCalorieWorkout, startCalories, sampleCalories, measuredCaloriesEligible, bestCalorieAttempt, type CalorieAttempt, type CalorieResult as CalorieResultType } from "@/lib/calorie-challenge";
 import { VoiceCommands } from "@/components/VoiceCommands";
 import { BleDiagnosticPanel } from "@/components/BleDiagnosticPanel";
+import { SupportDiagnosticPanel } from "@/components/SupportDiagnosticPanel";
 import Image from "next/image";
 import { WeeklyGoalsForm } from "@/components/WeeklyGoalsForm";
 import { EffortProfile } from "@/components/EffortProfile";
@@ -1599,6 +1600,7 @@ export function VeloQuestApp() {
 
           <ReleaseNotesCard />
           <QuickGuideCard />
+          <SupportDiagnosticPanel storage={{ hydrated, stateSaveFailed, routesSaveFailed }} session={{ active: Boolean(active), recoveryAvailable: Boolean(resumeSnapshot) }} bluetooth={{ connected: Boolean(bike), connecting: connectingBike, inspecting: diagnosingBike }} />
 
           <WeeklyGoalsForm key={`${week}-${target.sessions}-${target.minutes}`} target={target} onSave={(sessions, minutes) => { setState(previous => changeWeeklyGoals(previous, week, sessions, minutes)); setToast("Objectifs enregistrés pour cette semaine et les suivantes."); }} />
 

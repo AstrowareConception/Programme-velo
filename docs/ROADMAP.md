@@ -1,6 +1,6 @@
 # Roadmap VéloQuest
 
-Actualisée le **7 octobre 2026** à partir de `main` `e65bf33dc016212078516760e1f18a91df6d8ca9`. Orientation vers une distribution grand public validée par l’utilisateur. Les jalons ci-dessous pilotent désormais l’exécution ; le backlog détaillé reste conservé.
+Actualisée le **8 octobre 2026** à partir de `main` `de6cfcf16a386ee4c8956f270584efddb6b256c2`. Orientation vers une distribution grand public validée par l’utilisateur. Les jalons ci-dessous pilotent désormais l’exécution ; le backlog détaillé reste conservé.
 
 Cette roadmap remplace les listes historiques devenues obsolètes. Le produit dispose déjà d'un socle très riche : 44 séances, 84 parcours natifs, 38 balades faciles, 12 thèmes, 6 programmes, 22 campagnes/carnets et 77 badges. L'objectif n'est plus d'empiler les fonctionnalités, mais de consolider le produit, fiabiliser son usage réel, prolonger le programme au-delà de douze semaines et rendre le matériel connecté extensible à plusieurs vélos.
 
@@ -25,11 +25,12 @@ La PR 58 est publiée sur `e65bf33` : 224 unités, 288 scénarios navigateur san
 
 ### Jalon B — Bêta privée fiable · lot actif
 
-- ⏳ PR 55 remise à jour sur `e65bf33` : finalisation métier isolée et écriture locale confirmée avant fermeture du bilan/suppression de la reprise. En cas de refus, conserver le formulaire ouvert et permettre une nouvelle tentative.
+- ✅ PR 55 publiée sur `de6cfcf` : finalisation métier isolée et écriture locale confirmée avant fermeture du bilan/suppression de la reprise. Refus/réessai/rechargement vérifiés : 232 unités et 290 scénarios navigateur ; CI main et vérification production réussies.
 - ✅ Protocole de [recette bêta](BETA-TEST.md) préparé ; essais physiques et retours utilisateurs à recueillir.
 - Qualifier plusieurs combinaisons vélo/appareil/navigateur et afficher les capacités réellement disponibles.
 - Éprouver interruption, reprise, reconnexion, enregistrement, export et restauration avec des utilisateurs extérieurs.
-- Rendre explicites mesures reçues, données manquantes et simulations ; préparer un diagnostic prévisualisable sans données personnelles par défaut.
+- ⏳ Lot actif : diagnostic de support prévisualisable dans Plus, avec copie/export du texte exact, sélection manuelle si le presse-papiers est indisponible, exclusion du profil/historique/mesures/identifiants. Aucun envoi, scan Bluetooth ou test d’écriture du stockage. CI navigateur et publication à vérifier dans la PR de ce lot.
+- Rendre explicites mesures reçues, données manquantes et simulations.
 - Renforcer accessibilité, tests WebKit et qualité ; regrouper les changements avant publication pour éviter les cycles de CI inutiles.
 
 Passage au jalon suivant : plusieurs séances terminées par les testeurs, aucun blocage critique ni perte de données connue non corrigée. La CI ne remplace pas la recette physique.
@@ -101,7 +102,7 @@ Voir [Architecture des vélos connectés](CONNECTED-BIKES-ARCHITECTURE.md).
 
 ### P0.3 — Dette de `VeloQuestApp.tsx`
 
-**État : engagé — vélo connecté, reprise et persistance locale extraits (PR 54 fusionnée). La PR 55 de finalisation des séances est le lot actif, actualisé avec la protection contre les refus de stockage. Les écrans restent à découpler.**
+**État : engagé — vélo connecté, reprise et persistance locale extraits (PR 54 fusionnée). La PR 55 de finalisation des séances est publiée, avec protection contre les refus de stockage. Les écrans restent à découpler.**
 
 Après la PR 52, le composant principal est descendu à environ 2 160 lignes. Le lot de persistance locale le ramène à environ 2 135 lignes en retirant l’hydratation et les écritures directes de `localStorage` du composant principal.
 
@@ -109,7 +110,7 @@ Ordre de découpage proposé :
 
 1. ✅ contrôleur/hook de vélo connecté (`useBikeController`) ;
 2. ✅ contrôleur de reprise et instantané de séance (`useSessionSnapshotController`) ;
-3. ⏳ enregistrement et persistance : `useLocalPersistenceController` couvre l’état principal et les parcours personnels ; la finalisation est isolée dans le lot actif PR 55 ; l’import/export et leurs dépendances restent à extraire ;
+3. ⏳ enregistrement et persistance : `useLocalPersistenceController` couvre l’état principal et les parcours personnels ; la finalisation est isolée et livrée par la PR 55 ; l’import/export et leurs dépendances restent à extraire ;
 4. écrans Quête / Séances / Parcours / Suivi / Plus ;
 5. lecteur de séance et panneau Bluetooth ;
 6. suppression des dépendances croisées restantes.
