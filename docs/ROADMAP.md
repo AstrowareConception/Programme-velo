@@ -1,6 +1,6 @@
 # Roadmap VéloQuest
 
-Actualisée le **8 octobre 2026** à partir de `main` `9360ec8623df2ccc5ae8bc2cdcf2e22cf9eb6d2c`. Orientation vers une distribution grand public validée par l’utilisateur. Les jalons ci-dessous pilotent désormais l’exécution ; le backlog détaillé reste conservé.
+Actualisée le **8 octobre 2026** à partir de `main` `cb7cb15090bb945836321d0f3a1153b3c318d5ce`. Orientation vers une distribution grand public validée par l’utilisateur. Les jalons ci-dessous pilotent désormais l’exécution ; le backlog détaillé reste conservé.
 
 Cette roadmap remplace les listes historiques devenues obsolètes. Le produit dispose déjà d'un socle très riche : 44 séances, 84 parcours natifs, 38 balades faciles, 12 thèmes, 6 programmes, 22 campagnes/carnets et 77 badges. L'objectif n'est plus d'empiler les fonctionnalités, mais de consolider le produit, fiabiliser son usage réel, prolonger le programme au-delà de douze semaines et rendre le matériel connecté extensible à plusieurs vélos.
 
@@ -32,7 +32,9 @@ La PR 58 est publiée sur `e65bf33` : 224 unités, 288 scénarios navigateur san
 - ✅ Diagnostic de support livré par la PR 59 sur `b0818af` : aperçu exact, copie/export, repli manuel, champs personnels exclus. 236 unités et 296 scénarios navigateur réussis ; CI main et vérification production réussies.
 - Rendre explicites mesures reçues, données manquantes et simulations.
 - ✅ PR 60 publiée sur `9360ec8` : accessibilité des séances et WebKit. 236 unités et 334 scénarios navigateur (32 WebKit) réussis ; production vérifiée.
-- ⏳ Lot demandé le 8 octobre : six défis chronométrés à départ lancé et score cadence V2 dissocié de la note. Implémentation et recette en cours ; [règles](TIMED-TRIALS.md).
+- ✅ PR 61 publiée sur `cb7cb15` : six défis chronométrés au départ lancé et score cadence V2 dissocié de la note ; 245 unités et 362 scénarios navigateur réussis, CI main et vérification production vertes. [Règles](TIMED-TRIALS.md).
+- Retour utilisateur du 8 octobre : kilomètre lancé concluant ; les autres nouveautés ne sont pas toutes éprouvées.
+- ⏳ Retour de terrain en cours de traitement : vitesse instantanée, cadence, watts et BPM dans les défis ; vitesse moyenne au bilan et dans l’historique. Recette de fraîcheur des champs et affichage portrait/paysage avant publication.
 - À suivre : essais VoiceOver/Safari/Bluefy réels, audit des autres modales, contrastes et parcours complet de première utilisation. Regrouper les changements avant publication pour éviter les cycles de CI inutiles.
 
 Passage au jalon suivant : plusieurs séances terminées par les testeurs, aucun blocage critique ni perte de données connue non corrigée. La CI ne remplace pas la recette physique.

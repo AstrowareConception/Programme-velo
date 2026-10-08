@@ -7,18 +7,22 @@ import type { CompletedSession } from "@/lib/types";
 import { safeLocalStorageWrite } from "@/lib/storage";
 import { screenWakeLabel, useScreenWakeLock } from "./useScreenWakeLock";
 import { useSessionDialog } from "./useSessionDialog";
+import type { BikeLiveMetrics } from "@/lib/bike-live-metrics";
+import { TrialLiveMetrics } from "./TrialLiveMetrics";
 
 export function TrialSummary({ result }: { result: TrialResult }) {
-  return <section className="cadenceResult" aria-label="Résultat du défi chrono"><strong>{trialValue(result)} · {result.source === "ftms" ? `Mesuré · ${result.deviceName}` : "Déclaré"}</strong><p>{result.eligible ? "Performance admissible au record de cette épreuve." : result.reason ?? "Hors record : épreuve incomplète."}</p><p>{(result.distanceM / 1000).toFixed(3)} km · {result.elapsedSeconds.toFixed(1)} s. Résistance libre ; comparaison sur le même vélo, sans équivalence de puissance entre appareils.</p></section>;
+  const average = result.elapsedSeconds > 0 && Number.isFinite(result.elapsedSeconds) && result.distanceM >= 0 && Number.isFinite(result.distanceM) ? result.distanceM * 3.6 / result.elapsedSeconds : undefined;
+  return <section className="cadenceResult" aria-label="Résultat du défi chrono"><strong>{trialValue(result)} · {result.source === "ftms" ? `Mesuré · ${result.deviceName}` : "Déclaré"}</strong><p>{result.eligible ? "Performance admissible au record de cette épreuve." : result.reason ?? "Hors record : épreuve incomplète."}</p><p>{(result.distanceM / 1000).toFixed(3)} km · {result.elapsedSeconds.toFixed(1)} s.{average !== undefined && ` Vitesse moyenne calculée : ${average.toFixed(1).replace(".", ",")} km/h.`} Résistance libre ; comparaison sur le même vélo, sans équivalence de puissance entre appareils.</p></section>;
 }
 
 type Props = {
   sessions: CompletedSession[]; deviceName?: string; connected: boolean;
   reading?: { distanceM: number; at: number }; connect: () => void;
+  liveMetrics: BikeLiveMetrics;
   onBusy: (busy: boolean) => void; onSave: (session: CompletedSession) => boolean;
   disabled: boolean; locked: () => boolean; keepScreenAwake: boolean; bikeError: string | null; connecting: boolean;
 };
-export function TimedTrialsPanel({ sessions, deviceName, connected, reading, connect, onBusy, onSave, disabled, locked, keepScreenAwake, bikeError, connecting }: Props) {
+export function TimedTrialsPanel({ sessions, deviceName, connected, reading, liveMetrics, connect, onBusy, onSave, disabled, locked, keepScreenAwake, bikeError, connecting }: Props) {
   const [selected, setSelected] = useState<Trial>();
   const [source, setSource] = useState<"ftms" | "manual">("manual");
   const [run, setRun] = useState<TrialRun>();
@@ -96,7 +100,7 @@ export function TimedTrialsPanel({ sessions, deviceName, connected, reading, con
       return <article className="trialCard" key={t.id}><h3>{t.name}</h3><p>{t.kind === "time" ? `Distance maximale en ${t.target / 60} min` : `${t.target / 1000} km au meilleur temps`}</p><small>Record vélo : {measured ? trialValue(measured) : "à établir"}{connected ? ` · ${deviceName}` : " · connecte ton vélo"}<br />Record déclaré : {declared ? trialValue(declared) : "à établir"}</small><button className="secondary" disabled={disabled || !ready} onClick={() => { if (locked()) return; setSelected(t); setSource(connected ? "ftms" : "manual"); setDistance(""); setError(""); setReviewed(false); }}>Préparer · {t.name}</button></article>;
     })}</div>
     <p className="finePrint">Échauffe-toi avant l’épreuve. Ces défis comptent comme séances intenses. Distance issue de la console, jamais simulée ; rythme et résistance libres. Les notes et points du coach restent réservés aux séances guidées.</p>
-    {selected && createPortal(<div className="modalBackdrop"><div ref={dialog} className="sessionModal trialModal" role="dialog" aria-modal="true" aria-label={selected.name} tabIndex={-1}>
+    {selected && createPortal(<div className="modalBackdrop trialBackdrop"><div ref={dialog} className="sessionModal trialModal" role="dialog" aria-modal="true" aria-label={selected.name} tabIndex={-1}>
       <h2>{selected.name}</h2>
       {error && <p role="alert">{error}</p>}
       {snapshotError && <p role="alert">La sauvegarde de reprise est indisponible : garde cette fenêtre ouverte.</p>}
@@ -111,7 +115,10 @@ export function TimedTrialsPanel({ sessions, deviceName, connected, reading, con
         {previous && <p>Record comparable : {trialValue(previous)}</p>}
         <div className="trialActions"><button className="primary" disabled={source === "ftms" && (!connected || !reading || Date.now() - reading.at > 5000)} onClick={() => { if (locked()) return; const at = Date.now(); setNow(at); setRun(startTrial(selected, at, source, deviceName)); }}>Lancer le compte à rebours</button><button className="secondary closeTrial close" onClick={close}>Fermer</button></div>
       </> : run.phase !== "review" ? <>
+        <div className="trialLive">
         <div className="trialClock" role="status" aria-live={run.phase === "running" ? "off" : "polite"}><strong>{run.phase === "countdown" ? Math.max(1, Math.ceil((run.countdownEnd - now) / 1000)) : run.phase === "armed" ? "Prêt…" : run.elapsedSeconds < 1 ? "Partez !" : `${run.elapsedSeconds.toFixed(1)} s`}</strong><span>{run.phase === "countdown" ? "Prends ton élan · distance non comptée" : run.phase === "armed" ? "En attente du premier relevé de distance" : "Chrono continu · départ lancé"}</span></div>
+        {run.source === "ftms" ? <TrialLiveMetrics metrics={liveMetrics} now={now} connected={connected} /> : <p className="finePrint">Lis la vitesse et la cadence sur ta console. Ce défi reste déclaré.</p>}
+        </div>
         <p>{screenWakeLabel(wake.status, keepScreenAwake)}{["released", "refused"].includes(wake.status) && <button className="secondary" onClick={wake.retry}>Réessayer le maintien de l’écran</button>}</p>
         <p className="trialDistance">{run.source === "ftms" ? `${(run.distanceM / 1000).toFixed(3)} km` : "Distance à relever sur la console"}{selected.kind === "distance" ? ` / ${selected.target / 1000} km` : ` · objectif ${selected.target / 60} min`}</p>
         {run.source === "manual" && run.phase === "running" && selected.kind === "distance" && <button className="primary" onClick={() => setRun(v => v ? { ...v, elapsedSeconds: (Date.now() - v.start!) / 1000, phase: "review", completed: true } : v)}>Distance atteinte</button>}

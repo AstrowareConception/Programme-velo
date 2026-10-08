@@ -1,6 +1,7 @@
 "use client";
 
 import { TimedTrialsPanel, TrialSummary } from "@/components/TimedTrialsPanel";
+import { sampleBikeLiveMetrics, type BikeLiveMetrics } from "@/lib/bike-live-metrics";
 import { timedTrials } from "@/lib/timed-trials";
 import { CadenceCalibration } from "@/components/CadenceCalibration";
 import { AdaptiveProgram } from "@/components/AdaptiveProgram";
@@ -145,6 +146,7 @@ export function VeloQuestApp() {
   const [tab, setTab] = useState<Tab>("dashboard");
   const [trialBusy, setTrialBusy] = useState(false);
   const [trialReading, setTrialReading] = useState<{ distanceM: number; at: number }>();
+  const [trialMetrics, setTrialMetrics] = useState<BikeLiveMetrics>({});
   const [active, setActive] = useState<WorkoutTemplate | null>(null);
   const [activeClimb, setActiveClimb] = useState<ClimbChallenge | null>(null);
   const [routeMode, setRouteMode] = useState<RouteMode>("training");
@@ -212,6 +214,7 @@ export function VeloQuestApp() {
     diagnosing: diagnosingBike,
     isLocked: () => pwa.locked(),
     onBeforeConnect: () => {
+      setTrialReading(undefined); setTrialMetrics({});
       if (calorieTracker.current) {
         calorieTracker.current = { ...calorieTracker.current, valid: false };
         setCalorieAttempt(calorieTracker.current);
@@ -219,7 +222,9 @@ export function VeloQuestApp() {
       calorieReading.current = undefined;
     },
     onTelemetry: (next) => {
-      if (next.distanceM !== undefined) setTrialReading({ distanceM: next.distanceM, at: Date.now() });
+      const receivedAt = Date.now();
+      setTrialMetrics(previous => sampleBikeLiveMetrics(previous, next, receivedAt));
+      if (next.distanceM !== undefined) setTrialReading({ distanceM: next.distanceM, at: receivedAt });
       if (next.totalEnergyKcal !== undefined) {
         const now = Date.now();
         calorieReading.current = { kcal: next.totalEnergyKcal, at: now };
@@ -233,6 +238,7 @@ export function VeloQuestApp() {
       }
     },
     onDisconnected: () => {
+      setTrialReading(undefined); setTrialMetrics({});
       if (calorieTracker.current) {
         calorieTracker.current = { ...calorieTracker.current, valid: false };
         setCalorieAttempt(calorieTracker.current);
@@ -1339,7 +1345,7 @@ export function VeloQuestApp() {
         <section>
           <div className="pageHead pageHeadActions"><div><p className="eyebrow">CATALOGUE</p><h1>Choisis ta quête</h1><p>Du décrassage au HIIT. Le ressenti reste prioritaire sur le numéro de résistance.</p></div><button className="secondary" onClick={openManualLog}>+ Enregistrer une séance déjà faite</button></div>
           <p className="finePrint">Les formats express de moins de 10 min rapportent 0,5 point : des compléments à tes séances principales. Les bonus récupération restent à 0 point. Les points des séances déjà enregistrées sont conservés.</p>
-          {hydrated && !active && !resumeSnapshot && <TimedTrialsPanel sessions={state.sessions} deviceName={bike?.deviceName} connected={Boolean(bike)} reading={trialReading} connect={connectBike} onBusy={setTrialBusy} onSave={saveCompletedSession} disabled={Boolean(active) || Boolean(resumeSnapshot)} locked={pwa.locked} keepScreenAwake={preferences.keepScreenAwake} bikeError={bluetoothError} connecting={connectingBike} />}
+          {hydrated && !active && !resumeSnapshot && <TimedTrialsPanel sessions={state.sessions} deviceName={bike?.deviceName} connected={Boolean(bike)} reading={trialReading} liveMetrics={trialMetrics} connect={connectBike} onBusy={setTrialBusy} onSave={saveCompletedSession} disabled={Boolean(active) || Boolean(resumeSnapshot)} locked={pwa.locked} keepScreenAwake={preferences.keepScreenAwake} bikeError={bluetoothError} connecting={connectingBike} />}
           <MasteryPanel sessions={state.sessions} />
           <WorkoutProgramsPanel sessions={state.sessions} workouts={workouts} onLaunch={(workout) => launch(workout)} />
           <div className="workoutFilters">

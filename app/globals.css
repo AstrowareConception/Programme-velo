@@ -1321,3 +1321,21 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .trialActions { display:flex; flex-wrap:wrap; gap:.75rem; margin-top:1rem; }
 .trialModal button.close { position:static; width:auto; height:auto; border-radius:12px; font:inherit; line-height:1.4; padding:.8rem 1.1rem; }
 .trialModal input, .trialModal select { max-width:100%; }
+.trialLive { display:grid; gap:1rem; align-items:center; }
+.trialBackdrop { z-index:100; }
+.trialLiveMetrics { min-width:0; text-align:center; }
+.trialLiveMetrics dl { margin:0; }
+.trialLiveMetrics dd { margin:0; font-variant-numeric:tabular-nums; }
+.trialSpeed { padding:.75rem; border:1px solid rgba(80,227,255,.3); border-radius:16px; background:rgba(80,227,255,.06); }
+.trialSpeed dt { font-size:.9rem; }
+.trialSpeed strong { font-size:clamp(2.5rem,8vw,3.5rem); color:var(--cyan); line-height:1.2; }
+.trialSecondary { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.5rem; padding:.75rem 0; }
+.trialSecondary dt { font-size:.75rem; overflow-wrap:anywhere; }
+.trialSecondary strong { font-size:1.4rem; }
+.trialSecondary dd span { font-size:.75rem; }
+.trialLiveMetrics small { display:block; font-size:.7rem; color:var(--muted); }
+@media (min-width:760px) and (orientation:landscape) {
+  .trialLive { grid-template-columns:minmax(0,1fr) minmax(0,1.2fr); }
+  .trialLive .trialClock { padding:.5rem 0; }
+  .trialLive .trialClock strong { font-size:clamp(3rem,7vw,5rem); overflow-wrap:anywhere; }
+}
